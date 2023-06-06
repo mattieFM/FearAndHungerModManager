@@ -1,0 +1,11 @@
+*
+!.gitignore
+!www/
+www/*/
+!www/js/
+www/js/*
+!www/js/plugins/
+www/js/plugins/*
+!www/js/plugins/mattieFMModLoader.js
+!www/mods/
+!www/mods/*
