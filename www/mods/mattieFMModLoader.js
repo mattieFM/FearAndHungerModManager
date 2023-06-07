@@ -26,15 +26,21 @@ class ModManager {
         this._path = path
         this._mods = []
     }
-    parseMod(path,modName,mods, i){
+    parseMod(path,modName){
         const fs = require('fs');
         const modInfoPath =  path + modName;
         const modInfoData = fs.readFileSync(modInfoPath)
         const modInfo = JSON.parse(modInfoData);
-        mods[i] = {};
-        mods[i].status = modInfo.status;
-        mods[i].name = modInfo.name;
-        mods[i].parameters = modInfo.parameters;
+        this.addModEntry(modInfo.status,modInfo.name,modInfo.parameters)
+    }
+
+    addModEntry(status,name,params){
+        let mod = {};
+        mod.status = status;
+        mod.name = name;
+        mod.parameters = params;
+        this._mods.push(mod);
+
     }
 
     parseMods(path){
@@ -52,24 +58,26 @@ class ModManager {
         }
         readMods = fs.readdirSync(path);
         
-        let mods = [];
-        let i = 1;
-        mods[0] = {}
-        mods[0].status = true;
-        mods[0].name = "_common";
-        mods[0].parameters = {};
-        readMods.forEach(modName=>{
+        this.addModEntry(true,"_common",{}); //set common mod to load first
+        //mods that start with _ load first and do not have config files. This is as they should be dev facing and not using facing. any _ files should be
+        //dependencies for actual mods and thus should not present the user with config options.
+        readMods.forEach(modName => { //load _mods first
+            if (modName[0] === "_"){
+                this.addModEntry(true,modName.replace('.js',""),{}); 
+            }
+        })
+
+        readMods.forEach(modName=>{//load all other mods second
             try {
-                if(modName.includes('.json') && modName[0] != "_"){
-                    this.parseMod(path,modName,mods, i)
-                    i++
+                if(modName.includes('.json')){
+                    this.parseMod(path,modName)
                 }
 
             } catch (error) {
                 throw new Error(`an error occurred while loading the mod:\n${error}`)
             }
         })
-        return mods
+        return this._mods;
 
     }
 
@@ -77,7 +85,7 @@ class ModManager {
         mods.forEach((mod) => {
             if (mod.status && !this._mods.contains(mod.name)) {
                 this.setParameters(mod.name, mod.parameters);
-                this.loadScript(mod.name + '.js');
+                this.loadScript(mod.name);
                 this._mods.push(mod.name);
             };
         });
