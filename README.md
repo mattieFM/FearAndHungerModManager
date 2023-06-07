@@ -1,5 +1,5 @@
 # FearAndHungerModManager
-This is a mod manager that can be used for any RPG maker MV game, although was designed to mode Fear and Hunger 1/2. 
+This is a mod manager that can be used for any RPG maker MV game, although was designed to mod Fear and Hunger 1/2. 
 
 The mod manager itself is the file mattieFMModManger in the plugins dir. This plugin can be added to any rpg maker plugins folder and enable to allow the use of mods. 
 
