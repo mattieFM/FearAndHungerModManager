@@ -1,6 +1,7 @@
 *
 !.gitignore
 !www/
+!www/index.html
 www/*/
 !www/js/
 www/js/*
