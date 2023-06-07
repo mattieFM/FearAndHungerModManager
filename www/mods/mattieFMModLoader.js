@@ -39,7 +39,13 @@ class ModManager {
 
     parseMods(path){
         const fs = require('fs');
-        const readMods = fs.readdirSync(path);
+        let readMods;
+        try {
+            readMods = fs.readdirSync("www/"+path); //dist mode
+        } catch (error){
+            readMods = fs.readdirSync(path); //dev mode
+        }
+        
         let mods = [];
         let i = 1;
         mods[0] = {}
@@ -79,7 +85,7 @@ function () {
         const path = "mods/";
         PluginManager._path = path;
         const modManager = new ModManager(path);
-        const mods = modManager.parseMods("www/"+path); //fs is in a different root dir so it needs this.
+        const mods = modManager.parseMods(path); //fs is in a different root dir so it needs this.
         console.log(mods);
         setTimeout(() => {
             modManager.setup(mods); //all mods load after plugins
