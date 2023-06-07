@@ -40,11 +40,17 @@ class ModManager {
     parseMods(path){
         const fs = require('fs');
         let readMods;
+        let mode;
         try {
-            readMods = fs.readdirSync("www/"+path); //dist mode
+            fs.readdirSync("www/"+path); //dist mode
+            mode = "dist"
         } catch (error){
-            readMods = fs.readdirSync(path); //dev mode
+            mode = "dev";
         }
+        if(mode === "dist"){
+            path="www/"+path;
+        }
+        readMods = fs.readdirSync(path);
         
         let mods = [];
         let i = 1;
