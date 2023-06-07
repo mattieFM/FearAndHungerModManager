@@ -18,8 +18,7 @@
 //
 // The static class that manages the mods (might need to be beefed up in future, but for now, just extend plugin manager).
 
-const rootDir = process.cwd();
-const PATH = require('path')
+let MATTIE_ModManager = {};
 
 class ModManager {
     constructor(path) {
@@ -74,18 +73,19 @@ class ModManager {
 }
 
 
+MATTIE_ModManager.init =
+function () {
+    const defaultPath = PluginManager._path;
+        const path = "mods/";
+        PluginManager._path = path;
+        const modManager = new ModManager(path);
+        const mods = modManager.parseMods("www/"+path); //fs is in a different root dir so it needs this.
+        console.log(mods);
+        setTimeout(() => {
+            modManager.setup(mods); //all mods load after plugins
+            window.alert("all mods successfully loaded")
+            PluginManager._path = defaultPath;
+        }, 2000);
+}
 
-(async ()=>{
-
-    const path = "mods/";
-    const modManager = new ModManager(path);
-    const parameters = PluginManager.parameters('mattieFMModLoader');
-    const mods = modManager.parseMods(path);
-    console.log(mods);
-    setTimeout(() => {
-        modManager.setup(mods); //all mods load after plugins
-    }, 2000);
-    
-})();
-    
-    
+MATTIE_ModManager.init();
