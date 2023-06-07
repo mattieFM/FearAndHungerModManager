@@ -9,32 +9,49 @@ var MATTIE = MATTIE || {};
 
 (()=>{
     const params = PluginManager.parameters('betterSaves');
+    
     DataManager.maxSavefiles = function() {
         return params.maxSaves;
     };
 
+    function updateOldSaves() {
+        const globalInfo = DataManager.loadGlobalInfo();
+        const maxSaves = DataManager.maxSavefiles();
+        for (let index = 1; index < maxSaves; index++) {
+            if(globalInfo[index])
+            if(!globalInfo[index].name){
+                console.log(index)
+                let saveData = MATTIE.DataManager.loadAndReturnSave(index)
+                let diff = MATTIE.GameInfo.getDifficulty(saveData.$gameSwitches);
+                let name = JSON.stringify(saveData.$gameActors._data[saveData.$gameParty._actors[0]]._name);
+                
+                globalInfo[index].difficulty=diff;
+                globalInfo[index].name=name.replace("\"","").replace("\"","");
+            }
+            DataManager.saveGlobalInfo(globalInfo);
+            
+        } 
+    }
+
+    MATTIE.Scene_Save_prototype_init = Scene_Save.prototype.initialize
+    Scene_Save.prototype.initialize = function(){
+        updateOldSaves();
+        MATTIE.Scene_Save_prototype_init.call(this);  
+    }
+
+    MATTIE.Scene_Load_prototype_init = Scene_Load.prototype.initialize
+    Scene_Load.prototype.initialize = function(){
+        updateOldSaves();
+        MATTIE.Scene_Load_prototype_init.call(this);  
+    }
     Window_SavefileList.prototype.drawGameTitle = function(info, x, y, width, rect) {
         if (info.difficulty && info.name) {
-            this.drawText(info.difficulty, x, y+rect.height-70, width, "right");
-            this.drawText(info.name, x, y, width, "right");
+            this.drawText(info.difficulty, x, y+rect.height-37, width-125, "right");
+            this.drawText("-" + info.name, x-110, y, width, "left");
         } else if (info.title){
-            // const index =Math.round(rect.height/y);
-            // let saveData = JSON.parse(StorageManager.load(index));
-            // let diff = "Fear & Hunger"
-            // if(MATTIE.GameInfo.isHardMode(saveData.switches)){
-            //     diff = "Hard Mode"
-            // }else if (MATTIE.GameInfo.isTerrorAndStarvation(saveData.switches)){
-            //     diff = "Terror & Starvation"
-            // }try {
-            //     let name = JSON.stringify(saveData.actors._data['@a'][saveData.party._menuActorId+1]._name);
-            //     console.log(`name:${name}\ndiff:${diff}`)
-                this.drawText(info.title + " - legacy save", x, y+rect.height-35, width);
-        //     }
-           
-        //     catch (error) {
-        //         console.log(error)
-        //     }
-        }
+            this.drawText(info.title + " - legacy save", x, y+rect.height-35, width);
+       }
+        
     };
     
     Window_SavefileList.prototype.drawContents = function(info, rect, valid) {
