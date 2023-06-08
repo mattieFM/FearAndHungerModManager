@@ -2,7 +2,7 @@ var MATTIE = MATTIE || {};
 
 MATTIE.GameInfo = {};
 MATTIE.GameInfo.getDifficulty = (data=$gameSwitches)=>{
-    let difficulty = "Fear & Hunger"
+    var difficulty = "Fear & Hunger"
     if (MATTIE.GameInfo.isHardMode(data)) { //Hard mode
         difficulty = "Hard Mode" //funnier name: "Trepidation & Famine"
     }
@@ -22,7 +22,7 @@ MATTIE.DataManager = {};
  * @returns an object of the save's game data
  */
 MATTIE.DataManager.extractAndReturnSaveContents = function(contents) {
-    let data={};
+    var data={};
     data.$gameSystem        = contents.system;
     data.$gameScreen        = contents.screen;
     data.$gameTimer         = contents.timer;
@@ -60,8 +60,8 @@ MATTIE.DataManager.makeSaveContentsFromParam = function(data){
  * @returns full game data of that save
  */
 MATTIE.DataManager.loadAndReturnSave = function(index){
-    let saveJson = StorageManager.load(index)
-    let saveData = MATTIE.DataManager.extractAndReturnSaveContents(JsonEx.parse(saveJson));
+    var saveJson = StorageManager.load(index)
+    var saveData = MATTIE.DataManager.extractAndReturnSaveContents(JsonEx.parse(saveJson));
     return saveData;
 }
 /**
@@ -144,7 +144,7 @@ Input.addKeyBind = function (key, cb) {
 MATTIE.Prev_Input_Update = Input.update;
     Input.update = function () {
         MATTIE.Prev_Input_Update.call(this);
-        for(let key in keys){
+        for(var key in keys){
             const cb = keys[key];
             if(Input.isRepeated(key)){
                 cb();

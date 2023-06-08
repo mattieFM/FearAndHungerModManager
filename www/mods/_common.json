@@ -1,0 +1,11 @@
+{
+    "name":"_common",
+    "status":true,
+    "parameters":{},
+    "dependencies": [
+        "_common/menus/menu",
+        "_common/menus/mainMenu"
+    
+    ]
+
+}

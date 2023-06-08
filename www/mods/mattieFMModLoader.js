@@ -13,12 +13,16 @@
  */
 
 
-//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------\\
 // ModManager
-//
-// The static class that manages the mods (might need to be beefed up in future, but for now, just extend plugin manager).
+//-----------------------------------------------------------------------------\\
 
-let MATTIE_ModManager = {};
+/**
+ * By default mod's cannot load anything outside of their folder, all dependencies must be included within the mods folder.
+ */
+
+
+var MATTIE_ModManager = {};
 
 class ModManager {
     constructor(path) {
@@ -26,27 +30,42 @@ class ModManager {
         this._path = path
         this._mods = []
     }
+    /**
+     * @description Add a mod to the list of mods that setup will initialize. All mod dependencies (Defined in its mod.json) will be loaded before that mod.
+     * @param {*} path the path to the folder
+     * @param {*} modName the name of the json file containing the mod info
+     */
     parseMod(path,modName){
         const fs = require('fs');
+        
         const modInfoPath =  path + modName;
         const modInfoData = fs.readFileSync(modInfoPath)
         const modInfo = JSON.parse(modInfoData);
-        this.addModEntry(modInfo.status,modInfo.name,modInfo.parameters)
+        if(modInfo.dependencies){ //load all dependencies before mod
+            modInfo.dependencies.forEach(dep=>{
+                this.addModEntry(dep);
+            });
+        }
+        if(modInfo.name){
+            this.addModEntry(modInfo.name,modInfo.status,modInfo.parameters)
+        }else{
+            this.addModEntry(modName)
+        }
+        
     }
 
-    addModEntry(status,name,params){
-        let mod = {};
+    addModEntry(name,status=true,params={}){
+        var mod = {};
         mod.status = status;
         mod.name = name;
         mod.parameters = params;
         this._mods.push(mod);
-
     }
 
     parseMods(path){
         const fs = require('fs');
-        let readMods;
-        let mode;
+        var readMods;
+        var mode;
         try {
             fs.readdirSync("www/"+path); //dist mode
             mode = "dist"
@@ -58,18 +77,15 @@ class ModManager {
         }
         readMods = fs.readdirSync(path);
         
-        this.addModEntry(true,"_common",{}); //set common mod to load first
-        //mods that start with _ load first and do not have config files. This is as they should be dev facing and not using facing. any _ files should be
-        //dependencies for actual mods and thus should not present the user with config options.
         readMods.forEach(modName => { //load _mods first
-            if (modName[0] === "_"){
-                this.addModEntry(true,modName.replace('.js',""),{}); 
+            if (modName[0] === "_" && modName.includes(".json") ){
+                this.parseMod(path,modName); 
             }
         })
 
         readMods.forEach(modName=>{//load all other mods second
             try {
-                if(modName.includes('.json')){
+                if(modName.includes('.json') && modName[0] != "_"){
                     this.parseMod(path,modName)
                 }
 
@@ -81,6 +97,10 @@ class ModManager {
 
     }
 
+    /**
+     * @description load all mods from a list that are not already loaded
+     * @param {*} mods a list of mods to load
+     */
     setup(mods) {
         mods.forEach((mod) => {
             if (mod.status && !this._mods.contains(mod.name)) {
@@ -91,8 +111,6 @@ class ModManager {
         });
     };
 }
-
-
 MATTIE_ModManager.init =
 function () {
     const defaultPath = PluginManager._path;
@@ -105,7 +123,7 @@ function () {
             modManager.setup(mods); //all mods load after plugins
             window.alert("all mods successfully loaded")
             PluginManager._path = defaultPath;
-        }, 2000);
+        }, 500);
 }
 
 MATTIE_ModManager.init();
