@@ -17,13 +17,13 @@ var MATTIE = MATTIE || {};
     function updateOldSaves() {
         const globalInfo = DataManager.loadGlobalInfo();
         const maxSaves = DataManager.maxSavefiles();
-        for (let index = 1; index < maxSaves; index++) {
+        for (var index = 1; index < maxSaves; index++) {
             if(globalInfo[index])
             if(!globalInfo[index].name){
                 console.log(index)
-                let saveData = MATTIE.DataManager.loadAndReturnSave(index)
-                let diff = MATTIE.GameInfo.getDifficulty(saveData.$gameSwitches);
-                let name = JSON.stringify(saveData.$gameActors._data[saveData.$gameParty._actors[0]]._name);
+                var saveData = MATTIE.DataManager.loadAndReturnSave(index)
+                var diff = MATTIE.GameInfo.getDifficulty(saveData.$gameSwitches);
+                var name = JSON.stringify(saveData.$gameActors._data[saveData.$gameParty._actors[0]]._name);
                 
                 globalInfo[index].difficulty=diff;
                 globalInfo[index].name=name.replace("\"","").replace("\"","");
@@ -71,7 +71,7 @@ var MATTIE = MATTIE || {};
     
     MATTIE.DataManager_MakeSaveFileInfo = DataManager.makeSavefileInfo;
     DataManager.makeSavefileInfo = function() {
-        let oldData = MATTIE.DataManager_MakeSaveFileInfo.call(this);
+        var oldData = MATTIE.DataManager_MakeSaveFileInfo.call(this);
         const newData = {
             ...oldData,
             "name":MATTIE.GameInfo.getCharName(),

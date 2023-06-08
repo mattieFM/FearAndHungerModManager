@@ -1,0 +1,11 @@
+{
+    "name":"multiplayer",
+    "status":true,
+    "parameters":{"maxSaves":99},
+    "dependencies": [
+        "_multiplayer/peerjs.min",
+        "_multiplayer/multiplayerMenu",
+        "_multiplayer/hostMenu",
+        "_multiplayer/netController"
+]
+}
