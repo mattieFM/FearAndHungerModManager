@@ -4,9 +4,9 @@ MATTIE.scenes.multiplayer = MATTIE.scenes.multiplayer || {};
 MATTIE.windows.multiplayer = MATTIE.windows.multiplayer || {};
 MATTIE.TextManager = MATTIE.TextManager || {};
 MATTIE.CmdManager = MATTIE.CmdManager || {};
-MATTIE.TextManager.startGame = "Join";
+MATTIE.TextManager.joinGame = "Join";
 MATTIE.TextManager.returnToMultiplayer = "Return";
-MATTIE.CmdManager.startGame = "MATTIE_Join_Game"
+MATTIE.CmdManager.joinGame = "MATTIE_Join_Game"
 MATTIE.CmdManager.returnToMultiplayer = "MATTIE_ReturnToMulti"
 
 /**
@@ -24,7 +24,6 @@ MATTIE.scenes.multiplayer.join.prototype.create = function(){
     this.createWindowLayer();
     this.addOptionsBtns();
     this.addTextField();
-    Window.prototype.setCursorRect
 }
 MATTIE.scenes.multiplayer.join.prototype.addTextField = function (){
     this._inputWin = new MATTIE.windows.textInput(0,0,500,150,"Enter your connection key below:")
@@ -32,10 +31,14 @@ MATTIE.scenes.multiplayer.join.prototype.addTextField = function (){
 }
 MATTIE.scenes.multiplayer.join.prototype.addOptionsBtns = function(){
     let btns = {}
-    btns[MATTIE.TextManager.startGame] = MATTIE.CmdManager.startGame;
+    btns[MATTIE.TextManager.joinGame] = MATTIE.CmdManager.joinGame;
     btns[MATTIE.TextManager.returnToMultiplayer] = MATTIE.CmdManager.returnToMultiplayer;
     this._optionsWindow = new MATTIE.windows.horizontalBtns(175+300+10, btns, 2);
-    this._optionsWindow.setHandler(MATTIE.CmdManager.startGame, (()=>{console.log("join game")}).bind(this));
+    this._optionsWindow.setHandler(MATTIE.CmdManager.joinGame, (()=>{
+        MATTIE.multiplayer.netController.hostId = this._inputWin.getInput()
+        MATTIE.menus.multiplayer.openLobby();
+    
+    }).bind(this));
     this._optionsWindow.setHandler(MATTIE.CmdManager.returnToMultiplayer,  MATTIE.menus.multiplayer.openMultiplayer.bind(this));
     this.addWindow(this._optionsWindow);
 }

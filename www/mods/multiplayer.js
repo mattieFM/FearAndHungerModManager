@@ -7,6 +7,7 @@ MATTIE.multiplayer = MATTIE.multiplayer || {}
 MATTIE.menus.multiplayer = MATTIE.menus.multiplayer || {};
 MATTIE.scenes.multiplayer = MATTIE.scenes.multiplayer || {};
 MATTIE.windows.multiplayer = MATTIE.windows.multiplayer || {};
+
 /** @type {NetController} */
 MATTIE.multiplayer.netController = new NetController();
 var netController = MATTIE.multiplayer.netController;
@@ -21,6 +22,11 @@ MATTIE.menus.multiplayer.openJoin = () => {
 
 MATTIE.menus.multiplayer.openMultiplayer = () => {
     SceneManager.goto(MATTIE.scenes.multiplayer.main)
+}
+
+MATTIE.menus.multiplayer.openLobby = () => {
+    console.log("here")
+    SceneManager.goto(MATTIE.scenes.multiplayer.lobby)
 }
 
 
@@ -47,6 +53,10 @@ MATTIE.menus.multiplayer.openMultiplayer = () => {
     Input.addKeyBind('p', ()=>{
         console.log("clientTriggered")
         conn.send({"connected":"casca"})
+    })
+
+    Input.addKeyBind('u', ()=>{
+        console.log(MATTIE.multiplayer.netController.connections)
     })
 
 
