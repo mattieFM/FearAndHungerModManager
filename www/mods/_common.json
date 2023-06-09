@@ -4,7 +4,9 @@
     "parameters":{},
     "dependencies": [
         "_common/menus/menu",
-        "_common/menus/mainMenu"
+        "_common/menus/mainMenu",
+        "_common/menus/windows",
+        "_common/nw"
     
     ]
 

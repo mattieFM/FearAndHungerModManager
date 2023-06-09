@@ -6,6 +6,7 @@
         "_multiplayer/peerjs.min",
         "_multiplayer/multiplayerMenu",
         "_multiplayer/hostMenu",
-        "_multiplayer/netController"
+        "_multiplayer/netController",
+        "_multiplayer/joinMenu"
 ]
 }

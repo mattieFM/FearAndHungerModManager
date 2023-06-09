@@ -11,6 +11,28 @@ MATTIE.CmdManager.return = "MATTIE_return"
 
 
 
+MATTIE.scenes.multiplayer.base = function () {
+    this.initialize.apply(this, arguments);
+}
+
+MATTIE.scenes.multiplayer.base.prototype = Object.create(Scene_Base.prototype);
+MATTIE.scenes.multiplayer.base.prototype.constructor = MATTIE.scenes.multiplayer.base;
+
+MATTIE.scenes.multiplayer.base.prototype.create = function (){
+    Scene_Base.prototype.create.call(this);
+    this.createBackground();
+}
+
+MATTIE.scenes.multiplayer.base.prototype.createBackground = function() {
+    this._backSprite2 = new Sprite(ImageManager.loadBitmap("mods/_multiplayer/","multiPlayerMenu",0,true));
+    this.addChild(this._backSprite2);
+    
+};
+
+
+
+
+
 MATTIE.scenes.multiplayer.main = function () {
     this.initialize.apply(this, arguments);
 }
@@ -20,8 +42,8 @@ MATTIE.scenes.multiplayer.main.prototype.constructor = MATTIE.scenes.multiplayer
 
 MATTIE.scenes.multiplayer.main.prototype.createCommandWindow = function() {
     this._commandWindow = new MATTIE.windows.multiplayer.main();
-    this._commandWindow.setHandler(MATTIE.CmdManager.host,  MATTIE.menus.multiplayer.openHost.bind(this));
-    this._commandWindow.setHandler(MATTIE.CmdManager.join, (()=>{console.log("join")}).bind(this));
+    this._commandWindow.setHandler(MATTIE.CmdManager.host,    MATTIE.menus.multiplayer.openHost.bind(this));
+    this._commandWindow.setHandler(MATTIE.CmdManager.join,    MATTIE.menus.multiplayer.openJoin.bind(this));
     this._commandWindow.setHandler(MATTIE.CmdManager.return,  MATTIE.menus.toMainMenu.bind(this));
     this.addWindow(this._commandWindow);
 };

@@ -7,11 +7,16 @@ MATTIE.multiplayer = MATTIE.multiplayer || {}
 MATTIE.menus.multiplayer = MATTIE.menus.multiplayer || {};
 MATTIE.scenes.multiplayer = MATTIE.scenes.multiplayer || {};
 MATTIE.windows.multiplayer = MATTIE.windows.multiplayer || {};
+/** @type {NetController} */
 MATTIE.multiplayer.netController = new NetController();
 var netController = MATTIE.multiplayer.netController;
 
 MATTIE.menus.multiplayer.openHost = () => {
     SceneManager.goto(MATTIE.scenes.multiplayer.host)
+}
+
+MATTIE.menus.multiplayer.openJoin = () => {
+    SceneManager.goto(MATTIE.scenes.multiplayer.join)
 }
 
 MATTIE.menus.multiplayer.openMultiplayer = () => {
