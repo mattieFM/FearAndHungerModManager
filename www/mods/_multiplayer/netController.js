@@ -1,10 +1,10 @@
 //@using peerJs from /dist/peerjs.min.js
-
 var MATTIE = MATTIE || {};
 MATTIE.multiplayer = MATTIE.multiplayer || {}
 var EventEmitter = require("events");
 
-class _NetController extends EventEmitter {
+/** @global */
+class NetController extends EventEmitter {
     constructor() {
         super();
         this.host;
@@ -53,8 +53,12 @@ class _NetController extends EventEmitter {
     }
 }
 
-export default _NetController
 
-
-
-
+//ignore this does nothing, just to get intellisense working. solely used to import into the types file for dev.
+try {
+    module.exports.NetController = NetController;
+} catch (error) {
+    module = {}
+    module.exports = {}
+}
+module.exports.NetController = NetController;
