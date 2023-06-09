@@ -31,7 +31,9 @@ MATTIE.scenes.multiplayer.base.prototype.createBackground = function() {
 
 
 
-
+/**
+ * main scene
+ */
 
 MATTIE.scenes.multiplayer.main = function () {
     this.initialize.apply(this, arguments);
@@ -40,13 +42,36 @@ MATTIE.scenes.multiplayer.main = function () {
 MATTIE.scenes.multiplayer.main.prototype = Object.create(Scene_Title.prototype);
 MATTIE.scenes.multiplayer.main.prototype.constructor = MATTIE.scenes.multiplayer.main;
 
+MATTIE.scenes.multiplayer.main.prototype.create = function() {
+    Scene_Title.prototype.create.call(this);
+    this.addTextField()
+}
+
 MATTIE.scenes.multiplayer.main.prototype.createCommandWindow = function() {
     this._commandWindow = new MATTIE.windows.multiplayer.main();
-    this._commandWindow.setHandler(MATTIE.CmdManager.host,    MATTIE.menus.multiplayer.openHost.bind(this));
-    this._commandWindow.setHandler(MATTIE.CmdManager.join,    MATTIE.menus.multiplayer.openJoin.bind(this));
-    this._commandWindow.setHandler(MATTIE.CmdManager.return,  MATTIE.menus.toMainMenu.bind(this));
+    
+    this._commandWindow.setHandler(MATTIE.CmdManager.host, (() => {
+        MATTIE.multiplayer.netController.name = this._inputWin.getInput();
+        MATTIE.menus.multiplayer.openHost();
+    }).bind(this));
+
+    this._commandWindow.setHandler(MATTIE.CmdManager.join,    (()=>{
+        MATTIE.multiplayer.netController.name = this._inputWin.getInput();
+        MATTIE.menus.multiplayer.openJoin();
+    }).bind(this));
+
+    this._commandWindow.setHandler(MATTIE.CmdManager.return,  (()=>{
+        MATTIE.multiplayer.netController.name = this._inputWin.getInput();
+        MATTIE.menus.toMainMenu();
+    }).bind(this));
     this.addWindow(this._commandWindow);
 };
+
+MATTIE.scenes.multiplayer.main.prototype.addTextField = function (){
+    this._inputWin = new MATTIE.windows.textInput(0,0,250,150,"Type Username:");
+    this._inputWin.updateText(MATTIE.multiplayer.netController.name);
+    this.addWindow(this._inputWin);
+}
 
 MATTIE.scenes.multiplayer.main.prototype.createBackground = function() {
     this._backSprite1 = new Sprite(ImageManager.loadTitle1($dataSystem.title1Name));
@@ -55,6 +80,11 @@ MATTIE.scenes.multiplayer.main.prototype.createBackground = function() {
     this.addChild(this._backSprite2);
 };
 
+
+
+/**
+ * main window
+ */
 MATTIE.windows.multiplayer.main = function () {
     this.initialize.apply(this, arguments);
 }

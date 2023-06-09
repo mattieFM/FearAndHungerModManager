@@ -34,7 +34,6 @@ MATTIE.windows.horizontalBtns.prototype.maxCols = function() {
  */
 MATTIE.windows.horizontalBtns.prototype.makeCommandList = function() {
     for(key in this._mattieBtns){
-        console.log(key)
         this.addCommand(key, this._mattieBtns[key])
     }
 };
@@ -71,21 +70,67 @@ MATTIE.windows.textDisplay.prototype.updatePlacement = function(xOffset=0,yOffse
     this.x = ((Graphics.boxWidth - this.width)) / 2+xOffset;
     this.y = ((Graphics.boxHeight - this.height)) / 2+yOffset;
 };
+
 MATTIE.windows.textDisplay.prototype.updateText = function(text) {
     this.contents.clear();
-    if(typeof text === typeof []){
-        let i = 0;
-        text.forEach(element => {
-            this.drawText(element,0,25*i,0)
-            i++;
-        });
-    }else{
-        this.drawText(text,0,0,0)
+    if(typeof text === typeof "string"){
+        text+="\n";
+        text = text.split("\n")
     }
+    let i = 0;
+    text.forEach(element => {
+        this.drawText(element,0,25*i,0)
+        i++;
+    });
 };
 
 MATTIE.windows.textDisplay.prototype.windowWidth = function() {
     return this.mattieWidth;
+};
+
+
+
+
+
+/**
+ * A list with header
+ * @extends Window_Base
+ */
+MATTIE.windows.list = function () {
+    this.initialize.apply(this, arguments);
+}
+
+MATTIE.windows.list.prototype = Object.create(MATTIE.windows.textDisplay.prototype);
+MATTIE.windows.list.prototype.constructor = MATTIE.windows.list;
+
+MATTIE.windows.list.prototype.initialize = function(x, y, width, height, header) {
+    this._items = [];
+    this._index = 0;
+    this._header = header;
+    MATTIE.windows.textDisplay.prototype.initialize.call(this, x, y, width, height);
+};
+
+MATTIE.windows.list.prototype.updateText = function(text) {
+    if(typeof text === typeof "string"){
+        text+="\n";
+        text=text.split("\n");
+        this._items = text;
+    } else if(typeof text === typeof []){
+        this._items = text;
+    }
+    this.contents.clear();
+    this._index = 0;
+    this.drawText(this._header,0,25*this._index,0)
+    this._index++;
+    this._items.forEach(element => {
+        this.drawText(element,0,25*this._index,0)
+        this._index++;
+    });
+};
+
+MATTIE.windows.list.prototype.addItem = function(text) {
+    this.drawText(text,0,25*this._index,0)
+    this._index++;
 };
 
 
@@ -107,8 +152,8 @@ MATTIE.windows.textInput.prototype.initialize = function(x,y,width,height,header
     MATTIE.windows.textDisplay.prototype.initialize.call(this, x,y,width,height,"");
     this.updatePlacement();
     this.initEventHandler();
-    
-    
+
+
 };
 MATTIE.windows.textInput.prototype.close = function(){
     MATTIE.windows.textDisplay.prototype.close.call(this);
@@ -167,13 +212,14 @@ MATTIE.windows.textInput.prototype.updateText = function(text=this._text) {
     let i = 0;
     this.drawText(this._header,0,25*i,0)
     i++;
-    if(typeof text === typeof []){
-        text.forEach(element => {
-            this.drawText(element,0,25*i,0)
-            i++;
-        });
-    }else{
-        this.drawText(text,0,25*i,0)
+
+    if(typeof text === typeof "string"){
+        text+="\n";
+        text = text.split("\n")
     }
+    text.forEach(element => {
+        this.drawText(element,0,25*i,0)
+        i++;
+    });
 };
 
