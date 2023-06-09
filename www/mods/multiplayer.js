@@ -2,14 +2,13 @@
  * @using peerJs from /dist/peerjs.min.js
  */
 
-
 var MATTIE = MATTIE || {};
 MATTIE.multiplayer = MATTIE.multiplayer || {}
 MATTIE.menus.multiplayer = MATTIE.menus.multiplayer || {};
 MATTIE.scenes.multiplayer = MATTIE.scenes.multiplayer || {};
 MATTIE.windows.multiplayer = MATTIE.windows.multiplayer || {};
-let netController = MATTIE.multiplayer.netController; //from net controller;
-
+MATTIE.multiplayer.netController = new NetController();
+var netController = MATTIE.multiplayer.netController;
 
 MATTIE.menus.multiplayer.openHost = () => {
     SceneManager.goto(MATTIE.scenes.multiplayer.host)
