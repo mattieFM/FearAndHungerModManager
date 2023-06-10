@@ -32,6 +32,11 @@ MATTIE.menus.multiplayer.openLobby = () => {
     SceneManager.goto(MATTIE.scenes.multiplayer.lobby)
 }
 
+MATTIE.menus.multiplayer.openGame = () => {
+    SceneManager.goto(Scene_Load)
+}
+
+
 
 (()=>{
     //MATTIE.menus.multiplayer.openHost();
