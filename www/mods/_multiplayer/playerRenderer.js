@@ -92,13 +92,16 @@ MATTIE.multiplayer.renderer.overrideProcessMove = function (){
     //so send x and y sometimes or mabye on a different event or just a time to fix any slight offsets.
     Game_Character.prototype.processMoveCommand = function(command) {
         MATTIE.RPG.processMoveCommand.call(this, command);
-        if(MATTIE.multiplayer.isClient && MATTIE.multiplayer.isActive){
+        if(MATTIE.multiplayer.isActive){
             if(command.code){
                 let obj = {};
                 obj.move = {};
                 obj.move.command = command.code;
                 obj.move.dir4 = Input.dir4;
-                netController.sendHost(obj);
+                if(MATTIE.multiplayer.isClient)
+                    netController.sendHost(obj);
+                else if(MATTIE.multiplayer.isHost)
+                    netController.sendAll(obj);
                
                 
             }
@@ -124,21 +127,29 @@ MATTIE.multiplayer.renderer.overrideProcessMove = function (){
     MATTIE.RPG.performTransfer = Game_Player.prototype.performTransfer;
     Game_Player.prototype.performTransfer = function(){
         MATTIE.RPG.performTransfer.call(this);
-        if(MATTIE.multiplayer.isClient && MATTIE.multiplayer.isActive)
-        MATTIE.multiplayer.netController.sendHost(MATTIE.multiplayer.renderer.currentTransferObj);
+        if(MATTIE.multiplayer.isActive){
+            if(MATTIE.multiplayer.isClient)
+                MATTIE.multiplayer.netController.sendHost(MATTIE.multiplayer.renderer.currentTransferObj);
+            else if(MATTIE.multiplayer.isHost)
+                MATTIE.multiplayer.netController.sendAll(MATTIE.multiplayer.renderer.currentTransferObj);
+        }
+        
     }
 
     MATTIE.RPG.sceneMapOnLoaded = Scene_Map.prototype.onMapLoaded;
     Scene_Map.prototype.onMapLoaded = function () {
         MATTIE.RPG.sceneMapOnLoaded .call(this);
-        if(MATTIE.multiplayer.isClient && MATTIE.multiplayer.isActive){
+        if(MATTIE.multiplayer.isActive){
             let obj = {};
                 obj.travel = {};
                 obj.travel.cords = {};
                 obj.travel.cords.x = $gamePlayer.x;
                 obj.travel.cords.y = $gamePlayer.y;
                 obj.travel.map = $gameMap.mapId();
+            if(MATTIE.multiplayer.isClient)
             MATTIE.multiplayer.netController.sendHost(obj);
+            else if(MATTIE.multiplayer.isHost)
+            MATTIE.multiplayer.netController.sendAll(obj);
         }
     }
 
