@@ -60,18 +60,19 @@ MATTIE.multiplayer.renderer._createSecondaryChars = function() {
         let mattieI = 0;
         for(key in MATTIE.multiplayer.netController.players){
             const netPlayer = MATTIE.multiplayer.netController.players[key];
-            netPlayer.$gamePlayer = new MATTIE.multiplayer.Secondary_Player();
-            let p2 = netPlayer.$gamePlayer;
-
-            //TODO: figure out what the fuck this shit does we need it. but idk
-            p2.reserveTransfer($gameMap.mapId(), $gamePlayer.x,$gamePlayer.y); 
-            
-            p2.x = $gamePlayer.x;
-            p2.y = $gamePlayer.y;
-            mattieI++;
-            p2.name = netPlayer.name;
-            
-            this.playersSprites.push(new Sprite_Character(p2));
+            if(netPlayer.map === $gameMap.mapId()){//only render players on same map
+                netPlayer.$gamePlayer = new MATTIE.multiplayer.Secondary_Player();
+                let p2 = netPlayer.$gamePlayer;
+                
+                //TODO: figure out what the fuck this shit does we need it. but idk
+                p2.reserveTransfer($gameMap.mapId(), $gamePlayer.x,$gamePlayer.y); 
+                p2.performTransfer();
+                p2.x = $gamePlayer.x;
+                p2.y = $gamePlayer.y;
+                mattieI++;
+                p2.name = netPlayer.name;
+                this.playersSprites.push(new Sprite_Character(p2));
+            }
         }
         
         this._characterSprites.concat(this.playersSprites)
@@ -107,6 +108,7 @@ MATTIE.multiplayer.renderer.overrideProcessMove = function (){
         MATTIE.RPG.reserveTransfer.call(this, mapId, x, y, d, fadeType);
         if(MATTIE.multiplayer.isClient && MATTIE.multiplayer.isActive){
             let obj = MATTIE.multiplayer.renderer.currentTransferObj;
+                obj = {};
                 obj.travel = {};
                 obj.travel.cords = {};
                 obj.travel.cords.x = x;
@@ -120,6 +122,20 @@ MATTIE.multiplayer.renderer.overrideProcessMove = function (){
         MATTIE.RPG.performTransfer.call(this);
         if(MATTIE.multiplayer.isClient && MATTIE.multiplayer.isActive)
         MATTIE.multiplayer.netController.sendHost(MATTIE.multiplayer.renderer.currentTransferObj);
+    }
+
+    MATTIE.RPG.sceneMapOnLoaded = Scene_Map.prototype.onMapLoaded;
+    Scene_Map.prototype.onMapLoaded = function () {
+        MATTIE.RPG.sceneMapOnLoaded .call(this);
+        if(MATTIE.multiplayer.isClient && MATTIE.multiplayer.isActive){
+            let obj = {};
+                obj.travel = {};
+                obj.travel.cords = {};
+                obj.travel.cords.x = $gamePlayer.x;
+                obj.travel.cords.y = $gamePlayer.x;
+                obj.travel.map = $gameMap.mapId();
+            MATTIE.multiplayer.netController.sendHost(obj);
+        }
     }
 
 
