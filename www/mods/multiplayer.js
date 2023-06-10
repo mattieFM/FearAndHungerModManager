@@ -10,7 +10,7 @@ MATTIE.windows.multiplayer = MATTIE.windows.multiplayer || {};
 MATTIE.multiplayer.isActive = true;
 MATTIE.multiplayer.isClient = false;
 MATTIE.multiplayer.isHost = false;
-
+MATTIE.multiplayer.renderer.initialize();
 
 /** @type {NetController} */
 MATTIE.multiplayer.netController = new NetController();

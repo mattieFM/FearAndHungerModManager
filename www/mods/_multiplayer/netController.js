@@ -2,6 +2,7 @@
 var MATTIE = MATTIE || {};
 MATTIE.multiplayer = MATTIE.multiplayer || {}
 var EventEmitter = require("events");
+const { hostname } = require("os");
 
 /** @global */
 class NetController extends EventEmitter {
@@ -11,8 +12,8 @@ class NetController extends EventEmitter {
         this.host;
         this.hostId = undefined; //will be null if u are host
         this.name ="default"
-        this.clientName = "";
-        this.hostName = "";
+        this.clientName = "client";
+        this.hostName = "host";
         this.client;
         this.clientToHost;
         this.players = [];
@@ -89,6 +90,7 @@ class NetController extends EventEmitter {
         json.id = conn.peer;
         if(json.connected){
             this.playerConnectionEvent(json)
+            this.emit("playerList",this.getPlayerList()); //only used for menu rendering
         }
         if(json.move){
             this.playerMovementEvent(json);
@@ -96,19 +98,16 @@ class NetController extends EventEmitter {
     }
 
     playerMovementEvent(json){
-        for(key in this.connections){
+        for(key in this.players){
             console.log("player move event")
-            if(this.connections[key].id===json.id){
+            console.log(this.players[key].id)
+            console.log(json.id)
+            if(this.players[key].id === json.id){
                 console.log("player move event -- id matched")
                 const move = json.move;
-                this.connections[key].$gamePlayer.setDir4(move.dir4);
-                //this.connections[key].$gamePlayer._moveRouteIndex = json.move.command;
-                this.connections[key].$gamePlayer.moveByInput(move.command)
-                    
-                
-                
-                //this.connections[key].$gamePlayer.reserveTransfer($dataSystem.startMapId, this.connections[key].$gamePlayer.x , this.connections[key].$gamePlayer.y);
-                this.connections[key].$gamePlayer.update(true);
+                this.players[key].$gamePlayer.setDir4(move.dir4);
+                this.players[key].$gamePlayer.moveByInput(move.command)
+                this.players[key].$gamePlayer.update(true);
             }
         }
         
@@ -156,14 +155,18 @@ class NetController extends EventEmitter {
 
 
     getPlayerList(){
+        let players = [];
         for(key in this.connections){
-            this.players.push(this.connections[key].name);
+            let id = this.connections[key].id;
+            let name = this.connections[key].name;
+            this.players[id] = {"id":id,"name":name}
+            players.push(name)
         }
-        if(!this.players.includes(this.name)){
-            this.players.push(this.hostName);
+        if(!this.players.includes(this.name)){ //add self if not present
+            players.push(this.name) //will not work locally
         }
         
-        return this.players;
+        return players;
     }
 }
 
