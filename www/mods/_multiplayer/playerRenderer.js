@@ -113,7 +113,7 @@ MATTIE.multiplayer.renderer.overrideProcessMove = function (){
     MATTIE.RPG.reserveTransfer = Game_Player.prototype.reserveTransfer;
     Game_Player.prototype.reserveTransfer = function(mapId, x, y, d, fadeType){
         MATTIE.RPG.reserveTransfer.call(this, mapId, x, y, d, fadeType);
-        if(MATTIE.multiplayer.isClient && MATTIE.multiplayer.isActive){
+        if(MATTIE.multiplayer.isActive){
             let obj = MATTIE.multiplayer.renderer.currentTransferObj;
                 obj = {};
                 obj.travel = {};
