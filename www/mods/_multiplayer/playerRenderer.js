@@ -21,19 +21,25 @@ MATTIE.multiplayer.Secondary_Player.prototype.update = function () {
     MATTIE.RPG.gamePlayerUpdate.call(this);
 }
 
-MATTIE.RPG.gamePlayerInit = Game_Player.prototype.initialize;
 MATTIE.multiplayer.Secondary_Player.prototype.initialize = function () {
-    MATTIE.RPG.gamePlayerInit.call(this);
-    this.ctrlDir4 = Input.dir4;
+    Game_Player.prototype.initialize.call(this);
+}
+MATTIE.multiplayer.Secondary_Player.prototype.setDir4 = function(dir4) {
+    console.log("in setdir4:" + dir4 + "\n\n")
+    this.ctrlDir4 = dir4;
 }
 
-
-
 MATTIE.multiplayer.Secondary_Player.prototype.getInputDirection = function() {
-    return this.ctrlDir4;
+    console.log("in get dir 4")
+    if(this.ctrlDir4){
+        return this.ctrlDir4;
+    } else {
+        return 0
+    }
+    
 };
 
-MATTIE.RPG.spriteSetMap_CreateChars =Spriteset_Map.prototype.createCharacters;
+MATTIE.RPG.spriteSetMap_CreateChars = Spriteset_Map.prototype.createCharacters;
 
 Spriteset_Map.prototype.createCharacters = function() {
     this.playersSprites = [];
