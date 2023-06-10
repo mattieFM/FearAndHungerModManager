@@ -56,13 +56,11 @@ MATTIE.multiplayer.renderer.playerOverrides = function(){
 }
 /** render all secondary characters */
 MATTIE.multiplayer.renderer._createSecondaryChars = function() {
-    console.log('\n\n\n----enter-----\n\n\n')
     this.playersSprites = [];
         let mattieI = 0;
         for(key in MATTIE.multiplayer.netController.players){
             const netPlayer = MATTIE.multiplayer.netController.players[key];
             if(netPlayer.map === $gameMap.mapId()){//only render players on same map
-                console.log('\n\n\n----id match-----\n\n\n')
                 netPlayer.$gamePlayer = new MATTIE.multiplayer.Secondary_Player();
                 let p2 = netPlayer.$gamePlayer;
                 
@@ -73,8 +71,9 @@ MATTIE.multiplayer.renderer._createSecondaryChars = function() {
                 p2.y = $gamePlayer.y;
                 mattieI++;
                 p2.name = netPlayer.name;
-                this.playersSprites.push(new Sprite_Character(p2));
-                console.log('\n\n\n----idone-----\n\n\n');
+                let p2Sprite = new Sprite_Character(p2);
+                if(MATTIE.multiplayer.isDev) p2Sprite.tint = '003c9c'; //make secondary players obvious for dev mode
+                this.playersSprites.push(p2Sprite);
             }
         }
         
@@ -137,7 +136,7 @@ MATTIE.multiplayer.renderer.overrideProcessMove = function (){
                 obj.travel = {};
                 obj.travel.cords = {};
                 obj.travel.cords.x = $gamePlayer.x;
-                obj.travel.cords.y = $gamePlayer.x;
+                obj.travel.cords.y = $gamePlayer.y;
                 obj.travel.map = $gameMap.mapId();
             MATTIE.multiplayer.netController.sendHost(obj);
         }
