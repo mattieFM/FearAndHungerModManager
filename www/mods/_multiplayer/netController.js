@@ -22,9 +22,12 @@ class NetController extends EventEmitter {
     }
 
     /** send to all connections */
-    sendAll(data) {
+    sendAll(data, exclude = []) {
         for(key in this.connections){
-            this.connections[key].conn.send(data);
+            if(!exclude.includes(key)){
+                data.id = this.connections[key].conn.peer;
+                this.connections[key].conn.send(data);
+            }
         }
     }
 
@@ -55,7 +58,6 @@ class NetController extends EventEmitter {
                 this.connections[this.host.id].name = this.name;
             }
             conn.on('data', (data) => {
-                console.log(data)
                 this.hostDataProcessor(data, conn);
             })
          })
@@ -105,14 +107,14 @@ class NetController extends EventEmitter {
             let obj = {};
             obj.id = conn.peer;
             obj.move = json.move;
-            this.sendAll(obj)
+            this.sendAll(obj,[obj.id])
             this.playerMovementEvent(json);
         }
         if(json.travel){
             let obj = {};
             obj.id = conn.peer;
             obj.travel = json.travel;
-            this.sendAll(obj)
+            this.sendAll(obj,[obj.id])
             this.playerTravelEvent(json);
         }
     }
@@ -153,6 +155,12 @@ class NetController extends EventEmitter {
         })
     }
 
+    triggerStartGameEvent(){
+        let obj = {};
+        obj.gameStarted = "y";
+        this.sendAll(obj);
+    }
+
     playerMovementEvent(json){
         this.onMatchingPlayer(json,(key)=>{
             try { //for now we will just use a catch to fix this, might need to beef this up later
@@ -182,7 +190,6 @@ class NetController extends EventEmitter {
             }
 
             console.log(json);
-
             if(json.playerList){
                 this.emit("playerList",json.playerList)
             }

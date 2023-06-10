@@ -100,7 +100,7 @@ MATTIE.multiplayer.renderer.overrideProcessMove = function (){
                 obj.move.dir4 = Input.dir4;
                 if(MATTIE.multiplayer.isClient)
                     netController.sendHost(obj);
-                else if(MATTIE.multiplayer.isHost)
+                if(MATTIE.multiplayer.isHost)
                     netController.sendAll(obj);
                
                 
@@ -130,7 +130,7 @@ MATTIE.multiplayer.renderer.overrideProcessMove = function (){
         if(MATTIE.multiplayer.isActive){
             if(MATTIE.multiplayer.isClient)
                 MATTIE.multiplayer.netController.sendHost(MATTIE.multiplayer.renderer.currentTransferObj);
-            else if(MATTIE.multiplayer.isHost)
+            if(MATTIE.multiplayer.isHost)
                 MATTIE.multiplayer.netController.sendAll(MATTIE.multiplayer.renderer.currentTransferObj);
         }
         
@@ -148,7 +148,7 @@ MATTIE.multiplayer.renderer.overrideProcessMove = function (){
                 obj.travel.map = $gameMap.mapId();
             if(MATTIE.multiplayer.isClient)
             MATTIE.multiplayer.netController.sendHost(obj);
-            else if(MATTIE.multiplayer.isHost)
+            if(MATTIE.multiplayer.isHost)
             MATTIE.multiplayer.netController.sendAll(obj);
         }
     }
