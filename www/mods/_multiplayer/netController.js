@@ -79,14 +79,6 @@ class NetController extends EventEmitter {
             conn.on("data", (data) => {
                 this.clientDataProcessor(data);
             })
-
-            if(json.move){
-                this.playerMovementEvent(json);
-            }
-
-            if(json.travel){
-                this.playerTravelEvent(json);
-            }
             
         })
         return client;
@@ -111,12 +103,14 @@ class NetController extends EventEmitter {
         }
         if(json.move){
             let obj = {};
+            obj.id = conn.peer;
             obj.move = json.move;
             this.sendAll(obj)
             this.playerMovementEvent(json);
         }
         if(json.travel){
             let obj = {};
+            obj.id = conn.peer;
             obj.travel = json.travel;
             this.sendAll(obj)
             this.playerTravelEvent(json);
@@ -189,6 +183,14 @@ class NetController extends EventEmitter {
         }
         if(json.gameStarted){
             this.emit("gameStarted",json.gameStarted)
+        }
+
+        if(json.move){
+            this.playerMovementEvent(json);
+        }
+
+        if(json.travel){
+            this.playerTravelEvent(json);
         }
     }
 
