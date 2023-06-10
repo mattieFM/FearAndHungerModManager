@@ -28,6 +28,7 @@ MATTIE.scenes.multiplayer.host.prototype.create = function(){
     MATTIE.multiplayer.netController.host.on("open", ()=>{
         this.addPeerDisplayWindow();
         this.initListController();
+        MATTIE.multiplayer.netController.triggerPlayerListEventHost(); //a slightly hacky solution to render host
     });
 }
 
@@ -40,7 +41,6 @@ MATTIE.scenes.multiplayer.host.prototype.addPlayerListWindow = function(){
 MATTIE.scenes.multiplayer.host.prototype.initListController = function(){
     var netController = MATTIE.multiplayer.netController; 
     netController.addListener('playerList', (names) =>{
-        console.log(names)
         this._playerWindow.updateText(names)
     })
 }
