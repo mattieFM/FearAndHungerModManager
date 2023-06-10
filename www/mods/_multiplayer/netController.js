@@ -99,6 +99,7 @@ class NetController extends EventEmitter {
         for(key in this.connections){
             console.log("player move event")
             if(this.connections[key].id===json.id){
+                console.log("player move event -- id matched")
                 const move = json.move;
                 this.connections[key].$gamePlayer.setDir4(move.dir4);
                 //this.connections[key].$gamePlayer._moveRouteIndex = json.move.command;
