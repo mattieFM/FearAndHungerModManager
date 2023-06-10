@@ -172,25 +172,34 @@ class NetController extends EventEmitter {
     }
 
     clientDataProcessor(data){
-        var json;
-        if(typeof data === 'object'){
-            json = data
-        }else{
-            json = JSON.parse(data);
-        }
-        if(json.playerList){
-            this.emit("playerList",json.playerList)
-        }
-        if(json.gameStarted){
-            this.emit("gameStarted",json.gameStarted)
-        }
+        if(data.id !== this.clientToHost.peer){
+            var json;
+            
+            if(typeof data === 'object'){
+                json = data
+            }else{
+                json = JSON.parse(data);
+            }
 
-        if(json.move){
-            this.playerMovementEvent(json);
-        }
+            console.log(json);
 
-        if(json.travel){
-            this.playerTravelEvent(json);
+            if(json.playerList){
+                this.emit("playerList",json.playerList)
+            }
+            if(json.gameStarted){
+                this.emit("gameStarted",json.gameStarted)
+            }
+
+            if(json.move){
+                console.log("move")
+                this.playerMovementEvent(json);
+            }
+
+            if(json.travel){
+                console.log("trvl")
+                console.log(this.players)
+                this.playerTravelEvent(json);
+            }
         }
     }
 
