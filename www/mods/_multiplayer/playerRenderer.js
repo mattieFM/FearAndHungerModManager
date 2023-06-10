@@ -19,15 +19,26 @@ MATTIE.multiplayer.Secondary_Player.prototype.constructor = MATTIE.multiplayer.S
 MATTIE.RPG.gamePlayerUpdate = Game_Player.prototype.update;
 MATTIE.multiplayer.Secondary_Player.prototype.update = function () {
     MATTIE.RPG.gamePlayerUpdate.call(this);
-    console.log("hiya")
 }
+
+MATTIE.RPG.gamePlayerInit = Game_Player.prototype.initialize;
+MATTIE.multiplayer.Secondary_Player.prototype.initialize = function () {
+    MATTIE.RPG.gamePlayerInit.call(this);
+    this.ctrlDir4 = Input.dir4;
+}
+
+
+
+MATTIE.multiplayer.Secondary_Player.prototype.getInputDirection = function() {
+    return this.ctrlDir4;
+};
 
 MATTIE.RPG.spriteSetMap_CreateChars =Spriteset_Map.prototype.createCharacters;
 
 Spriteset_Map.prototype.createCharacters = function() {
     this.playersSprites = [];
     MATTIE.RPG.spriteSetMap_CreateChars.call(this);
-    if(MATTIE.multiplayer.isHost && MATTIE.multiplayer.isActive){
+    if(MATTIE.multiplayer.isActive){
         let mattieI = 0;
         for(key in MATTIE.multiplayer.netController.connections){
             const conn = MATTIE.multiplayer.netController.connections[key];
@@ -74,6 +85,7 @@ Game_Character.prototype.processMoveCommand = function(command) {
             let obj = {};
             obj.move = {};
             obj.move.command = command.code;
+            obj.move.dir4 = Input.dir4;
             netController.clientToHost.send(obj);
     }
 }
