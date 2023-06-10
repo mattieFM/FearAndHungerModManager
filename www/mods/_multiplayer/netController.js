@@ -36,7 +36,7 @@ class NetController extends EventEmitter {
 
     /** open a peer with host logic */
     openHostPeer(){
-        
+        MATTIE.multiplayer.isHost = true;
         var host = this.openPeer();
         this.host = host;
         host.on("open", (id)=>{
@@ -58,6 +58,7 @@ class NetController extends EventEmitter {
 
     /** open a peer with client logic */
     openClientPeer(){
+        MATTIE.multiplayer.isClient = true;
         var client = this.openPeer();
         this.client = client;
         client.on("open", (id)=>{
@@ -119,10 +120,6 @@ class NetController extends EventEmitter {
         }
         if(json.playerList){
             this.emit("playerList",json.playerList)
-        }
-
-        if(json.startGame){
-            this.emit("startGame")
         }
     }
 

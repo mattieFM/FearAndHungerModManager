@@ -7,7 +7,10 @@ MATTIE.multiplayer = MATTIE.multiplayer || {}
 MATTIE.menus.multiplayer = MATTIE.menus.multiplayer || {};
 MATTIE.scenes.multiplayer = MATTIE.scenes.multiplayer || {};
 MATTIE.windows.multiplayer = MATTIE.windows.multiplayer || {};
-MATTIE.multiplayer.active = true;
+MATTIE.multiplayer.isActive = true;
+MATTIE.multiplayer.isClient = false;
+MATTIE.multiplayer.isHost = false;
+
 
 /** @type {NetController} */
 MATTIE.multiplayer.netController = new NetController();
@@ -29,10 +32,6 @@ MATTIE.menus.multiplayer.openLobby = () => {
     SceneManager.goto(MATTIE.scenes.multiplayer.lobby)
 }
 
-MATTIE.menus.multiplayer.openGame = () => {
-    SceneManager.goto(Scene_Load);
-}
-
 
 (()=>{
     //MATTIE.menus.multiplayer.openHost();
@@ -50,8 +49,6 @@ MATTIE.menus.multiplayer.openGame = () => {
         client = netController.openClientPeer();
         netController.clientName = "client2"
         netController.name = "client2"
-        
-        
     })
 
     Input.addKeyBind('u', ()=>{

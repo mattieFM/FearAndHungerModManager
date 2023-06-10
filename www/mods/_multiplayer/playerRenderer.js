@@ -23,40 +23,43 @@ MATTIE.multiplayer.Secondary_Player.prototype.update = function () {
 }
 
 MATTIE.RPG.spriteSetMap_CreateChars =Spriteset_Map.prototype.createCharacters;
+
 Spriteset_Map.prototype.createCharacters = function() {
     this.playersSprites = [];
     MATTIE.RPG.spriteSetMap_CreateChars.call(this);
-    let mattieI = 0;
-    for(key in MATTIE.multiplayer.netController.connections){
-        const conn = MATTIE.multiplayer.netController.connections[key];
-        let player = conn.name;
-        conn.$gamePlayer = new MATTIE.multiplayer.Secondary_Player();
-        let p2 = conn.$gamePlayer;
+    if(MATTIE.multiplayer.isHost && MATTIE.multiplayer.isActive){
+        let mattieI = 0;
+        for(key in MATTIE.multiplayer.netController.connections){
+            const conn = MATTIE.multiplayer.netController.connections[key];
+            let player = conn.name;
+            conn.$gamePlayer = new MATTIE.multiplayer.Secondary_Player();
+            let p2 = conn.$gamePlayer;
 
-        //TODO: figure out what the fuck this shit does we need it. but idk
-        p2.reserveTransfer($gameMap.mapId(), $gamePlayer.x,$gamePlayer.y); 
+            //TODO: figure out what the fuck this shit does we need it. but idk
+            p2.reserveTransfer($gameMap.mapId(), $gamePlayer.x,$gamePlayer.y); 
+            
+            p2.x = $gamePlayer.x;
+            p2.y = $gamePlayer.y;
+            mattieI++;
+            setTimeout(() => {
+                p2.name = player;
+                p2.setTransparent(false);
+                p2.refresh();
+                p2.update(true)
+                p2.performTransfer()
+                p2.update(true);
+                p2.refresh();
+            }, 2000);
+            
+            this.playersSprites.push(new Sprite_Character(p2));
+        }
         
-        p2.x = $gamePlayer.x;
-        p2.y = $gamePlayer.y;
-        mattieI++;
-        setTimeout(() => {
-            p2.name = player;
-            p2.setTransparent(false);
-            p2.refresh();
-            p2.update(true)
-            p2.performTransfer()
-            p2.update(true);
-            p2.refresh();
-        }, 2000);
-        
-        this.playersSprites.push(new Sprite_Character(p2));
-    }
-    
-    this._characterSprites.concat(this.playersSprites)
+        this._characterSprites.concat(this.playersSprites)
 
-    
-    for (var i = 0; i < this.playersSprites.length; i++) {
-        this._tilemap.addChild(this.playersSprites[i]);
+        
+        for (var i = 0; i < this.playersSprites.length; i++) {
+            this._tilemap.addChild(this.playersSprites[i]);
+        }
     }
 };
 
@@ -65,13 +68,16 @@ MATTIE.RPG.processMoveCommand = Game_Character.prototype.processMoveCommand;
 //so send x and y sometimes or mabye on a different event or just a time to fix any slight offsets.
 Game_Character.prototype.processMoveCommand = function(command) {
     MATTIE.RPG.processMoveCommand.call(this, command);
-    console.log(command.code)
-    if(command.code){
-        let obj = {};
-        obj.move = {};
-        obj.move.command = command.code;
-        netController.clientToHost.send(obj);
+    if(MATTIE.multiplayer.isClient && MATTIE.multiplayer.isActive){
+        console.log(command.code)
+        if(command.code){
+            let obj = {};
+            obj.move = {};
+            obj.move.command = command.code;
+            netController.clientToHost.send(obj);
     }
+}
+    
     
 }
 
@@ -79,10 +85,12 @@ MATTIE.RPG.SceneMap_MainUpdate = Scene_Map.prototype.updateMain;
 
 Scene_Map.prototype.updateMain = function () {
     MATTIE.RPG.SceneMap_MainUpdate.call(this)
-    for(key in MATTIE.multiplayer.netController.connections){
-        let conn = MATTIE.multiplayer.netController.connections[key];
-        let player = conn.$gamePlayer;
-        player.update();
+    if(MATTIE.multiplayer.isHost && MATTIE.multiplayer.isActive){
+        for(key in MATTIE.multiplayer.netController.connections){
+            let conn = MATTIE.multiplayer.netController.connections[key];
+            let player = conn.$gamePlayer;
+            player.update();
+        }
     }
 }
 

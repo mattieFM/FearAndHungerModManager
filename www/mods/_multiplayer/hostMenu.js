@@ -57,12 +57,7 @@ MATTIE.scenes.multiplayer.host.prototype.addOptionsBtns = function(){
     btns[MATTIE.TextManager.startGame] = MATTIE.CmdManager.startGame;
     btns[MATTIE.TextManager.returnToMultiplayer] = MATTIE.CmdManager.returnToMultiplayer;
     this._optionsWindow = new MATTIE.windows.horizontalBtns(175+300+10, btns, 2);
-    this._optionsWindow.setHandler(MATTIE.CmdManager.startGame, (()=>{
-        let obj = {};
-        obj.startGame = "start";
-        MATTIE.multiplayer.netController.sendAll(obj);
-        MATTIE.menus.multiplayer.openGame();
-    }).bind(this));
+    this._optionsWindow.setHandler(MATTIE.CmdManager.startGame, (()=>{SceneManager.goto(Scene_Load)}).bind(this));
     this._optionsWindow.setHandler(MATTIE.CmdManager.returnToMultiplayer,  MATTIE.menus.multiplayer.openMultiplayer.bind(this));
     this.addWindow(this._optionsWindow);
 }
