@@ -208,6 +208,9 @@ MATTIE.windows.textInput.prototype.getInput = function(){
     return this._text;
 }
 MATTIE.windows.textInput.prototype.updateText = function(text=this._text) {
+    if(text != this._text){
+        this._text = text;
+    }
     this.contents.clear();
     let i = 0;
     this.drawText(this._header,0,25*i,0)

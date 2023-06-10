@@ -79,6 +79,10 @@ class NetController extends EventEmitter {
         return client;
     }
 
+    triggerPlayerListEventHost(){
+        this.emit("playerList",this.getPlayerList());
+    }
+
     hostDataProcessor(data, conn){
         var json;
         if(typeof data === 'object'){
@@ -90,7 +94,7 @@ class NetController extends EventEmitter {
         json.id = conn.peer;
         if(json.connected){
             this.playerConnectionEvent(json)
-            this.emit("playerList",this.getPlayerList()); //only used for menu rendering
+            this.triggerPlayerListEventHost();
         }
         if(json.move){
             this.playerMovementEvent(json);
@@ -99,15 +103,16 @@ class NetController extends EventEmitter {
 
     playerMovementEvent(json){
         for(key in this.players){
-            console.log("player move event")
-            console.log(this.players[key].id)
-            console.log(json.id)
             if(this.players[key].id === json.id){
-                console.log("player move event -- id matched")
-                const move = json.move;
-                this.players[key].$gamePlayer.setDir4(move.dir4);
-                this.players[key].$gamePlayer.moveByInput(move.command)
-                this.players[key].$gamePlayer.update(true);
+                try {
+                    const move = json.move;
+                    this.players[key].$gamePlayer.setDir4(move.dir4);
+                    this.players[key].$gamePlayer.moveByInput(move.command)
+                    this.players[key].$gamePlayer.update(true);
+                } catch (error) {
+                    console.log("A Client Loaded before the host")
+                }
+                
             }
         }
         
@@ -162,9 +167,19 @@ class NetController extends EventEmitter {
             this.players[id] = {"id":id,"name":name}
             players.push(name)
         }
-        if(!this.players.includes(this.name)){ //add self if not present
-            players.push(this.name) //will not work locally
+
+        if(this.players.length > 1){
+            for(key in this.players){
+                console.log("thatname"+this.players[key].name)
+                console.log("thisname"+this.name)
+                if(this.players[key].name !== this.name){
+                    players.push(this.name) //will not work locally //add self if not present
+                }
+            }
+        }else{
+            players.push(this.name)
         }
+        console.log(players)
         
         return players;
     }
