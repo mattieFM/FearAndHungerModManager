@@ -127,10 +127,14 @@ class NetController extends EventEmitter {
             let player = netPlayer.$gamePlayer
             let x = json.travel.cords.x
             let y = json.travel.cords.y
+            
             netPlayer.setX(x)
             netPlayer.setY(y)
             netPlayer.setMap(json.travel.map)
+            player.setTransparent(false);
             player.reserveTransfer(json.travel.map, x, y, 0, 0)
+            player.performTransfer();
+            player.refresh();
             player.update();
         })
     }

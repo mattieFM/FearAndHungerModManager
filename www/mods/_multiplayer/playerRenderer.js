@@ -69,15 +69,7 @@ MATTIE.multiplayer.renderer._createSecondaryChars = function() {
             p2.x = $gamePlayer.x;
             p2.y = $gamePlayer.y;
             mattieI++;
-            setTimeout(() => {
-                p2.name = netPlayer.name;
-                p2.setTransparent(false);
-                p2.refresh();
-                p2.update(true)
-                p2.performTransfer()
-                p2.update(true);
-                p2.refresh();
-            }, 2000);
+            p2.name = netPlayer.name;
             
             this.playersSprites.push(new Sprite_Character(p2));
         }
@@ -109,8 +101,8 @@ MATTIE.multiplayer.renderer.overrideProcessMove = function (){
     }
 
 
-    MATTIE.RPG.reserveTransfer = Game_Player.prototype.reserveTransfer;
-    Game_Player.prototype.reserveTransfer = function(mapId, x, y, d, fadeType){
+    MATTIE.RPG.reserveTransfer = Game_Player.prototype.performTransfer;
+    Game_Player.prototype.performTransfer = function(mapId, x, y, d, fadeType){
         MATTIE.RPG.reserveTransfer.call(this, mapId, x, y, d, fadeType);
         if(MATTIE.multiplayer.isClient && MATTIE.multiplayer.isActive){
             let obj = {};
