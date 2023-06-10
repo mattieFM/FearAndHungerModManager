@@ -7,6 +7,7 @@ MATTIE.multiplayer = MATTIE.multiplayer || {}
 MATTIE.menus.multiplayer = MATTIE.menus.multiplayer || {};
 MATTIE.scenes.multiplayer = MATTIE.scenes.multiplayer || {};
 MATTIE.windows.multiplayer = MATTIE.windows.multiplayer || {};
+MATTIE.multiplayer.active = true;
 
 /** @type {NetController} */
 MATTIE.multiplayer.netController = new NetController();
@@ -25,7 +26,6 @@ MATTIE.menus.multiplayer.openMultiplayer = () => {
 }
 
 MATTIE.menus.multiplayer.openLobby = () => {
-    console.log("here")
     SceneManager.goto(MATTIE.scenes.multiplayer.lobby)
 }
 
@@ -41,22 +41,21 @@ MATTIE.menus.multiplayer.openLobby = () => {
     
 
     Input.addKeyBind('i', ()=>{
+        console.log("-- Forced Client connection script --")
+        netController.hostId = netController.host.id
         client = netController.openClientPeer();
-        console.log("client connecting")
-        client.on("open",()=>{
-            conn = client.connect(netController.host.id);
-        })
+        netController.clientName = "client2"
+        netController.name = "client2"
         
-       
-    })
-
-    Input.addKeyBind('p', ()=>{
-        console.log("clientTriggered")
-        conn.send({"connected":"casca"})
+        
     })
 
     Input.addKeyBind('u', ()=>{
-        console.log(MATTIE.multiplayer.netController.connections)
+        let obj = {}
+        obj.move = {};
+        obj.move.x = -1;
+        obj.move.y = -1;
+        netController.clientToHost.send(obj)
     })
 
 
