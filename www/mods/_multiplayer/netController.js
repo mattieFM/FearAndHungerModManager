@@ -120,6 +120,10 @@ class NetController extends EventEmitter {
         if(json.playerList){
             this.emit("playerList",json.playerList)
         }
+
+        if(json.startGame){
+            this.emit("startGame")
+        }
     }
 
     /**
