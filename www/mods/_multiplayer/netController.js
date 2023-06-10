@@ -117,35 +117,47 @@ class NetController extends EventEmitter {
     onMatchingPlayer(json, cb){
         for(key in this.players){
             if(this.players[key].id === json.id){
-                cb(this.players[key])
+                cb(key)
             }
         }
     }
 
     playerTravelEvent(json){
-        this.onMatchingPlayer(json,(netPlayer)=>{
-            let player = netPlayer.$gamePlayer
+        this.onMatchingPlayer(json, (key)=>{
+            let netPlayer = this.players[key];
             let x = json.travel.cords.x
             let y = json.travel.cords.y
-            
             netPlayer.setX(x)
             netPlayer.setY(y)
             netPlayer.setMap(json.travel.map)
-            player.setTransparent(false);
-            player.reserveTransfer(json.travel.map, x, y, 0, 0)
-            player.performTransfer();
-            player.refresh();
-            player.update();
+            try {
+                SceneManager._scene.createSpriteset() //update rendered players after travel
+                let player =this.players[key].$gamePlayer;
+                console.log(this.players)
+                player.setTransparent(false);
+                player.reserveTransfer(json.travel.map, x, y, 0, 0)
+                player.performTransfer();
+                player.refresh();
+                player.update();  
+        
+            } catch (error) {
+                console.log(error)
+            }
         })
     }
 
     playerMovementEvent(json){
-        this.onMatchingPlayer(json,(player)=>{
+        this.onMatchingPlayer(json,(key)=>{
             try { //for now we will just use a catch to fix this, might need to beef this up later
                 const move = json.move;
-                player.$gamePlayer.setDir4(move.dir4);
-                player.$gamePlayer.moveByInput(move.command)
-                player.$gamePlayer.update(true);
+                let player = this.players[key]
+                if(player.$gamePlayer){
+                    player.$gamePlayer.setDir4(move.dir4);
+                    player.$gamePlayer.moveByInput(move.command)
+                    player.$gamePlayer.update(true);
+                }
+
+                
             } catch (error) {
                 console.log("A Client Loaded before the host")
             }
