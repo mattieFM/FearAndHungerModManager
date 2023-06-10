@@ -48,7 +48,7 @@ MATTIE.menus.multiplayer.openGame = () => {
     var client;
     var conn;
     
-
+    if(MATTIE.multiplayer.isDev){
     Input.addKeyBind('i', ()=>{
         console.log("-- Forced Client connection script --")
         netController.hostId = netController.host.id
@@ -58,12 +58,19 @@ MATTIE.menus.multiplayer.openGame = () => {
     })
 
     Input.addKeyBind('u', ()=>{
-        let obj = {}
-        obj.move = {};
-        obj.move.x = -1;
-        obj.move.y = -1;
-        netController.clientToHost.send(obj)
+        console.log("-- Forced Host open script --")
+        netController.hostName = "host"
+        netController.name = "host"
+        host = netController.openHostPeer();
+
     })
+
+    Input.addKeyBind('y', ()=>{
+        console.log("-- Forced Host start script --")
+        netController.triggerStartGameEvent();
+
+    })
+}
 
 
 
