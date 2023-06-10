@@ -61,6 +61,7 @@ MATTIE.scenes.multiplayer.host.prototype.addOptionsBtns = function(){
         let obj = {};
         obj.gameStarted = "y";
         MATTIE.multiplayer.netController.sendAll(obj);
+        
         MATTIE.menus.multiplayer.openGame();
     }).bind(this));
     this._optionsWindow.setHandler(MATTIE.CmdManager.returnToMultiplayer,  MATTIE.menus.multiplayer.openMultiplayer.bind(this));
