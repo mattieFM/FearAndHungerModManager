@@ -21,7 +21,6 @@
  * By default mod's cannot load anything outside of their folder, all dependencies must be included within the mods folder.
  */
 
-
 var MATTIE_ModManager = {};
 
 class ModManager {

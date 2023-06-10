@@ -11,7 +11,10 @@ class NetController extends EventEmitter {
         this.host;
         this.hostId = undefined; //will be null if u are host
         this.name ="default"
+        this.clientName = "";
+        this.hostName = "";
         this.client;
+        this.clientToHost;
         this.players = [];
         /** @type {{{<String>name:PlayerConnection}} */
         this.connections = {};
@@ -58,11 +61,13 @@ class NetController extends EventEmitter {
         var client = this.openPeer();
         this.client = client;
         client.on("open", (id)=>{
+            console.log(`Client Open At: ${id}`)
             const conn = client.connect(this.hostId);
+            this.clientToHost = conn;
             conn.on("open", () => {
-                console.log(`Client Open At: ${id}`)
+                console.log(`Client Connected to a host`)
                 conn.send({"connected":this.name})
-                this.handleConnection(conn)
+                //this.handleConnection(conn)
             })
             conn.on("data", (data) => {
                 this.clientDataProcessor(data);
@@ -79,10 +84,30 @@ class NetController extends EventEmitter {
         }else{
             json = JSON.parse(data);
         }
-        json.conn = conn;
+
+        json.id = conn.peer;
         if(json.connected){
             this.playerConnectionEvent(json)
         }
+        if(json.move){
+            this.playerMovementEvent(json);
+        }
+    }
+
+    playerMovementEvent(json){
+        for(key in this.connections){
+            console.log("player move event")
+            if(this.connections[key].id===json.id){
+                //this.connections[key].$gamePlayer._moveRouteIndex = json.move.command;
+                this.connections[key].$gamePlayer.moveByInput(json.move)
+                    
+                
+                
+                //this.connections[key].$gamePlayer.reserveTransfer($dataSystem.startMapId, this.connections[key].$gamePlayer.x , this.connections[key].$gamePlayer.y);
+                this.connections[key].$gamePlayer.update(true);
+            }
+        }
+        
     }
 
     clientDataProcessor(data){
@@ -112,7 +137,7 @@ class NetController extends EventEmitter {
      * @param {*} data the data sent by the client upon connection
      */
     playerConnectionEvent(data){
-        let id = data.conn.peer;
+        let id = data.id;
         if(!this.connections[id].name){//only fire on first connection
             this.connections[id].setName(data.connected)
             let obj = {}
@@ -124,15 +149,14 @@ class NetController extends EventEmitter {
 
 
     getPlayerList(){
-        let players = [];
         for(key in this.connections){
-            players.push(this.connections[key].name);
+            this.players.push(this.connections[key].name);
         }
-        if(!players.includes(this.name)){
-            //players.push(this.name);
+        if(!this.players.includes(this.name)){
+            players.push(this.hostName);
         }
         
-        return players;
+        return this.players;
     }
 }
 
