@@ -35,7 +35,4 @@ MATTIE.scenes.multiplayer.lobby.prototype.initListController = function(){
     netController.addListener('playerList', (names) =>{
         this._playerWindow.updateText(names);
     })
-    netController.addListener('startGame', () =>{
-        MATTIE.menus.multiplayer.openGame();
-    })
 }
