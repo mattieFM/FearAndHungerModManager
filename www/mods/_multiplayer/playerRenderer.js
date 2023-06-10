@@ -100,9 +100,9 @@ MATTIE.multiplayer.renderer.overrideProcessMove = function (){
                 obj.move.command = command.code;
                 obj.move.dir4 = Input.dir4;
                 if(command.code != 29){//either standing still or speed change I think?
-
+                    netController.sendHost(obj);
                 }
-                netController.sendHost(obj);
+                
             }
         }
     }
