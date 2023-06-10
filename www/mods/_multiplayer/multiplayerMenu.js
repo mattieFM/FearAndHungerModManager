@@ -24,7 +24,7 @@ MATTIE.scenes.multiplayer.base.prototype.create = function (){
 }
 
 MATTIE.scenes.multiplayer.base.prototype.createBackground = function() {
-    this._backSprite2 = new Sprite(ImageManager.loadBitmap("./mods/_multiplayer/","multiPlayerMenu",0,true));
+    this._backSprite2 = new Sprite(ImageManager.loadBitmap("www/mods/_multiplayer/","multiPlayerMenu",0,true));
     this.addChild(this._backSprite2);
     
 };
@@ -78,7 +78,7 @@ MATTIE.scenes.multiplayer.main.prototype.addTextField = function (){
 
 MATTIE.scenes.multiplayer.main.prototype.createBackground = function() {
     this._backSprite1 = new Sprite(ImageManager.loadTitle1($dataSystem.title1Name));
-    this._backSprite2 = new Sprite(ImageManager.loadBitmap("./mods/_multiplayer/","multiPlayerMenu",0,true));
+    this._backSprite2 = new Sprite(ImageManager.loadBitmap("www/mods/_multiplayer/","multiPlayerMenu",0,true));
     this.addChild(this._backSprite1);
     this.addChild(this._backSprite2);
 };
