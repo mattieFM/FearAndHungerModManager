@@ -28,6 +28,11 @@ class NetController extends EventEmitter {
         }
     }
 
+    /** send to host from client */
+    sendHost(data) {
+        this.clientToHost.send(data)
+    }
+
     /** open a peer with a auto generated id */
     openPeer(){
         let peer = new Peer();
@@ -99,23 +104,48 @@ class NetController extends EventEmitter {
         if(json.move){
             this.playerMovementEvent(json);
         }
+        if(json.travel){
+            this.playerTravelEvent(json);
+        }
+    }
+
+    /**
+     * proforma the call back only if the json.id matches a player.id
+     * @param {json event obj} json 
+     * @param {(player:Game_Player)=>{}} json 
+     */
+    onMatchingPlayer(json, cb){
+        for(key in this.players){
+            if(this.players[key].id === json.id){
+                cb(this.players[key])
+            }
+        }
+    }
+
+    playerTravelEvent(json){
+        this.onMatchingPlayer(json,(netPlayer)=>{
+            let player = netPlayer.$gamePlayer
+            let x = json.travel.cords.x
+            let y = json.travel.cords.y
+            netPlayer.setX(x)
+            netPlayer.setY(y)
+            netPlayer.setMap(json.travel.map)
+            player.reserveTransfer(json.travel.map, x, y, 0, 0)
+            player.update();
+        })
     }
 
     playerMovementEvent(json){
-        for(key in this.players){
-            if(this.players[key].id === json.id){
-                try {
-                    const move = json.move;
-                    this.players[key].$gamePlayer.setDir4(move.dir4);
-                    this.players[key].$gamePlayer.moveByInput(move.command)
-                    this.players[key].$gamePlayer.update(true);
-                } catch (error) {
-                    console.log("A Client Loaded before the host")
-                }
-                
+        this.onMatchingPlayer(json,(player)=>{
+            try { //for now we will just use a catch to fix this, might need to beef this up later
+                const move = json.move;
+                player.$gamePlayer.setDir4(move.dir4);
+                player.$gamePlayer.moveByInput(move.command)
+                player.$gamePlayer.update(true);
+            } catch (error) {
+                console.log("A Client Loaded before the host")
             }
-        }
-        
+        })
     }
 
     clientDataProcessor(data){
@@ -150,6 +180,7 @@ class NetController extends EventEmitter {
     playerConnectionEvent(data){
         let id = data.id;
         if(!this.connections[id].name){//only fire on first connection
+            this.setupPlayers();
             this.connections[id].setName(data.connected)
             let obj = {}
             obj.playerList = this.getPlayerList();
@@ -158,20 +189,27 @@ class NetController extends EventEmitter {
         }
     }
 
-
-    getPlayerList(){
-        let players = [];
+    setupPlayers(){
         for(key in this.connections){
             let id = this.connections[key].id;
             let name = this.connections[key].name;
-            this.players[id] = {"id":id,"name":name}
+            if(!this.players[id])
+            this.players[id] = new netPlayer(id,name)
+        }
+
+    }
+
+
+    /** get and set playerlist, probs should be broken into 2 but its not taht important */
+    getPlayerList(){
+        let players = [];
+        for(key in this.connections){
+            let name = this.connections[key].name;
             players.push(name)
         }
 
         if(this.players.length > 1){
             for(key in this.players){
-                console.log("thatname"+this.players[key].name)
-                console.log("thisname"+this.name)
                 if(this.players[key].name !== this.name){
                     players.push(this.name) //will not work locally //add self if not present
                 }
@@ -179,8 +217,6 @@ class NetController extends EventEmitter {
         }else{
             players.push(this.name)
         }
-        console.log(players)
-        
         return players;
     }
 }

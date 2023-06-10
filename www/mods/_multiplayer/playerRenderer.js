@@ -103,8 +103,23 @@ MATTIE.multiplayer.renderer.overrideProcessMove = function (){
                 obj.move = {};
                 obj.move.command = command.code;
                 obj.move.dir4 = Input.dir4;
-                netController.clientToHost.send(obj);
+                netController.sendHost(obj);
             }
+        }
+    }
+
+
+    MATTIE.RPG.reserveTransfer = Game_Player.prototype.reserveTransfer;
+    Game_Player.prototype.reserveTransfer = function(mapId, x, y, d, fadeType){
+        MATTIE.RPG.reserveTransfer.call(this, mapId, x, y, d, fadeType);
+        if(MATTIE.multiplayer.isClient && MATTIE.multiplayer.isActive){
+            let obj = {};
+                obj.travel = {};
+                obj.travel.cords = {};
+                obj.travel.cords.x = x;
+                obj.travel.cords.y = y;
+                obj.travel.map = mapId;
+            netController.sendHost(obj);
         }
     }
 }
