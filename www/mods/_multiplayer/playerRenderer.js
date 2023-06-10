@@ -56,11 +56,13 @@ MATTIE.multiplayer.renderer.playerOverrides = function(){
 }
 /** render all secondary characters */
 MATTIE.multiplayer.renderer._createSecondaryChars = function() {
+    console.log('\n\n\n----enter-----\n\n\n')
     this.playersSprites = [];
         let mattieI = 0;
         for(key in MATTIE.multiplayer.netController.players){
             const netPlayer = MATTIE.multiplayer.netController.players[key];
             if(netPlayer.map === $gameMap.mapId()){//only render players on same map
+                console.log('\n\n\n----id match-----\n\n\n')
                 netPlayer.$gamePlayer = new MATTIE.multiplayer.Secondary_Player();
                 let p2 = netPlayer.$gamePlayer;
                 
@@ -72,6 +74,7 @@ MATTIE.multiplayer.renderer._createSecondaryChars = function() {
                 mattieI++;
                 p2.name = netPlayer.name;
                 this.playersSprites.push(new Sprite_Character(p2));
+                console.log('\n\n\n----idone-----\n\n\n');
             }
         }
         
@@ -152,7 +155,9 @@ MATTIE.multiplayer.renderer.overrideMapUpdateMain = function (){
             for(key in MATTIE.multiplayer.netController.players){
                 let netPlayer = MATTIE.multiplayer.netController.players[key];
                 let localPlayer = netPlayer.$gamePlayer;
-                localPlayer.update();
+                if(localPlayer){
+                    localPlayer.update();
+                }
             }
         }
     }
