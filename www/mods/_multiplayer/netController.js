@@ -43,13 +43,13 @@ class NetController extends EventEmitter {
             console.log(`Host Open At: ${id}`)
         })
 
-        host.on("connection", (conn) => {
-            
+        host.on("connection", (conn) => {            
             this.handleConnection(conn);
             if(conn.peer === this.host.id){
                 this.connections[this.host.id].name = this.name;
             }
             conn.on('data', (data) => {
+                console.log(data)
                 this.hostDataProcessor(data, conn);
             })
          })
@@ -157,7 +157,7 @@ class NetController extends EventEmitter {
             this.players.push(this.connections[key].name);
         }
         if(!this.players.includes(this.name)){
-            players.push(this.hostName);
+            this.players.push(this.hostName);
         }
         
         return this.players;
