@@ -39,8 +39,9 @@ MATTIE.scenes.multiplayer.host.prototype.addPlayerListWindow = function(){
 
 MATTIE.scenes.multiplayer.host.prototype.initListController = function(){
     var netController = MATTIE.multiplayer.netController; 
-    netController.addListener('connect', (name) =>{
-        this._playerWindow.addItem(name)
+    netController.addListener('playerList', (names) =>{
+        console.log(names)
+        this._playerWindow.updateText(names)
     })
 }
 MATTIE.scenes.multiplayer.host.prototype.addPeerDisplayWindow = function(){
@@ -61,7 +62,7 @@ MATTIE.scenes.multiplayer.host.prototype.addOptionsBtns = function(){
         let obj = {};
         obj.gameStarted = "y";
         MATTIE.multiplayer.netController.sendAll(obj);
-        
+
         MATTIE.menus.multiplayer.openGame();
     }).bind(this));
     this._optionsWindow.setHandler(MATTIE.CmdManager.returnToMultiplayer,  MATTIE.menus.multiplayer.openMultiplayer.bind(this));

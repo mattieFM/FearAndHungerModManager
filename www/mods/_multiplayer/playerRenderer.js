@@ -3,12 +3,15 @@ MATTIE.multiplayer = MATTIE.multiplayer || {}
 MATTIE.menus.multiplayer = MATTIE.menus.multiplayer || {};
 MATTIE.scenes.multiplayer = MATTIE.scenes.multiplayer || {};
 MATTIE.windows.multiplayer = MATTIE.windows.multiplayer || {};
-
+MATTIE.multiplayer.renderer = MATTIE.multiplayer.renderer || {};
 MATTIE.RPG = MATTIE.RPG || {};
 
 //todo:documentation and make stuff pretty
 
-
+/**
+ * @description a class that represents any player that is not the one the user is actively controlling.
+ * @extends Game_Player
+ */
 MATTIE.multiplayer.Secondary_Player =  function () {
     this.initialize.apply(this, arguments);
 }
@@ -16,41 +19,49 @@ MATTIE.multiplayer.Secondary_Player =  function () {
 MATTIE.multiplayer.Secondary_Player.prototype = Object.create(Game_Player.prototype);
 MATTIE.multiplayer.Secondary_Player.prototype.constructor = MATTIE.multiplayer.Secondary_Player;
 
-MATTIE.RPG.gamePlayerUpdate = Game_Player.prototype.update;
-MATTIE.multiplayer.Secondary_Player.prototype.update = function () {
-    MATTIE.RPG.gamePlayerUpdate.call(this);
-}
-
 MATTIE.multiplayer.Secondary_Player.prototype.initialize = function () {
+    this.ctrlDir4 = 0; //start standing still
     Game_Player.prototype.initialize.call(this);
 }
+
+/** set the dir4 current control. dir4 is the direction on the arrow keys. */
 MATTIE.multiplayer.Secondary_Player.prototype.setDir4 = function(dir4) {
-    console.log("in setdir4:" + dir4 + "\n\n")
     this.ctrlDir4 = dir4;
 }
 
+/** 
+ * This function is how the movement controller determines if the player should move in a direction when a movement event is triggered.
+ * Might need to be expanded in future to accommodate gamepads
+ * @returns
+ * 0 if not moving
+ * 2 if down
+ * 8 if up
+ * 6 if right
+ * 4 if left
+ */
 MATTIE.multiplayer.Secondary_Player.prototype.getInputDirection = function() {
-    console.log("in get dir 4")
-    if(this.ctrlDir4){
-        return this.ctrlDir4;
-    } else {
-        return 0
-    }
-    
+    return this.ctrlDir4;
 };
 
-MATTIE.RPG.spriteSetMap_CreateChars = Spriteset_Map.prototype.createCharacters;
 
-Spriteset_Map.prototype.createCharacters = function() {
+
+
+MATTIE.RPG.spriteSetMap_CreateChars = Spriteset_Map.prototype.createCharacters;
+/** a function that handles overriding the player rendering settings to allow rendering of multiple PCs */
+MATTIE.multiplayer.renderer.playerOverrides = function(){
+    Spriteset_Map.prototype.createCharacters = function() {
+        MATTIE.RPG.spriteSetMap_CreateChars.call(this);
+        if(MATTIE.multiplayer.isActive) MATTIE.multiplayer.renderer._createSecondaryChars.call(this);
+    };
+}
+/** render all secondary characters */
+MATTIE.multiplayer.renderer._createSecondaryChars = function() {
     this.playersSprites = [];
-    MATTIE.RPG.spriteSetMap_CreateChars.call(this);
-    if(MATTIE.multiplayer.isActive){
         let mattieI = 0;
-        for(key in MATTIE.multiplayer.netController.connections){
-            const conn = MATTIE.multiplayer.netController.connections[key];
-            let player = conn.name;
-            conn.$gamePlayer = new MATTIE.multiplayer.Secondary_Player();
-            let p2 = conn.$gamePlayer;
+        for(key in MATTIE.multiplayer.netController.players){
+            const netPlayer = MATTIE.multiplayer.netController.players[key];
+            netPlayer.$gamePlayer = new MATTIE.multiplayer.Secondary_Player();
+            let p2 = netPlayer.$gamePlayer;
 
             //TODO: figure out what the fuck this shit does we need it. but idk
             p2.reserveTransfer($gameMap.mapId(), $gamePlayer.x,$gamePlayer.y); 
@@ -59,7 +70,7 @@ Spriteset_Map.prototype.createCharacters = function() {
             p2.y = $gamePlayer.y;
             mattieI++;
             setTimeout(() => {
-                p2.name = player;
+                p2.name = netPlayer.name;
                 p2.setTransparent(false);
                 p2.refresh();
                 p2.update(true)
@@ -77,84 +88,46 @@ Spriteset_Map.prototype.createCharacters = function() {
         for (var i = 0; i < this.playersSprites.length; i++) {
             this._tilemap.addChild(this.playersSprites[i]);
         }
-    }
-};
-
-MATTIE.RPG.processMoveCommand = Game_Character.prototype.processMoveCommand;
-//todo: cheat a little and tp the players every now and again to account for them getting slightly off due to move speed acceleration from frame changes.
-//so send x and y sometimes or mabye on a different event or just a time to fix any slight offsets.
-Game_Character.prototype.processMoveCommand = function(command) {
-    MATTIE.RPG.processMoveCommand.call(this, command);
-    if(MATTIE.multiplayer.isClient && MATTIE.multiplayer.isActive){
-        console.log(command.code)
-        if(command.code){
-            let obj = {};
-            obj.move = {};
-            obj.move.command = command.code;
-            obj.move.dir4 = Input.dir4;
-            netController.clientToHost.send(obj);
-    }
-}
-    
-    
 }
 
-MATTIE.RPG.SceneMap_MainUpdate = Scene_Map.prototype.updateMain;
-
-Scene_Map.prototype.updateMain = function () {
-    MATTIE.RPG.SceneMap_MainUpdate.call(this)
-    if(MATTIE.multiplayer.isHost && MATTIE.multiplayer.isActive){
-        for(key in MATTIE.multiplayer.netController.connections){
-            let conn = MATTIE.multiplayer.netController.connections[key];
-            let player = conn.$gamePlayer;
-            player.update();
+/** override the process move function to send data to the host */
+MATTIE.multiplayer.renderer.overrideProcessMove = function (){
+    MATTIE.RPG.processMoveCommand = Game_Character.prototype.processMoveCommand;
+    //todo: cheat a little and tp the players every now and again to account for them getting slightly off due to move speed acceleration from frame changes.
+    //so send x and y sometimes or mabye on a different event or just a time to fix any slight offsets.
+    Game_Character.prototype.processMoveCommand = function(command) {
+        MATTIE.RPG.processMoveCommand.call(this, command);
+        if(MATTIE.multiplayer.isClient && MATTIE.multiplayer.isActive){
+            if(command.code){
+                let obj = {};
+                obj.move = {};
+                obj.move.command = command.code;
+                obj.move.dir4 = Input.dir4;
+                netController.clientToHost.send(obj);
+            }
         }
     }
 }
 
 
-// Game_Player.prototype.update = function(){
-//     MATTIE.RPG.gamePlayerUpdate.call(this);
-//     // for(key in MATTIE.multiplayer.netController.connections){
-//     //     let conn = MATTIE.multiplayer.netController.connections[key];
-//     //     let player = conn.$gamePlayer;
-//     //     player.update();
-//     // }
-// }
+/** override the update map main call to also update secondary players routinely */
+MATTIE.multiplayer.renderer.overrideMapUpdateMain = function (){
+    MATTIE.RPG.SceneMap_MainUpdate = Scene_Map.prototype.updateMain;
+    Scene_Map.prototype.updateMain = function () {
+        MATTIE.RPG.SceneMap_MainUpdate.call(this)
+        if(MATTIE.multiplayer.isHost && MATTIE.multiplayer.isActive){
+            for(key in MATTIE.multiplayer.netController.players){
+                let netPlayer = MATTIE.multiplayer.netController.players[key];
+                let localPlayer = netPlayer.$gamePlayer;
+                localPlayer.update();
+            }
+        }
+    }
+}
 
-// MATTIE.RPG.moveByInput = Game_Player.prototype.moveByInput;
-// Game_Player.prototype.moveByInput = function() {
-//     if (!this.isMoving() && this.canMove()) {
-//         var direction = this.getInputDirection();
-        
-//         if (direction > 0) {
-//             $gameTemp.clearDestination();
-//         } else if ($gameTemp.isDestinationValid()){
-//             var x = $gameTemp.destinationX();
-//             var y = $gameTemp.destinationY();
-//             direction = this.findDirectionTo(x, y);
-//         }
-//         if (direction > 0) {
-//             var obj = {};
-//             obj.move = direction;
-//             netController.clientToHost.send(obj);
-//             this.executeMove(direction);
-//         }
-//     }
-// };
+MATTIE.multiplayer.renderer.initialize = function () {
+    MATTIE.multiplayer.renderer.playerOverrides.call(this);
+    MATTIE.multiplayer.renderer.overrideProcessMove.call(this);
+    MATTIE.multiplayer.renderer.overrideMapUpdateMain.call(this);
 
-
-// MATTIE.RPG.inputUpdate = Input.update;
-// Input.update = function () {
-//     try {
-//         MATTIE.RPG.inputUpdate.call(this);
-//         let obj = {};
-//         obj.move = {};
-//         obj.move.x = $gamePlayer.x;
-//         obj.move.y = $gamePlayer.y;
-//         //netController.clientToHost.send(obj);
-//     } catch (error) {
-        
-//     }
-    
-// }
+}
