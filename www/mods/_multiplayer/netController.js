@@ -79,6 +79,14 @@ class NetController extends EventEmitter {
             conn.on("data", (data) => {
                 this.clientDataProcessor(data);
             })
+
+            if(json.move){
+                this.playerMovementEvent(json);
+            }
+
+            if(json.travel){
+                this.playerTravelEvent(json);
+            }
             
         })
         return client;
@@ -102,9 +110,15 @@ class NetController extends EventEmitter {
             this.triggerPlayerListEventHost();
         }
         if(json.move){
+            let obj = {};
+            obj.move = json.move;
+            this.sendAll(obj)
             this.playerMovementEvent(json);
         }
         if(json.travel){
+            let obj = {};
+            obj.travel = json.travel;
+            this.sendAll(obj)
             this.playerTravelEvent(json);
         }
     }
@@ -137,7 +151,6 @@ class NetController extends EventEmitter {
                 player.setTransparent(false);
                 player.reserveTransfer(json.travel.map, x, y, 0, 0)
                 player.performTransfer();
-                player.refresh();
                 player.update();  
         
             } catch (error) {
