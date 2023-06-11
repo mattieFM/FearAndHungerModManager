@@ -98,10 +98,7 @@ MATTIE.multiplayer.renderer.overrideProcessMove = function (){
                 obj.move = {};
                 obj.move.command = command.code;
                 obj.move.dir4 = Input.dir4;
-                if(MATTIE.multiplayer.isClient)
-                    netController.sendHost(obj);
-                if(MATTIE.multiplayer.isHost)
-                    netController.sendAll(obj);
+                MATTIE.multiplayer.netController.triggerMoveEvent(obj);
                
                 
             }
@@ -128,10 +125,7 @@ MATTIE.multiplayer.renderer.overrideProcessMove = function (){
     Game_Player.prototype.performTransfer = function(){
         MATTIE.RPG.performTransfer.call(this);
         if(MATTIE.multiplayer.isActive){
-            if(MATTIE.multiplayer.isClient)
-                MATTIE.multiplayer.netController.sendHost(MATTIE.multiplayer.renderer.currentTransferObj);
-            if(MATTIE.multiplayer.isHost)
-                MATTIE.multiplayer.netController.sendAll(MATTIE.multiplayer.renderer.currentTransferObj);
+            MATTIE.multiplayer.netController.triggerOnMapLoaded(MATTIE.multiplayer.renderer.currentTransferObj)
         }
         
     }
@@ -146,10 +140,8 @@ MATTIE.multiplayer.renderer.overrideProcessMove = function (){
                 obj.travel.cords.x = $gamePlayer.x;
                 obj.travel.cords.y = $gamePlayer.y;
                 obj.travel.map = $gameMap.mapId();
-            if(MATTIE.multiplayer.isClient)
-            MATTIE.multiplayer.netController.sendHost(obj);
-            if(MATTIE.multiplayer.isHost)
-            MATTIE.multiplayer.netController.sendAll(obj);
+            MATTIE.multiplayer.netController.triggerOnMapLoaded(obj)
+
         }
     }
 
@@ -163,7 +155,7 @@ MATTIE.multiplayer.renderer.overrideMapUpdateMain = function (){
     MATTIE.RPG.SceneMap_MainUpdate = Scene_Map.prototype.updateMain;
     Scene_Map.prototype.updateMain = function () {
         MATTIE.RPG.SceneMap_MainUpdate.call(this)
-        if(MATTIE.multiplayer.isHost && MATTIE.multiplayer.isActive){
+        if(MATTIE.multiplayer.isActive){
             for(key in MATTIE.multiplayer.netController.players){
                 let netPlayer = MATTIE.multiplayer.netController.players[key];
                 let localPlayer = netPlayer.$gamePlayer;

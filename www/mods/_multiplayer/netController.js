@@ -8,7 +8,8 @@ const { hostname } = require("os");
 class NetController extends EventEmitter {
     constructor() {
         super();
-        this.self;
+        this.self = {};
+        this.self.id=""
         this.host;
         this.hostId = undefined; //will be null if u are host
         this.name ="default"
@@ -16,7 +17,7 @@ class NetController extends EventEmitter {
         this.hostName = "host";
         this.client;
         this.clientToHost;
-        this.players = [];
+        this.players = {};
         /** @type {{{<String>name:PlayerConnection}} */
         this.connections = {};
     }
@@ -25,9 +26,33 @@ class NetController extends EventEmitter {
     sendAll(data, exclude = []) {
         for(key in this.connections){
             if(!exclude.includes(key)){
-                data.id = this.connections[key].conn.peer;
+                data.id = this.host.id;
                 this.connections[key].conn.send(data);
             }
+        }
+    }
+
+    triggerMoveEvent(obj) { 
+        obj.id = this.self.id;
+        if(MATTIE.multiplayer.isClient){
+            this.sendHost(obj)
+        }
+        else if(MATTIE.multiplayer.isHost){
+            this.sendAll(obj)
+        }  
+    }
+
+    emitPerformTransfer(obj){
+        this.triggerOnMapLoaded(obj);
+    }
+
+    triggerOnMapLoaded(obj){
+        obj.id = this.self.id;
+        if(MATTIE.multiplayer.isClient){
+            this.sendHost(obj)
+        }
+        else if(MATTIE.multiplayer.isHost){
+            this.sendAll(obj)
         }
     }
 
@@ -89,6 +114,37 @@ class NetController extends EventEmitter {
     triggerPlayerListEventHost(){
         this.emit("playerList",this.getPlayerList());
     }
+    
+
+    clientDataProcessor(data){
+        if(data.id !== this.clientToHost.peer){
+            var json;
+            
+            if(typeof data === 'object'){
+                json = data
+            }else{
+                json = JSON.parse(data);
+            }
+            if(json.playerList){
+                this.emit("playerList",json.playerList)
+            }
+            if(json.playerData){
+                this.onPlayerData(json.playerData)
+                this.emit("playerData",json.playerData)
+            }
+            if(json.gameStarted){
+                this.emit("gameStarted",json.gameStarted)
+            }
+
+            if(json.move){
+                this.playerMovementEvent(json);
+            }
+
+            if(json.travel){
+                this.playerTravelEvent(json);
+            }
+        }
+    }
 
     hostDataProcessor(data, conn){
         var json;
@@ -114,7 +170,7 @@ class NetController extends EventEmitter {
             let obj = {};
             obj.id = conn.peer;
             obj.travel = json.travel;
-            this.sendAll(obj,[obj.id])
+            this.sendAll(obj)
             this.playerTravelEvent(json);
         }
     }
@@ -133,6 +189,7 @@ class NetController extends EventEmitter {
     }
 
     playerTravelEvent(json){
+        console.log(this.players)
         this.onMatchingPlayer(json, (key)=>{
             let netPlayer = this.players[key];
             let x = json.travel.cords.x
@@ -143,7 +200,6 @@ class NetController extends EventEmitter {
             try {
                 SceneManager._scene.createSpriteset() //update rendered players after travel
                 let player =this.players[key].$gamePlayer;
-                console.log(this.players)
                 player.setTransparent(false);
                 player.reserveTransfer(json.travel.map, x, y, 0, 0)
                 player.performTransfer();
@@ -179,35 +235,8 @@ class NetController extends EventEmitter {
         })
     }
 
-    clientDataProcessor(data){
-        if(data.id !== this.clientToHost.peer){
-            var json;
-            
-            if(typeof data === 'object'){
-                json = data
-            }else{
-                json = JSON.parse(data);
-            }
-
-            console.log(json);
-            if(json.playerList){
-                this.emit("playerList",json.playerList)
-            }
-            if(json.gameStarted){
-                this.emit("gameStarted",json.gameStarted)
-            }
-
-            if(json.move){
-                console.log("move")
-                this.playerMovementEvent(json);
-            }
-
-            if(json.travel){
-                console.log("trvl")
-                console.log(this.players)
-                this.playerTravelEvent(json);
-            }
-        }
+    onPlayerData(data){
+        this.setupPlayers(data);
     }
 
     /**
@@ -227,22 +256,38 @@ class NetController extends EventEmitter {
     playerConnectionEvent(data){
         let id = data.id;
         if(!this.connections[id].name){//only fire on first connection
-            this.setupPlayers();
             this.connections[id].setName(data.connected)
+            this.setupPlayers();
             let obj = {}
             obj.playerList = this.getPlayerList();
             this.sendAll(obj);
+            this.sendPlayerData();
             this.emit("connect",data.connected) // emit the event
         }
     }
 
-    setupPlayers(){
-        for(key in this.connections){
-            let id = this.connections[key].id;
-            let name = this.connections[key].name;
+    sendPlayerData(){
+        let obj = {};
+        obj.playerData = {};
+        this.players[this.host.id] = new netPlayer(this.host.id,this.name) //add host when sending data
+        for(key in this.players){
+            let player = this.players[key]
+            obj.playerData[key] = {};
+            obj.playerData[key].id = player.id
+            obj.playerData[key].name = player.name
+        }
+        
+        this.sendAll(obj)
+    }
+
+    setupPlayers(arr=this.connections){
+        for(key in arr){
+            let id = arr[key].id;
+            let name = arr[key].name;
             if(!this.players[id])
             this.players[id] = new netPlayer(id,name)
         }
+       
 
     }
 
