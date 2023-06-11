@@ -10,7 +10,29 @@ MATTIE.windows.multiplayer = MATTIE.windows.multiplayer || {};
 MATTIE.multiplayer.isActive = true;
 MATTIE.multiplayer.isClient = false;
 MATTIE.multiplayer.isHost = false;
-MATTIE.multiplayer.isDev = true;
+MATTIE.multiplayer.isDev = false;
+MATTIE.multiplayer.devTools = {};
+MATTIE.multiplayer.devTools.shouldTint = true;
+
+MATTIE.multiplayer.devTools.randBetween = function(min, max) {
+    return min + Math.floor(Math.random() * (max-min+1))
+}
+
+MATTIE.multiplayer.devTools.getTint = function() {
+    let min = 180;
+    let max = 255;
+    let r = min
+    let g = min
+    let b = min
+    let str = '0x'
+    r =  MATTIE.multiplayer.devTools.randBetween(min,max);
+    g = MATTIE.multiplayer.devTools.randBetween(min,max)
+    b = MATTIE.multiplayer.devTools.randBetween(min,max)
+    str += r.toString(16)
+    str += g.toString(16)
+    str += b.toString(16)
+    return str
+}
 
 
 /** @type {HostController} */

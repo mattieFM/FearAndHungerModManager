@@ -38,7 +38,7 @@ MATTIE.multiplayer.renderer._createSecondaryChars = function() {
                 
                 p2.name = netPlayer.name;
                 let p2Sprite = new Sprite_Character(p2);
-                if(MATTIE.multiplayer.isDev) p2Sprite.tint = '003c9c'; //make secondary players obvious for dev mode
+                if(MATTIE.multiplayer.devTools.shouldTint) p2Sprite.tint = MATTIE.multiplayer.devTools.getTint();
                 this.playersSprites.push(p2Sprite);
             }
         }
