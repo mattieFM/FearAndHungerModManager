@@ -63,6 +63,13 @@ MATTIE.multiplayer.Secondary_Player.prototype.initialize = function () {
 MATTIE.multiplayer.Secondary_Player.prototype.moveOneTile = function(dir4) {
     this.ctrlDir4 = dir4;
 }
+MATTIE.multiplayer.Secondary_Player.prototype.performTransfer = function () {
+    MATTIE.RPG.performTransfer.call(this);
+}
+
+MATTIE.multiplayer.Secondary_Player.prototype.reserveTransfer = function(mapId, x, y, d, fadeType){
+    MATTIE.RPG.reserveTransfer.call(this, mapId, x, y, d, fadeType);
+}
 
 
 MATTIE.multiplayer.Secondary_Player.prototype.executeMove = function (direction) {

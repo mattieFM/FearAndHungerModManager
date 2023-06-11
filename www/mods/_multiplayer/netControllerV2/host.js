@@ -58,6 +58,9 @@ class HostController extends BaseNetController {
         if(data.move){
             this.onMoveData(data.move,data.id)
         }
+        if(data.transfer){
+            this.onTransferData(data.transfer,data.id)
+        }
     }
 
     sendAll(data, excluded= []){
@@ -145,22 +148,25 @@ class HostController extends BaseNetController {
     }
 
     /**
-     *  triggers when the host received movement data from a netPlayer
-     * @param {*} moveData up/down/left/right as num 8 6 4 2
-     * @param {*} id the peer id of the player who moved
-     */
-    onMoveData(moveData,id){
-        this.moveNetPlayer(moveData,id);
-    }
-
-
-    /**
      * called through baseNetController and playerEmitter.
      * sends data to the clients when the host moves
      * @param {number} direction 2 / 4 / 6 / 8 representing down right left up
      */
     onMoveEvent(direction){
         this.sendAll(this.generateMoveDataForClients(direction, this.peerId)) //this data is the host moving so we need the host's id here
+    }
+
+    /**
+     * called through baseNetController and playerEmitter.
+     * sends data to the clients when the host transfers
+     * @param {Object} an obj with 3 members, x, y and map all numbers
+     */
+    onTransferEvent(transferObj){
+        let obj = {};
+            obj.transfer = {};
+            obj.transfer.data = transferObj;
+            obj.transfer.id = this.peerId;
+        this.sendAll(obj) //this data is the host moving so we need the host's id here
     }
 
 
