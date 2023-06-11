@@ -56,9 +56,11 @@ class HostController extends BaseNetController {
             this.onPlayerInfo(data.playerInfo);
         }
         if(data.move){
+            this.distributeMoveDataToClients(data.move,data.id)
             this.onMoveData(data.move,data.id)
         }
         if(data.transfer){
+            this.distributeTransferDataToClients(data.transfer,data.id)
             this.onTransferData(data.transfer,data.id)
         }
     }
@@ -134,6 +136,15 @@ class HostController extends BaseNetController {
     }
 
     /**
+     * sends the move data of a move event to all clients who need to know
+     * @param {*} moveData up/down/left/right as num 8 6 4 2
+     * @param {*} id the peer id of the player who moved
+     */
+    distributeTransferDataToClients(transData,id){
+        this.sendAll(this.generateTransDataForClients(transData,id),[id])
+    }
+
+    /**
      * generates an movedata obj in the format client needs
      * @param {number} moveData win4 move data
      * @param {Peerid} id the id of the peer this data applies to
@@ -144,6 +155,20 @@ class HostController extends BaseNetController {
             obj.move = {};
             obj.move.d = moveData;
             obj.move.id = id;
+        return obj;
+    }
+    /**
+     * generates an transData obj in the format client needs
+     * @param {obj} transData win4 move data
+     * @param {Peerid} id the id of the peer this data applies to
+     * @returns transData obj for clients
+     */
+    generateTransDataForClients(transData,id){
+        let obj = {};
+            obj.transfer = {};
+            obj.transfer.data = {};
+            obj.transfer.data.transfer = transData;
+            obj.transfer.id = id;
         return obj;
     }
 
