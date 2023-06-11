@@ -17,8 +17,8 @@ MATTIE.scenes.multiplayer.lobby.prototype.constructor = MATTIE.scenes.multiplaye
 MATTIE.scenes.multiplayer.lobby.prototype.create = function(){ 
     MATTIE.scenes.multiplayer.base.prototype.create.call(this);
     this.createWindowLayer();
-    MATTIE.multiplayer.netController.openClientPeer();
-    MATTIE.multiplayer.netController.client.on("open", ()=>{
+    MATTIE.multiplayer.clientController.open();
+    MATTIE.multiplayer.clientController.self.on("open", ()=>{
         this.addPlayerListWindow();
         this.initListController();
     });
@@ -31,12 +31,18 @@ MATTIE.scenes.multiplayer.lobby.prototype.addPlayerListWindow = function(){
 }
 
 MATTIE.scenes.multiplayer.lobby.prototype.initListController = function(){
-    var netController = MATTIE.multiplayer.netController; 
-    netController.addListener('playerList', (names) =>{
-        this._playerWindow.updateText(names);
+    var clientController = MATTIE.multiplayer.clientController; 
+    clientController.addListener('updateNetPlayers', (netPlayers) =>{
+        let arr = [];
+        for(key in netPlayers){
+            let netPlayer = netPlayers[key];
+            arr.push(netPlayer.name);
+        }
+        arr.push(clientController.player.name);
+        this._playerWindow.updateText(arr);
     })
 
-    netController.addListener('gameStarted', () =>{
+    clientController.addListener('startGame', () =>{
         MATTIE.menus.multiplayer.openGame();
     })
 }

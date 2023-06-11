@@ -1,16 +1,18 @@
 //@using peerJs from /dist/peerjs.min.js
 var MATTIE = MATTIE || {};
 MATTIE.multiplayer = MATTIE.multiplayer || {}
-var EventEmitter = require("events");
-const { hostname } = require("os");
 
-class ClientController extends EventEmitter {
+class ClientController extends BaseNetController {
     constructor(){
-        /** the host's peer */
+        super();
+        /** the client's peer */
         this.self;
 
-        /** the id of the host's peer */
+        /** the id of the client's peer */
         this.peerId;
+
+        /** the id of the host's peer */
+        this.hostId;
 
         /** the connection to the host */
         this.conn;
@@ -26,11 +28,15 @@ class ClientController extends EventEmitter {
     }
 
     open(){
-        this.self = Peer();
+        this.initEmitterOverrides(); //override stuff for interceptors
+        MATTIE.multiplayer.isClient = true;
+        this.self = new Peer();
         this.self.on('open', ()=>{
             this.peerId = this.self.id;
             this.player.setPeerId(this.peerId)
             console.info(`Client opened at: ${this.peerId}`)
+            console.info(`Attempting to connect to host at: ${this.hostId}`)
+            MATTIE.multiplayer.clientController.connect();
         })
 
         this.self.on('data', (data) => {
@@ -38,10 +44,10 @@ class ClientController extends EventEmitter {
         })
     }
 
-    connect(hostId){
-        this.conn = client.connect(hostId);
+    connect(hostId=this.hostId){
+        this.conn = this.self.connect(hostId);
             this.conn.on("open", () => {
-                console.log(`Client Connected to the host`)
+                console.info(`Client Connected to the host`)
                 this.sendPlayerInfo();
             })
 
@@ -54,6 +60,24 @@ class ClientController extends EventEmitter {
         if(data.updateNetPlayers){
             this.onUpdateNetPlayers(data.updateNetPlayers);
         }
+        if(data.startGame){
+            this.onStartGame(data.startGame)
+        }
+        if(data.move){
+            this.onMoveData(data.move);
+        }
+    }
+
+    sendHost(data){
+        this.conn.send(data);
+    }
+
+    /**
+     * @param {*} startGame unused var
+     * @emits startGame;
+     */
+    onStartGame(startGame){
+        this.emit('startGame')
     }
 
     /** 
@@ -64,12 +88,11 @@ class ClientController extends EventEmitter {
         for(key in netPlayers){
             let netPlayer = netPlayers[key];
             if(!this.netPlayers[key]) {
-                this.netPlayers[key]=netPlayer; //if this player hasn't been defined yet initialize it.
+                this.initializeNetPlayer(netPlayer); //if this player hasn't been defined yet initialize it.
             }else{
                 this.netPlayers[key] = Object.assign(this.netPlayers[key], netPlayer) //replace any files that conflict with new data, otherwise keep old data.
             }
         }
-        this.netPlayers = netPlayers;
         this.emit('updateNetPlayers', netPlayers);
     }
 
@@ -79,9 +102,40 @@ class ClientController extends EventEmitter {
      */
     sendPlayerInfo(){
         let obj = {};
-        obj.playerData = this.player;
-        this.conn.send(obj);
+        obj.playerInfo = this.player.getCoreData();
+        this.sendHost(obj);
     }
 
+    /**
+     * called through baseNetController and playerEmitter.
+     * sends data to the host when the player moves
+     * @param {number} direction 2 / 4 / 6 / 8 representing down right left up
+     */
+    onMoveEvent(direction){
+        let obj = {};
+        obj.move = direction;
+        this.sendHost(obj)
+    }
+
+    /**
+     * @description move a net player when receiving data to do so.
+     * @param {*} obj an object with two members, d for direction and id for the peer id that this move command applies to
+     */
+    onMoveData(obj){
+        let id = obj.id;
+        let direction = obj.d;
+        this.moveNetPlayer(direction,id);
+    }
+
+    
 
 }
+
+//ignore this does nothing, just to get intellisense working. solely used to import into the types file for dev.
+try {
+    module.exports.ClientController = ClientController;
+} catch (error) {
+    module = {}
+    module.exports = {}
+}
+module.exports.ClientController = ClientController;

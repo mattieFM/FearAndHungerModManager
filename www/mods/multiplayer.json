@@ -6,11 +6,16 @@
         "_multiplayer/peerjs.min",
         "_multiplayer/multiplayerMenu",
         "_multiplayer/hostMenu",
-        "_multiplayer/netController",
         "_multiplayer/joinMenu",
         "_multiplayer/lobby",
-        "_multiplayer/playerConn",
-        "_multiplayer/playerRenderer",
-        "_multiplayer/netPlayer"
+        "_multiplayer/netControllerV2/models/connectionModel",
+        "_multiplayer/netControllerV2/models/playerModel",
+        "_multiplayer/netControllerV2/baseNetController",
+        "_multiplayer/netControllerV2/playerEmitter",
+        "_multiplayer/netControllerV2/playerRenderer",
+        "_multiplayer/netControllerV2/client",
+        "_multiplayer/netControllerV2/host"
+        
+      
 ]
 }

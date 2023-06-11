@@ -1,12 +1,10 @@
 //@using peerJs from /dist/peerjs.min.js
 var MATTIE = MATTIE || {};
 MATTIE.multiplayer = MATTIE.multiplayer || {}
-var EventEmitter = require("events");
-const { hostname } = require("os");
-
 /** @global */
-class HostController extends EventEmitter{
+class HostController extends BaseNetController {
     constructor(){
+        super();
         /** the host's peer */
         this.self;
 
@@ -28,30 +26,52 @@ class HostController extends EventEmitter{
     }
 
     open(){
-        this.self = Peer();
+        this.initEmitterOverrides(); //override stuff for interceptors
+        MATTIE.multiplayer.isHost = true;
+        this.self = new Peer();
         this.self.on('open', () => {
             console.info(`host opened at: ${this.self.id}`)
             this.peerId = this.self.id;
             this.player.setPeerId(this.peerId);
+            setTimeout(() => {
+                this.emit('playerInfo', this.player.getCoreData()); //emit playerInfo event with self slightly after open to render host in lobby
+            }, 500);
+            
         })
 
         this.self.on('connection', (conn) => {
-            console.info(`Client connected to host:`);
-            console.info(`client at: ${conn.peer}`);
+            console.info(`Client connected to host at: ${conn.peer}`);
 
             this.handleConnection(conn);
 
             conn.on('data', (data) => {
-                this.onData(data);
+                this.onData(data,conn);
             })
         })
     }
-
-    
-    onData(data){
+ 
+    onData(data,conn){
+        data.id = conn.peer; //set the id of the data to the id of the peer on the other side of this connection
         if(data.playerInfo){
             this.onPlayerInfo(data.playerInfo);
         }
+        if(data.move){
+            this.onMoveData(data.move,data.id)
+        }
+    }
+
+    sendAll(data, excluded= []){
+        this.connections.forEach(conn=>{
+            if(!excluded.includes(conn.peer)) //if the id of the peer is excluded don't send
+            conn.send(data);
+        })
+    }
+
+    /** send all connections the startGame command */
+    startGame(){
+        let obj = {};
+        obj.startGame = "y"
+        this.sendAll(obj);
     }
 
     /** 
@@ -66,7 +86,7 @@ class HostController extends EventEmitter{
 
     handleConnection(conn){
         let id = conn.peer; //get the id of the peer that is on the other side of the connection
-        this.connections.push(new ConnectionModel(conn));
+        this.connections.push(conn);
     }
 
     /** send an updated list of all net players to the client.
@@ -82,6 +102,8 @@ class HostController extends EventEmitter{
         })
     }
 
+    
+
     /** 
      * assembles the proper list of netPlayers with host included and recipient excluded 
      * @param recipientId the id of the recipient's peer
@@ -90,22 +112,69 @@ class HostController extends EventEmitter{
         let dict = {}
         for(key in this.netPlayers){
             if(key != recipientId){
-                dict[key] = this.netPlayers[key] //add all but the recipient
+                dict[key] = this.netPlayers[key].getCoreData(); //add all but the recipient
             }
         }
 
-        dict[this.peerId] = this.player; //add host
+        dict[this.peerId] = this.player.getCoreData(); //add host
         return dict
     }
 
-    /** add a new player to the list of netPlayers. */
-    initializeNetPlayer(playerInfo){
-        let name = playerInfo.name;
-        let peerId = playerInfo.peerId;
-        let actorId = playerInfo.actorId;
-        this.netPlayers[peerId] = new PlayerModel(name,actorId);
+
+    /**
+     * sends the move data of a move event to all clients who need to know
+     * @param {*} moveData up/down/left/right as num 8 6 4 2
+     * @param {*} id the peer id of the player who moved
+     */
+    distributeMoveDataToClients(moveData,id){
+        this.sendAll(this.generateMoveDataForClients(moveData,id),[id])
     }
+
+    /**
+     * generates an movedata obj in the format client needs
+     * @param {number} moveData win4 move data
+     * @param {Peerid} id the id of the peer this data applies to
+     * @returns moveData obj for clients
+     */
+    generateMoveDataForClients(moveData,id){
+        let obj = {};
+            obj.move = {};
+            obj.move.d = moveData;
+            obj.move.id = id;
+        return obj;
+    }
+
+    /**
+     *  triggers when the host received movement data from a netPlayer
+     * @param {*} moveData up/down/left/right as num 8 6 4 2
+     * @param {*} id the peer id of the player who moved
+     */
+    onMoveData(moveData,id){
+        this.moveNetPlayer(moveData,id);
+    }
+
+
+    /**
+     * called through baseNetController and playerEmitter.
+     * sends data to the clients when the host moves
+     * @param {number} direction 2 / 4 / 6 / 8 representing down right left up
+     */
+    onMoveEvent(direction){
+        this.sendAll(this.generateMoveDataForClients(direction, this.peerId)) //this data is the host moving so we need the host's id here
+    }
+
 
 
 
 }
+
+
+
+//ignore this does nothing, just to get intellisense working. solely used to import into the types file for dev.
+try {
+    module.exports.HostController = HostController;
+} catch (error) {
+    module = {}
+    module.exports = {}
+}
+module.exports.HostController = HostController;
