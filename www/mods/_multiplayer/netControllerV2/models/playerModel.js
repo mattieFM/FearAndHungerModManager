@@ -24,9 +24,18 @@ class PlayerModel {
     setMap(map){
         this.map = map;
     }
+
+    setActorId(id){
+        this.actorId = id;
+        if(this.$gamePlayer){
+            this.$gamePlayer.setActor(id);
+        }
+    }
     
     initSecondaryGamePlayer(){
         this.$gamePlayer = new MATTIE.multiplayer.Secondary_Player()
+        this.$gamePlayer.setActor(this.actorId);
+        this.$gamePlayer.refresh();
     }
 
     getCoreData(){
@@ -49,7 +58,9 @@ class PlayerModel {
  */
 MATTIE.multiplayer.Secondary_Player =  function () {
     this.initialize.apply(this, arguments);
+    this.actorId = $gameParty._menuActorId;
 }
+
 
 MATTIE.multiplayer.Secondary_Player.prototype = Object.create(Game_Player.prototype);
 MATTIE.multiplayer.Secondary_Player.prototype.constructor = MATTIE.multiplayer.Secondary_Player;
@@ -75,6 +86,18 @@ MATTIE.multiplayer.Secondary_Player.prototype.performTransfer = function () {
 MATTIE.multiplayer.Secondary_Player.prototype.reserveTransfer = function(mapId, x, y, d, fadeType){
     MATTIE.RPG.reserveTransfer.call(this, mapId, x, y, d, fadeType);
 }
+
+MATTIE.multiplayer.Secondary_Player.prototype.setActor = function(id) {
+    this.actorId = id;
+}
+
+MATTIE.multiplayer.Secondary_Player.prototype.refresh = function() {
+    var actor = $gameActors.actor(this.actorId)
+    var characterName = actor ? actor.characterName() : '';
+    var characterIndex = actor ? actor.characterIndex() : 0;
+    this.setImage(characterName, characterIndex);
+    this._followers.refresh();
+};
 
 
 MATTIE.multiplayer.Secondary_Player.prototype.center = function(x, y) {
