@@ -45,26 +45,27 @@ MATTIE.scenes.multiplayer.main.prototype.constructor = MATTIE.scenes.multiplayer
 MATTIE.scenes.multiplayer.main.prototype.create = function() {
     Scene_Title.prototype.create.call(this);
     this.addTextField()
-    this._inputWin.updateText(MATTIE.multiplayer.netController.name);
+    this._inputWin.updateText(MATTIE.multiplayer.clientController.player.name);
 }
 
 MATTIE.scenes.multiplayer.main.prototype.createCommandWindow = function() {
     this._commandWindow = new MATTIE.windows.multiplayer.main();
     
     this._commandWindow.setHandler(MATTIE.CmdManager.host, (() => {
-        MATTIE.multiplayer.netController.name = this._inputWin.getInput();
-        MATTIE.multiplayer.netController.hostName = this._inputWin.getInput();
+        MATTIE.multiplayer.clientController.player.name = this._inputWin.getInput();
+        MATTIE.multiplayer.hostController.player.name = this._inputWin.getInput();
         MATTIE.menus.multiplayer.openHost();
     }).bind(this));
 
     this._commandWindow.setHandler(MATTIE.CmdManager.join,    (()=>{
-        MATTIE.multiplayer.netController.name = this._inputWin.getInput();
-        MATTIE.multiplayer.netController.clientName = this._inputWin.getInput();
+        MATTIE.multiplayer.clientController.player.name = this._inputWin.getInput();
+        MATTIE.multiplayer.hostController.player.name = this._inputWin.getInput();
         MATTIE.menus.multiplayer.openJoin();
     }).bind(this));
 
     this._commandWindow.setHandler(MATTIE.CmdManager.return,  (()=>{
-        MATTIE.multiplayer.netController.name = this._inputWin.getInput();
+        MATTIE.multiplayer.clientController.player.name = this._inputWin.getInput();
+        MATTIE.multiplayer.hostController.player.name = this._inputWin.getInput();
         MATTIE.menus.toMainMenu();
     }).bind(this));
     this.addWindow(this._commandWindow);
@@ -72,7 +73,7 @@ MATTIE.scenes.multiplayer.main.prototype.createCommandWindow = function() {
 
 MATTIE.scenes.multiplayer.main.prototype.addTextField = function (){
     this._inputWin = new MATTIE.windows.textInput(0,0,237,150,"Type Username:");
-    this._inputWin.updateText(MATTIE.multiplayer.netController.name);
+    this._inputWin.updateText(MATTIE.multiplayer.clientController.player.name);
     this.addWindow(this._inputWin);
 }
 

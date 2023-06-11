@@ -22,13 +22,12 @@ MATTIE.scenes.multiplayer.host.prototype.constructor = MATTIE.scenes.multiplayer
 MATTIE.scenes.multiplayer.host.prototype.create = function(){ 
     MATTIE.scenes.multiplayer.base.prototype.create.call(this);
     this.createWindowLayer();
-    MATTIE.multiplayer.netController.openHostPeer();
+    MATTIE.multiplayer.hostController.open();
     this.addPlayerListWindow();
     this.addOptionsBtns();
-    MATTIE.multiplayer.netController.host.on("open", ()=>{
+    MATTIE.multiplayer.hostController.self.on("open", ()=>{
         this.addPeerDisplayWindow();
         this.initListController();
-        MATTIE.multiplayer.netController.triggerPlayerListEventHost(); //a slightly hacky solution to render host
     });
 }
 
@@ -39,15 +38,15 @@ MATTIE.scenes.multiplayer.host.prototype.addPlayerListWindow = function(){
 }
 
 MATTIE.scenes.multiplayer.host.prototype.initListController = function(){
-    var netController = MATTIE.multiplayer.netController; 
-    netController.addListener('playerList', (names) =>{
-        this._playerWindow.updateText(names)
+    MATTIE.multiplayer.hostController.addListener('playerInfo', (player) =>{
+        this._playerWindow.addItem(player.name)
     })
 }
+
 MATTIE.scenes.multiplayer.host.prototype.addPeerDisplayWindow = function(){
     let text = [
         "People can join using this number:",
-        MATTIE.multiplayer.netController.host.id
+        MATTIE.multiplayer.hostController.peerId
         ]
     this._peerWindow = new MATTIE.windows.textDisplay((Graphics.boxWidth - 600) / 2+100,0,600,100,text);
     this.addWindow(this._peerWindow);
@@ -59,8 +58,7 @@ MATTIE.scenes.multiplayer.host.prototype.addOptionsBtns = function(){
     btns[MATTIE.TextManager.returnToMultiplayer] = MATTIE.CmdManager.returnToMultiplayer;
     this._optionsWindow = new MATTIE.windows.horizontalBtns(175+300+10, btns, 2);
     this._optionsWindow.setHandler(MATTIE.CmdManager.startGame, (()=>{
-        MATTIE.multiplayer.netController.triggerStartGameEvent();
-
+        MATTIE.multiplayer.hostController.startGame();
         MATTIE.menus.multiplayer.openGame();
     }).bind(this));
     this._optionsWindow.setHandler(MATTIE.CmdManager.returnToMultiplayer,  MATTIE.menus.multiplayer.openMultiplayer.bind(this));

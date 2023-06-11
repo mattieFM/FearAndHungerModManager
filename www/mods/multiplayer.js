@@ -11,11 +11,12 @@ MATTIE.multiplayer.isActive = true;
 MATTIE.multiplayer.isClient = false;
 MATTIE.multiplayer.isHost = false;
 MATTIE.multiplayer.isDev = true;
-MATTIE.multiplayer.renderer.initialize();
 
-/** @type {NetController} */
-MATTIE.multiplayer.netController = new NetController();
-var netController = MATTIE.multiplayer.netController;
+
+/** @type {HostController} */
+MATTIE.multiplayer.hostController = new HostController();
+/** @type {ClientController} */
+MATTIE.multiplayer.clientController = new ClientController();
 
 MATTIE.menus.multiplayer.openHost = () => {
     SceneManager.goto(MATTIE.scenes.multiplayer.host)
@@ -37,6 +38,10 @@ MATTIE.menus.multiplayer.openGame = () => {
     SceneManager.goto(Scene_Load)
 }
 
+MATTIE.multiplayer.getCurrentNetController = ()=>{
+    if(MATTIE.multiplayer.isClient) return MATTIE.multiplayer.clientController;
+    if(MATTIE.multiplayer.isHost) return MATTIE.multiplayer.hostController;
+}
 
 
 (()=>{
@@ -49,25 +54,24 @@ MATTIE.menus.multiplayer.openGame = () => {
     var conn;
     
     if(MATTIE.multiplayer.isDev){
-    Input.addKeyBind('i', ()=>{
-        console.log("-- Forced Client connection script --")
-        netController.hostId = netController.host.id
-        client = netController.openClientPeer();
-        netController.clientName = "client2"
-        netController.name = "client2"
-    })
+//     Input.addKeyBind('i', ()=>{
+//         console.log("-- Forced Client connection script --")
+//         netController.hostId = netController.host.id
+//         client = netController.openClientPeer();
+//         netController.clientName = "client2"
+//         netController.name = "client2"
+//     })
 
-    Input.addKeyBind('u', ()=>{
-        console.log("-- Forced Host open script --")
-        netController.hostName = "host"
-        netController.name = "host"
-        host = netController.openHostPeer();
+//     Input.addKeyBind('u', ()=>{
+//         console.log("-- Forced Host open script --")
+//         netController.hostName = "host"
+//         netController.name = "host"
+//         host = netController.openHostPeer();
 
-    })
+//     })
 
     Input.addKeyBind('y', ()=>{
-        console.log("-- Forced Host start script --")
-        netController.triggerStartGameEvent();
+        $gamePlayer.executeMove(8);
 
     })
 }
