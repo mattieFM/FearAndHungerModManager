@@ -67,10 +67,17 @@ MATTIE.multiplayer.Secondary_Player.prototype.performTransfer = function () {
     MATTIE.RPG.performTransfer.call(this);
 }
 
+MATTIE.multiplayer.Secondary_Player.prototype.center = function(x, y) {
+    //stop panning camra with netPlayers
+};
+
+MATTIE.multiplayer.Secondary_Player.prototype.updateScroll = function(lastScrolledX, lastScrolledY) {
+    //stop panning camra with netPlayers
+};
+
 MATTIE.multiplayer.Secondary_Player.prototype.reserveTransfer = function(mapId, x, y, d, fadeType){
     MATTIE.RPG.reserveTransfer.call(this, mapId, x, y, d, fadeType);
 }
-
 
 MATTIE.multiplayer.Secondary_Player.prototype.executeMove = function (direction) {
     MATTIE.multiplayer.gamePlayer.executeMove.call(this, direction);

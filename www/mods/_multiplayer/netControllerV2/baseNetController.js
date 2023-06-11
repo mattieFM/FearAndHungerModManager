@@ -90,10 +90,11 @@ class BaseNetController extends EventEmitter {
      * @param {*} id the id of the peer who's player moved
      */
     moveNetPlayer(moveData,id){
+        console.log(this.netPlayers);
         try {
             this.netPlayers[id].$gamePlayer.moveOneTile(moveData)
         } catch (error) {
-            console.warn('something went wrong when moving the character')
+            console.warn('something went wrong when moving the character' + error)
         }
         
     }
