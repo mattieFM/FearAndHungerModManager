@@ -28,22 +28,13 @@ MATTIE.multiplayer.renderer._createSecondaryChars = function() {
         for(key in players){
             /** @type {PlayerModel} */
             const netPlayer = players[key];
-            if($gameMap.mapId() === $gameMap.mapId()){//only render players on same map
+            if($gameMap.mapId() === netPlayer.map){//only render players on same map
                 if(!netPlayer.$gamePlayer){
                     netPlayer.initSecondaryGamePlayer();
                 }
                 let p2 = netPlayer.$gamePlayer;
-                
-                console.log(p2)
-                setTimeout(() => { //initial positioning, uneccacary once player transfer event is implemented
-                    p2.reserveTransfer($gameMap.mapId(), $gamePlayer.x,$gamePlayer.y); 
-                    p2.performTransfer();
-                    p2.setTransparent(false);
-                    p2.x = $gamePlayer.x;
-                    p2.y = $gamePlayer.y;
-                    p2.update()
-                    console.log(p2)
-                }, 500);
+                p2.setTransparent(false);
+
                 
                 p2.name = netPlayer.name;
                 let p2Sprite = new Sprite_Character(p2);
@@ -54,11 +45,14 @@ MATTIE.multiplayer.renderer._createSecondaryChars = function() {
         
         this._characterSprites.concat(this.playersSprites)
 
-        console.log( this._characterSprites);
         
         for (var i = 0; i < this.playersSprites.length; i++) {
             this._tilemap.addChild(this.playersSprites[i]);
         }
+
+
+
+
 }
 
 MATTIE.multiplayer.renderer.playerOverrides();

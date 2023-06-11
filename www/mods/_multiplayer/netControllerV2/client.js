@@ -64,7 +64,15 @@ class ClientController extends BaseNetController {
             this.onStartGame(data.startGame)
         }
         if(data.move){
-            this.onMoveData(data.move);
+            let id = data.move.id;
+            let direction = data.move.d;
+            this.onMoveData(direction, id);
+        }
+        if(data.transfer){
+            console.log("trans data event")
+            let transfer = data.transfer.data.transfer;
+            let id = data.transfer.id;
+            this.onTransferData(transfer,id)
         }
     }
 
@@ -118,14 +126,14 @@ class ClientController extends BaseNetController {
     }
 
     /**
-     * @description move a net player when receiving data to do so.
-     * @param {*} obj an object with two members, d for direction and id for the peer id that this move command applies to
+     * called through baseNetController and playerEmitter.
+     * sends data to the clients when the host transfers
+     * @param {Object} an obj with 3 members, x, y and map all numbers
      */
-    onMoveData(obj){
-        let id = obj.id;
-        let direction = obj.d;
-        this.moveNetPlayer(direction,id);
+    onTransferEvent(transferObj){
+        this.sendHost(transferObj)
     }
+
 
     
 

@@ -8,6 +8,9 @@ class BaseNetController extends EventEmitter {
         this.peerId;
         this.players = {};
         this.netPlayers = {};
+
+        this.transferRetries = 0;
+        this.maxTransferRetries = 10;
     }
 
     /** a function to emit the move event for the client
@@ -26,6 +29,43 @@ class BaseNetController extends EventEmitter {
     /** does nothing by defualt, overridden by both host and client */
     onMoveEvent(direction){
 
+    }
+
+    /**
+     *  triggers when the receiving movement data from a netPlayer
+     * @param {*} moveData up/down/left/right as num 8 6 4 2
+     * @param {*} id the peer id of the player who moved
+     */
+    onMoveData(moveData,id){
+        this.moveNetPlayer(moveData,id);
+    }
+
+    /** a function to emit the move event for the client
+     * @emits transferEvent
+     * @param {number} direction see below:
+     * 8: up
+     * 6: left
+     * 4: right
+     * 2: down
+     */
+    emitTransferEvent(transferObj) {
+    this.onTransferEvent(transferObj);
+    this.emit("transferEvent",transferObj);
+    }
+
+    /** does nothing by defualt, should be overridden by both host and client */
+    onTransferEvent(transferObj){
+
+    }
+
+    /**
+     *  triggers when the receiving transfer data from a netPlayer
+     * @param {*} transData x,y,map
+     * @param {*} id the peer id of the player who moved
+     */
+    onTransferData(transData,id){
+        console.log(id)
+        this.transferNetPlayer(transData,id);
     }
 
     /** add a new player to the list of netPlayers. */
@@ -50,7 +90,53 @@ class BaseNetController extends EventEmitter {
      * @param {*} id the id of the peer who's player moved
      */
     moveNetPlayer(moveData,id){
-        this.netPlayers[id].$gamePlayer.moveOneTile(moveData)
+        try {
+            this.netPlayers[id].$gamePlayer.moveOneTile(moveData)
+        } catch (error) {
+            console.warn('something went wrong when moving the character')
+        }
+        
+    }
+    
+
+     /**
+     * @description transfer a net player to a location
+     * @param {*} transData x,y,map
+     * @param {*} id the id of the peer who's player moved
+     */
+     transferNetPlayer(transData,id){
+        if(this.transferRetries <= this.maxTransferRetries){
+        try {
+            let x = transData.x;
+            let y = transData.y;
+            let map = transData.map;
+            this.netPlayers[id].setMap(map);
+            try {
+                SceneManager._scene.createSpriteset();
+                try {
+                    console.log(transData)
+                    this.netPlayers[id].$gamePlayer.reserveTransfer(map, x, y, 0, 0)
+                    this.netPlayers[id].$gamePlayer.performTransfer(); 
+                } catch (error) {
+                    console.warn('player was not on the map when transfer was called')
+                }
+
+            } catch (error) {
+                console.warn('createSprites was called not on scene_map:')
+                this.transferRetries++;
+                setTimeout(() => {
+                    this.transferNetPlayer(transData,id)
+                }, 500);
+            }
+            
+            
+        } catch (error) {
+            console.warn('something went wrong when transferring the character:' + error)
+        }
+    }else{
+        this.transferRetries=0;
+    }
+        
     }
 }
 
