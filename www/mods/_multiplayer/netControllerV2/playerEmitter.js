@@ -78,6 +78,18 @@ MATTIE.multiplayer.gamePlayer.override = function() {
             MATTIE.multiplayer.renderer.currentTransferObj.transfer.y = $gamePlayer.y;
             MATTIE.multiplayer.renderer.currentTransferObj.transfer.map = $gameMap.mapId();
             let netController = MATTIE.multiplayer.getCurrentNetController();
+
+            //handle setting the proper actor id when the player loads into a map 
+            //this does also allow the main actor changing if we want
+            var actor = $gameParty.leader();
+            if(actor.actorId() != netController.player.actorId){
+                netController.player.setActorId(actor.actorId());
+                //update host/client about the new actor id
+                netController.sendPlayerInfo();
+            }
+
+
+
             netController.emitTransferEvent( MATTIE.multiplayer.renderer.currentTransferObj)
         }
     }

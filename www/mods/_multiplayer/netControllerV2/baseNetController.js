@@ -77,6 +77,26 @@ class BaseNetController extends EventEmitter {
         this.netPlayers[peerId].setPeerId(peerId);
     }
 
+    /** updates net players
+     * @emits updateNetPlayers
+     */
+    updateNetPlayers(netPlayers){
+        for(key in netPlayers){
+            let netPlayer = netPlayers[key];
+            if(!this.netPlayers[key]) {
+                this.initializeNetPlayer(netPlayer); //if this player hasn't been defined yet initialize it.
+            }else{
+                this.netPlayers[key] = Object.assign(this.netPlayers[key], netPlayer) //replace any files that conflict with new data, otherwise keep old data.
+            }
+        }
+    }
+
+    updateNetPlayer(playerInfo){
+        let obj = {};
+        obj[playerInfo.peerId] = playerInfo;
+        this.updateNetPlayers(obj)
+    }
+
 
     initEmitterOverrides(){
         if(MATTIE.multiplayer.isActive){

@@ -84,7 +84,7 @@ class HostController extends BaseNetController {
      * @emits playerInfo
      * */
     onPlayerInfo(playerInfo){
-        this.initializeNetPlayer(playerInfo)
+        this.updateNetPlayer(playerInfo)
         this.distributeNetPlayersToClients();
         this.emit('playerInfo', playerInfo);
     }
@@ -105,6 +105,11 @@ class HostController extends BaseNetController {
                 obj.updateNetPlayers = newNetPlayers;
             conn.send(obj);
         })
+    }
+
+    /** alias of distributeNetPlayersToClients used for updating players when this one changes */
+    sendPlayerInfo(){
+        this.distributeNetPlayersToClients()
     }
 
     
