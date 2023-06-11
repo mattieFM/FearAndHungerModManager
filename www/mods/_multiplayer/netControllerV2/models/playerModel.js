@@ -64,8 +64,18 @@ MATTIE.multiplayer.Secondary_Player.prototype.moveOneTile = function(dir4) {
     this.ctrlDir4 = dir4;
 }
 MATTIE.multiplayer.Secondary_Player.prototype.performTransfer = function () {
+    //I dont want to full override this function so instead we can just make the game
+    //think that the new player never travels to new maps so that the $gameMap.setup() is never called
+    //this is neccacary to stop players from winding up in the fully hell dimension where the game
+    //thinks you are on top of every event at once :) 
+    this._newMapId = $gameMap.mapId(); 
     MATTIE.RPG.performTransfer.call(this);
 }
+
+MATTIE.multiplayer.Secondary_Player.prototype.reserveTransfer = function(mapId, x, y, d, fadeType){
+    MATTIE.RPG.reserveTransfer.call(this, mapId, x, y, d, fadeType);
+}
+
 
 MATTIE.multiplayer.Secondary_Player.prototype.center = function(x, y) {
     //stop panning camra with netPlayers
@@ -75,13 +85,14 @@ MATTIE.multiplayer.Secondary_Player.prototype.updateScroll = function(lastScroll
     //stop panning camra with netPlayers
 };
 
-MATTIE.multiplayer.Secondary_Player.prototype.reserveTransfer = function(mapId, x, y, d, fadeType){
-    MATTIE.RPG.reserveTransfer.call(this, mapId, x, y, d, fadeType);
-}
 
 MATTIE.multiplayer.Secondary_Player.prototype.executeMove = function (direction) {
     MATTIE.multiplayer.gamePlayer.executeMove.call(this, direction);
 }
+
+MATTIE.multiplayer.Secondary_Player.prototype.startMapEvent = function(x, y, triggers, normal) {
+
+};
 /** 
  * This function is how the movement controller determines if the player should move in a direction when a movement event is triggered.
  * Might need to be expanded in future to accommodate gamepads
