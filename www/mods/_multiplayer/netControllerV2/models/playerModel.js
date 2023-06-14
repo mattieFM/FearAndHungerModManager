@@ -68,6 +68,10 @@ MATTIE.multiplayer.Secondary_Player.prototype.constructor = MATTIE.multiplayer.S
 MATTIE.multiplayer.Secondary_Player.prototype.initialize = function () {
     this.ctrlDir4 = 0; //start standing still
     Game_Player.prototype.initialize.call(this);
+
+    //TODO: followers
+    this._followers = $gamePlayer.followers();
+    //this._followers = $gamePlayer.followers();
 }
 
 /** set the dir4 current control. dir4 is the direction on the arrow keys. */
@@ -114,7 +118,7 @@ MATTIE.multiplayer.Secondary_Player.prototype.executeMove = function (direction)
 }
 
 MATTIE.multiplayer.Secondary_Player.prototype.startMapEvent = function(x, y, triggers, normal) {
-
+    //netplayer started event on the same map as local player
 };
 /** 
  * This function is how the movement controller determines if the player should move in a direction when a movement event is triggered.

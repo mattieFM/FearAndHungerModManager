@@ -10,7 +10,7 @@ MATTIE.windows.multiplayer = MATTIE.windows.multiplayer || {};
 MATTIE.multiplayer.isActive = true;
 MATTIE.multiplayer.isClient = false;
 MATTIE.multiplayer.isHost = false;
-MATTIE.multiplayer.isDev = false;
+MATTIE.multiplayer.isDev = true;
 MATTIE.multiplayer.devTools = {};
 MATTIE.multiplayer.devTools.shouldTint = true;
 
@@ -92,8 +92,13 @@ MATTIE.multiplayer.getCurrentNetController = ()=>{
 
 //     })
 
+    Input.addKeyBind('u', ()=>{
+        $gameMap.events()[16].lock()
+
+    })
+
     Input.addKeyBind('y', ()=>{
-        $gamePlayer.executeMove(8);
+        $gameMap.events()[16].start();
 
     })
 }
