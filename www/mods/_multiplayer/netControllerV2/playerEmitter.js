@@ -83,18 +83,28 @@ MATTIE.multiplayer.gamePlayer.override = function() {
 
             //handle setting the proper actor id when the player loads into a map 
             //this does also allow the main actor changing if we want
-            var actor = $gameParty.leader();
-            if(actor.actorId() != netController.player.actorId){
-                netController.player.setActorId(actor.actorId());
-                //update host/client about the new actor id
-                netController.sendPlayerInfo();
-            }
+            netController.updatePlayerInfo();
+            
 
 
 
             netController.emitTransferEvent( MATTIE.multiplayer.renderer.currentTransferObj)
         }
     }
+
+
+    //extend the follower change command to emit the event we need
+    MATTIE.RPG.partyChangeCommand = Game_Interpreter.prototype.command129;
+    Game_Interpreter.prototype.command129 = function (){
+            let returnVal = MATTIE.RPG.partyChangeCommand.call(this);
+            console.info("follower change event")
+            MATTIE.multiplayer.getCurrentNetController().updatePlayerInfo();
+            return returnVal;
+      
+        
+       
+    }
+
 
 }
 
@@ -104,8 +114,8 @@ Game_Player.prototype.startMapEvent = function(x, y, triggers, normal) {
     if (!$gameMap.isEventRunning()) {
         $gameMap.eventsXy(x, y).forEach(function(event) {
             if (event.isTriggerIn(triggers) && event.isNormalPriority() === normal) {
-                if(MATTIE.multiplayer.isDev)console.log(`Event Code: ${event.eventId()} triggered`)
-                if(MATTIE.multiplayer.isDev)console.log(`Event List: ${JSON.stringify(event.list())} triggered`)
+                if(MATTIE.multiplayer.devTools.eventLogger)console.info(`Event Code: ${event.eventId()} triggered`)
+                if(MATTIE.multiplayer.devTools.eventLogger)console.info(`Event List: ${JSON.stringify(event.list())} triggered`)
                 event.start();
             }
         });
@@ -158,7 +168,7 @@ Game_Interpreter.prototype.command121 = function() {
         $gameSwitches.setValue(i, this._params[2] === 0);
         if(i !== 719 && i !== 729 && i !== 695 && i !== 247 && i !== 2434 && i !== 107 && i !== 106 && i !== 200 && i !== 246 && i !== 816)
         if(!this._isParallel)
-        if(MATTIE.multiplayer.isDev)console.log(`Game Switch ${i} set to ${this._params[2] === 0}`)
+        if(MATTIE.multiplayer.devTools.eventLogger)console.log(`Game Switch ${i} set to ${this._params[2] === 0}`)
     }
     return true;
 };

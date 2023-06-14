@@ -100,10 +100,6 @@ class CommonMod {
          this.loaded = false;
     }
 
-    consoleLog(){
-        console.log("hello")
-    }
-
     setLoaded(loaded){
         this.loaded = loaded;
     }

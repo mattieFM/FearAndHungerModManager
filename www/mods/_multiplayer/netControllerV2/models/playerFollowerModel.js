@@ -11,10 +11,15 @@ MATTIE.multiplayer.NetFollower = function () {
 MATTIE.multiplayer.NetFollower.prototype = Object.create(Game_Follower.prototype);
 MATTIE.multiplayer.NetFollower.prototype.constructor = MATTIE.multiplayer.NetFollower;
 
-MATTIE.multiplayer.NetFollower.prototype.initialize = function(memberIndex, netPlayer, actorId = 5) {
+MATTIE.multiplayer.NetFollower.prototype.initialize = function(memberIndex, netPlayer, actorId = undefined) {
     Game_Follower.prototype.initialize.call(this, memberIndex);
     this.actorId = actorId;
     this.netPlayer = netPlayer
+};
+
+MATTIE.multiplayer.NetFollower.prototype.setActor = function(actorId) {
+    this.actorId = actorId
+    this.refresh();
 };
 
 MATTIE.multiplayer.NetFollower.prototype.actor = function() {

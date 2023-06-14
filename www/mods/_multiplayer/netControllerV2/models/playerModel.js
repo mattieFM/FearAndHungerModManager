@@ -18,7 +18,46 @@ class PlayerModel {
         /** @type {MATTIE.multiplayer.Secondary_Player} */
         this.$gamePlayer;
         
+        /** the actor ids of any and all followers, -1 if not present */
+        this.followerIds = [];
+
         this.map = 0;
+
+    }
+
+
+    /**
+     * set the followers on the playermodel and the $gamePlayer
+     * @param {int array} ids the actor ids of any and all followers, -1 if not present
+     */
+    getFollowers(){
+        for (let index = 1; index < $gameParty.maxBattleMembers(); index++) {
+            if($gameParty.battleMembers()[index]){
+            let actorId =$gameParty.battleMembers()[index].actorId()
+            if(actorId)
+            this.followerIds[index-1] = actorId;
+            else{
+                this.followerIds[index-1] = -1;
+            }
+        }
+        }
+        return this.followerIds;
+    }
+
+    setFollowers(ids){
+        if(this.$gamePlayer){
+            let netFollowers =  this.$gamePlayer._followers._data;
+            for (let index = 0; index < ids.length; index++) {
+                this.followerIds[index] = ids[index];
+                const follower = netFollowers[index];
+                if(follower){
+                    if(this.followerIds[index] >= 0)
+                    follower.setActor(this.followerIds[index])
+                }
+                
+            }
+        }
+      
     }
 
     setMap(map){
@@ -43,6 +82,7 @@ class PlayerModel {
         obj.name = this.name;
         obj.actorId = this.actorId;
         obj.peerId = this.peerId;
+        obj.followerIds = this.followerIds;
         return obj;
     }
 

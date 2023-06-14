@@ -13,6 +13,7 @@ MATTIE.multiplayer.isHost = false;
 MATTIE.multiplayer.isDev = true;
 MATTIE.multiplayer.devTools = {};
 MATTIE.multiplayer.devTools.shouldTint = true;
+MATTIE.multiplayer.devTools.eventLogger = false;
 
 MATTIE.multiplayer.devTools.randBetween = function(min, max) {
     return min + Math.floor(Math.random() * (max-min+1))
@@ -93,8 +94,7 @@ MATTIE.multiplayer.getCurrentNetController = ()=>{
 //     })
 
     Input.addKeyBind('u', ()=>{
-        SceneManager._scene.createSpriteset();
-
+       
     })
 
     Input.addKeyBind('y', ()=>{

@@ -20,7 +20,7 @@ var MATTIE = MATTIE || {};
         for (var index = 1; index < maxSaves; index++) {
             if(globalInfo[index])
             if(!globalInfo[index].name){
-                console.log(index)
+                console.info("BETTERSAVES: Migrated save: " + index)
                 var saveData = MATTIE.DataManager.loadAndReturnSave(index)
                 var diff = MATTIE.GameInfo.getDifficulty(saveData.$gameSwitches);
                 var name = JSON.stringify(saveData.$gameActors._data[saveData.$gameParty._actors[0]]._name);
