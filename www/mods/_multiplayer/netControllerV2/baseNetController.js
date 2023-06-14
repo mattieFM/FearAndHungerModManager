@@ -133,7 +133,7 @@ class BaseNetController extends EventEmitter {
             let map = transData.map;
             this.netPlayers[id].setMap(map);
             try {
-                SceneManager._scene.createSpriteset();
+                SceneManager._scene.updateCharacters();
                 try {
                     console.log(transData)
                     this.netPlayers[id].$gamePlayer.reserveTransfer(map, x, y, 0, 0)

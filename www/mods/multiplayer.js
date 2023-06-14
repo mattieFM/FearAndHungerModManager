@@ -93,7 +93,7 @@ MATTIE.multiplayer.getCurrentNetController = ()=>{
 //     })
 
     Input.addKeyBind('u', ()=>{
-        $gameMap.events()[16].lock()
+        SceneManager._scene.createSpriteset();
 
     })
 
