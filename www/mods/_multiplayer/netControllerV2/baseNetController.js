@@ -64,7 +64,6 @@ class BaseNetController extends EventEmitter {
      * @param {*} id the peer id of the player who moved
      */
     onTransferData(transData,id){
-        console.log(id)
         this.transferNetPlayer(transData,id);
     }
 
@@ -73,7 +72,9 @@ class BaseNetController extends EventEmitter {
         let name = playerInfo.name;
         let peerId = playerInfo.peerId;
         let actorId = playerInfo.actorId;
+        let followerIds = playerInfo.followerIds;
         this.netPlayers[peerId] = new PlayerModel(name,actorId);
+        this.netPlayers[peerId].followerIds = followerIds;
         this.netPlayers[peerId].setPeerId(peerId);
     }
 
@@ -97,6 +98,20 @@ class BaseNetController extends EventEmitter {
         this.updateNetPlayers(obj)
     }
 
+    updateNetPlayerFollowers(playerInfo){
+        if(playerInfo.peerId){
+            let netPlayer = this.netPlayers[playerInfo.peerId];
+            if(netPlayer) netPlayer.setFollowers(playerInfo.followerIds)
+        }else{
+            for(key in playerInfo){
+                let player = playerInfo[key];
+                let netPlayer = this.netPlayers[player.peerId];
+                if(netPlayer) netPlayer.setFollowers(player.followerIds)
+            }
+        }
+        
+    }
+
 
     initEmitterOverrides(){
         if(MATTIE.multiplayer.isActive){
@@ -110,13 +125,24 @@ class BaseNetController extends EventEmitter {
      * @param {*} id the id of the peer who's player moved
      */
     moveNetPlayer(moveData,id){
-        console.log(this.netPlayers);
         try {
             this.netPlayers[id].$gamePlayer.moveOneTile(moveData)
         } catch (error) {
             console.warn('something went wrong when moving the character' + error)
         }
         
+    }
+
+
+    updatePlayerInfo(){
+        var actor = $gameParty.leader();
+        this.player.getFollowers();
+
+        if(this.player.actorId !== actor.actorId)
+        this.player.setActorId(actor.actorId());
+
+        //update host/client about the new actor id /follower
+        this.sendPlayerInfo();
     }
     
 
@@ -135,7 +161,6 @@ class BaseNetController extends EventEmitter {
             try {
                 SceneManager._scene.updateCharacters();
                 try {
-                    console.log(transData)
                     this.netPlayers[id].$gamePlayer.reserveTransfer(map, x, y, 0, 0)
                     this.netPlayers[id].$gamePlayer.performTransfer(); 
                 } catch (error) {

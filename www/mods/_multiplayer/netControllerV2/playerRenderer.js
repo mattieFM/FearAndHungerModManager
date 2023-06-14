@@ -33,15 +33,12 @@ MATTIE.multiplayer.renderer._renderNetPlayers = function(target) {
                 if(MATTIE.multiplayer.devTools.shouldTint) p2Sprite.tint = MATTIE.multiplayer.devTools.getTint();
                 this.playersSprites.push(p2Sprite);
                 netPlayer.$gamePlayer.followers().forEach(follower => {
-                    console.log('netplayer follower added')
                     let followerSprite = new Sprite_Character(follower);
                     follower.setTransparent(false);
                     this.playersSprites.push(followerSprite);
                 });
             }
         }
-
-        console.log(this._characterSprites)
         for (var i = 0; i < this.playersSprites.length; i++) {
             target.addChild(this.playersSprites[i]);
         }

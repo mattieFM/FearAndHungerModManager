@@ -69,7 +69,6 @@ class ClientController extends BaseNetController {
             this.onMoveData(direction, id);
         }
         if(data.transfer){
-            console.log("trans data event")
             let transfer = data.transfer.data.transfer;
             let id = data.transfer.id;
             this.onTransferData(transfer,id)
@@ -94,6 +93,7 @@ class ClientController extends BaseNetController {
      */
     onUpdateNetPlayers(netPlayers){
         this.updateNetPlayers(netPlayers)
+        this.updateNetPlayerFollowers(netPlayers);
         this.emit('updateNetPlayers', netPlayers);
     }
 

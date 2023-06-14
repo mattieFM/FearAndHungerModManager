@@ -86,6 +86,7 @@ class HostController extends BaseNetController {
     onPlayerInfo(playerInfo){
         this.updateNetPlayer(playerInfo)
         this.distributeNetPlayersToClients();
+        this.updateNetPlayerFollowers(playerInfo);
         this.emit('playerInfo', playerInfo);
     }
 
