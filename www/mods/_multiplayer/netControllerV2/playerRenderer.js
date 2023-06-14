@@ -10,10 +10,19 @@ MATTIE.multiplayer.renderer = MATTIE.multiplayer.renderer || {};
 MATTIE.RPG.spriteSetMap_CreateChars = Spriteset_Map.prototype.createCharacters;
 /** a function that handles overriding the player rendering settings to allow rendering of multiple PCs */
 MATTIE.multiplayer.renderer.playerOverrides = function(){
+
     Spriteset_Map.prototype.createCharacters = function() {
         MATTIE.RPG.spriteSetMap_CreateChars.call(this);
+        console.log(SceneManager._scene._spriteset)
+        console.log(SceneManager._scene.removeSpriteSet())
         if(MATTIE.multiplayer.isActive) MATTIE.multiplayer.renderer._createSecondaryChars.call(this);
     };
+
+
+    Scene_Map.prototype.removeSpriteSet = function (){
+        console.log("here")
+        return this.removeChild(this._spriteset);
+    }
 }
 
 /** render all secondary characters */
