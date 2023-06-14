@@ -9,6 +9,7 @@
         "_multiplayer/joinMenu",
         "_multiplayer/lobby",
         "_multiplayer/netControllerV2/models/connectionModel",
+        "_multiplayer/netControllerV2/models/playerFollowerModel",
         "_multiplayer/netControllerV2/models/playerModel",
         "_multiplayer/netControllerV2/baseNetController",
         "_multiplayer/netControllerV2/playerEmitter",
