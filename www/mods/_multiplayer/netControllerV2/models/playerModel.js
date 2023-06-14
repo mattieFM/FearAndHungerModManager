@@ -70,9 +70,15 @@ MATTIE.multiplayer.Secondary_Player.prototype.initialize = function () {
     Game_Player.prototype.initialize.call(this);
 
     //TODO: followers
-    this._followers = $gamePlayer.followers();
+    //this._followers = $gamePlayer.followers();
     //this._followers = $gamePlayer.followers();
 }
+
+//override init members to use netfollowers instead of followers
+MATTIE.multiplayer.Secondary_Player.prototype.initMembers = function() {
+    Game_Player.prototype.initMembers.call(this);
+    this._followers = new MATTIE.multiplayer.NetFollowers(this);
+};
 
 /** set the dir4 current control. dir4 is the direction on the arrow keys. */
 MATTIE.multiplayer.Secondary_Player.prototype.moveOneTile = function(dir4) {
