@@ -184,6 +184,38 @@ class BaseNetController extends EventEmitter {
     }
         
     }
+
+    onCtrlSwitchData(ctrlSwitch,id){
+        if(MATTIE.multiplayer.devTools.eventLogger)console.log("on ctrl switch data")
+        let index = ctrlSwitch.i;
+        let val = ctrlSwitch.b;
+        let s = ctrlSwitch.s;
+        if(MATTIE.multiplayer.devTools.eventLogger)console.log(index,val)
+        if(!s){
+        $gameSwitches.setValue(index, val, true);
+        } else if(s) {
+        $gameSelfSwitches.setValue(index, val);
+        }
+        this.sendSwitchEvent(ctrlSwitch,[id]);
+
+    }
+
+
+    /** @emits ctrlSwitch */
+    emitSwitchEvent(ctrlSwitch){
+        let obj = {};
+        obj.ctrlSwitch = ctrlSwitch
+        this.onSwitchEvent(obj)
+        this.emit("ctrlSwitch", obj)
+    }
+
+    onSwitchEvent(obj){
+        this.sendSwitchEvent(obj);
+    }
+
+    sendSwitchEvent(obj){
+
+    }
 }
 
 //ignore this does nothing, just to get intellisense working. solely used to import into the types file for dev.

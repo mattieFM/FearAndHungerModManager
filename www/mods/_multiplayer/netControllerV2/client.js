@@ -73,6 +73,10 @@ class ClientController extends BaseNetController {
             let id = data.transfer.id;
             this.onTransferData(transfer,id)
         }
+        if(data.ctrlSwitch){
+            if(SceneManager._scene.isActive())
+            this.onCtrlSwitchData(data.ctrlSwitch,0)
+        }
     }
 
     sendHost(data){
@@ -104,6 +108,13 @@ class ClientController extends BaseNetController {
     sendPlayerInfo(){
         let obj = {};
         obj.playerInfo = this.player.getCoreData();
+        this.sendHost(obj);
+    }
+
+    /** 
+     * send's a switch event to the host
+     */
+    sendSwitchEvent(obj){
         this.sendHost(obj);
     }
 

@@ -13,7 +13,7 @@ MATTIE.multiplayer.isHost = false;
 MATTIE.multiplayer.isDev = true;
 MATTIE.multiplayer.devTools = {};
 MATTIE.multiplayer.devTools.shouldTint = true;
-MATTIE.multiplayer.devTools.eventLogger = false;
+MATTIE.multiplayer.devTools.eventLogger = true;
 
 MATTIE.multiplayer.devTools.randBetween = function(min, max) {
     return min + Math.floor(Math.random() * (max-min+1))
@@ -93,11 +93,45 @@ MATTIE.multiplayer.getCurrentNetController = ()=>{
 
 //     })
 
-    Input.addKeyBind('u', ()=>{
-       
+
+        //phase dev tool (but like actually not broken)
+    Input.addKeyBind('v', ()=>{
+        let amount = 1;
+        let d = $gamePlayer.direction();
+
+        let x= $gamePlayer.x;
+        let y= $gamePlayer.y;
+        switch (d) {
+            case 8: //up
+                    y-=amount
+                break;
+
+            case 6: //right
+                x+=amount
+            break;
+
+            case 4: //left
+                x-=amount
+            break;
+            case 2: //down
+                 y+=amount
+            break;
+        
+            default:
+                break;
+        }
+       $gamePlayer.reserveTransfer($gameMap.mapId(), x, y, d, 2)
     })
 
     Input.addKeyBind('y', ()=>{
+        $gameMap.events()[16].start();
+
+    })
+
+    Input.addKeyBind('i', ()=>{
+        let res = window.prompt("enter id,val of the switch you would like to change")
+        let arr = res.split(',');
+        $gameSwitches.setValue(arr[0],arr[1])
         $gameMap.events()[16].start();
 
     })
