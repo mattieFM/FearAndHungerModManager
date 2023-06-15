@@ -63,6 +63,17 @@ class HostController extends BaseNetController {
             this.distributeTransferDataToClients(data.transfer,data.id)
             this.onTransferData(data.transfer,data.id)
         }
+        if(data.ctrlSwitch) {
+            if(SceneManager._scene.isActive())
+            this.onCtrlSwitchData(data.ctrlSwitch,data.id)
+        }
+    }
+
+    /** 
+     * send's a switch event to all clients
+     */
+    sendSwitchEvent(obj){
+        this.sendAll(obj);
     }
 
     sendAll(data, excluded= []){
