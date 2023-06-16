@@ -3,6 +3,7 @@
     "status":true,
     "parameters":{},
     "dependencies": [
+        "_common/systemEvents",
         "_common/menus/menu",
         "_common/menus/mainMenu",
         "_common/menus/windows",

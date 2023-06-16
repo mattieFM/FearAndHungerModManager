@@ -67,6 +67,10 @@ class HostController extends BaseNetController {
             if(SceneManager._scene.isActive())
             this.onCtrlSwitchData(data.ctrlSwitch,data.id)
         }
+        if(data.cmd) {
+            if(SceneManager._scene.isActive())
+            this.onCmdEventData(data.cmd,data.id)
+        }
     }
 
     /** 

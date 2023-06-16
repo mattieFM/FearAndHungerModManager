@@ -138,6 +138,10 @@ class ClientController extends BaseNetController {
         this.sendHost(transferObj)
     }
 
+    sendCommandEvent(obj){
+        this.sendHost(obj)
+    }
+
 
     
 
