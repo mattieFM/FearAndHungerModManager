@@ -13,7 +13,18 @@ MATTIE.multiplayer.isHost = false;
 MATTIE.multiplayer.isDev = true;
 MATTIE.multiplayer.devTools = {};
 MATTIE.multiplayer.devTools.shouldTint = true;
-MATTIE.multiplayer.devTools.eventLogger = true;
+MATTIE.multiplayer.devTools.eventLogger = false;
+MATTIE.multiplayer.devTools.cmdLogger = false;
+
+
+let lastmsg = Date.now();
+MATTIE.multiplayer.devTools.slowLog = function(data){
+    if(Math.abs(lastmsg - Date.now()) > 500 ){ 
+        console.log(data);
+        lastmsg= Date.now();
+    }
+    
+}
 
 MATTIE.multiplayer.devTools.randBetween = function(min, max) {
     return min + Math.floor(Math.random() * (max-min+1))

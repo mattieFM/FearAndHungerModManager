@@ -190,7 +190,7 @@ class BaseNetController extends EventEmitter {
         let index = ctrlSwitch.i;
         let val = ctrlSwitch.b;
         let s = ctrlSwitch.s;
-        if(MATTIE.multiplayer.devTools.eventLogger)console.log(index,val)
+        if(MATTIE.multiplayer.devTools.eventLogger){console.log(index,val);}
         if(!s){
         $gameSwitches.setValue(index, val, true);
         } else if(s) {
@@ -198,6 +198,29 @@ class BaseNetController extends EventEmitter {
         }
         this.sendSwitchEvent(ctrlSwitch,[id]);
 
+    }
+
+
+    /** @emits commandEvent */
+    emitCommandEvent(cmd){
+        let obj = {};
+        obj.cmd = cmd;
+        this.onCommandEvent(obj)
+        this.emit("commandEvent", cmd)
+    }
+
+    onCommandEvent(obj){
+        this.sendCommandEvent(obj);
+    }
+
+    sendCommandEvent(obj){
+
+    }
+
+    /** the cmd object */
+    onCmdEventData(cmd, peerId){
+        console.log(`${cmd.code} called in data event`)
+        $gameMap._interpreter.executeCommandFromParam(cmd);
     }
 
 
