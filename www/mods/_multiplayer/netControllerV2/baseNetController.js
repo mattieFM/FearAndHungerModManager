@@ -138,7 +138,7 @@ class BaseNetController extends EventEmitter {
         var actor = $gameParty.leader();
         this.player.getFollowers();
 
-        if(this.player.actorId !== actor.actorId)
+        if(this.player.actorId !== actor.actorId())
         this.player.setActorId(actor.actorId());
 
         //update host/client about the new actor id /follower
@@ -196,7 +196,8 @@ class BaseNetController extends EventEmitter {
         } else if(s) {
         $gameSelfSwitches.setValue(index, val);
         }
-        this.sendSwitchEvent(ctrlSwitch,[id]);
+        //this.sendSwitchEvent(ctrlSwitch,[id]);
+        //TODO: host forward on switch events to other clients
 
     }
 

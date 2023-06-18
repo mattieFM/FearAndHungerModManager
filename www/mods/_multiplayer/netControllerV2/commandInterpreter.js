@@ -2,12 +2,13 @@ var MATTIE = MATTIE || {};
 MATTIE.multiplayer = MATTIE.multiplayer || {}
 
 MATTIE.RPG.Game_InterpreterExecuteCommand = Game_Interpreter.prototype.executeCommand;
+
 Game_Interpreter.prototype.executeCommand = function () {
     let cmd = this.currentCommand();
-    let index = this._index;
+    
     let returnVal = MATTIE.RPG.Game_InterpreterExecuteCommand.call(this);
     if(cmd){
-         cmd.index = index;
+        cmd.eventId = this.eventId();
         if(cmd.code)
         if(MATTIE.multiplayer.enabledNetCommands.includes(cmd.code)){
             if(MATTIE.multiplayer.cmdLogger) MATTIE.multiplayer.devTools.slowLog(cmd);
@@ -15,7 +16,9 @@ Game_Interpreter.prototype.executeCommand = function () {
             switch (cmd.code) {
                 case 205: //set movement route
                     if(cmd.parameters[0] > 0) { //not targeting $gamePlayer
-                        console.log(`set movement route emitted`)
+                        console.log(this.eventId())
+                        console.log(`set movement route emitted`);
+                        if(MATTIE.multiplayer.isActive)
                         netController.emitCommandEvent(cmd)
                     }
                     break;
@@ -31,20 +34,28 @@ Game_Interpreter.prototype.executeCommand = function () {
     return returnVal;
 }
 
-Game_Interpreter.prototype.executeCommandFromParam = function(command) {
-    if (command) {
-        this._params = command.parameters;
-        this._indent = command.indent;
-        var methodName = 'command' + command.code;
-        
-        if (typeof this[methodName] === 'function') {
-            if (!this[methodName]()) {
-                return false;
-            }
+
+MATTIE.multiplayer.runGameCmd = function(cmd){
+    if (MATTIE.multiplayer._interpreter) {
+        if (!MATTIE.multiplayer._interpreter.isRunning()) {
+            MATTIE.multiplayer._interpreter.setup(this.list(), this._eventId);
         }
-        this._index++;
-    } else {
-        this.terminate();
+        MATTIE.multiplayer._interpreter.update();
+    }
+}
+
+Game_Interpreter.prototype.executeCommandFromParam = function(cmd) {
+    console.log(cmd)
+    let params = cmd.parameters;
+    $gameMap.refreshIfNeeded();
+    
+    let _character = $gameMap.event(params[0])
+    console.log(_character)
+    if (_character) {
+        _character.forceMoveRoute(params[1]);
+        if (params[1].wait) {
+            this.setWaitMode('route');
+        }
     }
     return true;
 };
@@ -58,6 +69,7 @@ MATTIE.multiplayer.enabledNetCommands = [
     603, //battle loss //interpret
     313, //change state //interpret
     331, //change enemy hp //send?
+    //set event location
     333, //change enemy state //send?
     334, //enemy recover all //send?
     335, //enemy appear //send?

@@ -28,6 +28,7 @@ class HostController extends BaseNetController {
     open(){
         this.initEmitterOverrides(); //override stuff for interceptors
         MATTIE.multiplayer.isHost = true;
+        MATTIE.multiplayer.isActive = true;
         this.self = new Peer();
         this.self.on('open', () => {
             console.info(`host opened at: ${this.self.id}`)
@@ -51,6 +52,7 @@ class HostController extends BaseNetController {
     }
  
     onData(data,conn){
+        console.log(data);
         data.id = conn.peer; //set the id of the data to the id of the peer on the other side of this connection
         if(data.playerInfo){
             this.onPlayerInfo(data.playerInfo);
@@ -99,6 +101,7 @@ class HostController extends BaseNetController {
      * @emits playerInfo
      * */
     onPlayerInfo(playerInfo){
+        console.log(playerInfo)
         this.updateNetPlayer(playerInfo)
         this.distributeNetPlayersToClients();
         this.updateNetPlayerFollowers(playerInfo);
