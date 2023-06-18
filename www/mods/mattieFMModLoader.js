@@ -40,7 +40,7 @@ class ModManager {
         const modInfoPath =  path + modName;
         const modInfoData = fs.readFileSync(modInfoPath)
         const modInfo = JSON.parse(modInfoData);
-        if(modInfo.dependencies){ //load all dependencies before mod
+        if(modInfo.dependencies && modInfo.status){ //load all dependencies before mod
             modInfo.dependencies.forEach(dep=>{
                 this.addModEntry(dep);
             });

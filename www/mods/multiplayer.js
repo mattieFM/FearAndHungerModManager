@@ -13,9 +13,10 @@ MATTIE.multiplayer.isHost = false;
 MATTIE.multiplayer.isDev = true;
 MATTIE.multiplayer.devTools = {};
 MATTIE.multiplayer.devTools.shouldTint = true;
-MATTIE.multiplayer.devTools.eventLogger = false;
+MATTIE.multiplayer.devTools.eventLogger = true;
 MATTIE.multiplayer.devTools.cmdLogger = false;
 
+MATTIE.multiplayer._interpreter = new Game_Interpreter();
 
 let lastmsg = Date.now();
 MATTIE.multiplayer.devTools.slowLog = function(data){
@@ -142,8 +143,9 @@ MATTIE.multiplayer.getCurrentNetController = ()=>{
     Input.addKeyBind('i', ()=>{
         let res = window.prompt("enter id,val of the switch you would like to change")
         let arr = res.split(',');
-        $gameSwitches.setValue(arr[0],arr[1])
-        $gameMap.events()[16].start();
+        console.info(`forcibly set ${arr[0]} to ${arr[1]}`)
+        $gameSwitches.setValue(parseInt(arr[0]),parseInt(arr[1]),false)
+        //$gameMap.events()[16].start();
 
     })
 }

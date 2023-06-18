@@ -1,5 +1,5 @@
 var MATTIE = MATTIE || {};
-
+MATTIE.isDev = true;
 MATTIE.GameInfo = {};
 MATTIE.GameInfo.getDifficulty = (data=$gameSwitches)=>{
     var difficulty = "Fear & Hunger"
@@ -148,5 +148,16 @@ MATTIE.Prev_Input_Update = Input.update;
         }
             
     }
+
+if(MATTIE.isDev){
+    // console.log("inited")
+    
+    // Input.keyMapper[119] = "F8"
+    // keys[119] = ()=>{
+    //     if (Utils.isNwjs()) {   
+    //         require('nw.gui').Window.get().showDevTools();
+    //     }
+    // }
+}
 
 // --ENGINE OVERRIDES--

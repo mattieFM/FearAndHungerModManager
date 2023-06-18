@@ -39,6 +39,7 @@ MATTIE.multiplayer.gamePlayer.override = function() {
                     localPlayer.update(SceneManager._scene.isActive());
                 }
         }
+        MATTIE.multiplayer._interpreter.update();
     }
 
 
@@ -84,10 +85,6 @@ MATTIE.multiplayer.gamePlayer.override = function() {
             //handle setting the proper actor id when the player loads into a map 
             //this does also allow the main actor changing if we want
             netController.updatePlayerInfo();
-            
-
-
-
             netController.emitTransferEvent( MATTIE.multiplayer.renderer.currentTransferObj)
         }
     }
@@ -96,14 +93,18 @@ MATTIE.multiplayer.gamePlayer.override = function() {
     //extend the follower change command to emit the event we need
     MATTIE.RPG.partyChangeCommand = Game_Interpreter.prototype.command129;
     Game_Interpreter.prototype.command129 = function (){
+            var actor = $gameActors.actor(this._params[0]);
             let returnVal = MATTIE.RPG.partyChangeCommand.call(this);
-            console.info("follower change event")
-            MATTIE.multiplayer.getCurrentNetController().updatePlayerInfo();
+            if(actor){
+                console.info("follower change event")
+                MATTIE.multiplayer.getCurrentNetController().updatePlayerInfo();
+            }
             return returnVal;
       
         
        
     }
+
 
 
 }
@@ -112,40 +113,4 @@ MATTIE.multiplayer.gamePlayer.override = function() {
 
 
 
-
-Game_Event.prototype.setupPageSettings = function() {
-    var page = this.page();
-    var image = page.image;
-    if (image.tileId > 0) {
-        this.setTileImage(image.tileId);
-    } else {
-        this.setImage(image.characterName, image.characterIndex);
-    }
-    if (this._originalDirection !== image.direction) {
-        this._originalDirection = image.direction;
-        this._prelockDirection = 0;
-        this.setDirectionFix(false);
-        this.setDirection(image.direction);
-    }
-    if (this._originalPattern !== image.pattern) {
-        this._originalPattern = image.pattern;
-        this.setPattern(image.pattern);
-    }
-    this.setMoveSpeed(page.moveSpeed);
-    this.setMoveFrequency(page.moveFrequency);
-    this.setPriorityType(page.priorityType);
-    this.setWalkAnime(page.walkAnime);
-    this.setStepAnime(page.stepAnime);
-    this.setDirectionFix(page.directionFix);
-    this.setThrough(page.through);
-    this.setMoveRoute(page.moveRoute);
-    this._moveType = page.moveType;
-    this._trigger = page.trigger;
-    if (this._trigger === 4) { //trigger 4 is parallel execution mode which will constantly span these events
-        this._interpreter = new Game_Interpreter();
-        this._interpreter._isParallel = true;
-    } else {
-        this._interpreter = null;
-    }
-};
 
