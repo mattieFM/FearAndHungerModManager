@@ -18,7 +18,8 @@ MATTIE.multiplayer.devTools.eventLogger = false;
 MATTIE.multiplayer.devTools.varLogger = false;
 MATTIE.multiplayer.devTools.cmdLogger = false;
 MATTIE.multiplayer.devTools.moveLogger = false;
-MATTIE.multiplayer.devTools.enemyHostLogger = true;
+MATTIE.multiplayer.devTools.enemyHostLogger = false;
+MATTIE.multiplayer.devTools.dataLogger = true
 
 MATTIE.multiplayer._interpreter = new Game_Interpreter();
 
