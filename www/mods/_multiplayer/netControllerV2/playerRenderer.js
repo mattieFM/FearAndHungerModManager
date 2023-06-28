@@ -30,7 +30,13 @@ MATTIE.multiplayer.renderer._renderNetPlayers = function(target) {
                 
                 p2.name = netPlayer.name;
                 let p2Sprite = new Sprite_Character(p2);
-                if(MATTIE.multiplayer.devTools.shouldTint) p2Sprite.tint = MATTIE.multiplayer.devTools.getTint();
+                if(MATTIE.multiplayer.devTools.shouldTint) {
+                    if(!MATTIE.multiplayer.devTools.consistentTint){
+                        MATTIE.multiplayer.devTools.consistentTint = MATTIE.multiplayer.devTools.getTint()
+                    }
+                    p2Sprite.tint = MATTIE.multiplayer.devTools.consistentTint;
+                
+                }
                 this.playersSprites.push(p2Sprite);
                 netPlayer.$gamePlayer.followers().forEach(follower => {
                     let followerSprite = new Sprite_Character(follower);
