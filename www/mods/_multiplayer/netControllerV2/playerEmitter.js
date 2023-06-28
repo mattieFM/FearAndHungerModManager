@@ -12,6 +12,15 @@ MATTIE.RPG = MATTIE.RPG || {};
  * 
  * override all uneccacary methods making them emit events for multiplayer support
  */
+
+//every x moves send player x and y to move
+MATTIE.multiplayer.selfMoveCount = 0;
+MATTIE.multiplayer.selfMax = 15;
+//every x moves send player x and y to transfer
+MATTIE.multiplayer.selfTransMoveCount = 0;
+MATTIE.multiplayer.selfTransMax = 100;
+
+
 MATTIE.multiplayer.gamePlayer.override = function() {
     console.info('--emitter overrides initialized--')
 
@@ -19,11 +28,22 @@ MATTIE.multiplayer.gamePlayer.override = function() {
     MATTIE.multiplayer.gamePlayer.executeMove = Game_Player.prototype.executeMove;
     Game_Player.prototype.executeMove = function (direction) {
         MATTIE.multiplayer.gamePlayer.executeMove.call(this, direction);
-        if(MATTIE.multiplayer.isClient){
-            MATTIE.multiplayer.clientController.emitMoveEvent(direction);
-        } else if(MATTIE.multiplayer.isHost){
-            MATTIE.multiplayer.hostController.emitMoveEvent(direction);
+        var netController = MATTIE.multiplayer.getCurrentNetController();
+        let args = [direction];
+        if(MATTIE.multiplayer.selfMoveCount >= MATTIE.multiplayer.selfMax){
+            args.push(this.x)
+            args.push(this.y)
+            MATTIE.multiplayer.selfMoveCount=0;
         }
+        if(MATTIE.multiplayer.selfTransMoveCount >= MATTIE.multiplayer.selfTransMax){
+            args.push(this.x)
+            args.push(this.y)
+            args.push(1);
+            MATTIE.multiplayer.selfTransMoveCount=0;
+        }
+        netController.emitMoveEvent(...args);
+        MATTIE.multiplayer.selfMoveCount++;
+        MATTIE.multiplayer.selfTransMoveCount++;
     }
 
 
@@ -66,13 +86,13 @@ MATTIE.multiplayer.gamePlayer.override = function() {
         if(MATTIE.multiplayer.isActive){
             let netController = MATTIE.multiplayer.getCurrentNetController();
             netController.emitTransferEvent(MATTIE.multiplayer.renderer.currentTransferObj)
-        }
-        
+        }        
     }
 
     //override the function that triggers when the scene map is fully loaded
     MATTIE.RPG.sceneMapOnLoaded = Scene_Map.prototype.onMapLoaded;
     Scene_Map.prototype.onMapLoaded = function () {
+        //console.log("map loaded")
         MATTIE.RPG.sceneMapOnLoaded .call(this);
         if(MATTIE.multiplayer.isActive){
             MATTIE.multiplayer.renderer.currentTransferObj = {};
@@ -86,6 +106,8 @@ MATTIE.multiplayer.gamePlayer.override = function() {
             //this does also allow the main actor changing if we want
             netController.updatePlayerInfo();
             netController.emitTransferEvent( MATTIE.multiplayer.renderer.currentTransferObj)
+            MATTIE.multiplayer.setEnemyHost();
+        
         }
     }
 

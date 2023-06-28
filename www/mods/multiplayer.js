@@ -10,11 +10,15 @@ MATTIE.windows.multiplayer = MATTIE.windows.multiplayer || {};
 MATTIE.multiplayer.isActive = true;
 MATTIE.multiplayer.isClient = false;
 MATTIE.multiplayer.isHost = false;
+MATTIE.multiplayer.isEnemyHost = false;
 MATTIE.multiplayer.isDev = true;
 MATTIE.multiplayer.devTools = {};
 MATTIE.multiplayer.devTools.shouldTint = true;
-MATTIE.multiplayer.devTools.eventLogger = true;
+MATTIE.multiplayer.devTools.eventLogger = false;
+MATTIE.multiplayer.devTools.varLogger = false;
 MATTIE.multiplayer.devTools.cmdLogger = false;
+MATTIE.multiplayer.devTools.moveLogger = false;
+MATTIE.multiplayer.devTools.enemyHostLogger = true;
 
 MATTIE.multiplayer._interpreter = new Game_Interpreter();
 
@@ -23,6 +27,37 @@ MATTIE.multiplayer.devTools.slowLog = function(data){
     if(Math.abs(lastmsg - Date.now()) > 500 ){ 
         console.log(data);
         lastmsg= Date.now();
+    }
+    
+}
+MATTIE.multiplayer.setEnemyHost = function (){
+    if($gameMap.mapId() !== MATTIE.multiplayer.lastEnemyHostMapId){
+        let netController = MATTIE.multiplayer.getCurrentNetController();
+        var shouldBeHost = true;
+        for(key in netController.netPlayers){
+            let player = netController.netPlayers[key];
+            if(player.map === $gameMap.mapId()){
+                shouldBeHost = false;
+            }
+        }
+        MATTIE.multiplayer.isEnemyHost = shouldBeHost;
+        if(MATTIE.multiplayer.devTools.enemyHostLogger)console.log("is enemy host? "+ MATTIE.multiplayer.isEnemyHost);
+    }
+    MATTIE.multiplayer.lastEnemyHostMapId = $gameMap.mapId();
+}
+
+MATTIE.multiplayer.updateEnemyHost = function (){
+    if(!MATTIE.multiplayer.isEnemyHost){
+        let netController = MATTIE.multiplayer.getCurrentNetController();
+        var shouldBeHost = true;
+        for(key in netController.netPlayers){
+            let player = netController.netPlayers[key];
+            if(player.map === $gameMap.mapId()){
+                shouldBeHost = false;
+            }
+        }
+        MATTIE.multiplayer.isEnemyHost = shouldBeHost;
+        if(MATTIE.multiplayer.devTools.enemyHostLogger)console.log("is enemy host? "+ MATTIE.multiplayer.isEnemyHost)
     }
     
 }
@@ -146,6 +181,40 @@ MATTIE.multiplayer.getCurrentNetController = ()=>{
         console.info(`forcibly set ${arr[0]} to ${arr[1]}`)
         $gameSwitches.setValue(parseInt(arr[0]),parseInt(arr[1]),false)
         //$gameMap.events()[16].start();
+
+    })
+
+    Input.addKeyBind('o', ()=>{
+        let res = window.prompt("enter id,val of the var you would like to change")
+        let arr = res.split(',');
+        console.info(`forcibly set ${arr[0]} to ${arr[1]}`)
+        $gameVariables.setValue(parseInt(arr[0]),parseInt(arr[1]))
+        //$gameMap.events()[16].start();
+
+    })
+
+    Input.addKeyBind('p', ()=>{
+        let res = window.prompt("enter id,x,y of the event you would like to move")
+        let arr = res.split(',');
+        
+        
+        let event = $gameMap.event(arr[0]);
+       
+        try {
+            let x = parseInt(arr[1]);
+            let y = parseInt(arr[2]);
+            event.x = x;
+            event.y = y;
+            event._x = x;
+            event._y = y;
+            console.info(`forcibly moved event:ID:${arr[0]} to x:${arr[1]}y:${arr[2]}`)
+        } catch (error) {
+            event[arr[1]] = arr[2];
+            console.info(`forcibly set event:ID:${arr[0]} prop: ${arr[1]} to ${arr[2]}`)
+        }
+       
+        
+        
 
     })
 }

@@ -58,7 +58,7 @@ class ClientController extends BaseNetController {
     }
 
     onData(data){
-        console.log(data);
+        if(MATTIE.multiplayer.devTools.dataLogger) console.info(data);
         if(data.updateNetPlayers){
             this.onUpdateNetPlayers(data.updateNetPlayers);
         }
@@ -67,8 +67,7 @@ class ClientController extends BaseNetController {
         }
         if(data.move){
             let id = data.move.id;
-            let direction = data.move.d;
-            this.onMoveData(direction, id);
+            this.onMoveData(data.move, id);
         }
         if(data.transfer){
             let transfer = data.transfer.data.transfer;
@@ -78,6 +77,10 @@ class ClientController extends BaseNetController {
         if(data.ctrlSwitch){
             if(SceneManager._scene.isActive())
             this.onCtrlSwitchData(data.ctrlSwitch,0)
+        }
+        if(data.event){
+            if(SceneManager._scene.isActive())
+            this.onEventMoveEventData(data.event)
         }
     }
 
@@ -113,6 +116,10 @@ class ClientController extends BaseNetController {
         this.sendHost(obj);
     }
 
+    sendEventMoveEvent(obj){
+        this.sendHost(obj);
+    }
+
     /** 
      * send's a switch event to the host
      */
@@ -125,9 +132,17 @@ class ClientController extends BaseNetController {
      * sends data to the host when the player moves
      * @param {number} direction 2 / 4 / 6 / 8 representing down right left up
      */
-    onMoveEvent(direction){
+    onMoveEvent(direction,x=undefined,y=undefined,transfer=false){
         let obj = {};
-        obj.move = direction;
+        obj.move = {};
+        obj.move.d = direction;
+        if(x){
+            obj.move.x = x;
+            obj.move.y = y;
+        }
+        if(transfer){
+            obj.move.t=true
+        }
         this.sendHost(obj)
     }
 

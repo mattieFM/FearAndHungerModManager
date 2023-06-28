@@ -15,7 +15,7 @@ class HostController extends BaseNetController {
         this.connections = [];
 
         /** the player on the local machine */
-        this.player = new PlayerModel("Mattie",3)
+        this.player = new PlayerModel("Mattie",3);
 
         /**
          *  players not on the local machine 
@@ -52,7 +52,7 @@ class HostController extends BaseNetController {
     }
  
     onData(data,conn){
-        console.log(data);
+        if(MATTIE.multiplayer.devTools.dataLogger) console.log(data);
         data.id = conn.peer; //set the id of the data to the id of the peer on the other side of this connection
         if(data.playerInfo){
             this.onPlayerInfo(data.playerInfo);
@@ -73,7 +73,19 @@ class HostController extends BaseNetController {
             if(SceneManager._scene.isActive())
             this.onCmdEventData(data.cmd,data.id)
         }
+        if(data.event){
+            if(SceneManager._scene.isActive())
+            this.hostOnEventMoveEventData(data.event,data.id)
+        }
     }
+
+    hostOnEventMoveEventData(data,peerId){
+        this.onEventMoveEventData(data);
+        let obj = {};
+        obj.event = data;
+        this.sendAll(obj,[peerId])
+    }
+
 
     /** 
      * send's a switch event to all clients
@@ -149,6 +161,10 @@ class HostController extends BaseNetController {
         return dict
     }
 
+    sendEventMoveEvent(obj){
+        this.sendAll(obj);
+    }
+
 
     /**
      * sends the move data of a move event to all clients who need to know
@@ -174,11 +190,19 @@ class HostController extends BaseNetController {
      * @param {Peerid} id the id of the peer this data applies to
      * @returns moveData obj for clients
      */
-    generateMoveDataForClients(moveData,id){
+    generateMoveDataForClients(direction,id,x=undefined,y=undefined,transfer=false){
         let obj = {};
-            obj.move = {};
-            obj.move.d = moveData;
-            obj.move.id = id;
+        obj.move = {};
+        obj.move.d = direction;
+        obj.move.id = id;
+        if(x){
+            obj.move.x = x;
+            obj.move.y = y;
+        }
+        if(transfer){
+            obj.move.t=true
+        }
+           
         return obj;
     }
     /**
@@ -201,8 +225,8 @@ class HostController extends BaseNetController {
      * sends data to the clients when the host moves
      * @param {number} direction 2 / 4 / 6 / 8 representing down right left up
      */
-    onMoveEvent(direction){
-        this.sendAll(this.generateMoveDataForClients(direction, this.peerId)) //this data is the host moving so we need the host's id here
+    onMoveEvent(direction,x=undefined,y=undefined,transfer=false){
+        this.sendAll(this.generateMoveDataForClients(direction, this.peerId,x,y,transfer)) //this data is the host moving so we need the host's id here
     }
 
     /**

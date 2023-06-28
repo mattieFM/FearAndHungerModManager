@@ -45,7 +45,7 @@ class PlayerModel {
     }
 
     setFollowers(ids){
-        if(this.$gamePlayer){
+        if(this.$gamePlayer && typeof this.$gamePlayer === typeof MATTIE.multiplayer.Secondary_Player){
             let netFollowers =  this.$gamePlayer._followers._data;
             for (let index = 0; index < ids.length; index++) {
                 this.followerIds[index] = ids[index];
@@ -66,7 +66,7 @@ class PlayerModel {
 
     setActorId(id){
         this.actorId = id;
-        if(this.$gamePlayer){
+        if(this.$gamePlayer && typeof this.$gamePlayer === typeof MATTIE.multiplayer.Secondary_Player){
             this.$gamePlayer.setActor(id);
         }
     }
@@ -131,6 +131,7 @@ MATTIE.multiplayer.Secondary_Player.prototype.performTransfer = function () {
     //thinks you are on top of every event at once :) 
     this._newMapId = $gameMap.mapId(); 
     MATTIE.RPG.performTransfer.call(this);
+    MATTIE.multiplayer.updateEnemyHost();
 }
 
 MATTIE.multiplayer.Secondary_Player.prototype.reserveTransfer = function(mapId, x, y, d, fadeType){
