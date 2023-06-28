@@ -193,7 +193,13 @@ class HostController extends BaseNetController {
     generateMoveDataForClients(direction,id,x=undefined,y=undefined,transfer=false){
         let obj = {};
         obj.move = {};
-        obj.move.d = direction;
+        //this if is fucked, fix it later if you care to
+        if(direction.d){
+            obj.move.d = direction.d;
+        }else{
+            obj.move.d = direction;
+        }
+        
         obj.move.id = id;
         if(x){
             obj.move.x = x;
