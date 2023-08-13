@@ -1,6 +1,6 @@
 var MATTIE = MATTIE || {};
 MATTIE.multiplayer = MATTIE.multiplayer || {};
-
+MATTIE.multiplayer.maxGrabAttempts = 3; //max number of times to try to over take player each cycle
 
 
 Game_Event.prototype.isCollidedWithPlayerCharacters = function(x, y) {
@@ -41,17 +41,40 @@ MATTIE.multiplayer.getNearestPlayer = function(x,y){
 //override yanfly's chase event to find the nearest player rather than just using game player
 
 Game_Event.prototype.updateChaseMovement = function() {
-    if (this._stopCount > 0 && this._chasePlayer) {
+    if(!this._locked){
+      if (this._stopCount > 0 && this._chasePlayer) {
         var nearestPlayer = MATTIE.multiplayer.getNearestPlayer(this.x,this.y);
-      var direction = this.findDirectionTo(nearestPlayer.x, nearestPlayer.y);
-      if (direction > 0) this.moveStraight(direction);
-    } else if (this._stopCount > 0 && this._fleePlayer) {
-      this.updateFleeMovement();
-    } else if (this._returnPhase) {
-      this.updateMoveReturnAfter();
-    } else {
-      Yanfly.ECP.Game_Event_updateSelfMovement.call(this);
+        var direction = this.findDirectionTo(nearestPlayer.x, nearestPlayer.y);
+        if (direction > 0) this.moveStraight(direction);
+      } else if (this._stopCount > 0 && this._fleePlayer) {
+        this.updateFleeMovement();
+      } else if (this._returnPhase) {
+        this.updateMoveReturnAfter();
+      } else {
+        Yanfly.ECP.Game_Event_updateSelfMovement.call(this);
+      }
     }
+    
+};
+
+Game_Event.prototype.chaseConditions = function(dis) {
+  if(!this.lastDis) this.lastDis = 2;
+  if(dis == 1 && this.lastDis == 1) {
+    this.grabAttempts = this.grabAttempts? this.grabAttempts + 1 : 1;
+    if(this.grabAttempts >= MATTIE.multiplayer.maxGrabAttempts){
+      return false;
+    }
+  }else{
+    this.grabAttempts = 0;
+  }
+  this.lastDis = dis;
+  if (dis <= this._chaseRange && this.nonSeePlayer()) {
+    this._alertLock = this._sightLock;
+    return true;
+  }
+  if (this._alertLock > 0) return true;
+  if (dis <= this._chaseRange && this.canSeePlayer()) return true;
+  return false;
 };
 
 Game_Event.prototype.canSeePlayer = function() {

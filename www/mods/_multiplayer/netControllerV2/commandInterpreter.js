@@ -38,8 +38,11 @@ Game_Interpreter.prototype.executeCommand = function () {
                 
                 case 205: //set movement route
                     if(cmd.parameters[0] >= 0) { //not targeting $gamePlayer
-                        console.log(this.eventId())
-                        console.log(`set movement route emitted`);
+                        if(MATTIE.multiplayer.devTools.enemyMoveLogger){
+                            console.debug(this.eventId())
+                        console.debug(`set movement route emitted`);
+                        }
+                        
                         if(MATTIE.multiplayer.isActive)
                         netController.emitCommandEvent(cmd)
                     }
@@ -67,7 +70,7 @@ MATTIE.multiplayer.runGameCmd = function(cmd){
 }
 
 Game_Interpreter.prototype.executeCommandFromParam = function(cmd) {
-    console.log(cmd)
+    if(MATTIE.multiplayer.devTools.cmdLogger) console.debug(cmd)
     this._x = cmd.x;
     this._y = cmd.y;
     this._realX = cmd.realX
@@ -77,7 +80,7 @@ Game_Interpreter.prototype.executeCommandFromParam = function(cmd) {
     
     let _character = $gameMap.event(params[0])
     this._character = _character;
-    console.log(_character)
+    if(MATTIE.multiplayer.devTools.cmdLogger) console.debug(_character)
     if (_character) {
         _character.forceMoveRoute(params[1]);
         if (params[1].wait) {
