@@ -77,6 +77,14 @@ class HostController extends BaseNetController {
             if(SceneManager._scene.isActive())
             this.hostOnEventMoveEventData(data.event,data.id)
         }
+        if(data.battleStart){
+            this.distributeBattleStartToClients(data.battleStart, data.id)
+            this.onBattleStartData(data.battleStart, data.id);
+        }
+
+        if(data.battleEnd){
+            this.onBattleEndData(data.battleEnd, data.id);
+        }
     }
 
     hostOnEventMoveEventData(data,peerId){
@@ -113,7 +121,7 @@ class HostController extends BaseNetController {
      * @emits playerInfo
      * */
     onPlayerInfo(playerInfo){
-        console.log(playerInfo)
+        //console.log(playerInfo)
         this.updateNetPlayer(playerInfo)
         this.distributeNetPlayersToClients();
         this.updateNetPlayerFollowers(playerInfo);
@@ -248,6 +256,27 @@ class HostController extends BaseNetController {
         this.sendAll(obj) //this data is the host moving so we need the host's id here
     }
 
+    /** distribute battle start event to clients */
+    onBattleStartEvent(battleStartObj){
+        battleStartObj.id = this.peerId;
+        this.sendAll(battleStartObj);
+    }
+
+    distributeBattleStartToClients(battleStartObj, senderId){
+        var obj = {};
+        battleStartObj.id = senderId;
+        obj.battleStart = battleStartObj;
+        this.sendAll(battleStartObj, [senderId]);
+    }
+
+    onBattleEndEvent(battleEndObj){
+        battleEndObj.id = this.peerId;
+        this.sendAll(battleEndObj);
+    }
+
+    distributeBattleEndToClients(battleEndObj, senderId){
+
+    }
 
 
 

@@ -82,6 +82,13 @@ class ClientController extends BaseNetController {
             if(SceneManager._scene.isActive())
             this.onEventMoveEventData(data.event)
         }
+        if(data.battleStart){
+            var id = data.battleStart.id;
+            this.onBattleStartData(data.battleStart, id);
+        }
+        if(data.battleEnd){
+            this.onBattleEndData(data.battleEnd, id);
+        }
     }
 
     sendHost(data){
@@ -159,7 +166,14 @@ class ClientController extends BaseNetController {
         this.sendHost(obj)
     }
 
-
+    /** send the battle start event to the host */
+    onBattleStartEvent(battleStartObj){
+        this.sendHost(battleStartObj);
+    }
+    
+    onBattleEndEvent(battleEndObj){
+        this.sendHost(battleEndObj);
+    }
     
 
 }

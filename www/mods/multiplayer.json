@@ -21,7 +21,8 @@
         "_multiplayer/netControllerV2/playerRenderer",
         "_multiplayer/netControllerV2/spritesetMapController",
         "_multiplayer/netControllerV2/client",
-        "_multiplayer/netControllerV2/host"
+        "_multiplayer/netControllerV2/host",
+        "_multiplayer/netControllerV2/enemyIFrames"
         
       
 ]

@@ -18,8 +18,15 @@ MATTIE.multiplayer.devTools.eventLogger = false;
 MATTIE.multiplayer.devTools.varLogger = false;
 MATTIE.multiplayer.devTools.cmdLogger = false;
 MATTIE.multiplayer.devTools.moveLogger = false;
+MATTIE.multiplayer.devTools.enemyMoveLogger = false;
+MATTIE.multiplayer.devTools.battleLogger = false;
 MATTIE.multiplayer.devTools.enemyHostLogger = false;
-MATTIE.multiplayer.devTools.dataLogger = true
+MATTIE.multiplayer.devTools.dataLogger = false
+
+MATTIE.multiplayer.runTime = 2000; //ms till enemy can move after combat. Note this time starts while menus are closing so it needs to be higher than one would think.
+MATTIE.multiplayer.hasImmunityToBattles = false;
+MATTIE.multiplayer.currentBattleEnemy = {};
+MATTIE.multiplayer.inBattle = false;
 
 MATTIE.multiplayer._interpreter = new Game_Interpreter();
 

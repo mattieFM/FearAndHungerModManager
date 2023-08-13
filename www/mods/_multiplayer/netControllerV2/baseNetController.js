@@ -59,6 +59,55 @@ class BaseNetController extends EventEmitter {
     this.emit("transferEvent",transferObj);
     }
 
+    /**
+     * a function to emit the battle start event
+     * @param {*} battleStartObj a obj containing eventid and mapid of the battle triggered 
+     */
+    emitBattleStartEvent(battleStartObj){
+        this.onBattleStartEvent(battleStartObj);
+        $gameMap.event(battleStartObj.battleStart.eventId).addIdToCombatArr(this.peerId)
+        this.emit("battleStartEvent", battleStartObj);
+    }
+
+    /** does nothing by default --should be overridden by host and client */
+    onBattleStartEvent(battleStartObj){
+        
+    }
+
+    onBattleStartData(battleStartObj, id){ //take the battleStartObj and set that enemy as "in combat" with id
+            if(battleStartObj.mapId == $gameMap.mapId()){
+                if(MATTIE.multiplayer.devTools.battleLogger) console.info("net event battle start --on enemy host");
+                var event = $gameMap.event(battleStartObj.eventId);
+                event.addIdToCombatArr(id);
+                event.lock();
+            }    
+    }
+
+    /**
+     * a function to emit the battle end event
+     * @param {*} battleEndObj a obj containing eventid and mapid of the battle that has ended
+     */
+    emitBattleEndEvent(battleEndObj){
+        this.emit("battleEndEvent", battleEndObj);
+        $gameMap.event(battleEndObj.battleEnd.eventId).removeIdFromCombatArr(this.peerId)
+        this.onBattleEndEvent(battleEndObj);
+    }
+
+    /** does nothing by default --should be overridden by host and client */
+    onBattleEndEvent(battleEndObj){
+
+    }
+
+    onBattleEndData(battleEndObj, id){ //take the battleEndObj and set that enemy as "out of combat" with id
+            if(battleEndObj.mapId == $gameMap.mapId()){
+                if(MATTIE.multiplayer.devTools.enemyHostLogger) console.debug("net event battle end --on enemy host");
+                var event = $gameMap.event(battleEndObj.eventId);
+                event.removeIdFromCombatArr(id);
+                if(!event.inCombat()) setTimeout(() => event.unlock(), MATTIE.multiplayer.runTime);
+                else event.lock();
+            }    
+    }
+
     /** does nothing by defualt, should be overridden by both host and client */
     onTransferEvent(transferObj){
 
@@ -243,11 +292,11 @@ class BaseNetController extends EventEmitter {
     }
 
     onCtrlSwitchData(ctrlSwitch,id){
-        if(MATTIE.multiplayer.devTools.eventLogger)console.log("on ctrl switch data")
+        if(MATTIE.multiplayer.devTools.eventLogger)console.debug("on ctrl switch data")
         let index = ctrlSwitch.i;
         let val = ctrlSwitch.b;
         let s = ctrlSwitch.s;
-        if(MATTIE.multiplayer.devTools.eventLogger){console.log(index,val);}
+        if(MATTIE.multiplayer.devTools.eventLogger){console.debug(index,val);}
         if(s==0){
             $gameSwitches.setValue(index, val, true);
         } else if(s==1) {
@@ -279,8 +328,8 @@ class BaseNetController extends EventEmitter {
 
     /** the cmd object */
     onCmdEventData(cmd, peerId){
-        //if(MATTIE.multiplayer.devTools.cmdLogger)
-        console.log(`${cmd.code} called in data event`)
+        if(MATTIE.multiplayer.devTools.cmdLogger)
+        console.debug(`${cmd.code} called in data event`)
         /** @type {Game_Event} */
         const event = $gameMap.event(cmd.eventId);
         if(event._interpreter)

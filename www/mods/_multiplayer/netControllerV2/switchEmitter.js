@@ -143,7 +143,7 @@ let eventAndSwitchEmitterInit = function () {
         this._moveType = page.moveType;
         this._trigger = page.trigger;
         if (this._trigger === 4) { //trigger 4 is parallel execution mode which will constantly span these events
-            console.log("is parallel")
+            //console.log("is parallel")
             this._interpreter = new Game_Interpreter();
             this._interpreter._isParallel = true;
         } else {
