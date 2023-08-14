@@ -45,7 +45,7 @@ class PlayerModel {
     }
 
     setFollowers(ids){
-        if(this.$gamePlayer && typeof this.$gamePlayer === typeof MATTIE.multiplayer.Secondary_Player){
+        if(this.$gamePlayer){
             let netFollowers =  this.$gamePlayer._followers._data;
             for (let index = 0; index < ids.length; index++) {
                 this.followerIds[index] = ids[index];
