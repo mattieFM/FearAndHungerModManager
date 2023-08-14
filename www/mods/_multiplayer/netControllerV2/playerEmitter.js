@@ -18,7 +18,7 @@ MATTIE.multiplayer.selfMoveCount = 0;
 MATTIE.multiplayer.selfMax = 15;
 //every x moves send player x and y to transfer
 MATTIE.multiplayer.selfTransMoveCount = 0;
-MATTIE.multiplayer.selfTransMax = 100;
+MATTIE.multiplayer.selfTransMax = 15;
 
 
 MATTIE.multiplayer.gamePlayer.override = function() {
