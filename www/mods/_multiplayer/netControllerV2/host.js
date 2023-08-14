@@ -85,6 +85,11 @@ class HostController extends BaseNetController {
         if(data.battleEnd){
             this.onBattleEndData(data.battleEnd, data.id);
         }
+
+        if(data.ready){
+            this.onReadyData(data.ready.val, data.id);
+            this.distributeReadyEventToClients(data.ready.val,data.id);
+        }
     }
 
     hostOnEventMoveEventData(data,peerId){
@@ -276,6 +281,22 @@ class HostController extends BaseNetController {
 
     distributeBattleEndToClients(battleEndObj, senderId){
 
+    }
+
+    distributeReadyEventToClients(readyObj, senderId){
+        var obj = {};
+        obj.ready = {};
+        obj.ready.val = readyObj;
+        obj.ready.id = senderId;
+        this.sendAll(obj,[senderId]);
+    }
+
+    onReadyEvent(bool){
+        var obj = {};
+        obj.ready = {};
+        obj.ready.val = bool.ready.val;
+        obj.ready.id = this.peerId
+        this.sendAll(obj)
     }
 
 

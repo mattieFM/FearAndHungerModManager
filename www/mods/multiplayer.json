@@ -22,7 +22,10 @@
         "_multiplayer/netControllerV2/spritesetMapController",
         "_multiplayer/netControllerV2/client",
         "_multiplayer/netControllerV2/host",
-        "_multiplayer/netControllerV2/enemyIFrames"
+        "_multiplayer/netControllerV2/enemyIFrames",
+        "_multiplayer/multiCombatMenu",
+        "_multiplayer/netControllerV2/combatEmitter",
+        "_multiplayer/netControllerV2/battle/battleController"
         
       
 ]

@@ -15,8 +15,25 @@ class BaseNetController extends EventEmitter {
 
         this.transferRetries = 0;
         this.maxTransferRetries = 10;
+
+
+
+
     }
 
+
+    /**left blank by default ment to be overriden by host and client */
+    onReadyEvent(obj){
+
+    }
+
+    onReadyData(readyObj, senderId){
+        console.log(readyObj);
+        let val = readyObj.val;
+        let id = senderId;
+        MATTIE.multiplayer.currentBattleEvent.setReadyIfExists(id,val);
+        console.log(MATTIE.multiplayer.currentBattleEvent._combatants);
+    }
 
 
     /** a function to emit the move event for the client
@@ -65,8 +82,22 @@ class BaseNetController extends EventEmitter {
      */
     emitBattleStartEvent(battleStartObj){
         this.onBattleStartEvent(battleStartObj);
+        this.emitChangeInBattlersEvent(this.formatChangeInBattleObj(battleStartObj.eventId,battleStartObj.mapid,this.peerId));
         $gameMap.event(battleStartObj.battleStart.eventId).addIdToCombatArr(this.peerId)
         this.emit("battleStartEvent", battleStartObj);
+    }
+
+    /** called whenever anyone enters or leaves a battle, contains the id of the player and the battle */
+    emitChangeInBattlersEvent(obj){
+        this.emit("battleChange",obj)
+    }
+
+    formatChangeInBattleObj(eventid,mapid,peerid){
+        var obj = {};
+        obj.eventId = eventid;
+        obj.mapId = mapid;
+        obj.peerId = peerid;
+        return obj;
     }
 
     /** does nothing by default --should be overridden by host and client */
@@ -75,12 +106,14 @@ class BaseNetController extends EventEmitter {
     }
 
     onBattleStartData(battleStartObj, id){ //take the battleStartObj and set that enemy as "in combat" with id
+        console.log(id);
             if(battleStartObj.mapId == $gameMap.mapId()){
                 if(MATTIE.multiplayer.devTools.battleLogger) console.info("net event battle start --on enemy host");
                 var event = $gameMap.event(battleStartObj.eventId);
                 event.addIdToCombatArr(id);
                 event.lock();
             }    
+            this.emitChangeInBattlersEvent(this.formatChangeInBattleObj(battleStartObj.eventId,battleStartObj.mapid,id));
     }
 
     /**
@@ -89,6 +122,7 @@ class BaseNetController extends EventEmitter {
      */
     emitBattleEndEvent(battleEndObj){
         this.emit("battleEndEvent", battleEndObj);
+        this.emitChangeInBattlersEvent(this.formatChangeInBattleObj(battleEndObj.eventId,battleEndObj.mapid,this.peerId));
         $gameMap.event(battleEndObj.battleEnd.eventId).removeIdFromCombatArr(this.peerId)
         this.onBattleEndEvent(battleEndObj);
     }
@@ -106,6 +140,7 @@ class BaseNetController extends EventEmitter {
                 if(!event.inCombat()) setTimeout(() => event.unlock(), MATTIE.multiplayer.runTime);
                 else event.lock();
             }    
+            this.emitChangeInBattlersEvent(this.formatChangeInBattleObj(battleEndObj.eventId,battleEndObj.mapid,id));
     }
 
     /** does nothing by defualt, should be overridden by both host and client */
@@ -355,9 +390,7 @@ class BaseNetController extends EventEmitter {
         this.sendSwitchEvent(obj);
     }
 
-    sendSwitchEvent(obj){
-
-    }
+    
 }
 
 //ignore this does nothing, just to get intellisense working. solely used to import into the types file for dev.
