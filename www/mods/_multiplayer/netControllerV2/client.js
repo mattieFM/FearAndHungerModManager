@@ -83,11 +83,15 @@ class ClientController extends BaseNetController {
             this.onEventMoveEventData(data.event)
         }
         if(data.battleStart){
-            var id = data.battleStart.id;
+            var id = data.id;
             this.onBattleStartData(data.battleStart, id);
         }
         if(data.battleEnd){
             this.onBattleEndData(data.battleEnd, id);
+        }
+        if(data.ready){
+            let id = data.ready.id;
+            this.onReadyData(data.ready, id);
         }
     }
 
@@ -173,6 +177,10 @@ class ClientController extends BaseNetController {
     
     onBattleEndEvent(battleEndObj){
         this.sendHost(battleEndObj);
+    }
+
+    onReadyEvent(obj){
+        this.sendHost(obj)
     }
     
 

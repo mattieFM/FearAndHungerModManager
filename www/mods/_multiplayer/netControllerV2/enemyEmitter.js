@@ -53,6 +53,7 @@ Game_Interpreter.prototype.command301 = function() {
     obj.battleStart.eventId = this.eventId();
     obj.battleStart.mapId = this._mapId;
     MATTIE.multiplayer.currentBattleEnemy = obj.battleStart;
+    MATTIE.multiplayer.currentBattleEvent = $gameMap.event(this.eventId());
     MATTIE.multiplayer.getCurrentNetController().emitBattleStartEvent(obj);
     MATTIE.multiplayer.hasImmunityToBattles = true;
     enemyLog("Battle Processing for event #" + this.eventId() + " on map #"+this._mapId);
@@ -62,7 +63,7 @@ Game_Interpreter.prototype.command301 = function() {
 MATTIE.multiplayer.GameCharBase_Init = Game_CharacterBase.prototype.initMembers;
 Game_CharacterBase.prototype.initMembers = function () {
     MATTIE.multiplayer.GameCharBase_Init.call(this);
-    this._inCombatWithArr = [];
+    this._combatants = {};
 }
 
 Game_Map.prototype.unlockEvent = function(eventId) {
@@ -73,28 +74,55 @@ Game_Map.prototype.unlockEvent = function(eventId) {
 };
 
 Game_CharacterBase.prototype.getIdsInCombatWith = function () {
-    return this._inCombatWithArr;
+    return this._combatants;
+}
+
+Game_CharacterBase.prototype.totalCombatants = function () {
+    return Object.keys(this._combatants).length;
 }
 
 Game_CharacterBase.prototype.inCombat = function () {
-    if(!this._inCombatWithArr) this._inCombatWithArr = [];
-    if(MATTIE.multiplayer.devTools.battleLogger) console.info("incombat. The following players are in combat with this event: " + this._inCombatWithArr.length);
-    return this._inCombatWithArr.length > 0;
+    if(!this._combatants) this._combatants = {};
+    if(MATTIE.multiplayer.devTools.battleLogger) console.info("incombat. The following players are in combat with this event: " + this.totalCombatants());
+    return this.totalCombatants() > 0;
 }
 
 Game_CharacterBase.prototype.addIdToCombatArr = function (id) {
-    if(this._inCombatWithArr)
-    this._inCombatWithArr.push(id);
-    else
-    this._inCombatWithArr = [id];
+    console.log(id);
+    if(this._combatants)
+    this._combatants[id] = 0;
+    else{
+    this._combatants = {};
+    this._combatants[id] = 0;
+    console.log(this._combatants);
 
-    if(MATTIE.multiplayer.devTools.battleLogger) console.info("The following players are in combat with this event: " + this._inCombatWithArr.length);
+    }
+
+    if(MATTIE.multiplayer.devTools.battleLogger) console.info("The following players are in combat with this event: " + this.totalCombatants());
 }
 
 Game_CharacterBase.prototype.removeIdFromCombatArr = function (id) {
-    var n = this._inCombatWithArr.indexOf(id);
-    this._inCombatWithArr.splice(n,1);
-    if(MATTIE.multiplayer.devTools.battleLogger) console.info("The following players are in combat with this event: " + this._inCombatWithArr.length);
+    delete this._combatants[id];
+    if(MATTIE.multiplayer.devTools.battleLogger) console.info("The following players are in combat with this event: " + this.totalCombatants());
+}
+
+Game_CharacterBase.prototype.setReadyIfExists = function (id, bool) {
+    console.log(id + " tried to set to "+ bool)
+    if(Object.keys(this._combatants).indexOf(id) != -1){
+        this._combatants[id] = bool;
+    }
+    console.log(this._combatants)
+}
+
+Game_CharacterBase.prototype.allReady = function () {
+    let val = true;
+    Object.keys(this._combatants).forEach(key => {
+        let element = this._combatants[key];
+        if(element == 0){
+            val = false
+            return false;}
+    });
+    return val;
 }
 
 
