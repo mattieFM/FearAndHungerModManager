@@ -11,6 +11,15 @@ MATTIE.windows.multicombat_SceneBattleOrg = Scene_Battle.prototype.createAllWind
 
 MATTIE.multiplayer.multiCombat.rowHeight = .1;
 MATTIE.multiplayer.multiCombat.maxAlliesPerRow = 6;
+MATTIE.multiplayer.multiCombat.minCharHeight = 50;
+
+MATTIE.multiplayer.multiCombat.ellipseHor = MATTIE.multiplayer.multiCombat.maxAlliesPerRow;
+MATTIE.multiplayer.multiCombat.ellipseVert = MATTIE.multiplayer.multiCombat.maxAlliesPerRow/1.5;
+MATTIE.multiplayer.multiCombat.ellipseGetY = function (x){
+    let b = MATTIE.multiplayer.multiCombat.ellipseVert;
+    let a = MATTIE.multiplayer.multiCombat.ellipseHor;
+    return Math.sqrt((1/b**2)+(((x**2)*b**2)/a**2));
+}
 
 
 Scene_Battle.prototype.createAllWindows = function() {
@@ -46,6 +55,13 @@ Scene_Battle.prototype.createAllWindows = function() {
     
 
     //todo: render other players 
+};
+
+Spriteset_Battle.prototype.updateActors = function() {
+    var members = $gameParty.battleMembers();
+    for (var i = 0; i < this._actorSprites.length; i++) {
+        this.setBattlerPos(this._actorSprites[i],members[i], i)
+    }
 };
 
 Spriteset_Battle.prototype.removeNetBattler = function(index) {
@@ -89,7 +105,7 @@ Spriteset_Battle.prototype.updateNetBattlers = function(){
     if(!this._netActors) this._netActors = [];
     var members = this._netActors;
     for (var i = 0; i < this._netActorSprites.length; i++) {
-        this.setBattlerPos(this._netActorSprites[i], members[i], i+1);
+        this.setBattlerPos(this._netActorSprites[i], members[i], i+$gameParty.battleMembers().length);
     }
 }
 
@@ -110,8 +126,11 @@ Spriteset_Battle.prototype.setBattlerPos = function (sprite, battler, index) {
             let rowNum = Math.floor(index/MATTIE.multiplayer.multiCombat.maxAlliesPerRow)
             
             let xOffset = (Graphics.width / MATTIE.multiplayer.multiCombat.maxAlliesPerRow) * colNum;
-            let yOffset = ((MATTIE.multiplayer.multiCombat.rowHeight*Graphics.boxHeight / MATTIE.multiplayer.multiCombat.maxAlliesPerRow) * colNum) + (rowNum * MATTIE.multiplayer.multiCombat.rowHeight*Graphics.boxHeight)
-            sprite.setHome(0+xOffset, Graphics.boxHeight/2+100+yOffset);
+            let x = colNum- MATTIE.multiplayer.multiCombat.maxAlliesPerRow/2;
+            let y = MATTIE.multiplayer.multiCombat.ellipseGetY(x);
+            let rowOffset = (rowNum * MATTIE.multiplayer.multiCombat.rowHeight * Graphics.height);
+            let yOffset = (y * MATTIE.multiplayer.multiCombat.rowHeight * Graphics.height);
+            sprite.setHome(50+xOffset, Graphics.boxHeight-MATTIE.multiplayer.multiCombat.minCharHeight-rowOffset-yOffset);
         }
         sprite.startEntryMotion();
         sprite._stateSprite.setup(battler);
