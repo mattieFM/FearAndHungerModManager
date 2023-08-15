@@ -28,11 +28,12 @@ class BaseNetController extends EventEmitter {
     }
 
     onReadyData(readyObj, senderId){
-        console.log(readyObj);
+        //console.log(readyObj);
         let val = readyObj.val;
         let id = senderId;
+        if(MATTIE.multiplayer.currentBattleEvent)
         MATTIE.multiplayer.currentBattleEvent.setReadyIfExists(id,val);
-        console.log(MATTIE.multiplayer.currentBattleEvent._combatants);
+        //console.log(MATTIE.multiplayer.currentBattleEvent._combatants);
     }
 
 

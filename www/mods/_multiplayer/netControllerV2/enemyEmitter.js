@@ -74,7 +74,7 @@ Game_Map.prototype.unlockEvent = function(eventId) {
 };
 
 Game_CharacterBase.prototype.getIdsInCombatWith = function () {
-    return this._combatants;
+    return Object.keys(this._combatants);
 }
 
 Game_CharacterBase.prototype.totalCombatants = function () {

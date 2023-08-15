@@ -58,7 +58,7 @@ BattleManager.startTurn = function() {
             break;
         case 'action':
             this.updateAction();
-            console.log("action case")
+            console.log("update turn case")
             break;
         case 'phaseChange':
             this.updatePhase();

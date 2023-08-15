@@ -151,6 +151,17 @@ MATTIE.multiplayer.Secondary_Player.prototype.refresh = function() {
 };
 
 
+MATTIE.multiplayer.Secondary_Player.prototype.getBattleMembers = function(){
+    let arr = [];
+    arr.push($gameActors.actor(this.actorId));
+    
+    this._followers.forEach(follower =>{
+        let actor = follower.actor();
+        if(actor) arr.push(actor);
+    });
+    return arr;
+}
+
 MATTIE.multiplayer.Secondary_Player.prototype.center = function(x, y) {
     //stop panning camra with netPlayers
 };
