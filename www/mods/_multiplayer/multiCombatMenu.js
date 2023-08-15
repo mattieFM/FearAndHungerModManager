@@ -112,7 +112,7 @@ Spriteset_Battle.prototype.updateNetBattlers = function(){
 MATTIE.multiplayer.spiresetBattleUpdate = Spriteset_Battle.prototype.update;
 Spriteset_Battle.prototype.update = function(){
     MATTIE.multiplayer.spiresetBattleUpdate.call(this);
-    //this.updateNetBattlers();
+    this.updateNetBattlers();
 }
 
 
