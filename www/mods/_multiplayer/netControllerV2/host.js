@@ -87,8 +87,8 @@ class HostController extends BaseNetController {
         }
 
         if(data.ready){
-            this.onReadyData(data.ready.val, data.id);
-            this.distributeReadyEventToClients(data.ready.val,data.id);
+            this.onReadyData(data.ready, data.id);
+            this.distributeReadyEventToClients(data.ready,data.id);
         }
     }
 
@@ -285,16 +285,12 @@ class HostController extends BaseNetController {
 
     distributeReadyEventToClients(readyObj, senderId){
         var obj = {};
-        obj.ready = {};
-        obj.ready.val = readyObj;
+        obj.ready = readyObj;
         obj.ready.id = senderId;
         this.sendAll(obj,[senderId]);
     }
 
-    onReadyEvent(bool){
-        var obj = {};
-        obj.ready = {};
-        obj.ready.val = bool.ready.val;
+    onReadyEvent(obj){
         obj.ready.id = this.peerId
         this.sendAll(obj)
     }

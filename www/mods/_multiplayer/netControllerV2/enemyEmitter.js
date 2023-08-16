@@ -76,6 +76,11 @@ Game_Map.prototype.unlockEvent = function(eventId) {
 Game_CharacterBase.prototype.getIdsInCombatWith = function () {
     return Object.keys(this._combatants);
 }
+/** get ids in combat with excluding self id */
+Game_CharacterBase.prototype.getIdsInCombatWithExSelf = function () {
+    let selfId = MATTIE.multiplayer.getCurrentNetController().peerId;
+    return Object.keys(this._combatants).filter(id => id!=selfId);
+}
 
 Game_CharacterBase.prototype.totalCombatants = function () {
     return Object.keys(this._combatants).length;

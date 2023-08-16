@@ -25,7 +25,8 @@
         "_multiplayer/netControllerV2/enemyIFrames",
         "_multiplayer/multiCombatMenu",
         "_multiplayer/netControllerV2/combatEmitter",
-        "_multiplayer/netControllerV2/battle/battleController"
+        "_multiplayer/netControllerV2/battle/battleController",
+        "_multiplayer/netControllerV2/models/netActors"
         
       
 ]

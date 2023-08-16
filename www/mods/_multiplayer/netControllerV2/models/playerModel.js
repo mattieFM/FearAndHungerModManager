@@ -17,12 +17,38 @@ class PlayerModel {
 
         /** @type {MATTIE.multiplayer.Secondary_Player} */
         this.$gamePlayer;
+
+        this.$netActors = new MATTIE.multiplayer.NetActors();
         
         /** the actor ids of any and all followers, -1 if not present */
         this.followerIds = [];
 
         this.map = 0;
 
+    }
+
+    select(activeMember){
+        this.members().forEach(function(member) {
+            if (member === activeMember) {
+                member.select();
+            } else {
+                member.deselect();
+            }
+        });
+    }
+
+    members(){
+        return this.battleMembers();
+    }
+
+    battleMembers(){
+        let arr = [];
+        arr.push(this.$gamePlayer.actor());
+        this.followerIds.forEach(followerId=>{
+            let actor = this.$netActors.baseActor(followerId);
+            if(actor.isAlive()) arr.push(actor);
+        })
+        return arr;
     }
 
 
@@ -72,7 +98,7 @@ class PlayerModel {
     }
     
     initSecondaryGamePlayer(){
-        this.$gamePlayer = new MATTIE.multiplayer.Secondary_Player()
+        this.$gamePlayer = new MATTIE.multiplayer.Secondary_Player(this.$netActors);
         this.$gamePlayer.setActor(this.actorId);
         this.$gamePlayer.refresh();
     }
@@ -105,9 +131,11 @@ MATTIE.multiplayer.Secondary_Player =  function () {
 MATTIE.multiplayer.Secondary_Player.prototype = Object.create(Game_Player.prototype);
 MATTIE.multiplayer.Secondary_Player.prototype.constructor = MATTIE.multiplayer.Secondary_Player;
 
-MATTIE.multiplayer.Secondary_Player.prototype.initialize = function () {
+MATTIE.multiplayer.Secondary_Player.prototype.initialize = function (netActors) {
     this.ctrlDir4 = 0; //start standing still
     Game_Player.prototype.initialize.call(this);
+    this.$netActors = netActors;
+
 
     //TODO: followers
     //this._followers = $gamePlayer.followers();
@@ -139,11 +167,16 @@ MATTIE.multiplayer.Secondary_Player.prototype.reserveTransfer = function(mapId, 
 }
 
 MATTIE.multiplayer.Secondary_Player.prototype.setActor = function(id) {
+    if(!this.$netActors.baseActor(id)) this.$netActors.createNewNetActor(id);
     this.actorId = id;
 }
 
+MATTIE.multiplayer.Secondary_Player.prototype.actor = function(){
+    return this.$netActors.baseActor(this.actorId);
+}
+
 MATTIE.multiplayer.Secondary_Player.prototype.refresh = function() {
-    var actor = $gameActors.actor(this.actorId)
+    var actor = this.$netActors.baseActor(this.actorId);
     var characterName = actor ? actor.characterName() : '';
     var characterIndex = actor ? actor.characterIndex() : 0;
     this.setImage(characterName, characterIndex);
@@ -153,7 +186,7 @@ MATTIE.multiplayer.Secondary_Player.prototype.refresh = function() {
 
 MATTIE.multiplayer.Secondary_Player.prototype.getBattleMembers = function(){
     let arr = [];
-    arr.push($gameActors.actor(this.actorId));
+    arr.push(this.$netActors.baseActor(this.actorId));
     
     this._followers.forEach(follower =>{
         let actor = follower.actor();

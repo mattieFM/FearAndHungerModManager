@@ -28,12 +28,25 @@ class BaseNetController extends EventEmitter {
     }
 
     onReadyData(readyObj, senderId){
-        //console.log(readyObj);
         let val = readyObj.val;
         let id = senderId;
-        if(MATTIE.multiplayer.currentBattleEvent)
-        MATTIE.multiplayer.currentBattleEvent.setReadyIfExists(id,val);
-        //console.log(MATTIE.multiplayer.currentBattleEvent._combatants);
+        if(MATTIE.multiplayer.currentBattleEvent){
+            MATTIE.multiplayer.currentBattleEvent.setReadyIfExists(id,val);
+        }
+            
+
+        if(readyObj.actions){
+            let actions = JSON.parse(readyObj.actions);
+            actions.forEach(action => {
+                /** @type {Game_Actor} */
+                let actor = this.netPlayers[senderId].$netActors.baseActor(action._subjectActorId);
+                actor.setCurrentAction(action);
+                BattleManager.addNetActionBattler(actor);
+            });
+        }
+        
+        
+        
     }
 
 
@@ -192,7 +205,7 @@ class BaseNetController extends EventEmitter {
     updateNetPlayerFollowers(playerInfo){
         if(playerInfo.peerId){
             let netPlayer = this.netPlayers[playerInfo.peerId];
-            if(netPlayer) netPlayer.setFollowers(playerInfo.followerIds)
+            if(netPlayer) netPlayer.setFollowers(playerInfo.followerIds);
         }else{
             for(key in playerInfo){
                 let player = playerInfo[key];
@@ -401,30 +414,6 @@ try {
     module = {}
     module.exports = {}
 }
-
-
-MATTIE.multiplayer.createGameObj = DataManager.createGameObjects;
-DataManager.createGameObjects = function(){
-    MATTIE.multiplayer.createGameObj.call(this);
-    try {
-        MATTIE.multiplayer.getCurrentNetController().player.$gamePlayer = $gamePlayer;
-    } catch (error) {
-        
-    }
-    
-}
-
-MATTIE.multiplayer.extractSaveContents = DataManager.extractSaveContents;
-DataManager.extractSaveContents = function(contents) {
-    MATTIE.multiplayer.extractSaveContents.call(this,contents);
-    try {
-        MATTIE.multiplayer.getCurrentNetController().player.$gamePlayer = $gamePlayer;
-    } catch (error) {
-        
-    }
-}
-
-
 
 
 

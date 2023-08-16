@@ -8,11 +8,12 @@ var EventEmitter = require("events");
 
 
 class BattleController extends EventEmitter {
-    emitReadyEvent(){
+    emitReadyEvent(actions){
         this.emit("ready")
         var obj = {};
         obj.ready = {};
         obj.ready.val = true;
+        obj.ready.actions = actions;
         MATTIE.multiplayer.currentBattleEvent.setReadyIfExists(MATTIE.multiplayer.getCurrentNetController().peerId,1);
         MATTIE.multiplayer.getCurrentNetController().onReadyEvent(obj);
     }

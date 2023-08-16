@@ -14,17 +14,18 @@ MATTIE.multiplayer.NetFollower.prototype.constructor = MATTIE.multiplayer.NetFol
 MATTIE.multiplayer.NetFollower.prototype.initialize = function(memberIndex, netPlayer, actorId = undefined) {
     Game_Follower.prototype.initialize.call(this, memberIndex);
     this.actorId = actorId;
-    this.netPlayer = netPlayer
+    this.netPlayer = netPlayer;
+    this.$netActors = netPlayer.$netActors;
 };
 
 MATTIE.multiplayer.NetFollower.prototype.setActor = function(actorId) {
-    this.actorId = actorId
+    if(!this.netPlayer.$netActors.baseActor(actorId)) this.netPlayer.$netActors.createNewNetActor(actorId);
+    this.actorId = actorId;
     this.refresh();
 };
 
 MATTIE.multiplayer.NetFollower.prototype.actor = function() {
-    //console.log($gameActors.actor(this.actorId))
-    return $gameActors.actor(this.actorId);
+    return this.netPlayer.$netActors.baseActor(this.actorId);
 };
 
 MATTIE.multiplayer.NetFollower.prototype.refresh = function() {
@@ -81,6 +82,7 @@ MATTIE.multiplayer.NetFollowers.prototype.initialize = function(netPlayer) {
     this._gathering = false;
     this._data = [];
     this.netPlayer = netPlayer;
+    this.$netActors = this.netPlayer.$netActors;
     for (var i = 1; i < $gameParty.maxBattleMembers(); i++) {
         this._data.push(new MATTIE.multiplayer.NetFollower(i,netPlayer));
     }
