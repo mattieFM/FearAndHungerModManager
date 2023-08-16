@@ -11,6 +11,11 @@ function BattleLog(str) {
     if(MATTIE.multiplayer.devTools.inBattleLogger) console.info(str);
 }
 
+BattleManager.startAfterReady = function(){
+    
+    MATTIE.BattleManagerStartTurn.call(this);
+}
+
 /** exit the ready state, returning to the beginning of the input phase 
  * TODO: instead of returning to the start of the input phase return to the last input so that players can easily correct mistakes without having to...
  * 
@@ -27,7 +32,7 @@ BattleManager.ready = function(){
     this._phase = 'ready';
     
     BattleLog("ready!");
-    MATTIE.multiplayer.BattleController.emitReadyEvent();
+    MATTIE.multiplayer.BattleController.emitReadyEvent(JSON.stringify(this.getAllPlayerActions()));
 }
 
 /** check if a battler exists in the local party */
@@ -43,18 +48,54 @@ BattleManager.getAllPlayerActions = function () {
         if (battler.battlerInParty() && battler.isAlive())
         arr.push(battler.currentAction());
     });
-    console.log(arr);
+    return(arr);
 }
 /** start the combat round */
 BattleManager.startTurn = function() {
     if(MATTIE.multiplayer.currentBattleEvent.totalCombatants() == 1){ //if solo, start next phase
-        this.getAllPlayerActions();
         MATTIE.BattleManagerStartTurn.call(this);
     }else{ //if the player is fighting with allies enter "ready" state
         this.ready();
     }
     
   };
+  BattleManager.getNextSubject = function() {
+    if ($gameTroop.turnCount() <= 0) return;
+    this._performedBattlers = this._performedBattlers || [];
+    this.makeActionOrders();
+    for (;;) {
+        var battlerArray = [];
+        for (var i = 0; i < this._actionBattlers.length; ++i) {
+          var obj = this._actionBattlers[i];
+          if (!this._performedBattlers.contains(obj)) battlerArray.push(obj);
+        }
+        this._actionBattlers = battlerArray;
+        var battler = this._actionBattlers.shift();
+        console.log(battler);
+        if (!battler) return null;
+        if (battler.isAlive()) {
+          console.log("returned");
+            this._performedBattlers.push(battler);
+            return battler;
+        }
+    }
+};
+  
+
+  BattleManager.addNetActionBattler = function(battler){
+    if(!this._netActionBattlers) this._netActionBattlers = [];
+    this._netActionBattlers.push(battler);
+  }
+
+  MATTIE.multiplayer.multiCombat.makeActionOrders = BattleManager.makeActionOrders;
+  BattleManager.makeActionOrders = function() {
+    if(!this._netActionBattlers) this._netActionBattlers = [];
+    MATTIE.multiplayer.multiCombat.makeActionOrders.call(this);
+    this._actionBattlers.splice.apply(this._actionBattlers, [4, 0].concat(this._netActionBattlers));
+  }
+  Game_Battler.prototype.setCurrentAction = function(action) {
+    this.forceAction(action._item._itemId,action._targetIndex);
+};
 
   /** check that all combatants on this event are ready */
   BattleManager.checkAllPlayersReady = function(){
@@ -73,8 +114,7 @@ BattleManager.startTurn = function() {
             //allow 'un-reading' to go back to previous state.
             //and if all players are ready proceed to turn state.
             if(this.checkAllPlayersReady()){
-                this.getAllPlayerActions();
-                 MATTIE.BattleManagerStartTurn.call(this);
+                this.startAfterReady();
             }
             
             break;

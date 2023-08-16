@@ -7,7 +7,7 @@ MATTIE.multiplayer.multiCombat = {};
 MATTIE.scenes.multiplayer.multiCombat = {};
 MATTIE.windows.multiplayer.multiCombat = {};
 MATTIE.windows.multicombat_SceneBattleOrg = Scene_Battle.prototype.createAllWindows;
-
+MATTIE.multiplayer.multiCombat.netPlayerOffset = 0;
 
 MATTIE.multiplayer.multiCombat.rowHeight = .1;
 MATTIE.multiplayer.multiCombat.maxAlliesPerRow = 6;
@@ -18,8 +18,15 @@ MATTIE.multiplayer.multiCombat.ellipseVert = MATTIE.multiplayer.multiCombat.maxA
 MATTIE.multiplayer.multiCombat.ellipseGetY = function (x){
     let b = MATTIE.multiplayer.multiCombat.ellipseVert;
     let a = MATTIE.multiplayer.multiCombat.ellipseHor;
-    return Math.sqrt((1/b**2)+(((x**2)*b**2)/a**2));
+    return Math.sqrt((1/b**2)+(((x**2)*b**2)/a**2)); //ellipse formula for y from x;
 }
+
+
+MATTIE.multiplayer.multiCombat.additionalStatusRows = 1;
+MATTIE.multiplayer.multiCombat.additionalCommandRows = 1;
+
+TextManager.multiplayer = "multiplayer"
+TextManager.viewNextParty = "view next party"
 
 
 Scene_Battle.prototype.createAllWindows = function() {
@@ -27,6 +34,9 @@ Scene_Battle.prototype.createAllWindows = function() {
 
     this._textWindow = new MATTIE.windows.multiplayer.multiCombat.allyCount(0,0,155,75);
     this.addWindow(this._textWindow);
+
+    this._partyDisplay = new MATTIE.windows.textDisplay(155,0,400,75,"Viewing: Self");
+    this.addWindow(this._partyDisplay);
 
     this._readyDisplay = new Window_Selectable(0+this._textWindow.width,0,155,75);
     this._readyDisplay.drawText("Ready!",0,0,155,75)
@@ -48,20 +58,8 @@ Scene_Battle.prototype.createAllWindows = function() {
         this.refreshNetBattlers();
     })
 
-    // this._netBattlers = new Spriteset_Battle_ActorRow();
-    // this.addChild(this._netBattlers);
     
     this.refreshNetBattlers();
-    
-
-    //todo: render other players 
-};
-
-Spriteset_Battle.prototype.updateActors = function() {
-    var members = $gameParty.battleMembers();
-    for (var i = 0; i < this._actorSprites.length; i++) {
-        this.setBattlerPos(this._actorSprites[i],members[i], i)
-    }
 };
 
 Spriteset_Battle.prototype.removeNetBattler = function(index) {
@@ -76,13 +74,26 @@ Spriteset_Battle.prototype.removeNetBattler = function(index) {
 Spriteset_Battle.prototype.addNetBattler = function(actor) {
     if(!this._netActorSprites) this._netActorSprites = [];
     if(!this._netActors) this._netActors = [];
-    this._netActorSprites.push(new Sprite_Actor(actor));
-    this._netActors.push(actor);
+    actor.forceIndex(this._netActorSprites.length);
+    let sprite = new Sprite_Actor(actor);
+    MATTIE.multiplayer.multiCombat.netPlayerOffset = $gameParty.battleMembers().length;
+    if(MATTIE.multiplayer.devTools.shouldTint) {
+        if(!MATTIE.multiplayer.devTools.consistentTint){
+            MATTIE.multiplayer.devTools.consistentTint = MATTIE.multiplayer.devTools.getTint()
+        }
+        sprite._mainSprite.tint = MATTIE.multiplayer.devTools.consistentTint;
+    }
+
+    this._netActorSprites.push(sprite);
     
+    this._netActors.push(actor);
+       
+
     this._battleField.addChild(this._netActorSprites[this._netActorSprites.length-1]);
 }
 
 Scene_Battle.prototype.refreshNetBattlers = function(){
+    MATTIE.multiplayer.multiCombat.netPlayerOffset = $gameParty.battleMembers().length;
     let playersIds = MATTIE.multiplayer.currentBattleEvent.getIdsInCombatWith();
     let netCont = MATTIE.multiplayer.getCurrentNetController();
     if(!this._spriteset._netActorSprites) this._spriteset._netActorSprites = [];
@@ -100,12 +111,34 @@ Scene_Battle.prototype.refreshNetBattlers = function(){
     this._spriteset.updateNetBattlers();
 }
 
+
+MATTIE.multiplayer.gameActorInit = Game_Actor.prototype.initMembers;
+Game_Actor.prototype.initMembers = function() {
+    MATTIE.multiplayer.gameActorInit.call(this);
+    this._forcedIndex = null;
+}
+Game_Actor.prototype.index = function() {
+    console.log(this._forcedIndex);
+    if(this._forcedIndex != null) return this._forcedIndex 
+    else return $gameParty.members().indexOf(this);
+};
+
+Game_Actor.prototype.forceIndex = function(index) {
+    console.log(index);
+    this._forcedIndex = index;
+    console.log(this._forcedIndex);
+};
+
+Game_Actor.prototype.unForceIndex = function() {
+    this._forcedIndex =null;
+};
+
 Spriteset_Battle.prototype.updateNetBattlers = function(){
     if(!this._netActorSprites) this._netActorSprites = [];
     if(!this._netActors) this._netActors = [];
     var members = this._netActors;
     for (var i = 0; i < this._netActorSprites.length; i++) {
-        this.setBattlerPos(this._netActorSprites[i], members[i], i+$gameParty.battleMembers().length);
+        this._netActorSprites[i].setBattler(members[i]);
     }
 }
 
@@ -115,26 +148,18 @@ Spriteset_Battle.prototype.update = function(){
     this.updateNetBattlers();
 }
 
-
-Spriteset_Battle.prototype.setBattlerPos = function (sprite, battler, index) {
-    sprite.setBattler(battler);
-    var changed = (battler !== this._actor);
-    if (changed) {
-        sprite._actor = battler;
-        if (battler) {
-            let colNum = index % MATTIE.multiplayer.multiCombat.maxAlliesPerRow;
-            let rowNum = Math.floor(index/MATTIE.multiplayer.multiCombat.maxAlliesPerRow)
-            
-            let xOffset = (Graphics.width / MATTIE.multiplayer.multiCombat.maxAlliesPerRow) * colNum;
-            let x = colNum- MATTIE.multiplayer.multiCombat.maxAlliesPerRow/2;
-            let y = MATTIE.multiplayer.multiCombat.ellipseGetY(x);
-            let rowOffset = (rowNum * MATTIE.multiplayer.multiCombat.rowHeight * Graphics.height);
-            let yOffset = (y * MATTIE.multiplayer.multiCombat.rowHeight * Graphics.height);
-            sprite.setHome(50+xOffset, Graphics.boxHeight-MATTIE.multiplayer.multiCombat.minCharHeight-rowOffset-yOffset);
-        }
-        sprite.startEntryMotion();
-        sprite._stateSprite.setup(battler);
-    }
+Sprite_Actor.prototype.setActorHome = function (index) {
+    index += MATTIE.multiplayer.multiCombat.netPlayerOffset;
+    console.log(MATTIE.multiplayer.multiCombat.netPlayerOffset);
+    let colNum = index % MATTIE.multiplayer.multiCombat.maxAlliesPerRow;
+    let rowNum = Math.floor(index/MATTIE.multiplayer.multiCombat.maxAlliesPerRow)
+    
+    let xOffset = (Graphics.width / MATTIE.multiplayer.multiCombat.maxAlliesPerRow) * colNum;
+    let x = colNum- MATTIE.multiplayer.multiCombat.maxAlliesPerRow/2;
+    let y = MATTIE.multiplayer.multiCombat.ellipseGetY(x);
+    let rowOffset = (rowNum * MATTIE.multiplayer.multiCombat.rowHeight * Graphics.height);
+    let yOffset = (y * MATTIE.multiplayer.multiCombat.rowHeight * Graphics.height);
+    this.setHome(50+xOffset, Graphics.boxHeight-MATTIE.multiplayer.multiCombat.minCharHeight-rowOffset-yOffset);
 }
 
 MATTIE.windows.multiplayer.multiCombat.allyCount = function () {
@@ -249,3 +274,161 @@ Spriteset_Battle_ActorRow.prototype.setBattlerPos = function (sprite, battler, i
 Spriteset_Battle_ActorRow.prototype.validFog = function (id){
     return false;
 }
+
+MATTIE.multiplayer.multiCombat.maxItems = Window_BattleStatus.prototype.maxItems;
+Window_BattleStatus.prototype.maxItems = function() {
+    return MATTIE.multiplayer.multiCombat.maxItems.call(this) + MATTIE.multiplayer.multiCombat.additionalStatusRows;
+    
+};
+MATTIE.multiplayer.multiCombat.numVisibleRows = Window_BattleStatus.prototype.numVisibleRows;
+Window_BattleStatus.prototype.numVisibleRows = function() {
+    let numRows = MATTIE.multiplayer.multiCombat.numVisibleRows.call(this);
+    if(this.maxItems() + MATTIE.multiplayer.multiCombat.additionalStatusRows > numRows){
+        return numRows + MATTIE.multiplayer.multiCombat.additionalStatusRows;
+    }else{
+        return numRows;
+    }
+};
+
+
+Window_BattleStatus.prototype.drawTextItem = function(index, text){
+    let rect = this.basicAreaRect(index);
+    this.drawTitleText(text, rect.x + 0, rect.y, 150);
+}
+
+Window_BattleStatus.prototype.setGameParty = function(party){
+    this._gameParty = party;
+}
+
+Window_BattleStatus.prototype.drawTitleText = function(text, x, y, width) {
+    width = width || 168;
+    this.drawText(text, x, y, width);
+};
+
+Window_BattleStatus.prototype.drawItem = function(index) {
+    let gameParty = this._gameParty || $gameParty;
+    var actor = gameParty.battleMembers()[index];
+    this.drawBasicArea(this.basicAreaRect(index), actor);
+    this.drawGaugeArea(this.gaugeAreaRect(index), actor);
+};
+
+MATTIE.multiplayer.multiCombat.drawItem = Window_BattleStatus.prototype.drawItem;
+Window_BattleStatus.prototype.drawItem = function(index) {
+
+    if(index < MATTIE.multiplayer.multiCombat.maxItems()){ //if non extended row
+        MATTIE.multiplayer.multiCombat.drawItem.call(this, index);
+    }else{ //if extended row
+       this.drawTextItem(index,TextManager.viewNextParty)
+    }
+
+
+};
+
+// MATTIE.multiplayer.Window_BattleStatusDrawAll = Window_BattleStatus.prototype.drawAllItems;
+// Window_BattleStatus.prototype.drawAllItems = function (){
+//     MATTIE.multiplayer.Window_BattleStatusDrawAll.call(this);
+//     this.drawText("party",0,0,200);
+// }
+
+
+
+
+MATTIE.multiplayer.multiCombat.numVisibleRowsActorCommand = Window_ActorCommand.prototype.numVisibleRows;
+Window_ActorCommand.prototype.numVisibleRows = function() {
+    return MATTIE.multiplayer.multiCombat.numVisibleRowsActorCommand.call(this) + MATTIE.multiplayer.multiCombat.additionalCommandRows;
+};
+
+MATTIE.multiplayer.multiCombat.window_actorcommandMakeCommandList=Window_ActorCommand.prototype.makeCommandList;
+Window_ActorCommand.prototype.makeCommandList = function() {
+    MATTIE.multiplayer.multiCombat.window_actorcommandMakeCommandList.call(this);
+    if (this._actor) {
+        this.addMultiplayerCommand();
+    }
+}
+
+Window_ActorCommand.prototype.addMultiplayerCommand = function(){
+    this.addCommand(TextManager.multiplayer, 'multiplayer');
+}
+Scene_Battle.prototype.resetParty = function() {
+    this._partyDisplay.updateText("Viewing: Self")
+    this._actorWindow.setGameParty(null);
+    this._statusWindow.setGameParty(null);
+    this._actorWindow.currentid = 0;
+}
+
+Scene_Battle.prototype.viewNetParty = function(n) {
+    let playersIds = MATTIE.multiplayer.currentBattleEvent.getIdsInCombatWithExSelf();
+    let netCont = MATTIE.multiplayer.getCurrentNetController();
+    this._actorWindow.setGameParty(netCont.netPlayers[playersIds[n]]);
+    this._statusWindow.setGameParty(netCont.netPlayers[playersIds[n]]);
+    this._partyDisplay.updateText("Viewing: " + netCont.netPlayers[playersIds[n]].name);
+}
+
+Scene_Battle.prototype.refreshParties = function(){
+    this._actorWindow.refresh();
+    this._statusWindow.refresh();
+}
+
+
+Scene_Battle.prototype.shiftParty = function() {
+    let playersIds = MATTIE.multiplayer.currentBattleEvent.getIdsInCombatWithExSelf();
+   let netCont = MATTIE.multiplayer.getCurrentNetController();
+   console.log(playersIds);
+    if(this._actorWindow._gameParty == netCont.netPlayers[playersIds[playersIds.length-1]]){
+        this.resetParty();
+   }else{
+        if(!this._actorWindow.currentid) this._actorWindow.currentid =0;
+        this.viewNetParty(this._actorWindow.currentid);
+        this._actorWindow.currentid++;
+   }
+   console.log("ShiftedParty");
+}
+
+Scene_Battle.prototype.multiplayerCmd = function() {
+     let playersIds = MATTIE.multiplayer.currentBattleEvent.getIdsInCombatWith();
+    let netCont = MATTIE.multiplayer.getCurrentNetController();
+    this._actorWindow.setGameParty(netCont.netPlayers[playersIds[1]]);
+    this._statusWindow.setGameParty(netCont.netPlayers[playersIds[1]]);
+    console.log(this._actorWindow._gameParty);
+    console.log("multiplayer active");
+}
+
+MATTIE.multiplayer.sceneBattleOk = Scene_Battle.prototype.onActorOk;
+Scene_Battle.prototype.onActorOk = function() {
+    console.log(this._actorWindow.index());
+    if(this._actorWindow.index()+1 <= MATTIE.multiplayer.multiCombat.maxItems.call(this._actorWindow)){
+        MATTIE.multiplayer.sceneBattleOk.call(this);
+        this.resetParty();
+        this.refreshParties();
+    }else{
+        
+        this.shiftParty();
+        this.selectActorSelection();
+        console.log("custom command selected")
+    }
+};
+
+
+MATTIE.multiplayer.sceneBattleCreateCommandWindow = Scene_Battle.prototype.createActorCommandWindow;
+Scene_Battle.prototype.createActorCommandWindow = function() {
+    MATTIE.multiplayer.sceneBattleCreateCommandWindow.call(this);
+    this._actorCommandWindow.setHandler('multiplayer', this.shiftParty.bind(this));
+}
+
+
+Window_BattleActor.prototype.hide = function() {
+    let gameParty = this._gameParty || $gameParty;
+    Window_BattleStatus.prototype.hide.call(this);
+    gameParty.select(null);
+};
+
+Window_BattleActor.prototype.select = function(index) {
+    let gameParty = this._gameParty || $gameParty;
+    Window_BattleStatus.prototype.select.call(this, index);
+    gameParty.select(this.actor());
+};
+
+Window_BattleActor.prototype.actor = function() {
+    let gameParty = this._gameParty || $gameParty;
+    return gameParty.members()[this.index()];
+};

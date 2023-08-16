@@ -23,6 +23,7 @@ MATTIE.multiplayer.devTools.battleLogger = false;
 MATTIE.multiplayer.devTools.inBattleLogger = true;
 MATTIE.multiplayer.devTools.enemyHostLogger = false;
 MATTIE.multiplayer.devTools.dataLogger = false
+MATTIE.multiplayer.devTools.consistentTint = "0x2bf0ec"; //set to null to enable random tints
 
 MATTIE.multiplayer.runTime = 2000; //ms till enemy can move after combat. Note this time starts while menus are closing so it needs to be higher than one would think.
 MATTIE.multiplayer.hasImmunityToBattles = false;
