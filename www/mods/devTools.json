@@ -1,0 +1,9 @@
+{
+    "name":"devTools",
+    "status":true,
+    "parameters":{},
+    "dependencies": [
+        "_devTools/cheatMenu"
+
+]
+}
