@@ -1,7 +1,1 @@
-{
-    "name":"unlockedBloodPortal",
-    "status":true,
-    "parameters":{},
-    "danger": true
-
-}
+{"name":"unlockedBloodPortal","status":false,"parameters":{},"danger":true}
