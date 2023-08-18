@@ -32,11 +32,16 @@ Most mods will work for both F&H1 and F&H2. But if they are not working properly
   -A lot of changes
 
 #Install
- -First Decompile Fear and Hunger.
- -Download this repo.
- -add the mods folder to your game's www/ folder.
- -replace your game's index.html file with mine.
- -The mod loader is now installed.
+
+   -First Decompile Fear and Hunger.
+ 
+   -Download this repo.
+ 
+   -add the mods folder to your game's www/ folder.
+ 
+   -replace your game's index.html file with mine.
+ 
+   -The mod loader is now installed.
 
 #development info
 Mods consist of 2 files, a .js file and a .json file, the .json file contains information about the mod, think of it as a config file of sorts. It must contain the following values
