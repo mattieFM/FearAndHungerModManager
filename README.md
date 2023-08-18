@@ -55,7 +55,7 @@ there is one more value that is not required which is:
 {  
 	"dependencies": (array) (array of file names without prefixes that need to be loaded before this mod can be run).  
 }  
-
+The Mod Loader will attempt to load mods without a .json file by creating a json file with default values for them. This allows compatibility with Cheshire's mods and things of the sort.
 
 the .js file is akin to a plugin file for RPG maker but it does not need any of the specific rpg maker metadata or comments as the mod is loaded as a mod rather than a plugin.  
 Any mod with _ at the front of its name will be loaded before files without a _, this is useful for loading Libraries that are common between all of your mods. The commonLib's folder is not ment to be edited ever, these are files specific to the mod loader and are loaded before everything else.  
