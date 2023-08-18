@@ -1,7 +1,7 @@
 # FearAndHungerModManager  
 Welcome to MATTIE's Fear And Hunger Mod Manager. This mod manager works for both F&H 1 and 2.  
 
-##Mod Loader Features  
+## Mod Loader Features  
 -Abiltiy to toggle on and off any and all mods you have installed.  
 ![image](https://github.com/mattieFM/FearAndHungerModManager/assets/66142165/e3012f3c-b75d-4ec4-a4d0-282b8ad24cf4)
 
