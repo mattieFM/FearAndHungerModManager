@@ -129,7 +129,6 @@ MATTIE.multiplayer.getCurrentNetController = ()=>{
     //MATTIE.menus.multiplayer.openHost();
     //MATTIE.menus.toMainMenu();
     MATTIE.menus.mainMenu.addBtnToMainMenu("Multiplayer","multiplayer", MATTIE.menus.multiplayer.openMultiplayer.bind(this))
-    
     console.log("Multiplayer Init")
     var client;
     var conn;

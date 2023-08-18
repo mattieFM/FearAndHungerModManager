@@ -68,6 +68,7 @@ Spriteset_Battle.prototype.removeNetBattler = function(index) {
     if(!this._netActors) this._netActors = [];
     var val = this._netActorSprites.splice(index,1)[0];
     this._netActors.splice(index,1);
+    BattleManager._netActors.splice(index,1);
     console.log(this._battleField.removeChild(val));
 }
 
@@ -85,10 +86,9 @@ Spriteset_Battle.prototype.addNetBattler = function(actor) {
     }
 
     this._netActorSprites.push(sprite);
-    
+    BattleManager._netActors.push(actor);
     this._netActors.push(actor);
        
-
     this._battleField.addChild(this._netActorSprites[this._netActorSprites.length-1]);
 }
 

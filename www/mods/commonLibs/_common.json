@@ -1,0 +1,17 @@
+{
+    "name":"_common",
+    "status":true,
+    "parameters":{},
+    "dependencies": [
+        "_common/systemEvents",
+        "_common/menus/menu",
+        "_common/menus/mainMenu",
+        "_common/menus/windows",
+        "_common/nw",
+        "_common/menus/scenes",
+        "_common/saveProtector"
+    
+    ],
+    "danger": false
+
+}

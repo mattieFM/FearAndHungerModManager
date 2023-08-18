@@ -4,6 +4,6 @@
     "parameters":{},
     "dependencies": [
         "_devTools/cheatMenu"
-
-]
+    ],
+    "danger": true
 }

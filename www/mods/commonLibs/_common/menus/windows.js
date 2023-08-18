@@ -1,0 +1,325 @@
+/**
+ * create a new horisontal btn menu
+ * y pos, 
+ * btns
+ * width
+ */
+MATTIE.windows.horizontalBtns = function () {
+    this.initialize.apply(this, arguments);
+}
+
+MATTIE.windows.horizontalBtns.prototype = Object.create(Window_HorzCommand.prototype);
+MATTIE.windows.horizontalBtns.prototype.constructor = MATTIE.windows.horizontalBtns;
+
+MATTIE.windows.horizontalBtns.prototype.initialize = function(y,btns,width) {
+        this._mattieBtns = btns;
+        this._mattieMaxCols = width;
+        Window_HorzCommand.prototype.initialize.call(this,0,0)
+        this.updatePlacement(y);
+        
+};
+
+MATTIE.windows.horizontalBtns.prototype.updatePlacement = function(y) {
+    this.x = (Graphics.boxWidth - this.width) / 2;
+    this.y = y;
+};
+
+MATTIE.windows.horizontalBtns.prototype.maxCols = function() {
+    return this._mattieMaxCols;
+};
+
+/**
+ * 
+ * @param {dict} btns a key pair value {displayname:commandname} 
+ */
+MATTIE.windows.horizontalBtns.prototype.makeCommandList = function() {
+    for(key in this._mattieBtns){
+        this.addCommand(key, this._mattieBtns[key])
+    }
+};
+
+
+
+/**
+ * A window to display text
+ * @extends Window_Base
+ */
+MATTIE.windows.textDisplay = function () {
+    this.initialize.apply(this, arguments);
+}
+
+MATTIE.windows.textDisplay.prototype = Object.create(Window_Base.prototype);
+MATTIE.windows.textDisplay.prototype.constructor = MATTIE.windows.textDisplay;
+
+MATTIE.windows.textDisplay.prototype.initialize = function(x,y,width,height,text) {
+    Window_Base.prototype.initialize.call(this, x,y,width,height);
+    this.mattieWidth = width;
+    this.resetTextColor();
+    this.changePaintOpacity(true);
+    this.updateText(text);
+    
+    
+};
+
+/**
+ * center this window then add the offsets
+ * @param {*} xOffset how much to offset x by
+ * @param {*} yOffset how much to offset y by
+ */
+MATTIE.windows.textDisplay.prototype.updatePlacement = function(xOffset=0,yOffset=0) {
+    this.x = ((Graphics.boxWidth - this.width)) / 2+xOffset;
+    this.y = ((Graphics.boxHeight - this.height)) / 2+yOffset;
+};
+
+MATTIE.windows.textDisplay.prototype.updateText = function(text) {
+    this.contents.clear();
+    if(typeof text === typeof "string"){
+        text+="\n";
+        text = text.split("\n")
+    }
+    let i = 0;
+    text.forEach(element => {
+        this.drawText(element,0,25*i,0)
+        i++;
+    });
+};
+
+MATTIE.windows.textDisplay.prototype.windowWidth = function() {
+    return this.mattieWidth;
+};
+
+
+
+
+
+/**
+ * A list with header
+ * @extends Window_Base
+ */
+MATTIE.windows.list = function () {
+    this.initialize.apply(this, arguments);
+}
+
+MATTIE.windows.list.prototype = Object.create(MATTIE.windows.textDisplay.prototype);
+MATTIE.windows.list.prototype.constructor = MATTIE.windows.list;
+
+MATTIE.windows.list.prototype.initialize = function(x, y, width, height, header) {
+    this._items = [];
+    this._index = 0;
+    this._header = header;
+    MATTIE.windows.textDisplay.prototype.initialize.call(this, x, y, width, height);
+};
+
+MATTIE.windows.list.prototype.updateText = function(text) {
+    if(typeof text === typeof "string"){
+        text+="\n";
+        text=text.split("\n");
+        this._items = text;
+    } else if(typeof text === typeof []){
+        this._items = text;
+    }
+    this.contents.clear();
+    this._index = 0;
+    this.drawText(this._header,0,25*this._index,0)
+    this._index++;
+    this._items.forEach(element => {
+        this.drawText(element,0,25*this._index,0)
+        this._index++;
+    });
+};
+
+MATTIE.windows.list.prototype.addItem = function(text) {
+    this.drawText(text,0,25*this._index,0)
+    this._index++;
+};
+
+
+
+/**
+ * A window to display text
+ * @extends MATTIE.windows.textDisplay
+ */
+MATTIE.windows.textInput = function () {
+    this.initialize.apply(this, arguments);
+}
+
+MATTIE.windows.textInput.prototype = Object.create(MATTIE.windows.textDisplay.prototype);
+MATTIE.windows.textInput.prototype.constructor = MATTIE.windows.textInput;
+
+MATTIE.windows.textInput.prototype.initialize = function(x,y,width,height,header) {
+    this._text = "";
+    this._header = header;
+    MATTIE.windows.textDisplay.prototype.initialize.call(this, x,y,width,height,"");
+    this.updatePlacement();
+    this.initEventHandler();
+
+
+};
+MATTIE.windows.textInput.prototype.close = function(){
+    MATTIE.windows.textDisplay.prototype.close.call(this);
+    document.removeEventListener('keydown', this._listenFunc);
+}
+MATTIE.windows.textInput.prototype.initEventHandler = function() {
+    let lastKey = ""
+    this._listenFunc = (event) => {
+        var key = event.key;
+        //this is fucky but w/e its just a shitty menu so it shouldn't cause issues
+        if(!key.startsWith("Arrow")) //no arrow key inputs
+        if(key !== "Return")
+        if(key !== "Enter")
+        if(key !== "PageDown")
+        if(key !== "PageUp")
+        if(key !== "Shift")
+        if(key === "Control"){
+            lastKey = "Control"
+        } 
+        else if(key !== "Alt")
+        if(key !== "Tab")
+        switch (key) {
+            case "Escape":
+                this._text=""
+                break;
+            case "Backspace":
+                this._text=this._text.slice(0,this._text.length-1)
+                break;
+            case "v":
+                if(lastKey === "Control"){
+                    let data;
+                    if(Utils.isNwjs){
+                        data = nwGui.Clipboard.get().get();
+                    }else{
+                        data = window.navigator.clipboard.readText()
+                    }
+                    this._text+=data
+                    break;
+                }
+            default:
+                this._text+=key
+                break;
+        }
+        this.updateText()
+      }
+      
+    document.addEventListener('keydown', this._listenFunc, false);
+    
+}
+
+MATTIE.windows.textInput.prototype.getInput = function(){
+    return this._text;
+}
+MATTIE.windows.textInput.prototype.updateText = function(text=this._text) {
+    if(text != this._text){
+        this._text = text;
+    }
+    this.contents.clear();
+    let i = 0;
+    this.drawText(this._header,0,25*i,0)
+    i++;
+
+    if(typeof text === typeof "string"){
+        text+="\n";
+        text = text.split("\n")
+    }
+    text.forEach(element => {
+        this.drawText(element,0,25*i,0)
+        i++;
+    });
+};
+
+
+MATTIE.windows.modListWin = function(){
+    this.initialize.apply(this, arguments);
+}
+
+MATTIE.windows.modListWin.prototype = Object.create(Window_HorzCommand.prototype);
+MATTIE.windows.modListWin.prototype.constructor = MATTIE.windows.modListWin;
+
+MATTIE.windows.modListWin.prototype.initialize = function() {
+    Window_HorzCommand.prototype.initialize.call(this, 0, 0);
+    this.setUpHandlers();
+};
+
+MATTIE.windows.modListWin.prototype.windowWidth = function() {
+    return Graphics.boxWidth;
+};
+
+MATTIE.windows.modListWin.prototype.maxCols = function() {
+    return 1;
+};
+
+MATTIE.windows.modListWin.prototype.numVisibleRows = function() {
+    return 8;
+};
+
+MATTIE.windows.modListWin.prototype.makeCommandList = function() {
+    TextManager["MATTIE_"+"Vanilla_Fear_And_Hunger"] = "Vanilla Fear & Hunger" + "    " + (MATTIE_ModManager.modManager.checkVanilla()? "active": "not active")
+    this.addCommand(TextManager["MATTIE_"+"Vanilla_Fear_And_Hunger"], "MATTIE_"+"Vanilla_Fear_And_Hunger");
+
+    TextManager["MATTIE_"+"Vanilla_Save_Compatible"] = "Vanilla Save Compatible" + "    " + (!MATTIE_ModManager.modManager.checkSaveDanger()? "active": "not active")
+    this.addCommand(TextManager["MATTIE_"+"Vanilla_Save_Compatible"], "MATTIE_"+"Vanilla_Save_Compatible");
+
+
+    MATTIE_ModManager.modManager.getAllMods().forEach(mod=>{
+        let name = mod.name;
+        let status = mod.status;
+        TextManager["MATTIE_"+name] = name + "    " + (status? "active": "not active");
+        this.addCommand(TextManager["MATTIE_"+name],  "MATTIE_"+name);
+        
+
+        
+    })
+    TextManager["MATTIE_"+"Apply Changes"] = "Apply Changes";
+    
+    this.addCommand(TextManager["MATTIE_"+"Apply Changes"], "MATTIE_"+"Apply Changes");
+};
+
+MATTIE.windows.modListWin.prototype.reloadModsIfNeeded = function(){
+    let bool = MATTIE_ModManager.modManager.checkModsChanged();
+    if(bool){
+        alert("Press Okay to Reload Mods.")
+        MATTIE_ModManager.modManager.reloadGame();
+    }else{
+        SceneManager.pop()
+        alert("No Changes to mods were made, no reload is needed.")
+    }
+}
+
+MATTIE.windows.modListWin.prototype.setUpHandlers = function(){
+    this.setHandler("MATTIE_"+"Vanilla_Fear_And_Hunger", (()=>{
+        MATTIE_ModManager.modManager.setVanilla();
+        this.refresh();
+        this.activate();
+    }).bind(this));
+
+    this.setHandler("MATTIE_"+"Vanilla_Save_Compatible", (()=>{
+        MATTIE_ModManager.modManager.setNonDanger();
+        this.refresh();
+        this.activate();
+    }).bind(this));
+
+
+    
+
+
+    MATTIE_ModManager.modManager.getAllMods().forEach(mod=>{
+        let name = mod.name;
+        let status = mod.status;
+        this.setHandler("MATTIE_"+name,      (()=>{
+            MATTIE_ModManager.modManager.switchStatusOfMod(name)
+            this.refresh();
+            this.activate();
+        
+        }).bind(this));
+    });
+    
+    this.setHandler("cancel", (()=>{this.reloadModsIfNeeded();}).bind(this))
+
+    
+
+    this.setHandler("MATTIE_"+"Apply Changes", (()=>{this.reloadModsIfNeeded();}).bind(this));
+}
+
+MATTIE.windows.modListWin.prototype.setItemWindow = function(itemWindow) {
+    this._itemWindow = itemWindow;
+    this.update();
+};
