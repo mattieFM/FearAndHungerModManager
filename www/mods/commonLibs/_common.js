@@ -1,4 +1,12 @@
 var MATTIE = MATTIE || {};
+MATTIE.menus = MATTIE.menus || {};
+MATTIE.windows = MATTIE.windows || {};
+MATTIE.scenes = MATTIE.scenes || {};
+MATTIE.TextManager = MATTIE.TextManager || {};
+MATTIE.CmdManager = MATTIE.CmdManager || {};
+MATTIE.modLoader = MATTIE.modLoader || {};
+MATTIE.menus.mainMenu = MATTIE.menus.mainMenu || {};
+
 MATTIE.isDev = true;
 MATTIE.GameInfo = {};
 MATTIE.GameInfo.getDifficulty = (data=$gameSwitches)=>{
@@ -149,7 +157,12 @@ MATTIE.Prev_Input_Update = Input.update;
             
     }
 
+    console.log(MATTIE);
+    MATTIE.menus.mainMenu.addBtnToMainMenu(TextManager.Mods,TextManager.Mods,
+        MATTIE.menus.toModMenu.bind(this));
+    console.log("inited")
 if(MATTIE.isDev){
+   
     // console.log("inited")
     
     // Input.keyMapper[119] = "F8"

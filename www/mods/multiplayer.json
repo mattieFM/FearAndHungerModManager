@@ -26,8 +26,7 @@
         "_multiplayer/multiCombatMenu",
         "_multiplayer/netControllerV2/combatEmitter",
         "_multiplayer/netControllerV2/battle/battleController",
-        "_multiplayer/netControllerV2/models/netActors"
-        
-      
-]
+        "_multiplayer/netControllerV2/models/netActors"   
+    ],
+    "danger": true
 }

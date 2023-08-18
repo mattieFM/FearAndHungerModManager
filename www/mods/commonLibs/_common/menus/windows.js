@@ -226,3 +226,100 @@ MATTIE.windows.textInput.prototype.updateText = function(text=this._text) {
     });
 };
 
+
+MATTIE.windows.modListWin = function(){
+    this.initialize.apply(this, arguments);
+}
+
+MATTIE.windows.modListWin.prototype = Object.create(Window_HorzCommand.prototype);
+MATTIE.windows.modListWin.prototype.constructor = MATTIE.windows.modListWin;
+
+MATTIE.windows.modListWin.prototype.initialize = function() {
+    Window_HorzCommand.prototype.initialize.call(this, 0, 0);
+    this.setUpHandlers();
+};
+
+MATTIE.windows.modListWin.prototype.windowWidth = function() {
+    return Graphics.boxWidth;
+};
+
+MATTIE.windows.modListWin.prototype.maxCols = function() {
+    return 1;
+};
+
+MATTIE.windows.modListWin.prototype.numVisibleRows = function() {
+    return 8;
+};
+
+MATTIE.windows.modListWin.prototype.makeCommandList = function() {
+    TextManager["MATTIE_"+"Vanilla_Fear_And_Hunger"] = "Vanilla Fear & Hunger" + "    " + (MATTIE_ModManager.modManager.checkVanilla()? "active": "not active")
+    this.addCommand(TextManager["MATTIE_"+"Vanilla_Fear_And_Hunger"], "MATTIE_"+"Vanilla_Fear_And_Hunger");
+
+    TextManager["MATTIE_"+"Vanilla_Save_Compatible"] = "Vanilla Save Compatible" + "    " + (!MATTIE_ModManager.modManager.checkSaveDanger()? "active": "not active")
+    this.addCommand(TextManager["MATTIE_"+"Vanilla_Save_Compatible"], "MATTIE_"+"Vanilla_Save_Compatible");
+
+
+    MATTIE_ModManager.modManager.getAllMods().forEach(mod=>{
+        let name = mod.name;
+        let status = mod.status;
+        TextManager["MATTIE_"+name] = name + "    " + (status? "active": "not active");
+        this.addCommand(TextManager["MATTIE_"+name],  "MATTIE_"+name);
+        
+
+        
+    })
+    TextManager["MATTIE_"+"Apply Changes"] = "Apply Changes";
+    
+    this.addCommand(TextManager["MATTIE_"+"Apply Changes"], "MATTIE_"+"Apply Changes");
+};
+
+MATTIE.windows.modListWin.prototype.reloadModsIfNeeded = function(){
+    let bool = MATTIE_ModManager.modManager.checkModsChanged();
+    if(bool){
+        alert("Press Okay to Reload Mods.")
+        MATTIE_ModManager.modManager.reloadGame();
+    }else{
+        SceneManager.pop()
+        alert("No Changes to mods were made, no reload is needed.")
+    }
+}
+
+MATTIE.windows.modListWin.prototype.setUpHandlers = function(){
+    this.setHandler("MATTIE_"+"Vanilla_Fear_And_Hunger", (()=>{
+        MATTIE_ModManager.modManager.setVanilla();
+        this.refresh();
+        this.activate();
+    }).bind(this));
+
+    this.setHandler("MATTIE_"+"Vanilla_Save_Compatible", (()=>{
+        MATTIE_ModManager.modManager.setNonDanger();
+        this.refresh();
+        this.activate();
+    }).bind(this));
+
+
+    
+
+
+    MATTIE_ModManager.modManager.getAllMods().forEach(mod=>{
+        let name = mod.name;
+        let status = mod.status;
+        this.setHandler("MATTIE_"+name,      (()=>{
+            MATTIE_ModManager.modManager.switchStatusOfMod(name)
+            this.refresh();
+            this.activate();
+        
+        }).bind(this));
+    });
+    
+    this.setHandler("cancel", (()=>{this.reloadModsIfNeeded();}).bind(this))
+
+    
+
+    this.setHandler("MATTIE_"+"Apply Changes", (()=>{this.reloadModsIfNeeded();}).bind(this));
+}
+
+MATTIE.windows.modListWin.prototype.setItemWindow = function(itemWindow) {
+    this._itemWindow = itemWindow;
+    this.update();
+};

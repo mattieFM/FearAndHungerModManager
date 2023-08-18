@@ -21,14 +21,30 @@
  * By default mod's cannot load anything outside of their folder, all dependencies must be included within the mods folder.
  */
 
-var MATTIE_ModManager = {};
+var MATTIE_ModManager = MATTIE_ModManager || {};
+var MATTIE = MATTIE || {};
+MATTIE.menus = MATTIE.menus || {};
+MATTIE.windows = MATTIE.windows || {};
+MATTIE.scenes = MATTIE.scenes || {};
+MATTIE.TextManager = MATTIE.TextManager || {};
+MATTIE.CmdManager = MATTIE.CmdManager || {};
+MATTIE.menus.mainMenu = MATTIE.menus.mainMenu || {};
 
 class ModManager {
     constructor(path) {
         Object.assign(this,PluginManager);
         this._path = path
+        this._realMods = [];
         this._mods = []
     }
+    getModInfo(path,modName){
+        const fs = require('fs');
+        const modInfoPath =  path + modName;
+        const modInfoData = fs.readFileSync(modInfoPath)
+        const modInfo = JSON.parse(modInfoData);
+        return modInfo;
+    }
+
     /**
      * @description Add a mod to the list of mods that setup will initialize. All mod dependencies (Defined in its mod.json) will be loaded before that mod.
      * @param {*} path the path to the folder
@@ -46,19 +62,146 @@ class ModManager {
             });
         }
         if(modInfo.name){
-            this.addModEntry(modInfo.name,modInfo.status,modInfo.parameters)
+            this.addModEntry(modInfo.name,modInfo.status,modInfo.danger,modInfo.parameters)
         }else{
             this.addModEntry(modName)
         }
         
     }
 
-    addModEntry(name,status=true,params={}){
+    getActiveRealDangerMods(){
+        let arr = [];
+        let currentModsData = this.getAllMods();
+        currentModsData.forEach(mod => {
+            if(mod.status && mod.name[0] != "_" && mod.danger == true) arr.push(mod);
+        });
+        return arr;
+    }
+
+    getActiveRealMods(){
+        let arr = [];
+        let currentModsData = this.getAllMods();
+        currentModsData.forEach(mod => {
+            if(mod.status && mod.name[0] != "_") arr.push(mod);
+        });
+        return arr;
+    }
+
+    checkSaveDanger(){
+        return this.getActiveRealDangerMods().length > 0;
+    }
+
+    checkVanilla(){
+        return this.getActiveRealMods().length === 0;
+    }
+
+    checkModded(){
+        return this.getActiveRealMods().length > 0;
+    }
+
+    setVanilla(){
+        let currentModsData = this.getAllMods();
+        currentModsData.forEach(mod => {
+            if(mod.status) this.switchStatusOfMod(mod.name);
+        });
+    }
+
+    setNonDanger(){
+        let currentModsData = this.getAllMods();
+        currentModsData.forEach(mod => {
+            if(mod.status == true && mod.danger == true) {
+                this.switchStatusOfMod(mod.name);
+            }
+        });
+    }
+
+    checkModsChanged(){
+        let currentModsData = this.getAllMods();
+        for (let index = 0; index < this._mods.length; index++) {
+            const mod = this._mods[index];
+            for (let index = 0; index < currentModsData.length; index++) {
+                const currentMod = currentModsData[index];
+                if(mod.name === currentMod.name && mod.status != currentMod.status) {
+                    return true
+                }
+                
+            }
+            
+        }
+        return false;
+    }
+
+    reloadIfChangedGame(){
+        if(this.checkModsChanged())  this.reloadGame();
+    }
+
+    reloadGame(){
+        location.reload()
+    }
+
+    switchStatusOfMod(modName){
+        if(!modName.includes(".json")) modName+=".json";
+        const fs = require('fs');
+        let arr = [];
+        let mode;
+        let path;
+        try {
+            fs.readdirSync("www/"+this._path); //dist mode
+            mode = "dist"
+        } catch (error){
+            mode = "dev";
+        }
+        if(mode === "dist"){
+            path="www/"+this._path;
+        }
+
+        let dataInfo = this.getModInfo(path,modName);
+        dataInfo.status = !dataInfo.status;
+        fs.writeFileSync(path+modName,JSON.stringify(dataInfo));
+    }
+
+    getAllMods(){
+        const fs = require('fs');
+        let arr = [];
+        let mode;
+        let path;
+        try {
+            fs.readdirSync("www/"+this._path); //dist mode
+            mode = "dist"
+        } catch (error){
+            mode = "dev";
+        }
+        if(mode === "dist"){
+            path="www/"+this._path;
+        }
+        let readMods = fs.readdirSync(path);
+        
+        readMods.forEach(modName => { //load _mods first
+            if(modName.includes(".json")){
+                let name = modName.replace(".json","").replace("_","");
+                let obj = {};
+                let dataInfo = this.getModInfo(path,modName);
+                arr.push(dataInfo);
+            }
+            
+        })
+        return arr;
+
+    }
+
+    addModEntry(name,status=true,danger=false, params={}){
         var mod = {};
         mod.status = status;
         mod.name = name;
         mod.parameters = params;
+        mod.danger = danger;
         this._mods.push(mod);
+    }
+
+    
+    disableAndReload(){
+        this.setVanilla();
+        this.reloadGame();
     }
 
     parseMods(path){
@@ -114,15 +257,44 @@ MATTIE_ModManager.init =
 function () {
     const defaultPath = PluginManager._path;
         const path = "mods/";
-        PluginManager._path = path;
+        const commonLibsPath = path+"commonLibs/";
+        
         const modManager = new ModManager(path);
-        const mods = modManager.parseMods(path); //fs is in a different root dir so it needs this.
-        console.log(mods);
-        setTimeout(() => {
+        MATTIE_ModManager.modManager = modManager;
+        const commonModManager = new ModManager(commonLibsPath);
+        const commonMods = modManager.parseMods(commonLibsPath)
+        new Promise(res=>{
+            PluginManager._path = commonLibsPath;
+            commonModManager.setup(commonMods);
+            window.alert("mod loader successfully initialized")
+
+            PluginManager._path = defaultPath
+            res();
+        }).then(()=>{
+            PluginManager._path = path;
+            const mods = modManager.parseMods(path); //fs is in a different root dir so it needs this.
+            console.info(mods)
             modManager.setup(mods); //all mods load after plugins
-            window.alert("all mods successfully loaded")
+            
             PluginManager._path = defaultPath;
-        }, 500);
+        })
+
 }
+
+SceneManager.onError = function(e) {
+    console.error(e.message);
+    console.error(e.filename, e.lineno);
+    try {
+        this.stop();
+        Graphics.printError('Error', e.message+"\nPress Any Key To Reboot without mods");
+        AudioManager.stopAll();
+        document.addEventListener('keydown', (()=>{
+            MATTIE_ModManager.modManager.disableAndReload();
+            MATTIE_ModManager.modManager.reloadGame();
+        }), false);
+        
+    } catch (e2) {
+    }
+};
 
 MATTIE_ModManager.init();

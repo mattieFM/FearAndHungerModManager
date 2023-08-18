@@ -11,6 +11,17 @@ function BattleLog(str) {
     if(MATTIE.multiplayer.devTools.inBattleLogger) console.info(str);
 }
 
+MATTIE.multiplayer.battleManagerInit = BattleManager.initMembers;
+BattleManager.initMembers = function() {
+    MATTIE.multiplayer.battleManagerInit.call(this);
+    this._netActors = [];
+}
+
+BattleManager.getNetBattlers = function(){
+    if(!this._netActors)  this._netActors = [];
+    return this._netActors;
+}
+
 BattleManager.startAfterReady = function(){
     
     MATTIE.BattleManagerStartTurn.call(this);
@@ -80,6 +91,11 @@ BattleManager.startTurn = function() {
         }
     }
 };
+    MATTIE.multiplayer.battlemanageronStart = BattleManager.startBattle;
+    BattleManager.startBattle = function() {
+        MATTIE.multiplayer.battlemanageronStart.call(this);
+        this._netActors = [];
+    };
   
 
   BattleManager.addNetActionBattler = function(battler){
@@ -94,6 +110,7 @@ BattleManager.startTurn = function() {
     this._actionBattlers.splice.apply(this._actionBattlers, [4, 0].concat(this._netActionBattlers));
   }
   Game_Battler.prototype.setCurrentAction = function(action) {
+    console.log(action);
     this.forceAction(action._item._itemId,action._targetIndex);
 };
 

@@ -10,3 +10,9 @@ MATTIE.CmdManager = MATTIE.CmdManager || {};
 MATTIE.menus.toMainMenu = function(){
     SceneManager.goto(Scene_Title);
 }
+
+/** go to mod scene */
+MATTIE.menus.toModMenu = function(){
+    SceneManager.push(MATTIE.scenes.modLoader);
+}
+

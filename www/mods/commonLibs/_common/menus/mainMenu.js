@@ -1,8 +1,13 @@
 var MATTIE = MATTIE || {};
+MATTIE.menus = MATTIE.menus || {};
+MATTIE.windows = MATTIE.windows || {};
+MATTIE.scenes = MATTIE.scenes || {};
+MATTIE.TextManager = MATTIE.TextManager || {};
+MATTIE.CmdManager = MATTIE.CmdManager || {};
 MATTIE.menus.mainMenu = MATTIE.menus.mainMenu || {};
 
 var MATTIE_RPG = MATTIE_RPG || {};
-
+TextManager.Mods = "Mods";
 
 /**
  * @description add a new button to the main menu
@@ -13,18 +18,20 @@ var MATTIE_RPG = MATTIE_RPG || {};
 
 MATTIE.menus.mainMenu.addBtnToMainMenu = function (displayText,cmdText,cb) {
     cmdText ="MATTIEModManager" + cmdText
-    TextManager.multiplayer = displayText;
 
-    MATTIE_RPG.Scene_Title_createCommandWindow = Scene_Title.prototype.createCommandWindow;
+    var previousFunc = Scene_Title.prototype.createCommandWindow;
 
     Scene_Title.prototype.createCommandWindow = function() {
-        MATTIE_RPG.Scene_Title_createCommandWindow.call(this)
+        previousFunc.call(this)
         this._commandWindow.setHandler(cmdText, (cb).bind(this));
     };
-    MATTIE_RPG.WindowTitleCommand_makeCommandList = Window_TitleCommand.prototype.makeCommandList;
+    var prevWindowTitle = Window_TitleCommand.prototype.makeCommandList;
 
     Window_TitleCommand.prototype.makeCommandList = function() {
-        MATTIE_RPG.WindowTitleCommand_makeCommandList.call(this);
-        this.addCommand(TextManager.multiplayer,   cmdText);
+        prevWindowTitle.call(this);
+        this.addCommand(displayText,   cmdText);
     };
 } 
+
+
+
