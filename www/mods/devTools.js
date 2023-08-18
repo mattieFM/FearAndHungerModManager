@@ -35,12 +35,6 @@ MATTIE.devTools = MATTIE.devTools || {};
         }
        $gamePlayer.reserveTransfer($gameMap.mapId(), x, y, d, 2)
     })
-
-    Input.addKeyBind('l', ()=>{
-        Game_Interpreter.prototype.command352();
-    })
-
-    
 })();
 
 

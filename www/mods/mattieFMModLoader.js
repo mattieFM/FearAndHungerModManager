@@ -331,22 +331,25 @@ function () {
         modManager.generateDefaultJsonForModsWithoutJsons();
         const commonModManager = new ModManager(commonLibsPath);
         const commonMods = modManager.parseMods(commonLibsPath)
-        new Promise(res=>{
-            PluginManager._path = commonLibsPath;
-            commonModManager.setup(commonMods);
-            window.alert("mod loader successfully initialized")
-
-            PluginManager._path = defaultPath
-            res();
-        }).then(()=>{
-            PluginManager._path = path;
-            const mods = modManager.parseMods(path); //fs is in a different root dir so it needs this.
-            console.info(mods)
-            modManager.setup(mods); //all mods load after plugins
-            
-            PluginManager._path = defaultPath;
-           
-        })
+        setTimeout(() => {
+            new Promise(res=>{
+                PluginManager._path = commonLibsPath;
+                commonModManager.setup(commonMods);
+                window.alert("mod loader successfully initialized")
+    
+                PluginManager._path = defaultPath
+                res();
+            }).then(()=>{
+                PluginManager._path = path;
+                const mods = modManager.parseMods(path); //fs is in a different root dir so it needs this.
+                console.info(mods)
+                modManager.setup(mods); //all mods load after plugins
+                
+                PluginManager._path = defaultPath;
+               
+            })
+        }, 500);
+        
 
 }
 
