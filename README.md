@@ -3,6 +3,8 @@ Welcome to MATTIE's Fear And Hunger Mod Manager. This mod manager works for both
 
 ##Mod Loader Features
 -Abiltiy to toggle on and off any and all mods you have installed.
+![image](https://github.com/mattieFM/FearAndHungerModManager/assets/66142165/e3012f3c-b75d-4ec4-a4d0-282b8ad24cf4)
+
 -Save File Protection.
   -All mods are marked as either "safe for save files" or "unsafe for save files" if you are running mods that are unsafe for game files, the mod loader will create a seperate set of saves and protect your vanilla saves. If you are using mods that are safe for game files than the mod loader will load your normal saves for the game. 
   -There are settings to make the mod manager always use its own saves or always use vanilla saves. 
