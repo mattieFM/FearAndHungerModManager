@@ -17,19 +17,19 @@ Welcome to MATTIE's Fear And Hunger Mod Manager. This mod manager works for both
 Most mods will work for both F&H1 and F&H2. But if they are not working properly than the mod loader should automatically disable them and inform you which one it believes is not supported.  
 
 
--Better Saves  
+### Better Saves  
   -Allows as many save files as you would like, by default max saves is set to 99 but can be set to how ever large a value you would like.  
   -Also displays name and difficulty on save files, as shown below:  
   ![image](https://github.com/mattieFM/FearAndHungerModManager/assets/66142165/37b1610a-fd7f-4559-83ed-8103e536113f)  
   
--Dev Tools.  
+### Dev Tools.  
   -Press "i" to open and close a cheat menu.  
   -Press "v" to use a better form of phase step.  
   
--Unlocked Blood Portal  
+### Unlocked Blood Portal  
   -Press "b" to open the blood portal menu from anywhere. Allowing fast travel from any location.  
 
--Multiplayer  
+### Multiplayer  
   -WIP
   -A lot of changes
 
