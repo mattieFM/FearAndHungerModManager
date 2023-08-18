@@ -45,6 +45,73 @@ class ModManager {
         return modInfo;
     }
 
+    getPath(){
+        const fs = require('fs');
+        let path;
+        let mode;
+        try {
+            fs.readdirSync("www/"+this._path); //dist mode
+            mode = "dist"
+        } catch (error){
+            mode = "dev";
+        }
+        if(mode === "dist"){
+            path="www/"+this._path;
+        }else{
+            path =this._path;
+        }
+        return path
+    }
+
+    getModsFolder(){
+        let arr = [];
+        const fs = require('fs');
+        
+        let readMods = fs.readdirSync(this.getPath());
+        
+        readMods.forEach(modName => { //load _mods first
+            arr.push(modName);
+        })
+        return arr;
+    }
+
+    generateDefaultJSONForMod(modName){
+        const fs = require('fs');
+        let path = this.getPath();
+        let obj = {}
+        obj.name = modName;
+        obj.status = false;
+        obj.parameters = {};
+        obj.danger = true;
+        fs.writeFileSync(path+modName+".json",JSON.stringify(obj))
+
+    }
+
+    generateDefaultJsonForModsWithoutJsons(){
+        let modsWithoutJson = this.getModsWithoutJson();
+        modsWithoutJson.forEach(modName=>{
+            this.generateDefaultJSONForMod(modName);
+        })
+    }
+
+    getModsWithoutJson(){
+        let modsWithJson = this.getAllMods().map(mod=>mod.name);
+        console.log(modsWithJson);
+        let modsWithoutJson = [];
+        this.getModsFolder().forEach(modName =>{
+            if(modName.endsWith(".js") && !modName.includes("mattieFMModLoader")){
+                modName = modName.replace(".js","")
+                if(!modsWithJson.includes(modName)){
+                    modsWithoutJson.push(modName);
+                }
+            }
+            
+        })
+        return modsWithoutJson;
+
+
+    }
+
     /**
      * @description Add a mod to the list of mods that setup will initialize. All mod dependencies (Defined in its mod.json) will be loaded before that mod.
      * @param {*} path the path to the folder
@@ -261,6 +328,7 @@ function () {
         
         const modManager = new ModManager(path);
         MATTIE_ModManager.modManager = modManager;
+        modManager.generateDefaultJsonForModsWithoutJsons();
         const commonModManager = new ModManager(commonLibsPath);
         const commonMods = modManager.parseMods(commonLibsPath)
         new Promise(res=>{
@@ -277,6 +345,7 @@ function () {
             modManager.setup(mods); //all mods load after plugins
             
             PluginManager._path = defaultPath;
+           
         })
 
 }
