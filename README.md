@@ -1,7 +1,7 @@
 # FearAndHungerModManager  
 Welcome to MATTIE's Fear And Hunger Mod Manager. This mod manager works for both F&H 1 and 2.  
 
-##Mod Loader Features  
+## Mod Loader Features  
 -Abiltiy to toggle on and off any and all mods you have installed.  
 ![image](https://github.com/mattieFM/FearAndHungerModManager/assets/66142165/e3012f3c-b75d-4ec4-a4d0-282b8ad24cf4)
 
@@ -17,31 +17,34 @@ Welcome to MATTIE's Fear And Hunger Mod Manager. This mod manager works for both
 Most mods will work for both F&H1 and F&H2. But if they are not working properly than the mod loader should automatically disable them and inform you which one it believes is not supported.  
 
 
--Better Saves  
+### Better Saves  
   -Allows as many save files as you would like, by default max saves is set to 99 but can be set to how ever large a value you would like.  
   -Also displays name and difficulty on save files, as shown below:  
   ![image](https://github.com/mattieFM/FearAndHungerModManager/assets/66142165/37b1610a-fd7f-4559-83ed-8103e536113f)  
   
--Dev Tools.  
+### Dev Tools.  
   -Press "i" to open and close a cheat menu.  
   -Press "v" to use a better form of phase step.  
   
--Unlocked Blood Portal  
+### Unlocked Blood Portal  
   -Press "b" to open the blood portal menu from anywhere. Allowing fast travel from any location.  
 
--Multiplayer  
+### Multiplayer  
   -WIP
   -A lot of changes
 
-#Install  
+# Install  
 
    -First Decompile Fear and Hunger.  
    -Download this repo.  
    -add the mods folder to your game's www/ folder.  
    -replace your game's index.html file with mine.  
-   -The mod loader is now installed.  
+   -The mod loader & all my mods are now installed.  
+   -once the game launches on the main menu you can see a mods tab to activate or deactivate any mod/mods you would like.  
+   ![image](https://github.com/mattieFM/FearAndHungerModManager/assets/66142165/0afa2d96-8f7f-451c-a972-b6f520cbc214)
 
-#development info  
+
+# development info  
 
 Mods consist of 2 files, a .js file and a .json file, the .json file contains information about the mod, think of it as a config file of sorts. It must contain the following values  
 {  
