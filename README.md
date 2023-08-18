@@ -32,7 +32,6 @@ Most mods will work for both F&H1 and F&H2. But if they are not working properly
   -A lot of changes
 
 #Install
-Installation instructions: 
  -First Decompile Fear and Hunger.
  -Download this repo.
  -add the mods folder to your game's www/ folder.
