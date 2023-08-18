@@ -39,7 +39,10 @@ Most mods will work for both F&H1 and F&H2. But if they are not working properly
    -Download this repo.  
    -add the mods folder to your game's www/ folder.  
    -replace your game's index.html file with mine.  
-   -The mod loader is now installed.  
+   -The mod loader & all my mods are now installed.  
+   -once the game launches on the main menu you can see a mods tab to activate or deactivate any mod/mods you would like.
+   ![image](https://github.com/mattieFM/FearAndHungerModManager/assets/66142165/0afa2d96-8f7f-451c-a972-b6f520cbc214)
+
 
 # development info  
 
