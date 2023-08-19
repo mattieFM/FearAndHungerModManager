@@ -137,12 +137,12 @@ class CommonMod {
 // --UTIL--
 function updateKeys(keys,name="") {
     Object.keys(keys).forEach(key => {
-        Input.keyMapper[key.toUpperCase().charCodeAt(0)] = (name != "" ? name : key); //add our key to the list of watched keys
+        Input.keyMapper[key.toUpperCase().charCodeAt(0)] = key; //add our key to the list of watched keys
     });
 };
 
 function updateKey(key,name="") {
-    Input.keyMapper[key.toUpperCase().charCodeAt(0)] = (name != "" ? name : key); //add our key to the list of watched keys
+    Input.keyMapper[key.toUpperCase().charCodeAt(0)] = key; //add our key to the list of watched keys
 };
 const keys = {};
 Input.addKeyBind = function (key, cb, name ="") {
@@ -151,13 +151,13 @@ Input.addKeyBind = function (key, cb, name ="") {
         let tempFunc = Window_KeyConfig.prototype.actionKey;
         let tempFunc2 = Window_KeyAction.prototype.makeCommandList;
         Window_KeyConfig.prototype.actionKey = function(action) {
-            if(action === name) return name;
+            if(action === key) return name;
             return tempFunc.call(this,action);
         }
 
         Window_KeyAction.prototype.makeCommandList = function() {
             tempFunc2.call(this);
-            this.addCommand(name, 'ok', true, name);
+            this.addCommand(name, 'ok', true, key);
         }
     }
     keys[key]=cb;
