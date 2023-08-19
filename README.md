@@ -28,6 +28,11 @@ Most mods will work for both F&H1 and F&H2. But if they are not working properly
   
 ### Unlocked Blood Portal  
   -Press "b" to open the blood portal menu from anywhere. Allowing fast travel from any location.  
+  
+### Quick Save / Load
+ -Press "o" to open the quick load menu  
+ -Press "l" to open the quick save menu  
+
 
 ### Multiplayer  
   -WIP
