@@ -133,74 +133,7 @@ MATTIE.multiplayer.getCurrentNetController = ()=>{
     var client;
     var conn;
     
-    if(MATTIE.multiplayer.isDev){
-//     Input.addKeyBind('i', ()=>{
-//         console.log("-- Forced Client connection script --")
-//         netController.hostId = netController.host.id
-//         client = netController.openClientPeer();
-//         netController.clientName = "client2"
-//         netController.name = "client2"
-//     })
 
-//     Input.addKeyBind('u', ()=>{
-//         console.log("-- Forced Host open script --")
-//         netController.hostName = "host"
-//         netController.name = "host"
-//         host = netController.openHostPeer();
-
-//     })
-
-
-        //phase dev tool (but like actually not broken)
-
-    // Input.addKeyBind('y', ()=>{
-    //     $gameMap.events()[16].start();
-
-    // })
-
-    // Input.addKeyBind('i', ()=>{
-    //     let res = window.prompt("enter id,val of the switch you would like to change")
-    //     let arr = res.split(',');
-    //     console.info(`forcibly set ${arr[0]} to ${arr[1]}`)
-    //     $gameSwitches.setValue(parseInt(arr[0]),parseInt(arr[1]),false)
-    //     //$gameMap.events()[16].start();
-
-    // })
-
-    // Input.addKeyBind('o', ()=>{
-    //     let res = window.prompt("enter id,val of the var you would like to change")
-    //     let arr = res.split(',');
-    //     console.info(`forcibly set ${arr[0]} to ${arr[1]}`)
-    //     $gameVariables.setValue(parseInt(arr[0]),parseInt(arr[1]))
-    //     //$gameMap.events()[16].start();
-
-    // })
-
-    // Input.addKeyBind('p', ()=>{
-    //     let res = window.prompt("enter id,x,y of the event you would like to move")
-    //     let arr = res.split(',');
-        
-        
-    //     let event = $gameMap.event(arr[0]);
-       
-    //     try {
-    //         let x = parseInt(arr[1]);
-    //         let y = parseInt(arr[2]);
-    //         event.x = x;
-    //         event.y = y;
-    //         event._x = x;
-    //         event._y = y;
-    //         console.info(`forcibly moved event:ID:${arr[0]} to x:${arr[1]}y:${arr[2]}`)
-    //     } catch (error) {
-    //         event[arr[1]] = arr[2];
-    //         console.info(`forcibly set event:ID:${arr[0]} prop: ${arr[1]} to ${arr[2]}`)
-    //     }
-       
-        
-        
-
-    // })
-}
 
 
 
