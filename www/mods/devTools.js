@@ -6,7 +6,7 @@ MATTIE.devTools = MATTIE.devTools || {};
 (()=>{
     Input.addKeyBind('i', ()=>{
         MATTIE.devTools.switchCheatScene();
-    })
+    }, "CHEAT")
     
     Input.addKeyBind('v', ()=>{
         let amount = 1;
@@ -34,7 +34,7 @@ MATTIE.devTools = MATTIE.devTools || {};
                 break;
         }
        $gamePlayer.reserveTransfer($gameMap.mapId(), x, y, d, 2)
-    })
+    }, "PHASE")
 })();
 
 

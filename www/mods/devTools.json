@@ -1,1 +1,1 @@
-{"name":"devTools","status":true,"parameters":{},"dependencies":["_devTools/cheatMenu"],"danger":true}
+{"name":"devTools","status":true,"parameters":{},"dependencies":["_devTools/cheatMenu"],"danger":false}

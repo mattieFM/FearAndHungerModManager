@@ -135,15 +135,33 @@ class CommonMod {
 }
 
 // --UTIL--
-function updateKeys(keys) {
+function updateKeys(keys,name="") {
     Object.keys(keys).forEach(key => {
-        Input.keyMapper[key.toUpperCase().charCodeAt(0)] = key; //add our key to the list of watched keys
+        Input.keyMapper[key.toUpperCase().charCodeAt(0)] = (name != "" ? name : key); //add our key to the list of watched keys
     });
 };
+
+function updateKey(key,name="") {
+    Input.keyMapper[key.toUpperCase().charCodeAt(0)] = (name != "" ? name : key); //add our key to the list of watched keys
+};
 const keys = {};
-Input.addKeyBind = function (key, cb) {
+Input.addKeyBind = function (key, cb, name ="") {
+    
+    if(name != ""){
+        let tempFunc = Window_KeyConfig.prototype.actionKey;
+        let tempFunc2 = Window_KeyAction.prototype.makeCommandList;
+        Window_KeyConfig.prototype.actionKey = function(action) {
+            if(action === name) return name;
+            return tempFunc.call(this,action);
+        }
+
+        Window_KeyAction.prototype.makeCommandList = function() {
+            tempFunc2.call(this);
+            this.addCommand(name, 'ok', true, name);
+        }
+    }
     keys[key]=cb;
-    updateKeys(keys);
+    updateKey(key, name);
 }
 MATTIE.Prev_Input_Update = Input.update;
     Input.update = function () {
