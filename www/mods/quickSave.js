@@ -5,11 +5,26 @@ MATTIE.devTools = MATTIE.devTools || {};
 
 function initQuickSave (){
     Input.addKeyBind('l', ()=>{
-        Game_Interpreter.prototype.command352();
+        $gameSystem.onBeforeSave();
+        DataManager.saveGame(DataManager.maxSavefiles() + 1);
     }, "Quick Save")
 
     Input.addKeyBind('o', ()=>{
-        SceneManager.push(Scene_Load);
+       
+        DataManager.loadGame(DataManager.maxSavefiles() + 1);
+        $gameSystem.onAfterLoad();
+        SceneManager.goto(Scene_Map);
     }, "Quick Load")
+
+    Input.addKeyBind('u', ()=>{
+        Game_Interpreter.prototype.command352();
+    }, "Save")
+
+    Input.addKeyBind('i', ()=>{
+        SceneManager.push(Scene_Load);
+    }, "Load")
+
+
+    //maxSavefiles
 }
 initQuickSave();
