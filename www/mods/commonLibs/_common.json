@@ -9,7 +9,8 @@
         "_common/menus/windows",
         "_common/nw",
         "_common/menus/scenes",
-        "_common/saveProtector"
+        "_common/saveProtector",
+        "_common/compatibility"
     
     ],
     "danger": false
