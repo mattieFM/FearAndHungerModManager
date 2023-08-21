@@ -5,11 +5,6 @@
 www/*/
 !www/js/
 www/js/*
-!www/mods/
-!www/mods/*
-!www/mods/**
 www/mods/
-www/mods/multiplayer.js
-www/mods/multiplayer.json
-www/mods/_multiplayer\*
-www/mods/_multiplayer\**
+www/mods/*
+www/mods/**

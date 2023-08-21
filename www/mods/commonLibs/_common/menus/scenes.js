@@ -21,7 +21,7 @@ MATTIE.scenes.base.prototype.create = function (){
 }
 
 MATTIE.scenes.base.prototype.createBackground = function() {
-    this._backSprite2 = new Sprite(ImageManager.loadBitmap("mods/commonLibs/_common/images/","FearAndHungerModMan",0,true));
+    this._backSprite2 = new Sprite(ImageManager.loadBitmap("mods/commonLibs/_common/images/","FearAndHungerModMan",0,true, true));
     this.addChild(this._backSprite2);
     this._modListWin = new MATTIE.windows.modListWin(0,0);
     this.addChild(this._modListWin);

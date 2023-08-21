@@ -16,3 +16,15 @@ MATTIE.menus.toModMenu = function(){
     SceneManager.push(MATTIE.scenes.modLoader);
 }
 
+/** go to load scene */
+MATTIE.menus.toLoadMenu = function(){
+    SceneManager.goto(Scene_Load);
+}
+
+/** go to new game menu */
+MATTIE.menus.toNewMenu = function(){
+    DataManager.setupNewGame();
+    SceneManager.goto(Scene_Map);
+}
+
+
