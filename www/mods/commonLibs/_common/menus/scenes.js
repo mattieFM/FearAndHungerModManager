@@ -6,8 +6,6 @@ MATTIE.TextManager = MATTIE.TextManager || {};
 MATTIE.CmdManager = MATTIE.CmdManager || {};
 MATTIE.modLoader = MATTIE.modLoader || {};
 
-
-
 MATTIE.scenes.base = function () {
     this.initialize.apply(this, arguments);
 }
@@ -26,7 +24,6 @@ MATTIE.scenes.base.prototype.createBackground = function() {
     this._modListWin = new MATTIE.windows.modListWin(0,0);
     this.addChild(this._modListWin);
 };
-
 
 MATTIE.scenes.modLoader = function () {
     this.initialize.apply(this, arguments);

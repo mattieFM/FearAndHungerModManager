@@ -23,12 +23,21 @@
 
 var MATTIE_ModManager = MATTIE_ModManager || {};
 var MATTIE = MATTIE || {};
+
+MATTIE.global = MATTIE.global || {};
+MATTIE.global.version = 1;
 MATTIE.menus = MATTIE.menus || {};
 MATTIE.windows = MATTIE.windows || {};
 MATTIE.scenes = MATTIE.scenes || {};
 MATTIE.TextManager = MATTIE.TextManager || {};
 MATTIE.CmdManager = MATTIE.CmdManager || {};
 MATTIE.menus.mainMenu = MATTIE.menus.mainMenu || {};
+
+MATTIE.global.checkGameVersion = function(){
+    let version = $dataSystem.gameTitle.includes("termina")? 2 : 1;
+    MATTIE.global.version = version
+    return version;
+}
 
 class ModManager {
     constructor(path) {
@@ -346,7 +355,7 @@ function () {
                 modManager.setup(mods); //all mods load after plugins
                 
                 PluginManager._path = defaultPath;
-               
+                MATTIE.global.checkGameVersion();
             })
         }, 500);
         

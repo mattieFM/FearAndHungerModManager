@@ -10,7 +10,10 @@
         "_common/nw",
         "_common/menus/scenes",
         "_common/saveProtector",
-        "_common/compatibility"
+        "_common/compatibility",
+        "_common/menus/cheatMenu",
+        "_common/static",
+        "_common/items"
     
     ],
     "danger": false
