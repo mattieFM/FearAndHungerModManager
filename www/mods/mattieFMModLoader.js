@@ -38,6 +38,20 @@ MATTIE.global.checkGameVersion = function(){
     return version;
 }
 
+MATTIE.DataManagerLoaddatabase =DataManager.loadDatabase;
+DataManager.loadDatabase = function() {
+    MATTIE.DataManagerLoaddatabase.call(this);
+    let int = setInterval(() => {
+        if(DataManager.isDatabaseLoaded()){
+            MATTIE.global.checkGameVersion();
+            MATTIE.static.update();
+            clearInterval(int);
+        }
+    }, 50);
+    
+    
+};
+
 class ModManager {
     constructor(path) {
         Object.assign(this,PluginManager);
@@ -341,7 +355,7 @@ function () {
         const commonMods = modManager.parseMods(commonLibsPath)
         setTimeout(() => {
             new Promise(res=>{
-                MATTIE.global.checkGameVersion();
+                
                 PluginManager._path = commonLibsPath;
                 commonModManager.setup(commonMods);
                 window.alert("mod loader successfully initialized")
@@ -349,14 +363,18 @@ function () {
                 PluginManager._path = defaultPath
                 res();
             }).then(()=>{
-                PluginManager._path = path;
-                const mods = modManager.parseMods(path); //fs is in a different root dir so it needs this.
-                console.info(mods)
-                modManager.setup(mods); //all mods load after plugins
+                setTimeout(() => {
+                    PluginManager._path = path;
+                    const mods = modManager.parseMods(path); //fs is in a different root dir so it needs this.
+                    console.info(mods)
+                    modManager.setup(mods); //all mods load after plugins
+                    
+                    PluginManager._path = defaultPath;
+                }, 2000);
                 
-                PluginManager._path = defaultPath;
+                
             })
-        }, 500);
+        }, 10);
         
 
 }

@@ -27,4 +27,12 @@ MATTIE.menus.toNewMenu = function(){
     SceneManager.goto(Scene_Map);
 }
 
+/**
+ * load a save id and then go to the map
+ */
+MATTIE.menus.loadGameAndGoTo = function(id){
+    DataManager.loadGame(id);
+    $gameSystem.onAfterLoad();
+    SceneManager.goto(Scene_Map);
+}
 
