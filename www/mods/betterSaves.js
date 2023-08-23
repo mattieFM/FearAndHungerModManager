@@ -12,6 +12,22 @@ MATTIE.saves.suspendedRunId = 9998;
 
 
 (()=>{
+    MATTIE.saves.createCommandWindow = Scene_GameEnd.prototype.createCommandWindow;
+    Scene_GameEnd.prototype.createCommandWindow = function() {
+        MATTIE.saves.createCommandWindow.call(this);
+        this._commandWindow.setHandler('suspend', (()=>{
+            MATTIE.saves.suspendRun();
+            this.commandToTitle();
+        
+        }).bind(this));
+    };
+
+    MATTIE.saves.makeCommandList = Window_GameEnd.prototype.makeCommandList;
+    Window_GameEnd.prototype.makeCommandList = function() {
+        MATTIE.saves.makeCommandList.call(this);
+        this.addCommand("Save And Quit", 'suspend');
+    };
+
     MATTIE.saves.continueFromSuspendedRun = function (){
         MATTIE.menus.loadGameAndGoTo(MATTIE.saves.suspendedRunId);
         MATTIE.saves.deleteSuspendedRun();
