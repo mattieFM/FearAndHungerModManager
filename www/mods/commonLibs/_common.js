@@ -23,11 +23,7 @@ MATTIE.GameInfo.getDifficulty = (data=$gameSwitches)=>{
 MATTIE.GameInfo.getCharName = (data=$gameParty)=>{ return data.menuActor()._name;};
 MATTIE.GameInfo.isHardMode = (data=$gameSwitches)=>data._data[2190] === true;
 MATTIE.GameInfo.isTerrorAndStarvation = (data=$gameSwitches)=>(!data._data[2190] && data._data[3153] === true);
-MATTIE.global.checkGameVersion = function(){
-    let version = $dataSystem.gameTitle.includes("termina")? 2 : 1;
-    MATTIE.global.version = version
-    return version;
-}
+
 MATTIE.DataManager = {};
 /**
  * @description load a save as an object to acsess information from it but not load it 
