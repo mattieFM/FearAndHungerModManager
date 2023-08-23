@@ -32,6 +32,11 @@ MATTIE.TextManager = MATTIE.TextManager || {};
 MATTIE.CmdManager = MATTIE.CmdManager || {};
 MATTIE.menus.mainMenu = MATTIE.menus.mainMenu || {};
 
+MATTIE.global.checkGameVersion = function(){
+    let version = $dataSystem.gameTitle.includes("termina")? 2 : 1;
+    MATTIE.global.version = version
+    return version;
+}
 
 class ModManager {
     constructor(path) {
@@ -329,7 +334,6 @@ function () {
     const defaultPath = PluginManager._path;
         const path = "mods/";
         const commonLibsPath = path+"commonLibs/";
-        
         const modManager = new ModManager(path);
         MATTIE_ModManager.modManager = modManager;
         modManager.generateDefaultJsonForModsWithoutJsons();
@@ -337,6 +341,7 @@ function () {
         const commonMods = modManager.parseMods(commonLibsPath)
         setTimeout(() => {
             new Promise(res=>{
+                MATTIE.global.checkGameVersion();
                 PluginManager._path = commonLibsPath;
                 commonModManager.setup(commonMods);
                 window.alert("mod loader successfully initialized")
@@ -350,9 +355,6 @@ function () {
                 modManager.setup(mods); //all mods load after plugins
                 
                 PluginManager._path = defaultPath;
-                setTimeout(() => {
-                    MATTIE.global.checkGameVersion();
-                }, 2000);
             })
         }, 500);
         
