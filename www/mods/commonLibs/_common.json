@@ -13,7 +13,8 @@
         "_common/compatibility",
         "_common/menus/cheatMenu",
         "_common/static",
-        "_common/items"
+        "_common/items",
+        "_common/optimisations"
     
     ],
     "danger": false

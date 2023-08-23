@@ -16,7 +16,7 @@ TextManager.Mods = "Mods";
  * @param {()=>{}} cb the callback
  */
 
-MATTIE.menus.mainMenu.addBtnToMainMenu = function (displayText,cmdText,cb) {
+MATTIE.menus.mainMenu.addBtnToMainMenu = function (displayText,cmdText,cb,enabled=true) {
     cmdText ="MATTIEModManager" + cmdText
 
     var previousFunc = Scene_Title.prototype.createCommandWindow;
@@ -28,8 +28,14 @@ MATTIE.menus.mainMenu.addBtnToMainMenu = function (displayText,cmdText,cb) {
     var prevWindowTitle = Window_TitleCommand.prototype.makeCommandList;
 
     Window_TitleCommand.prototype.makeCommandList = function() {
+        let bool = enabled;
+        try {
+            bool = enabled();
+        } catch (error) {
+            
+        }
         prevWindowTitle.call(this);
-        this.addCommand(displayText,   cmdText);
+        this.addCommand(displayText, cmdText, bool);
     };
 } 
 

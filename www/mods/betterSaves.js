@@ -6,8 +6,41 @@
 * mods define their 
 */
 var MATTIE = MATTIE || {};
+MATTIE.saves = MATTIE.saves || {};
+MATTIE.saves.suspendedRunId = 9998;
+
+
 
 (()=>{
+    MATTIE.saves.continueFromSuspendedRun = function (){
+        MATTIE.menus.loadGameAndGoTo(MATTIE.saves.suspendedRunId);
+        MATTIE.saves.deleteSuspendedRun();
+    }
+    
+    MATTIE.saves.deleteSuspendedRun = function(){
+        StorageManager.saveToLocalFile(MATTIE.saves.suspendedRunId, {});
+        let globalInfo = DataManager.loadGlobalInfo();
+        globalInfo[MATTIE.saves.suspendedRunId] = null;
+        DataManager.saveGlobalInfo(globalInfo);
+    }
+    MATTIE.saves.suspendRun = function (){
+        DataManager.saveGame(MATTIE.saves.suspendedRunId,true);
+    }
+    MATTIE.saves.suspendedRunExists = function (){
+        let global = DataManager.loadGlobalInfo();
+        console.log(global[MATTIE.saves.suspendedRunId])
+        if(global[MATTIE.saves.suspendedRunId]) return true
+        return false
+    }
+
+    Input.addKeyBind('q', ()=>{
+        MATTIE.saves.suspendRun();
+    }, "SuspendRun")
+    
+
+    updateOldSaves(); //update old saves on init
+    MATTIE.menus.mainMenu.addBtnToMainMenu("Continue Suspended Run","suspendedRunContinue", MATTIE.saves.continueFromSuspendedRun.bind(this), ()=>MATTIE.saves.suspendedRunExists())
+
     const params = PluginManager.parameters('betterSaves');
     
     DataManager.maxSavefiles = function() {
@@ -15,6 +48,7 @@ var MATTIE = MATTIE || {};
     };
 
     function updateOldSaves() {
+        MATTIE.saves.savedLatest = DataManager.latestSavefileId(); 
         const globalInfo = DataManager.loadGlobalInfo();
         const maxSaves = DataManager.maxSavefiles();
         for (var index = 1; index < maxSaves; index++) {
@@ -29,19 +63,17 @@ var MATTIE = MATTIE || {};
                 globalInfo[index].name=name.replace("\"","").replace("\"","");
             }
             DataManager.saveGlobalInfo(globalInfo);
-            
+            MATTIE.DataManager.loadAndReturnSave(MATTIE.saves.savedLatest);
         } 
     }
 
     MATTIE.Scene_Save_prototype_init = Scene_Save.prototype.initialize
     Scene_Save.prototype.initialize = function(){
-        updateOldSaves();
         MATTIE.Scene_Save_prototype_init.call(this);  
     }
 
     MATTIE.Scene_Load_prototype_init = Scene_Load.prototype.initialize
     Scene_Load.prototype.initialize = function(){
-        updateOldSaves();
         MATTIE.Scene_Load_prototype_init.call(this);  
     }
     Window_SavefileList.prototype.drawGameTitle = function(info, x, y, width, rect) {
@@ -70,8 +102,8 @@ var MATTIE = MATTIE || {};
     };
     
     MATTIE.DataManager_MakeSaveFileInfo = DataManager.makeSavefileInfo;
-    DataManager.makeSavefileInfo = function() {
-        var oldData = MATTIE.DataManager_MakeSaveFileInfo.call(this);
+    DataManager.makeSavefileInfo = function(noTimeStamp = false) {
+        var oldData = MATTIE.DataManager_MakeSaveFileInfo.call(this, noTimeStamp);
         const newData = {
             ...oldData,
             "name":MATTIE.GameInfo.getCharName(),

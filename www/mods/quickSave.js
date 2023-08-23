@@ -1,19 +1,17 @@
 
 
 var MATTIE = MATTIE || {};
-MATTIE.devTools = MATTIE.devTools || {};
+MATTIE.quickSaves = MATTIE.quickSaves || {};
 
+MATTIE.quickSaves.quickSaveId = 9998;
 function initQuickSave (){
     Input.addKeyBind('l', ()=>{
         $gameSystem.onBeforeSave();
-        DataManager.saveGame(DataManager.maxSavefiles() + 1);
+        DataManager.saveGame(MATTIE.quickSaves.quickSaveId,true);
     }, "Quick Save")
 
     Input.addKeyBind('o', ()=>{
-       
-        DataManager.loadGame(DataManager.maxSavefiles() + 1);
-        $gameSystem.onAfterLoad();
-        SceneManager.goto(Scene_Map);
+        MATTIE.menus.loadGameAndGoTo(MATTIE.quickSaves.quickSaveId);
     }, "Quick Load")
 
     Input.addKeyBind('u', ()=>{
