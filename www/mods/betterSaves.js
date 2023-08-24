@@ -72,11 +72,14 @@ MATTIE.saves.suspendedRunId = 9998;
             if(!globalInfo[index].name){
                 console.info("BETTERSAVES: Migrated save: " + index)
                 var saveData = MATTIE.DataManager.loadAndReturnSave(index)
-                var diff = MATTIE.GameInfo.getDifficulty(saveData.$gameSwitches);
-                var name = JSON.stringify(saveData.$gameActors._data[saveData.$gameParty._actors[0]]._name);
+                if(saveData){
+                    var diff = MATTIE.GameInfo.getDifficulty(saveData.$gameSwitches);
+                    var name = JSON.stringify(saveData.$gameActors._data[saveData.$gameParty._actors[0]]._name);
+                    
+                    globalInfo[index].difficulty=diff;
+                    globalInfo[index].name=name.replace("\"","").replace("\"","");
+                }
                 
-                globalInfo[index].difficulty=diff;
-                globalInfo[index].name=name.replace("\"","").replace("\"","");
             }
             DataManager.saveGlobalInfo(globalInfo);
             MATTIE.DataManager.loadAndReturnSave(MATTIE.saves.savedLatest);

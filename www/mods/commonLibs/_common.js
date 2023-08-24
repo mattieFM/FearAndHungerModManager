@@ -69,9 +69,15 @@ MATTIE.DataManager.makeSaveContentsFromParam = function(data){
  * @returns full game data of that save
  */
 MATTIE.DataManager.loadAndReturnSave = function(index){
-    var saveJson = StorageManager.load(index)
-    var saveData = MATTIE.DataManager.extractAndReturnSaveContents(JsonEx.parse(saveJson));
-    return saveData;
+    try {
+        var saveJson = StorageManager.load(index)
+        var saveData = MATTIE.DataManager.extractAndReturnSaveContents(JsonEx.parse(saveJson)); 
+        return saveData;
+    } catch (error) {
+        return null
+    }
+    
+    
 }
 /**
  * @description make save file info from param
