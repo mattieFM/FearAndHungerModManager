@@ -5,6 +5,6 @@
 www/*/
 !www/js/
 www/js/*
-www/mods/
-www/mods/*
-www/mods/**
+!www/mods/
+!www/mods/*
+!www/mods/**/*
