@@ -16,3 +16,23 @@ MATTIE.menus.toModMenu = function(){
     SceneManager.push(MATTIE.scenes.modLoader);
 }
 
+/** go to load scene */
+MATTIE.menus.toLoadMenu = function(){
+    SceneManager.goto(Scene_Load);
+}
+
+/** go to new game menu */
+MATTIE.menus.toNewMenu = function(){
+    DataManager.setupNewGame();
+    SceneManager.goto(Scene_Map);
+}
+
+/**
+ * load a save id and then go to the map
+ */
+MATTIE.menus.loadGameAndGoTo = function(id){
+    DataManager.loadGame(id);
+    $gameSystem.onAfterLoad();
+    SceneManager.goto(Scene_Map);
+}
+

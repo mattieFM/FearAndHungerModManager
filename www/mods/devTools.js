@@ -2,9 +2,9 @@
 
 var MATTIE = MATTIE || {};
 MATTIE.devTools = MATTIE.devTools || {};
-
+//
 (()=>{
-    Input.addKeyBind('i', ()=>{
+    Input.addKeyBind('-', ()=>{
         MATTIE.devTools.switchCheatScene();
     }, "CHEAT")
     

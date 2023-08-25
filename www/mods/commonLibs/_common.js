@@ -6,7 +6,8 @@ MATTIE.TextManager = MATTIE.TextManager || {};
 MATTIE.CmdManager = MATTIE.CmdManager || {};
 MATTIE.modLoader = MATTIE.modLoader || {};
 MATTIE.menus.mainMenu = MATTIE.menus.mainMenu || {};
-
+MATTIE.global = MATTIE.global || {};
+MATTIE.global.version = 1;
 MATTIE.isDev = true;
 MATTIE.GameInfo = {};
 MATTIE.GameInfo.getDifficulty = (data=$gameSwitches)=>{
@@ -68,9 +69,15 @@ MATTIE.DataManager.makeSaveContentsFromParam = function(data){
  * @returns full game data of that save
  */
 MATTIE.DataManager.loadAndReturnSave = function(index){
-    var saveJson = StorageManager.load(index)
-    var saveData = MATTIE.DataManager.extractAndReturnSaveContents(JsonEx.parse(saveJson));
-    return saveData;
+    try {
+        var saveJson = StorageManager.load(index)
+        var saveData = MATTIE.DataManager.extractAndReturnSaveContents(JsonEx.parse(saveJson)); 
+        return saveData;
+    } catch (error) {
+        return null
+    }
+    
+    
 }
 /**
  * @description make save file info from param

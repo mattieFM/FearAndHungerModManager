@@ -12,7 +12,9 @@ var MATTIE = MATTIE || {};
         $gameTemp.reserveCommonEvent(152);
     });
 
-    
+    DataManager.changeActivationCondition(MATTIE.static.skills.bloodportal,2);
+    DataManager.clearEffects(MATTIE.static.skills.bloodportal);
+    DataManager.addEffect(MATTIE.static.skills.bloodportal,DataManager.buildCommonEventEffect(MATTIE.static.commonEvents.bloodportal.id));
 })();
 
 
