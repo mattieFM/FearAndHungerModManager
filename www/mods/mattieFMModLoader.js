@@ -23,12 +23,34 @@
 
 var MATTIE_ModManager = MATTIE_ModManager || {};
 var MATTIE = MATTIE || {};
+
+MATTIE.global = MATTIE.global || {};
 MATTIE.menus = MATTIE.menus || {};
 MATTIE.windows = MATTIE.windows || {};
 MATTIE.scenes = MATTIE.scenes || {};
 MATTIE.TextManager = MATTIE.TextManager || {};
 MATTIE.CmdManager = MATTIE.CmdManager || {};
 MATTIE.menus.mainMenu = MATTIE.menus.mainMenu || {};
+
+MATTIE.global.checkGameVersion = function(){
+    let version = $dataSystem.gameTitle.includes("termina")? 2 : 1;
+    MATTIE.global.version = version
+    return version;
+}
+
+MATTIE.DataManagerLoaddatabase =DataManager.loadDatabase;
+DataManager.loadDatabase = function() {
+    MATTIE.DataManagerLoaddatabase.call(this);
+    let int = setInterval(() => {
+        if(DataManager.isDatabaseLoaded()){
+            MATTIE.global.checkGameVersion();
+            MATTIE.static.update();
+            clearInterval(int);
+        }
+    }, 50);
+    
+    
+};
 
 class ModManager {
     constructor(path) {
@@ -320,12 +342,12 @@ class ModManager {
         });
     };
 }
+
 MATTIE_ModManager.init =
 function () {
     const defaultPath = PluginManager._path;
         const path = "mods/";
         const commonLibsPath = path+"commonLibs/";
-        
         const modManager = new ModManager(path);
         MATTIE_ModManager.modManager = modManager;
         modManager.generateDefaultJsonForModsWithoutJsons();
@@ -333,6 +355,7 @@ function () {
         const commonMods = modManager.parseMods(commonLibsPath)
         setTimeout(() => {
             new Promise(res=>{
+                
                 PluginManager._path = commonLibsPath;
                 commonModManager.setup(commonMods);
                 window.alert("mod loader successfully initialized")
@@ -340,15 +363,18 @@ function () {
                 PluginManager._path = defaultPath
                 res();
             }).then(()=>{
-                PluginManager._path = path;
-                const mods = modManager.parseMods(path); //fs is in a different root dir so it needs this.
-                console.info(mods)
-                modManager.setup(mods); //all mods load after plugins
+                setTimeout(() => {
+                    PluginManager._path = path;
+                    const mods = modManager.parseMods(path); //fs is in a different root dir so it needs this.
+                    console.info(mods)
+                    modManager.setup(mods); //all mods load after plugins
+                    
+                    PluginManager._path = defaultPath;
+                }, 2000);
                 
-                PluginManager._path = defaultPath;
-               
+                
             })
-        }, 500);
+        }, 10);
         
 
 }
