@@ -90,6 +90,11 @@ class HostController extends BaseNetController {
             this.onReadyData(data.ready, data.id);
             this.distributeReadyEventToClients(data.ready,data.id);
         }
+
+        if(data.turnEnd){
+            this.onTurnEndData(data.turnEnd, data.id);
+            //this.distributeTurnEndDataToClients();
+        }
     }
 
     hostOnEventMoveEventData(data,peerId){
@@ -197,6 +202,10 @@ class HostController extends BaseNetController {
         this.sendAll(this.generateTransDataForClients(transData,id),[id])
     }
 
+      distributeTurnEndDataToClients(data,id){
+        this.sendAll(data,[id])
+    }
+
     /**
      * generates an movedata obj in the format client needs
      * @param {number} moveData win4 move data
@@ -277,6 +286,12 @@ class HostController extends BaseNetController {
     onBattleEndEvent(battleEndObj){
         battleEndObj.id = this.peerId;
         this.sendAll(battleEndObj);
+    }
+
+    //send all clients the turn end event
+    onTurnEndEvent(obj){
+        obj.id = this.peerId;
+        this.sendAll(obj);
     }
 
     distributeBattleEndToClients(battleEndObj, senderId){

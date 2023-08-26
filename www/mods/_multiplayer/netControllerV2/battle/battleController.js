@@ -26,6 +26,17 @@ class BattleController extends EventEmitter {
         MATTIE.multiplayer.currentBattleEvent.setReadyIfExists( MATTIE.multiplayer.getCurrentNetController().peerId,0);
         MATTIE.multiplayer.getCurrentNetController().onReadyEvent(obj);
     }
+
+
+    emitTurnEndEvent(){
+        this.emit("turnEnd");
+        var obj = {};
+        obj.turnEnd = {};
+        obj.turnEnd.enemyHps = $gameTroop._enemies.map(enemy=>{return enemy._hp});
+        obj.turnEnd.enemyStates = $gameTroop._enemies.map(enemy=>{return enemy.states().map(state=>state.id)});
+        console.log(obj)
+        MATTIE.multiplayer.getCurrentNetController().onTurnEndEvent(obj);
+    }
 }
 
 

@@ -21,6 +21,65 @@ class BaseNetController extends EventEmitter {
 
     }
 
+    /**left blank by default ment to be overriden by host and client */
+    onTurnEndEvent(obj){
+
+    }
+
+    /**
+     * 
+     * @param {*} data the turnEnd obj, for now just contains an array of enemy healths
+     */
+    onTurnEndData(data){
+        console.log("incomingdata"+data)
+        console.log("on turn end data");
+        let enemyHealthArr = data.enemyHps;
+        let enemyStatesArr = data.enemyStates;
+        this.syncEnemyHealths(enemyHealthArr);
+        this.syncEnemyStates(enemyStatesArr);
+    }
+
+    syncActorHealths(){
+
+    }
+
+    syncEnemyStates(enemyStatesArr){
+        for (let index = 0; index < $gameTroop._enemies.length; index++) {
+            const enemy = $gameTroop._enemies[index];
+            let netStates = enemyStatesArr[index];
+                netStates.forEach(state => {
+                    if(!enemy.isStateAffected(state)){
+                        console.log("added state")
+                        $gameTroop._enemies[index].addState(state);
+                    }
+                });
+           
+        }
+    }
+
+    syncEnemyHealths(enemyHealthArr){
+        for (let index = 0; index < $gameTroop._enemies.length; index++) {
+            const enemy = $gameTroop._enemies[index];
+            let orgHp = enemy._hp;
+            $gameTroop._enemies[index].setHp(Math.min(enemy._hp,enemyHealthArr[index]));
+            //enemy.performDamage();
+            if(orgHp > 0 && enemy._hp <= 0) {
+                let ids = MATTIE.multiplayer.currentBattleEvent.getIdsInCombatWithExSelf();
+                if(ids){
+                    if(ids.length > 0){
+                        this.netPlayers[ids[parseInt(Math.random()*ids.length)]].battleMembers()[0].performAttack();
+                    }
+                }
+                
+                enemy.addState(enemy.deathStateId());
+                enemy.performCollapse();
+                enemy.hide();
+            }
+
+           
+        }
+    }
+
 
     /**left blank by default ment to be overriden by host and client */
     onReadyEvent(obj){

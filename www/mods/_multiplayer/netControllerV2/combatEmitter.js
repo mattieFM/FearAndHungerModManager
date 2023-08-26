@@ -175,8 +175,10 @@ Game_Action.prototype.setNetPartyId = function(id){
         case 'turnEnd':
             this.updateTurnEnd();
             MATTIE.multiplayer.BattleController.emitUnreadyEvent();
+            MATTIE.multiplayer.BattleController.emitTurnEndEvent();
             break;
         case 'battleEnd':
+            MATTIE.multiplayer.BattleController.emitTurnEndEvent();
             this.updateBattleEnd();
             break;
         }
