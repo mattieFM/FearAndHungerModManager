@@ -1,7 +1,7 @@
 /**
  * @using peerJs from /dist/peerjs.min.js
  */
-
+//
 var MATTIE = MATTIE || {};
 MATTIE.multiplayer = MATTIE.multiplayer || {}
 MATTIE.menus.multiplayer = MATTIE.menus.multiplayer || {};
@@ -116,7 +116,7 @@ MATTIE.menus.multiplayer.openLobby = () => {
 }
 
 MATTIE.menus.multiplayer.openGame = () => {
-    SceneManager.goto(Scene_Load)
+    SceneManager.goto(MATTIE.scenes.multiplayer.startGame)
 }
 
 MATTIE.multiplayer.getCurrentNetController = ()=>{

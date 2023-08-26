@@ -397,6 +397,12 @@ MATTIE.multiplayer.sceneBattleOk = Scene_Battle.prototype.onActorOk;
 Scene_Battle.prototype.onActorOk = function() {
     console.log(this._actorWindow.index());
     if(this._actorWindow.index()+1 <= MATTIE.multiplayer.multiCombat.maxItems.call(this._actorWindow)){
+        var action = BattleManager.inputtingAction();
+        let playersIds = MATTIE.multiplayer.currentBattleEvent.getIdsInCombatWithExSelf();
+        let netCont = MATTIE.multiplayer.getCurrentNetController();
+        console.log(action);
+        let id = playersIds[this._actorWindow.currentid-1] ? playersIds[this._actorWindow.currentid-1] :  netCont.peerId;
+        action.setNetPartyId(id);
         MATTIE.multiplayer.sceneBattleOk.call(this);
         this.resetParty();
         this.refreshParties();
@@ -406,6 +412,7 @@ Scene_Battle.prototype.onActorOk = function() {
         this.selectActorSelection();
         console.log("custom command selected")
     }
+    
 };
 
 
