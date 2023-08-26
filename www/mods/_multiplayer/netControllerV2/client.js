@@ -93,6 +93,11 @@ class ClientController extends BaseNetController {
             let id = data.ready.id;
             this.onReadyData(data.ready, id);
         }
+
+        if(data.turnEnd){
+            this.onTurnEndData(data.turnEnd, data.id);
+            //this.distributeTurnEndDataToClients();
+        }
     }
 
     sendHost(data){
@@ -155,6 +160,10 @@ class ClientController extends BaseNetController {
             obj.move.t=true
         }
         this.sendHost(obj)
+    }
+
+    onTurnEndEvent(obj){
+        this.sendHost(obj);
     }
 
     /**
