@@ -34,6 +34,7 @@ class BaseNetController extends EventEmitter {
         console.log("incomingdata"+data)
         console.log("on turn end data");
         let enemyHealthArr = data.enemyHps;
+        let actorDataArr = data.actorData;
         let enemyStatesArr = data.enemyStates;
         this.syncEnemyHealths(enemyHealthArr);
         this.syncEnemyStates(enemyStatesArr);

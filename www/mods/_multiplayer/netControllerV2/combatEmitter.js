@@ -127,7 +127,11 @@ Game_Action.prototype.makeTargets = function() {
     }
 
     if(this.netPartyId) {//host targeting net player
-        let netParty = MATTIE.multiplayer.getCurrentNetController().netPlayers[this.netPartyId].battleMembers();
+        let net = MATTIE.multiplayer.getCurrentNetController().netPlayers[this.netPartyId];
+        let netParty = []
+        if(net){
+            netParty = net.battleMembers();
+        }
         return netParty;
     }
     return MATTIE.maketargets.call(this);
