@@ -93,13 +93,11 @@ Game_CharacterBase.prototype.inCombat = function () {
 }
 
 Game_CharacterBase.prototype.addIdToCombatArr = function (id) {
-    console.log(id);
     if(this._combatants)
     this._combatants[id] = 0;
     else{
     this._combatants = {};
     this._combatants[id] = 0;
-    console.log(this._combatants);
 
     }
 

@@ -82,10 +82,8 @@ BattleManager.startTurn = function() {
         }
         this._actionBattlers = battlerArray;
         var battler = this._actionBattlers.shift();
-        console.log(battler);
         if (!battler) return null;
         if (battler.isAlive()) {
-          console.log("returned");
             this._performedBattlers.push(battler);
             return battler;
         }
@@ -124,13 +122,11 @@ Game_Battler.prototype.forceAction = function(skillId, targetIndex, forcedTarget
 MATTIE.maketargets = Game_Action.prototype.makeTargets
 /** override make targets to return forced target if we need */
 Game_Action.prototype.makeTargets = function() {
-    if(this.forcedTargets) {
-        console.log("forced targets thrown");
+    if(this.forcedTargets) { //net player targetting someone
         return this.forcedTargets;
     }
 
-    if(this.netPartyId) {
-        console.log("local targeting net");
+    if(this.netPartyId) {//host targeting net player
         let netParty = MATTIE.multiplayer.getCurrentNetController().netPlayers[this.netPartyId].battleMembers();
         return netParty;
     }
@@ -152,7 +148,6 @@ Game_Action.prototype.setNetPartyId = function(id){
         switch (this._phase) {
         case 'start':
             this.startInput();
-            console.log("start case")
             break;
         case 'ready':
             //allow 'un-reading' to go back to previous state.
@@ -164,32 +159,25 @@ Game_Action.prototype.setNetPartyId = function(id){
             break;
         case 'turn':
             this.updateTurn();
-            console.log("update turn case:\n" + this._actionList)
             break;
         case 'action':
             this.updateAction();
-            console.log("update turn case")
             break;
         case 'phaseChange':
             this.updatePhase();
-            console.log("update phase case")
             break;
         case 'actionList':
             this.updateActionList()
-            console.log("action list case")
             break;
         case 'actionTargetList':
             this.updateActionTargetList()
-            console.log("action list target case")
             break;
         case 'turnEnd':
             this.updateTurnEnd();
             MATTIE.multiplayer.BattleController.emitUnreadyEvent();
-            console.log("turn end case")
             break;
         case 'battleEnd':
             this.updateBattleEnd();
-            console.log("battle end case")
             break;
         }
     }
