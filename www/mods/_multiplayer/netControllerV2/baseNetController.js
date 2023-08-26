@@ -38,24 +38,20 @@ class BaseNetController extends EventEmitter {
         if(readyObj.actions){
             let actions = JSON.parse(readyObj.actions);
             actions.forEach(action => {
-                /** @type {Game_Actor} */
-                let actor = this.netPlayers[senderId].$netActors.baseActor(action._subjectActorId);
-                if(action.netPartyId){
-                    console.log(action.netPartyId);
-                    console.log(this.peerId);
-                    console.log(action.netPartyId == this.peerId);
-                    if(action.netPartyId != this.peerId){
-                        action.forcedTargets = [];
-                        console.log(action);
-                        console.log(action.netPartyId);
-                        console.log(this.netPlayers[action.netPartyId]);
-                        console.log(this.netPlayers);
-                        let targetedNetParty = this.netPlayers[action.netPartyId].battleMembers()
-                        action.forcedTargets.push(targetedNetParty[action._targetIndex])
+                if(action){
+                    /** @type {Game_Actor} */
+                    let actor = this.netPlayers[senderId].$netActors.baseActor(action._subjectActorId);
+                    if(action.netPartyId){
+                        if(action.netPartyId != this.peerId){
+                            action.forcedTargets = [];
+                            let targetedNetParty = this.netPlayers[action.netPartyId].battleMembers()
+                            action.forcedTargets.push(targetedNetParty[action._targetIndex])
+                        }
                     }
+                    actor.setCurrentAction(action);
+                    BattleManager.addNetActionBattler(actor);
                 }
-                actor.setCurrentAction(action);
-                BattleManager.addNetActionBattler(actor);
+                
             });
         }
         
@@ -163,6 +159,7 @@ class BaseNetController extends EventEmitter {
     onBattleEndData(battleEndObj, id){ //take the battleEndObj and set that enemy as "out of combat" with id
             if(battleEndObj.mapId == $gameMap.mapId()){
                 if(MATTIE.multiplayer.devTools.enemyHostLogger) console.debug("net event battle end --on enemy host");
+                console.debug("net player left event");
                 var event = $gameMap.event(battleEndObj.eventId);
                 event.removeIdFromCombatArr(id);
                 if(!event.inCombat()) setTimeout(() => event.unlock(), MATTIE.multiplayer.runTime);

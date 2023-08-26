@@ -30,6 +30,7 @@ TextManager.viewNextParty = "view next party"
 
 
 Scene_Battle.prototype.createAllWindows = function() {
+    MATTIE.multiplayer.multiCombat.netPlayerOffset = 0; //reset the offset anytime we create a new scene
     MATTIE.windows.multicombat_SceneBattleOrg.call(this);
 
     this._textWindow = new MATTIE.windows.multiplayer.multiCombat.allyCount(0,0,155,75);
@@ -72,11 +73,18 @@ Spriteset_Battle.prototype.removeNetBattler = function(index) {
     console.log(this._battleField.removeChild(val));
 }
 
+
+Sprite_Actor.prototype.setNet = function(){
+    this.isNet = true;
+}
+
 Spriteset_Battle.prototype.addNetBattler = function(actor) {
     if(!this._netActorSprites) this._netActorSprites = [];
     if(!this._netActors) this._netActors = [];
     actor.forceIndex(this._netActorSprites.length);
-    let sprite = new Sprite_Actor(actor);
+    let sprite = new Sprite_Actor();
+    sprite.setNet();
+    sprite.setBattler(actor);
     MATTIE.multiplayer.multiCombat.netPlayerOffset = $gameParty.battleMembers().length;
     if(MATTIE.multiplayer.devTools.shouldTint) {
         if(!MATTIE.multiplayer.devTools.consistentTint){
@@ -149,7 +157,7 @@ Spriteset_Battle.prototype.update = function(){
 }
 
 Sprite_Actor.prototype.setActorHome = function (index) {
-    index += MATTIE.multiplayer.multiCombat.netPlayerOffset;
+    if(this.isNet) index += MATTIE.multiplayer.multiCombat.netPlayerOffset;
     console.log(MATTIE.multiplayer.multiCombat.netPlayerOffset);
     let colNum = index % MATTIE.multiplayer.multiCombat.maxAlliesPerRow;
     let rowNum = Math.floor(index/MATTIE.multiplayer.multiCombat.maxAlliesPerRow)
