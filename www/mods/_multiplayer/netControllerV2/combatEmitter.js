@@ -110,9 +110,36 @@ BattleManager.startTurn = function() {
     this._actionBattlers.splice.apply(this._actionBattlers, [4, 0].concat(this._netActionBattlers));
   }
   Game_Battler.prototype.setCurrentAction = function(action) {
-    console.log(action);
-    this.forceAction(action._item._itemId,action._targetIndex);
+    this.forceAction(action._item._itemId,action._targetIndex, action.forcedTargets);
+    if(action._item._dataClass==="item") this._actions[this._actions.length-1].setItem(action._item._itemId)
+
 };
+MATTIE.forceAction = Game_Battler.prototype.forceAction;
+Game_Battler.prototype.forceAction = function(skillId, targetIndex, forcedTargets = []) {
+    if(forcedTargets.length > 0) this.forcedTargets = forcedTargets;
+    MATTIE.forceAction.call(this, skillId, targetIndex);
+    if(forcedTargets.length > 0) this._actions[this._actions.length-1].forcedTargets = forcedTargets;
+};
+
+MATTIE.maketargets = Game_Action.prototype.makeTargets
+/** override make targets to return forced target if we need */
+Game_Action.prototype.makeTargets = function() {
+    if(this.forcedTargets) {
+        console.log("forced targets thrown");
+        return this.forcedTargets;
+    }
+
+    if(this.netPartyId) {
+        console.log("local targeting net");
+        let netParty = MATTIE.multiplayer.getCurrentNetController().netPlayers[this.netPartyId].battleMembers();
+        return netParty;
+    }
+    return MATTIE.maketargets.call(this);
+};
+
+Game_Action.prototype.setNetPartyId = function(id){
+    this.netPartyId = id;
+}
 
   /** check that all combatants on this event are ready */
   BattleManager.checkAllPlayersReady = function(){

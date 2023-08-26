@@ -5,9 +5,13 @@ MATTIE.windows.multiplayer = MATTIE.windows.multiplayer || {};
 MATTIE.TextManager.host = "Host A Game"
 MATTIE.TextManager.join = "Join A Game"
 MATTIE.TextManager.return = "Return"
+MATTIE.TextManager.newGame = "New Game"
+MATTIE.TextManager.loadGame = "Load Game"
 MATTIE.CmdManager.host = "MATTIE_host"
 MATTIE.CmdManager.join = "MATTIE_join"
 MATTIE.CmdManager.return = "MATTIE_return"
+MATTIE.CmdManager.newGame = "MATTIE_New_Game"
+MATTIE.CmdManager.loadGame = "MATTIE_Load_Game"
 
 
 
@@ -24,7 +28,7 @@ MATTIE.scenes.multiplayer.base.prototype.create = function (){
 }
 
 MATTIE.scenes.multiplayer.base.prototype.createBackground = function() {
-    this._backSprite2 = new Sprite(ImageManager.loadBitmap("mods/_multiplayer/","multiPlayerMenu",0,true));
+    this._backSprite2 = new Sprite(ImageManager.loadBitmap("mods/_multiplayer/","multiPlayerMenu",0,true, true));
     this.addChild(this._backSprite2);
     
 };
@@ -79,7 +83,7 @@ MATTIE.scenes.multiplayer.main.prototype.addTextField = function (){
 
 MATTIE.scenes.multiplayer.main.prototype.createBackground = function() {
     this._backSprite1 = new Sprite(ImageManager.loadTitle1($dataSystem.title1Name));
-    this._backSprite2 = new Sprite(ImageManager.loadBitmap("mods/_multiplayer/","multiPlayerMenu",0,true));
+    this._backSprite2 = new Sprite(ImageManager.loadBitmap("mods/_multiplayer/","multiPlayerMenu",0,true, true));
     this.addChild(this._backSprite1);
     this.addChild(this._backSprite2);
 };
@@ -100,4 +104,20 @@ MATTIE.windows.multiplayer.main.prototype.makeCommandList = function() {
     this.addCommand(MATTIE.TextManager.host,   MATTIE.CmdManager.host);
     this.addCommand(MATTIE.TextManager.join, MATTIE.CmdManager.join);
     this.addCommand(MATTIE.TextManager.return,   MATTIE.CmdManager.return);
+};
+
+
+/**
+ * main window
+ */
+MATTIE.windows.multiplayer.startWin = function () {
+    this.initialize.apply(this, arguments);
+}
+
+MATTIE.windows.multiplayer.startWin.prototype = Object.create(Window_TitleCommand.prototype);
+MATTIE.windows.multiplayer.startWin.prototype.constructor = MATTIE.windows.multiplayer.startWin;
+
+MATTIE.windows.multiplayer.startWin.prototype.makeCommandList = function() {
+    this.addCommand(MATTIE.TextManager.newGame,   MATTIE.CmdManager.newGame);
+    this.addCommand(MATTIE.TextManager.loadGame, MATTIE.CmdManager.loadGame,DataManager.isAnySavefileExists());
 };
