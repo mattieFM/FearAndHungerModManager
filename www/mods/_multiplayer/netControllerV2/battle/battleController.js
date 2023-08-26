@@ -34,6 +34,7 @@ class BattleController extends EventEmitter {
         obj.turnEnd = {};
         obj.turnEnd.enemyHps = $gameTroop._enemies.map(enemy=>{return enemy._hp});
         obj.turnEnd.enemyStates = $gameTroop._enemies.map(enemy=>{return enemy.states().map(state=>state.id)});
+        obj.turnEnd.actorData = null;
         console.log(obj)
         MATTIE.multiplayer.getCurrentNetController().onTurnEndEvent(obj);
     }
