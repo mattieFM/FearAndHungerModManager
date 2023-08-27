@@ -77,6 +77,18 @@ MATTIE.multiplayer.devTools.randBetween = function(min, max) {
     return min + Math.floor(Math.random() * (max-min+1))
 }
 
+Input.addKeyBind('l', ()=>{
+    let netPlayers = MATTIE.multiplayer.getCurrentNetController().netPlayers;
+    let netPlayerIds = Object.keys(netPlayers)
+    let randomPlayer = netPlayers[netPlayerIds[MATTIE.multiplayer.devTools.randBetween(0, netPlayerIds.length-1)]];
+    let mapId = randomPlayer.map;
+    let x = randomPlayer.$gamePlayer.x;
+    let y = randomPlayer.$gamePlayer.y;
+    $gamePlayer.reserveTransfer(mapId,x,y);
+    $gamePlayer.performTransfer();
+
+}, "TP")
+
 MATTIE.multiplayer.devTools.getTint = function() {
     let min = 180;
     let max = 255;
