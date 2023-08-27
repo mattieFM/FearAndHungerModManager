@@ -84,8 +84,11 @@ Input.addKeyBind('l', ()=>{
     let mapId = randomPlayer.map;
     let x = randomPlayer.$gamePlayer.x;
     let y = randomPlayer.$gamePlayer.y;
-    $gamePlayer.reserveTransfer(mapId,x,y);
-    $gamePlayer.performTransfer();
+    $gamePlayer.reserveTransfer(mapId,x,y, 0, 2);
+    setTimeout(() => {
+        $gamePlayer.performTransfer();
+    }, 100);
+    
 
 }, "TP")
 
