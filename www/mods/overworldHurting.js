@@ -14,7 +14,7 @@ DataManager.setCallbackOnObj(MATTIE.static.skills.hurting, ()=>{
         if(event.page())
         if(event.page().list){
             let isEnemy = event.page().list.some(entry=>{
-                return entry.code == MATTIE.static.rpg.battleProcessingId
+                return entry.code == MATTIE.static.rpg.battleProcessingId;
             });
             console.log(isEnemy);
             if(isEnemy){
@@ -37,25 +37,6 @@ DataManager.setCallbackOnObj(MATTIE.static.skills.hurting, ()=>{
         } 
     }
     let battleEvent = getFirstBattleEvent();
-    console.log(battleEvent);
-    console.log(battleEvent.parameters[1]);
     let gameTroop = $dataTroops[battleEvent.parameters[1]];
-      /**@type {Game_Enemy} */
-    let enemies = [];
-    gameTroop.members.forEach(function(member) {
-        if ($dataEnemies[member.enemyId]) {
-            var enemyId = member.enemyId;
-            var enemy = new Game_Enemy(enemyId, x, y);
-            enemies.push(enemy);
-            enemy.die();
-            enemy.addState($dataStates[11]);
-            console.log(enemy.enemy());
-            //this does work to find the right enemy, but wtf do I do form here.
-            //somehow we need to affect the troop and make the troop dead, but I don't know how that works
-        }
-    }, this);
-
-  
-    //enemies[Math.random() * enemies.length].setHp(0)
-    console.log(gameTroop);
+    gameTroop.members[parseInt(Math.random() * gameTroop.members.length)].hidden = true
 });

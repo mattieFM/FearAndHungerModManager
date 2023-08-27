@@ -379,20 +379,53 @@ function () {
 
 }
 
-SceneManager.onError = function(e) {
+Graphics.clearCanvasFilter = function() {
+    if (this._canvas) {
+        this._canvas.style.opacity = 1;
+        this._canvas.style.filter = null;
+        this._canvas.style.webkitFilter = null;
+    }
+};
+Graphics.hideError = function() {
+    this._errorShowed = false;
+    this.eraseLoadingError();
+    this.clearCanvasFilter();
+};
+
+
+MATTIE.onError = function(e) {
     console.error(e.message);
     console.error(e.filename, e.lineno);
     try {
         this.stop();
-        Graphics.printError('Error', e.message+"\nPress Any Key To Reboot without mods");
+        Graphics.printError('Error', e.message+"<br>Press Any Key To Reboot without mods. <br> Press n to try to continue despite this error. <br><br> If you are reporting a bug, <br> include this screen with the error and what mod/mods you were using and when you were doing when the bug occurred. <br> Thanks <br> -Mattie");
         AudioManager.stopAll();
-        document.addEventListener('keydown', (()=>{
-            MATTIE_ModManager.modManager.disableAndReload();
-            MATTIE_ModManager.modManager.reloadGame();
-        }), false);
+        document.addEventListener('keydown', ((key)=>{
+            if(key.key === 'n'){
+                document.removeEventListener('keydown', arguments.callee)
+                Graphics.hideError();
+                this.resume()
+                
+            }else{
+                MATTIE_ModManager.modManager.disableAndReload();
+                MATTIE_ModManager.modManager.reloadGame();
+            }
+            
+        }), {once:true});
         
     } catch (e2) {
+        Graphics.printError('Error', e.message+"\nFUBAR");
     }
+}
+
+//error handling woooooo
+
+SceneManager.onError = function(e) {
+    MATTIE.onError.call(this,e);
+};
+
+SceneManager.catchException = function(e) {
+    MATTIE.onError.call(this,e);
 };
 
 MATTIE_ModManager.init();

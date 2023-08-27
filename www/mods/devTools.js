@@ -7,6 +7,10 @@ MATTIE.devTools = MATTIE.devTools || {};
     Input.addKeyBind('-', ()=>{
         MATTIE.devTools.switchCheatScene();
     }, "CHEAT")
+
+    Input.addKeyBind('2', ()=>{
+        SceneManager.onError(new Error("hiya im an error"))
+    }, "THROW ERROR")
     
     Input.addKeyBind('v', ()=>{
         let amount = 1;
