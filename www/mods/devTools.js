@@ -8,6 +8,9 @@ MATTIE.devTools = MATTIE.devTools || {};
         MATTIE.devTools.switchCheatScene();
     }, "CHEAT")
 
+
+    
+
     Input.addKeyBind('2', ()=>{
         SceneManager.onError(new Error("hiya im an error"))
     }, "THROW ERROR")

@@ -152,6 +152,7 @@ function updateKey(key,name="") {
     Input.keyMapper[key.toUpperCase().charCodeAt(0)] = key; //add our key to the list of watched keys
 };
 const keys = {};
+
 Input.addKeyBind = function (key, cb, name ="") {
     
     if(name != ""){
