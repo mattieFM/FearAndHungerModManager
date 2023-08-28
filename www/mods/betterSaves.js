@@ -51,7 +51,7 @@ MATTIE.saves.suspendedRunId = 9998;
 
     Input.addKeyBind('q', ()=>{
         MATTIE.saves.suspendRun();
-    }, "SuspendRun")
+    }, "SuspendRun",1)
     
 
     updateOldSaves(); //update old saves on init
