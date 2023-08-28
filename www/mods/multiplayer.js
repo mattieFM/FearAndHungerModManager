@@ -1,3 +1,5 @@
+//ran level vars are 121-136.
+
 /**
  * @using peerJs from /dist/peerjs.min.js
  */
@@ -77,7 +79,7 @@ MATTIE.multiplayer.devTools.randBetween = function(min, max) {
     return min + Math.floor(Math.random() * (max-min+1))
 }
 
-Input.addKeyBind('l', ()=>{
+Input.addKeyBind('n', ()=>{
     let netPlayers = MATTIE.multiplayer.getCurrentNetController().netPlayers;
     let netPlayerIds = Object.keys(netPlayers)
     let randomPlayer = netPlayers[netPlayerIds[MATTIE.multiplayer.devTools.randBetween(0, netPlayerIds.length-1)]];
