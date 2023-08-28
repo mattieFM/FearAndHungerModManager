@@ -151,8 +151,37 @@ function updateKeys(keys,name="") {
 function updateKey(key,name="") {
     Input.keyMapper[key.toUpperCase().charCodeAt(0)] = key; //add our key to the list of watched keys
 };
+
+/**
+ * 
+ * @param {int} scope
+ * -1 = never
+ * 0 = global
+ * 1 = on scene_map
+ * 2 = on scene_battle
+ * 3 = on scene_menu
+ */
+Input.checkScope = function(scope){
+    switch (scope) {
+        case -1:
+            return false;
+        case 0:
+            return true;
+        case 1:
+            return SceneManager._scene instanceof Scene_Map;
+        case 2:
+            return SceneManager._scene instanceof Scene_Battle;
+        case 3:
+            return SceneManager._scene instanceof Scene_Menu;
+        default:
+            return false;
+    }
+}
+
+
+
 const keys = {};
-Input.addKeyBind = function (key, cb, name ="") {
+Input.addKeyBind = function (key, cb, name ="", scope = 0) {
     
     if(name != ""){
         let tempFunc = Window_KeyConfig.prototype.actionKey;
@@ -167,7 +196,7 @@ Input.addKeyBind = function (key, cb, name ="") {
             this.addCommand(name, 'ok', true, key);
         }
     }
-    keys[key]=cb;
+    keys[key]=()=>{if(Input.checkScope(scope))cb()};
     updateKey(key, name);
 }
 MATTIE.Prev_Input_Update = Input.update;

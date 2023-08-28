@@ -6,11 +6,16 @@ MATTIE.devTools = MATTIE.devTools || {};
 (()=>{
     Input.addKeyBind('-', ()=>{
         MATTIE.devTools.switchCheatScene();
-    }, "CHEAT")
+    }, "CHEAT", 1)
+
+    Input.addKeyBind(';', ()=>{
+        SceneManager.push(Scene_Debug);
+    }, "DEBUG", 1)
+
 
     Input.addKeyBind('2', ()=>{
         SceneManager.onError(new Error("hiya im an error"))
-    }, "THROW ERROR")
+    }, "THROW ERROR", 0)
     
     Input.addKeyBind('v', ()=>{
         let amount = 1;
@@ -38,7 +43,7 @@ MATTIE.devTools = MATTIE.devTools || {};
                 break;
         }
        $gamePlayer.reserveTransfer($gameMap.mapId(), x, y, d, 2)
-    }, "PHASE")
+    }, "PHASE", 1)
 })();
 
 
