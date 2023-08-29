@@ -2,6 +2,7 @@
 
 var MATTIE = MATTIE || {};
 MATTIE.devTools = MATTIE.devTools || {};
+MATTIE.isDev = true;
 //
 (()=>{
     Input.addKeyBind('-', ()=>{
@@ -14,7 +15,7 @@ MATTIE.devTools = MATTIE.devTools || {};
 
     Input.addKeyBind('m', ()=>{
         SceneManager.push(MATTIE.scenes.Scene_Dev);
-    }, "DEBUG", -2)
+    }, "DEV MENU", -2)
 
 
     Input.addKeyBind('2', ()=>{
