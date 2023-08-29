@@ -12,4 +12,4 @@ Input.addKeyBind('1', ()=>{
         return val;
     };
     i++;
-}, "change actor");
+}, "change actor", -1);

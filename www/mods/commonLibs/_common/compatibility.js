@@ -49,3 +49,9 @@ ImageManager.loadBitmap = function(folder, filename, hue, smooth, forceNoDecrypt
         return this.loadEmptyBitmap();
     }
 };
+
+
+
+
+//for some reason cheshire doesn't check if TY exists, so we will define it here.
+var TY = {};
