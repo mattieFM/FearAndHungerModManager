@@ -5,28 +5,35 @@ MATTIE.scenes = MATTIE.scenes || {};
 MATTIE.TextManager = MATTIE.TextManager || {};
 MATTIE.CmdManager = MATTIE.CmdManager || {};
 
+/** go to the item cheat menu scene */
+MATTIE.menus.toItemCheatMenu = function(){
+    SceneManager.push(MATTIE.scenes.Scene_DevItems);
+}
+
+
 /**
- * A scene to spawn in items
+ * // Scene_DevItems
+ * @description a scene to spawn in items for dev
  * @extends Scene_Item
  */
-MATTIE.scenes.cheatMenu = function () {
+MATTIE.scenes.Scene_DevItems = function () {
     this.initialize.apply(this, arguments);
 }
 
-MATTIE.scenes.cheatMenu.prototype = Object.create(Scene_Item.prototype);
-MATTIE.scenes.cheatMenu.prototype.constructor = MATTIE.scenes.cheatMenu;
+MATTIE.scenes.Scene_DevItems.prototype = Object.create(Scene_Item.prototype);
+MATTIE.scenes.Scene_DevItems.prototype.constructor = MATTIE.scenes.Scene_DevItems;
 
-MATTIE.scenes.cheatMenu.prototype.initialize = function() {
+MATTIE.scenes.Scene_DevItems.prototype.initialize = function() {
     Scene_Item.prototype.initialize.call(this);
     this.lastItem = null;
     
 };
 
-
-MATTIE.scenes.cheatMenu.prototype.createItemWindow = function() {
+//override to use our cheatItemWin instead of the default window
+MATTIE.scenes.Scene_DevItems.prototype.createItemWindow = function() {
     var wy = this._categoryWindow.y + this._categoryWindow.height;
     var wh = Graphics.boxHeight - wy;
-    this._itemWindow = new MATTIE.windows.cheatItemWin(0, wy, Graphics.boxWidth, wh);
+    this._itemWindow = new MATTIE.windows.Window_CheatItem(0, wy, Graphics.boxWidth, wh);
     this._itemWindow.setHelpWindow(this._helpWindow);
     this._itemWindow.setHandler('ok',     this.onItemOk.bind(this));
     this._itemWindow.setHandler('cancel', this.onItemCancel.bind(this));
@@ -34,14 +41,15 @@ MATTIE.scenes.cheatMenu.prototype.createItemWindow = function() {
     this._categoryWindow.setItemWindow(this._itemWindow);
 };
 
-
-MATTIE.scenes.cheatMenu.prototype.onCategoryOk = function() {
+//override on categoryOk to work properly
+MATTIE.scenes.Scene_DevItems.prototype.onCategoryOk = function() {
     this._itemWindow.activate();
     var index = this._itemWindow._data.indexOf(this.lastItem);
     this._itemWindow.select(index >= 0 ? index : 0);
 };
 
-MATTIE.scenes.cheatMenu.prototype.onItemOk = function() {
+//override the on item function to give the player that item instead of using it.
+MATTIE.scenes.Scene_DevItems.prototype.onItemOk = function() {
     $gameParty.gainItem(this.item(), 1, false);
     this.lastItem = this.item();
     this._itemWindow.activate();
@@ -49,37 +57,44 @@ MATTIE.scenes.cheatMenu.prototype.onItemOk = function() {
 };
 
 
-MATTIE.windows.cheatItemWin = function () {
+
+
+/**
+ * Window_CheatItem
+ * @description a window that displays all items in the game, intended to be used for the cheat menu
+ * @extends Window_ItemList
+ */
+MATTIE.windows.Window_CheatItem = function () {
     this.initialize.apply(this, arguments);
 }
 
-MATTIE.windows.cheatItemWin.prototype = Object.create(Window_ItemList.prototype);
-MATTIE.windows.cheatItemWin.prototype.constructor = MATTIE.windows.cheatItemWin;
+MATTIE.windows.Window_CheatItem.prototype = Object.create(Window_ItemList.prototype);
+MATTIE.windows.Window_CheatItem.prototype.constructor = MATTIE.windows.Window_CheatItem;
 
-MATTIE.windows.cheatItemWin.prototype.initialize = function(x, y, width, height) {
+MATTIE.windows.Window_CheatItem.prototype.initialize = function(x, y, width, height) {
     Window_ItemList.prototype.initialize.call(this, x, y, width, height);
 };
-MATTIE.windows.cheatItemWin.allItems = function(){
+MATTIE.windows.Window_CheatItem.allItems = function(){
     return $dataItems.concat($dataArmors).concat($dataWeapons);
 }
 
-MATTIE.windows.cheatItemWin.prototype.isCurrentItemEnabled = function() {
+MATTIE.windows.Window_CheatItem.prototype.isCurrentItemEnabled = function() {
     return true;
 };
 
-MATTIE.windows.cheatItemWin.prototype.isEnabled = function(item) {
+MATTIE.windows.Window_CheatItem.prototype.isEnabled = function(item) {
     return true;
 };
 
-MATTIE.windows.cheatItemWin.prototype.setCategory = function(category) {
+MATTIE.windows.Window_CheatItem.prototype.setCategory = function(category) {
     if (this._category !== category) {
         this._category = category;
         this.refresh();
     }
 };
 
-MATTIE.windows.cheatItemWin.prototype.makeItemList = function() {
-    let allItems = MATTIE.windows.cheatItemWin.allItems();
+MATTIE.windows.Window_CheatItem.prototype.makeItemList = function() {
+    let allItems = MATTIE.windows.Window_CheatItem.allItems();
     this._data = allItems.filter(function(item) {
         return this.includes(item);
     }, this);
@@ -91,27 +106,26 @@ MATTIE.windows.cheatItemWin.prototype.makeItemList = function() {
 
 
 /**
+ * // Scene_OneUseCheat
  * A scene to spawn in one item and then close
- * @extends MATTIE.scenes.cheatMenu
+ * @extends MATTIE.scenes.Scene_DevItems
  */
-MATTIE.scenes.oneUseCheatMenu = function () {
+MATTIE.scenes.Scene_OneUseCheat = function () {
     this.initialize.apply(this, arguments);
 }
 
-MATTIE.scenes.oneUseCheatMenu.prototype = Object.create(MATTIE.scenes.cheatMenu.prototype);
-MATTIE.scenes.oneUseCheatMenu.prototype.constructor = MATTIE.scenes.oneUseCheatMenu;
+MATTIE.scenes.Scene_OneUseCheat.prototype = Object.create(MATTIE.scenes.Scene_DevItems.prototype);
+MATTIE.scenes.Scene_OneUseCheat.prototype.constructor = MATTIE.scenes.Scene_OneUseCheat;
 
-MATTIE.scenes.oneUseCheatMenu.prototype.initialize = function() {
-    MATTIE.scenes.cheatMenu.prototype.initialize.call(this);
+MATTIE.scenes.Scene_OneUseCheat.prototype.initialize = function() {
+    MATTIE.scenes.Scene_DevItems.prototype.initialize.call(this);
 };
 
-
-MATTIE.scenes.oneUseCheatMenu.prototype.onItemOk = function() {
-    MATTIE.scenes.cheatMenu.prototype.onItemOk.call(this);
+//override the on item ok function to give the item then return to the previous scene closing the cheat menu.
+MATTIE.scenes.Scene_OneUseCheat.prototype.onItemOk = function() {
+    MATTIE.scenes.Scene_DevItems.prototype.onItemOk.call(this);
     SceneManager.pop();
 };
-
-
 
 MATTIE.windows.emptyScrollHelpWindow  = function () {
     this.initialize.apply(this, arguments);
@@ -124,6 +138,7 @@ MATTIE.windows.emptyScrollHelpWindow.prototype.initialize = function(numLines) {
     Window_Help.prototype.initialize.call(this, numLines);
 };
 
+//a poorly written function that gives a typing affect to the text. deleting till the current text matches then typing the rest.
 MATTIE.windows.emptyScrollHelpWindow.prototype.setText = function(text) {
     this.typingActions = [];
     if(this.interval) clearInterval(this.interval);
@@ -191,15 +206,15 @@ MATTIE.scenes.emptyScroll = function () {
     this.initialize.apply(this, arguments);
 }
 
-MATTIE.scenes.emptyScroll.prototype = Object.create(MATTIE.scenes.oneUseCheatMenu.prototype);
+MATTIE.scenes.emptyScroll.prototype = Object.create(MATTIE.scenes.Scene_OneUseCheat.prototype);
 MATTIE.scenes.emptyScroll.prototype.constructor = MATTIE.scenes.emptyScroll;
 
 MATTIE.scenes.emptyScroll.prototype.initialize = function() {
-    MATTIE.scenes.oneUseCheatMenu.prototype.initialize.call(this);
+    MATTIE.scenes.Scene_OneUseCheat.prototype.initialize.call(this);
 };
 
 MATTIE.scenes.emptyScroll.prototype.create = function() {
-     MATTIE.scenes.oneUseCheatMenu.prototype.create.call(this);
+     MATTIE.scenes.Scene_OneUseCheat.prototype.create.call(this);
 };
 
 MATTIE.scenes.emptyScroll.prototype.createHelpWindow = function() {
@@ -207,4 +222,96 @@ MATTIE.scenes.emptyScroll.prototype.createHelpWindow = function() {
     this._helpWindow.setText("O Lord, Give, ");
     this.addWindow(this._helpWindow);
     this._helpWindow.refresh();
+};
+
+
+
+
+/**
+ * Scene_CheatSkill
+ * A scene that extends the skill scene intended for dev work / cheating
+ * @extends Scene_Skill
+ */
+MATTIE.scenes.Scene_DevSkill = function () {
+    this.initialize.apply(this, arguments);
+}
+
+MATTIE.scenes.Scene_DevSkill.prototype = Object.create(Scene_Skill.prototype);
+MATTIE.scenes.Scene_DevSkill.prototype.constructor = MATTIE.scenes.Scene_DevSkill;
+
+MATTIE.scenes.Scene_DevSkill.prototype.initialize = function() {
+    Scene_Skill.prototype.initialize.call(this);
+};
+
+
+//override skills display window creation to use our window
+MATTIE.scenes.Scene_DevSkill.prototype.createItemWindow = function() {
+    var wx = 0;
+    var wy = this._statusWindow.y + this._statusWindow.height;
+    var ww = Graphics.boxWidth;
+    var wh = Graphics.boxHeight - wy;
+    this._itemWindow = new MATTIE.windows.Window_DevSkillList(wx, wy, ww, wh);
+    this._itemWindow.setHelpWindow(this._helpWindow);
+    this._itemWindow.setHandler('ok',     this.onItemOk.bind(this));
+    this._itemWindow.setHandler('cancel', this.onItemCancel.bind(this));
+    this._skillTypeWindow.setSkillWindow(this._itemWindow);
+    this.addWindow(this._itemWindow);
+};
+
+//override. This is the function that actually uses the skill, cus skills are "items"
+//we want to always select an actor to teach the skill to
+MATTIE.scenes.Scene_DevSkill.prototype.determineItem = function() {
+    var action = new Game_Action(this.user());
+    var item = this.item();
+    action.setItemObject(item);
+    this.showSubWindow(this._actorWindow);
+    this._actorWindow.selectForItem(this.item());
+};
+
+
+MATTIE.scenes.Scene_DevSkill.prototype.onActorOk = function() {
+    /** @type {Game_Actor} */
+    let actor = this.user();
+    actor.learnSkill(this.item().id);
+    this.hideSubWindow(this._actorWindow);
+    this._itemWindow.activate();
+};
+
+/**
+ * Window_DevSkillList
+ * @description a window that displays all skills in the game, intended for dev use.
+ * @extends Window_SkillList
+ */
+MATTIE.windows.Window_DevSkillList = function () {
+    this.initialize.apply(this, arguments);
+}
+
+MATTIE.windows.Window_DevSkillList.prototype = Object.create(Window_SkillList.prototype);
+MATTIE.windows.Window_DevSkillList.prototype.constructor = MATTIE.windows.Window_DevSkillList;
+
+MATTIE.windows.Window_DevSkillList.prototype.initialize = function(x, y, width, height) {
+    Window_SkillList.prototype.initialize.call(this, x, y, width, height);
+};
+//override to return all skills. We return the skills with icons first
+MATTIE.windows.Window_DevSkillList.prototype.makeItemList = function() {
+    let allSkills = $dataSkills.filter((skill) => skill!=null);
+    let skillsWithIcons = allSkills.filter((skill) => skill.iconIndex != 0);
+    let skillsWithoutIcons = allSkills.filter((skill) => skill.iconIndex == 0);
+    //skillsWithIcons = skillsWithIcons.sort((skill1,skill2)=>(skill1.mpCost < skill2.mpCost)? 1 : (skill1.mpCost < skill2.mpCost)? -1: 0 ) //then sort by mp cost;
+    let orderedSkills = skillsWithIcons.concat(skillsWithoutIcons);
+    this._data = orderedSkills;
+};
+//by default this function checks against the actor to get the cost, we need to check against the skill's data instead
+MATTIE.windows.Window_DevSkillList.prototype.drawSkillCost = function(skill, x, y, width) {
+    if (skill.tpCost > 0) {
+        this.changeTextColor(this.tpCostColor());
+        this.drawText(skill.tpCost, x, y, width, 'right');
+    } else if (skill.mpCost > 0) {
+        this.changeTextColor(this.mpCostColor());
+        this.drawText(skill.mpCost, x, y, width, 'right');
+    }
+};
+//we wand all skills to be enabled
+Window_SkillList.prototype.isEnabled = function(item) {
+    return true;
 };

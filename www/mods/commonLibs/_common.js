@@ -154,7 +154,8 @@ function updateKey(key,name="") {
 
 /**
  * 
- * @param {int} scope
+ * @param {int} scope 
+ * -2 = in dev mode
  * -1 = never
  * 0 = global
  * 1 = on scene_map
@@ -173,6 +174,8 @@ Input.checkScope = function(scope){
             return SceneManager._scene instanceof Scene_Battle;
         case 3:
             return SceneManager._scene instanceof Scene_Menu;
+        case -2:
+            return MATTIE.isDev;
         default:
             return false;
     }
@@ -186,24 +189,31 @@ Input.addKeyBind = function (key, cb, name ="", scope = 0) {
     if(name != ""){
         let tempFunc = Window_KeyConfig.prototype.actionKey;
         let tempFunc2 = Window_KeyAction.prototype.makeCommandList;
+        //this is so that keys can be rebound
         Window_KeyConfig.prototype.actionKey = function(action) {
             if(action === key) return name;
             return tempFunc.call(this,action);
         }
-
+        //this is so that keys can be rebound
         Window_KeyAction.prototype.makeCommandList = function() {
             tempFunc2.call(this);
             this.addCommand(name, 'ok', true, key);
         }
     }
-    keys[key]=()=>{if(Input.checkScope(scope))cb()};
+
+    keys[name]={
+        key: key,
+        cb: ()=>{if(Input.checkScope(scope))cb()}
+    };
     updateKey(key, name);
 }
 MATTIE.Prev_Input_Update = Input.update;
     Input.update = function () {
         MATTIE.Prev_Input_Update.call(this);
-        for(var key in keys){
-            const cb = keys[key];
+        for(var name in keys){
+            let obj = keys[name]
+            let key = obj.key;
+            let cb = obj.cb;
             if(Input.isRepeated(key)){
                 cb();
             }
@@ -213,18 +223,6 @@ MATTIE.Prev_Input_Update = Input.update;
 
     console.log(MATTIE);
     MATTIE.menus.mainMenu.addBtnToMainMenu(TextManager.Mods,TextManager.Mods,
-        MATTIE.menus.toModMenu.bind(this));
-    console.log("inited")
-if(MATTIE.isDev){
-   
-    // console.log("inited")
-    
-    // Input.keyMapper[119] = "F8"
-    // keys[119] = ()=>{
-    //     if (Utils.isNwjs()) {   
-    //         require('nw.gui').Window.get().showDevTools();
-    //     }
-    // }
-}
+    MATTIE.menus.toModMenu.bind(this));
 
 // --ENGINE OVERRIDES--
