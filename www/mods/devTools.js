@@ -10,12 +10,16 @@ MATTIE.devTools = MATTIE.devTools || {};
 
     Input.addKeyBind(';', ()=>{
         SceneManager.push(Scene_Debug);
-    }, "DEBUG", 1)
+    }, "DEBUG", -2)
+
+    Input.addKeyBind('m', ()=>{
+        SceneManager.push(MATTIE.scenes.Scene_Dev);
+    }, "DEBUG", -2)
 
 
     Input.addKeyBind('2', ()=>{
         SceneManager.onError(new Error("hiya im an error"))
-    }, "THROW ERROR", 0)
+    }, "THROW ERROR", -2)
     
     Input.addKeyBind('v', ()=>{
         let amount = 1;
@@ -46,16 +50,12 @@ MATTIE.devTools = MATTIE.devTools || {};
     }, "PHASE", 1)
 })();
 
-
-
-
-
 MATTIE.devTools.switchCheatScene = function(){
-    if(SceneManager._scene instanceof MATTIE.scenes.cheatMenu){
+    if(SceneManager._scene instanceof MATTIE.scenes.Scene_DevItems){
         SceneManager.pop();
     }else{
         MATTIE.devTools.lastScene = SceneManager._scene;
-        SceneManager.push(MATTIE.scenes.cheatMenu);
+        SceneManager.push(MATTIE.scenes.Scene_DevItems);
     }
 
     
