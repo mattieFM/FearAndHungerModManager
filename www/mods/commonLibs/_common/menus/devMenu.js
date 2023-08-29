@@ -10,6 +10,9 @@ TextManager.ItemCheatTab = "Items"
 MATTIE.CmdManager.ItemCheatTab = "MATTIE_ITEM_CHEAT";
 TextManager.SkillCheatTab = "Skills"
 MATTIE.CmdManager.SkillCheatTab = "MATTIE_Skill_CHEAT";
+TextManager.ActorCheatTab = "Actors"
+MATTIE.CmdManager.ActorCheatTab = "MATTIE_ACTORS_CHEAT";
+
 
 
 
@@ -40,6 +43,7 @@ MATTIE.scenes.Scene_Dev.prototype.createCommandWindow = function(){
     this._commandWindow = new MATTIE.windows.Window_DevMenuCommand();
     this._commandWindow.setHandler(MATTIE.CmdManager.ItemCheatTab, MATTIE.scenes.Scene_Dev.prototype.onItemCheatTab.bind(this));
     this._commandWindow.setHandler(MATTIE.CmdManager.SkillCheatTab, MATTIE.scenes.Scene_Dev.prototype.onSkillCheatTab.bind(this));
+    this._commandWindow.setHandler(MATTIE.CmdManager.ActorCheatTab, MATTIE.scenes.Scene_Dev.prototype.onActorCheatTab.bind(this));
     this._commandWindow.setHandler("cancel", ()=>SceneManager.pop());
     this.addWindow(this._commandWindow);
 }
@@ -50,6 +54,10 @@ MATTIE.scenes.Scene_Dev.prototype.onItemCheatTab = function(){
 }
 MATTIE.scenes.Scene_Dev.prototype.onSkillCheatTab = function(){
     SceneManager.push(MATTIE.scenes.Scene_DevSkill);
+}
+
+MATTIE.scenes.Scene_Dev.prototype.onActorCheatTab = function(){
+    SceneManager.push(MATTIE.scenes.Scene_DevActors);
 }
 
 
@@ -78,4 +86,5 @@ MATTIE.windows.Window_DevMenuCommand.prototype.windowWidth = function() {
 MATTIE.windows.Window_DevMenuCommand.prototype.makeCommandList = function() {
     this.addCommand(TextManager.ItemCheatTab, MATTIE.CmdManager.ItemCheatTab, true);
     this.addCommand(TextManager.SkillCheatTab, MATTIE.CmdManager.SkillCheatTab, true);
+    this.addCommand(TextManager.ActorCheatTab, MATTIE.CmdManager.ActorCheatTab, true);
 };

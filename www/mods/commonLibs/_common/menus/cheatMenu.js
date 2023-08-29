@@ -315,3 +315,134 @@ MATTIE.windows.Window_DevSkillList.prototype.drawSkillCost = function(skill, x, 
 Window_SkillList.prototype.isEnabled = function(item) {
     return true;
 };
+
+
+/**
+ * Scene_DevActors
+ * @description a scene to spawn in or remove actors
+ * @extends Scene_MenuBase
+ */
+MATTIE.scenes.Scene_DevActors = function () {
+    this.initialize.apply(this, arguments);
+}
+
+MATTIE.scenes.Scene_DevActors.prototype = Object.create(Scene_MenuBase.prototype);
+MATTIE.scenes.Scene_DevActors.prototype.constructor = MATTIE.scenes.Scene_DevActors;
+
+MATTIE.scenes.Scene_DevActors.prototype.initialize = function() {
+    Scene_MenuBase.prototype.initialize.call(this);
+};
+
+MATTIE.scenes.Scene_DevActors.prototype.create = function() {
+    Scene_MenuBase.prototype.create.call(this);
+    for (let index = 0; index < $dataActors.length; index++) {
+        $gameActors.actor(index);
+    }
+    this._actorWindow = new MATTIE.windows.Window_AllStatus(0,0);
+    this._actorWindow.loadImages();
+    this._actorWindow.reserveFaceImages()
+    this._actorWindow.setFormationMode(false);
+    this._actorWindow.selectLast();
+    this._actorWindow.activate();
+    this._actorWindow.refresh();
+    this.addWindow(this._actorWindow);
+    this._actorWindow.setHandler("cancel", ()=>{SceneManager.pop()})
+    this._actorWindow.setHandler("ok", MATTIE.scenes.Scene_DevActors.prototype.onActorOk.bind(this))
+};
+
+MATTIE.scenes.Scene_DevActors.prototype.onActorOk = function(){
+    let actor = $gameActors.actor(this._actorWindow.index());
+    if($gameParty.allMembers().includes(actor)){
+        $gameParty.removeActor(actor._actorId)
+    }else{
+        console.log(actor);
+        console.log($gameActors.actor(actor._actorId));
+        if(actor.hp <= 0){//resurrect actor if dead
+            actor.setHp(1);
+            actor.revive();
+        }
+        $gameParty.addActor(actor._actorId);
+    }
+    this._actorWindow.activate();
+    this._actorWindow.refresh();
+}
+
+
+/**
+ * Window_AllStatus
+ * @description a window that displays all actors
+ * @extends Window_MenuStatus
+ */
+MATTIE.windows.Window_AllStatus = function () {
+    this.initialize.apply(this, arguments);
+}
+
+MATTIE.windows.Window_AllStatus.prototype = Object.create(Window_MenuStatus.prototype);
+MATTIE.windows.Window_AllStatus.prototype.constructor = MATTIE.windows.Window_AllStatus;
+
+MATTIE.windows.Window_AllStatus.prototype.initialize = function(x,y) {
+    Window_MenuStatus.prototype.initialize.call(this,x,y);
+    this.last = 0;
+    this.refresh();
+};
+
+
+MATTIE.windows.Window_AllStatus.prototype.maxItems = function() {
+    return $dataActors.length;
+};
+
+MATTIE.windows.Window_AllStatus.prototype.drawItemImage = function(index) {
+    var actor = $gameActors.actor(index) || $gameActors.actor(15);
+    var rect = this.itemRect(index);
+    this.changePaintOpacity(actor.isBattleMember());
+    this.drawActorFace(actor, rect.x + 1, rect.y + 1, Window_Base._faceWidth, Window_Base._faceHeight);
+    this.changePaintOpacity(true);
+};
+
+MATTIE.windows.Window_AllStatus.prototype.drawItemStatus = function(index) {
+    var actor = $gameActors.actor(index) || $gameActors.actor(15);
+    var rect = this.itemRect(index);
+    var x = rect.x + 162;
+    var y = rect.y + rect.height / 2 - this.lineHeight() * 1.5;
+    var width = rect.width - x - this.textPadding();
+    this.drawActorSimpleStatus(actor, x, y, width);
+};
+
+MATTIE.windows.Window_AllStatus.prototype.processOk = function() {
+    Window_Selectable.prototype.processOk.call(this);
+    this.last = this.index();
+};
+
+MATTIE.windows.Window_AllStatus.prototype.isCurrentItemEnabled = function() {
+    if (this._formationMode) {
+        var actor = $gameActors.actor(this.index()) || $gameActors.actor(15);
+        return actor && actor.isFormationChangeOk();
+    } else {
+        return true;
+    }
+};
+
+MATTIE.windows.Window_AllStatus.prototype.selectLast = function() {
+    this.select(this.last || 0);
+};
+
+MATTIE.windows.Window_AllStatus.prototype.loadImages = function() {
+    console.log($gameActors)
+    $gameActors._data.forEach(function(actor) {
+        if(actor)
+        ImageManager.reserveFace(actor.faceName());
+    }, this);
+};
+
+MATTIE.windows.Window_AllStatus.prototype.drawActorName = function(actor, x, y, width) {
+    width = width || 168;
+    this.changeTextColor(this.hpColor(actor));
+    this.drawText(actor.name(), x-100, y+200, width);
+};
+
+MATTIE.windows.Window_AllStatus.prototype.reserveFaceImages = function() {
+    $gameActors._data.forEach(function(actor) {
+        if(actor)
+        ImageManager.reserveFace(actor.faceName());
+    }, this);
+};
