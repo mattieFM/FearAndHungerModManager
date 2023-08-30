@@ -30,14 +30,15 @@ class BaseNetController extends EventEmitter {
      * 
      * @param {*} data the turnEnd obj, for now just contains an array of enemy healths
      */
-    onTurnEndData(data){
-        console.log("incomingdata"+data)
-        console.log("on turn end data");
-        let enemyHealthArr = data.enemyHps;
-        let actorDataArr = data.actorData;
-        let enemyStatesArr = data.enemyStates;
-        this.syncEnemyHealths(enemyHealthArr);
-        this.syncEnemyStates(enemyStatesArr);
+    onTurnEndData(data, id){
+        if($gameTroop.getIdsInCombatWithExSelf().includes(id)){
+            let enemyHealthArr = data.enemyHps;
+            let actorDataArr = data.actorData;
+            let enemyStatesArr = data.enemyStates;
+            this.syncEnemyHealths(enemyHealthArr);
+            this.syncEnemyStates(enemyStatesArr);
+        }
+        
     }
 
     syncActorHealths(){
@@ -50,7 +51,6 @@ class BaseNetController extends EventEmitter {
             let netStates = enemyStatesArr[index];
                 netStates.forEach(state => {
                     if(!enemy.isStateAffected(state)){
-                        console.log("added state")
                         $gameTroop._enemies[index].addState(state);
                     }
                 });
@@ -65,7 +65,7 @@ class BaseNetController extends EventEmitter {
             $gameTroop._enemies[index].setHp(Math.min(enemy._hp,enemyHealthArr[index]));
             //enemy.performDamage();
             if(orgHp > 0 && enemy._hp <= 0) {
-                let ids = MATTIE.multiplayer.currentBattleEvent.getIdsInCombatWithExSelf();
+                let ids = $gameTroop.getIdsInCombatWithExSelf();
                 if(ids){
                     if(ids.length > 0){
                         this.netPlayers[ids[parseInt(Math.random()*ids.length)]].battleMembers()[0].performAttack();
@@ -92,6 +92,7 @@ class BaseNetController extends EventEmitter {
         let id = senderId;
         if(MATTIE.multiplayer.currentBattleEvent){
             MATTIE.multiplayer.currentBattleEvent.setReadyIfExists(id,val);
+            $gameTroop.setReadyIfExists(id,val);
         }
             
 
@@ -191,7 +192,19 @@ class BaseNetController extends EventEmitter {
     }
     
     battleEndRemoveCombatant(troopId,id){
-        console.log(troopId);
+        
+        let troopName = $dataTroops[troopId].name;
+        
+        $dataTroops.forEach(element => {
+            if(element){
+                if(element.name === troopName){
+                    if(element._combatants){
+                        delete element._combatants[id];
+                    }
+                }
+        }
+        });
+        
         $gameTroop.removeIdFromCombatArr(id);
         if($dataTroops[troopId]._combatants){
             delete $dataTroops[troopId]._combatants[id];
@@ -199,7 +212,25 @@ class BaseNetController extends EventEmitter {
     }
 
     battleStartAddCombatant(troopId,id){
-        console.log(troopId);
+        let troopName = $dataTroops[troopId].name;
+        $dataTroops.forEach(element => {
+            if(element){
+                if(element.name === troopName){
+                    if(element._combatants){
+                        element._combatants[id] = 0
+                    }else{
+                        element._combatants = {};
+                        element._combatants[id] = 0
+                    }
+                }
+        }
+
+        });
+
+        if($gameTroop.name == troopName){
+            $gameTroop.addIdToCombatArr(id)
+        }
+
         if($gameTroop._troopId == troopId){
             $gameTroop.addIdToCombatArr(id)
         } else { 
@@ -213,7 +244,6 @@ class BaseNetController extends EventEmitter {
     }
 
     onBattleStartData(battleStartObj, id){ //take the battleStartObj and set that enemy as "in combat" with id
-        console.log(id);
             if(battleStartObj.mapId == $gameMap.mapId()){
                 if(MATTIE.multiplayer.devTools.battleLogger) console.info("net event battle start --on enemy host");
                 var event = $gameMap.event(battleStartObj.eventId);
@@ -243,7 +273,7 @@ class BaseNetController extends EventEmitter {
     }
 
     onBattleEndData(battleEndObj, id){ //take the battleEndObj and set that enemy as "out of combat" with id
-        this.battleEndRemoveCombatant(battleEndObj.troopId,id);
+        this.battleEndRemoveCombatant(battleEndObj.troopId, id);
             if(battleEndObj.mapId == $gameMap.mapId()){
                 if(MATTIE.multiplayer.devTools.enemyHostLogger) console.debug("net event battle end --on enemy host");
                 console.debug("net player left event");
