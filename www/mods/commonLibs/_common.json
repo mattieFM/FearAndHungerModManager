@@ -14,7 +14,8 @@
         "_common/menus/cheatMenu",
         "_common/static",
         "_common/items",
-        "_common/optimisations"
+        "_common/optimisations",
+        "_common/menus/devMenu"
     
     ],
     "danger": false

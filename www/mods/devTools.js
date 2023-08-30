@@ -2,18 +2,28 @@
 
 var MATTIE = MATTIE || {};
 MATTIE.devTools = MATTIE.devTools || {};
+MATTIE.isDev = true;
 //
 (()=>{
     Input.addKeyBind('-', ()=>{
         MATTIE.devTools.switchCheatScene();
-    }, "CHEAT")
+    }, "CHEAT", 1)
+
+    Input.addKeyBind(';', ()=>{
+        SceneManager.push(Scene_Debug);
+    }, "DEBUG", -2)
+
+    Input.addKeyBind('m', ()=>{
+        SceneManager.push(MATTIE.scenes.Scene_Dev);
+    }, "DEV MENU", -2)
+
 
 
     
 
     Input.addKeyBind('2', ()=>{
         SceneManager.onError(new Error("hiya im an error"))
-    }, "THROW ERROR")
+    }, "THROW ERROR", -2)
     
     Input.addKeyBind('v', ()=>{
         let amount = 1;
@@ -41,19 +51,15 @@ MATTIE.devTools = MATTIE.devTools || {};
                 break;
         }
        $gamePlayer.reserveTransfer($gameMap.mapId(), x, y, d, 2)
-    }, "PHASE")
+    }, "PHASE", 1)
 })();
 
-
-
-
-
 MATTIE.devTools.switchCheatScene = function(){
-    if(SceneManager._scene instanceof MATTIE.scenes.cheatMenu){
+    if(SceneManager._scene instanceof MATTIE.scenes.Scene_DevItems){
         SceneManager.pop();
     }else{
         MATTIE.devTools.lastScene = SceneManager._scene;
-        SceneManager.push(MATTIE.scenes.cheatMenu);
+        SceneManager.push(MATTIE.scenes.Scene_DevItems);
     }
 
     

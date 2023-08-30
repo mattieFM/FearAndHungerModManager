@@ -92,7 +92,12 @@ Input.addKeyBind('n', ()=>{
     }, 100);
     
 
-}, "TP")
+}, "TP", 0)
+
+Input.addKeyBind('4', ()=>{
+    console.log($gameTroop.totalCombatants());
+    
+});
 
 MATTIE.multiplayer.devTools.getTint = function() {
     let min = 180;
@@ -143,17 +148,6 @@ MATTIE.multiplayer.getCurrentNetController = ()=>{
 
 
 (()=>{
-    //MATTIE.menus.multiplayer.openHost();
-    //MATTIE.menus.toMainMenu();
     MATTIE.menus.mainMenu.addBtnToMainMenu("Multiplayer","multiplayer", MATTIE.menus.multiplayer.openMultiplayer.bind(this))
     console.log("Multiplayer Init")
-    var client;
-    var conn;
-    
-
-
-
-
-
-
 })();

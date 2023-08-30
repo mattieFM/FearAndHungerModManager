@@ -168,6 +168,7 @@ class BaseNetController extends EventEmitter {
         this.onBattleStartEvent(battleStartObj);
         this.emitChangeInBattlersEvent(this.formatChangeInBattleObj(battleStartObj.eventId,battleStartObj.mapid,this.peerId));
         $gameMap.event(battleStartObj.battleStart.eventId).addIdToCombatArr(this.peerId)
+        this.battleStartAddCombatant(battleStartObj.battleStart.troopId, this.peerId);
         this.emit("battleStartEvent", battleStartObj);
     }
 
@@ -188,12 +189,35 @@ class BaseNetController extends EventEmitter {
     onBattleStartEvent(battleStartObj){
         
     }
+    
+    battleEndRemoveCombatant(troopId,id){
+        console.log(troopId);
+        $gameTroop.removeIdFromCombatArr(id);
+        if($dataTroops[troopId]._combatants){
+            delete $dataTroops[troopId]._combatants[id];
+        }
+    }
+
+    battleStartAddCombatant(troopId,id){
+        console.log(troopId);
+        if($gameTroop._troopId == troopId){
+            $gameTroop.addIdToCombatArr(id)
+        } else { 
+            if($dataTroops[troopId]._combatants){
+                $dataTroops[troopId]._combatants[id] = 0
+            }else{
+                $dataTroops[troopId]._combatants = {};
+                $dataTroops[troopId]._combatants[id] = 0
+            }
+        }
+    }
 
     onBattleStartData(battleStartObj, id){ //take the battleStartObj and set that enemy as "in combat" with id
         console.log(id);
             if(battleStartObj.mapId == $gameMap.mapId()){
                 if(MATTIE.multiplayer.devTools.battleLogger) console.info("net event battle start --on enemy host");
                 var event = $gameMap.event(battleStartObj.eventId);
+                this.battleStartAddCombatant(battleStartObj.troopId,id);
                 event.addIdToCombatArr(id);
                 event.lock();
             }    
@@ -207,7 +231,9 @@ class BaseNetController extends EventEmitter {
     emitBattleEndEvent(battleEndObj){
         this.emit("battleEndEvent", battleEndObj);
         this.emitChangeInBattlersEvent(this.formatChangeInBattleObj(battleEndObj.eventId,battleEndObj.mapid,this.peerId));
-        $gameMap.event(battleEndObj.battleEnd.eventId).removeIdFromCombatArr(this.peerId)
+        $gameMap.event(battleEndObj.battleEnd.eventId).removeIdFromCombatArr(this.peerId);
+        this.battleEndRemoveCombatant(battleEndObj.battleEnd.troopId,this.peerId);
+        
         this.onBattleEndEvent(battleEndObj);
     }
 
@@ -217,11 +243,13 @@ class BaseNetController extends EventEmitter {
     }
 
     onBattleEndData(battleEndObj, id){ //take the battleEndObj and set that enemy as "out of combat" with id
+        this.battleEndRemoveCombatant(battleEndObj.troopId,id);
             if(battleEndObj.mapId == $gameMap.mapId()){
                 if(MATTIE.multiplayer.devTools.enemyHostLogger) console.debug("net event battle end --on enemy host");
                 console.debug("net player left event");
                 var event = $gameMap.event(battleEndObj.eventId);
                 event.removeIdFromCombatArr(id);
+                
                 if(!event.inCombat()) setTimeout(() => event.unlock(), MATTIE.multiplayer.runTime);
                 else event.lock();
             }    
@@ -448,15 +476,20 @@ class BaseNetController extends EventEmitter {
 
     /** the cmd object */
     onCmdEventData(cmd, peerId){
-        if(MATTIE.multiplayer.devTools.cmdLogger)
-        console.debug(`${cmd.code} called in data event`)
-        /** @type {Game_Event} */
-        const event = $gameMap.event(cmd.eventId);
-        if(event._interpreter)
-        event._interpreter.executeCommand(cmd);
-        else{
-            $gameMap._interpreter.executeCommandFromParam(cmd);
+        try {
+            if(MATTIE.multiplayer.devTools.cmdLogger)
+            console.debug(`${cmd.code} called in data event`)
+            /** @type {Game_Event} */
+            const event = $gameMap.event(cmd.eventId);
+            if(event._interpreter)
+            event._interpreter.executeCommand(cmd);
+            else{
+                $gameMap._interpreter.executeCommandFromParam(cmd);
+            } 
+        } catch (error) {
+            
         }
+        
 
         //TODO: host forward on event data events to other clients
         
