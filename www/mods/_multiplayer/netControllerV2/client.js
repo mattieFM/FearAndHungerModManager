@@ -85,17 +85,6 @@ class ClientController extends BaseNetController {
     }
 
     /** 
-     * handle when the host sends an updated list of netplayers
-     * @emits updateNetPlayers
-     */
-    onUpdateNetPlayersData(netPlayers){
-        console.log("update net players")
-        this.updateNetPlayers(netPlayers)
-        this.updateNetPlayerFollowers(netPlayers);
-        this.emit('updateNetPlayers', netPlayers);
-    }
-
-    /** 
      * send's the user's player info to the host
      * used to initialize them as a player
      */

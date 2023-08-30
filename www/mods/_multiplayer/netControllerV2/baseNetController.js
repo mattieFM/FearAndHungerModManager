@@ -87,6 +87,10 @@ class BaseNetController extends EventEmitter {
         }
     }
 
+    //-----------------------------------------------------
+    //Turn End Event
+    //-----------------------------------------------------
+
     /**
      * 
      * @description emit the turnend event, sending data to connected peers.
@@ -160,6 +164,10 @@ class BaseNetController extends EventEmitter {
         }
     }
 
+    //-----------------------------------------------------
+    //Ready Event
+    //-----------------------------------------------------
+
 
     /**
      * @description trigger the ready event. This event is called when a player enters the ready state in combat.
@@ -228,6 +236,10 @@ class BaseNetController extends EventEmitter {
     }
 
 
+    //-----------------------------------------------------
+    //Move Event
+    //-----------------------------------------------------
+
     /** 
      * @descriptiona function to emit the move event for the client
      * @emits moveEvent
@@ -261,6 +273,39 @@ class BaseNetController extends EventEmitter {
         this.moveNetPlayer(moveData,id);
     }
 
+    /**
+     * @description move a net player 1 tile
+     * @param {*} moveData which direction on the key pad the player pressed, up/down/left/right as a number 8/6/4/2
+     * @param {*} id the id of the peer who's player moved
+     */
+    moveNetPlayer(moveData,id){
+        if(moveData.x){
+            if(moveData.t){
+                moveData.map = $gameMap.mapId();
+                this.transferNetPlayer(moveData,id);
+            }else{
+                this.netPlayers[id].$gamePlayer._x = moveData.x;
+                this.netPlayers[id].$gamePlayer._y = moveData.y;
+            }
+            //moveData.map = $gameMap.mapId();
+            
+            //this.transferNetPlayer(moveData,id);
+        }else{
+            try {
+                this.netPlayers[id].$gamePlayer.moveOneTile(moveData.d)
+            } catch (error) {
+                console.warn('something went wrong when moving the character' + error)
+            }
+        }
+        
+        
+    }
+
+
+    //-----------------------------------------------------
+    //Transfer Event
+    //-----------------------------------------------------
+
     /** a function to emit the move event for the client
      * @emits transferEvent
      * @param {number} direction see below:
@@ -273,6 +318,62 @@ class BaseNetController extends EventEmitter {
         this.emit("transferEvent",transferObj);
         this.sendViaMainRoute(transferObj)
     }
+
+    /**
+     *  triggers when the receiving transfer data from a netPlayer
+     * @param {*} transData x,y,map
+     * @param {*} id the peer id of the player who moved
+     */
+    onTransferData(transData,id){
+        this.transferNetPlayer(transData,id);
+    }
+
+
+         /**
+     * @description transfer a net player to a location
+     * @param {*} transData x,y,map
+     * @param {*} id the id of the peer who's player moved
+     */
+         transferNetPlayer(transData,id){
+            if(this.transferRetries <= this.maxTransferRetries){
+            try {
+                let x = transData.x;
+                let y = transData.y;
+                let map = transData.map;
+                this.netPlayers[id].setMap(map);
+                try {
+                    SceneManager._scene.updateCharacters();
+                    try {
+                        this.netPlayers[id].$gamePlayer.reserveTransfer(map, x, y, 0, 0)
+                        this.netPlayers[id].$gamePlayer.performTransfer(); 
+                    } catch (error) {
+                        console.warn('player was not on the map when transfer was called')
+                    }
+    
+                } catch (error) {
+                    console.warn('createSprites was called not on scene_map:')
+                    this.transferRetries++;
+                    setTimeout(() => {
+                        this.transferNetPlayer(transData,id)
+                    }, 500);
+                }
+                
+                
+            } catch (error) {
+                console.warn('something went wrong when transferring the character:' + error)
+            }
+        }else{
+            this.transferRetries=0;
+        }
+            
+        }
+
+
+
+
+    //-----------------------------------------------------
+    //Battle Start Event
+    //-----------------------------------------------------
 
     /**
      * @description send the battle start event to connections
@@ -296,6 +397,19 @@ class BaseNetController extends EventEmitter {
        
     }
 
+    onBattleStartData(battleStartObj, id){ //take the battleStartObj and set that enemy as "in combat" with id
+        this.battleStartAddCombatant(battleStartObj.troopId,id);
+
+        //handle all logic needed for the event tile 
+        if(battleStartObj.mapId == $gameMap.mapId()){//event tile tracking can only be done on same screen
+            if(MATTIE.multiplayer.devTools.battleLogger) console.info("net event battle start --on enemy host");
+            var event = $gameMap.event(battleStartObj.eventId);
+            event.addIdToCombatArr(id);
+            event.lock();
+        }    
+        this.emitChangeInBattlersEvent(this.formatChangeInBattleObj(battleStartObj.eventId,battleStartObj.mapid,id));
+}
+
     /** called whenever anyone enters or leaves a battle, contains the id of the player and the battle */
     emitChangeInBattlersEvent(obj){
         this.emit("battleChange",obj)
@@ -309,7 +423,11 @@ class BaseNetController extends EventEmitter {
         return obj;
     }
 
-    
+    /**
+     * @description removes a combatant to the gameTroop's combat arr. This matches based on name and id, this is to help with some of the spegetti that the dev does with battle events
+     * @param {*} troopId  
+     * @param {*} id 
+     */
     battleEndRemoveCombatant(troopId,id){
         
         let troopName = $dataTroops[troopId].name;
@@ -330,6 +448,11 @@ class BaseNetController extends EventEmitter {
         }
     }
 
+     /**
+     * @description adds a combatant to the gameTroop's combat arr. This matches based on name and id, this is to help with some of the spegetti that the dev does with battle events
+     * @param {*} troopId  
+     * @param {*} id 
+     */
     battleStartAddCombatant(troopId,id){
         let troopName = $dataTroops[troopId].name;
         $dataTroops.forEach(element => {
@@ -362,16 +485,11 @@ class BaseNetController extends EventEmitter {
         }
     }
 
-    onBattleStartData(battleStartObj, id){ //take the battleStartObj and set that enemy as "in combat" with id
-            if(battleStartObj.mapId == $gameMap.mapId()){
-                if(MATTIE.multiplayer.devTools.battleLogger) console.info("net event battle start --on enemy host");
-                var event = $gameMap.event(battleStartObj.eventId);
-                this.battleStartAddCombatant(battleStartObj.troopId,id);
-                event.addIdToCombatArr(id);
-                event.lock();
-            }    
-            this.emitChangeInBattlersEvent(this.formatChangeInBattleObj(battleStartObj.eventId,battleStartObj.mapid,id));
-    }
+
+
+    //-----------------------------------------------------
+    //Battle End Event
+    //-----------------------------------------------------
 
     /**
      * a function to emit the battle end event
@@ -392,7 +510,9 @@ class BaseNetController extends EventEmitter {
 
     onBattleEndData(battleEndObj, id){ //take the battleEndObj and set that enemy as "out of combat" with id
         this.battleEndRemoveCombatant(battleEndObj.troopId, id);
-            if(battleEndObj.mapId == $gameMap.mapId()){
+
+        //handle all logic needed for the event tile 
+            if(battleEndObj.mapId == $gameMap.mapId()){//event tile tracking can only be done on same screen
                 if(MATTIE.multiplayer.devTools.enemyHostLogger) console.debug("net event battle end --on enemy host");
                 console.debug("net player left event");
                 var event = $gameMap.event(battleEndObj.eventId);
@@ -405,24 +525,19 @@ class BaseNetController extends EventEmitter {
     }
 
 
-    /**
-     *  triggers when the receiving transfer data from a netPlayer
-     * @param {*} transData x,y,map
-     * @param {*} id the peer id of the player who moved
-     */
-    onTransferData(transData,id){
-        this.transferNetPlayer(transData,id);
-    }
+    //-----------------------------------------------------
+    //Update Net Players Event
+    //-----------------------------------------------------
 
-    /** add a new player to the list of netPlayers. */
-    initializeNetPlayer(playerInfo){
-        let name = playerInfo.name;
-        let peerId = playerInfo.peerId;
-        let actorId = playerInfo.actorId;
-        let followerIds = playerInfo.followerIds;
-        this.netPlayers[peerId] = new PlayerModel(name,actorId);
-        this.netPlayers[peerId].followerIds = followerIds;
-        this.netPlayers[peerId].setPeerId(peerId);
+    /** 
+     * handle when the host sends an updated list of netplayers
+     * @emits updateNetPlayers
+     */
+    onUpdateNetPlayersData(netPlayers){
+        console.log("update net players")
+        this.updateNetPlayers(netPlayers)
+        this.updateNetPlayerFollowers(netPlayers);
+        this.emit('updateNetPlayers', netPlayers);
     }
 
     /** updates net players
@@ -460,40 +575,16 @@ class BaseNetController extends EventEmitter {
     }
 
 
-    initEmitterOverrides(){
-        if(MATTIE.multiplayer.isActive){
-            MATTIE.multiplayer.gamePlayer.override.call(this);
-        }
+    /** add a new player to the list of netPlayers. */
+    initializeNetPlayer(playerInfo){
+        let name = playerInfo.name;
+        let peerId = playerInfo.peerId;
+        let actorId = playerInfo.actorId;
+        let followerIds = playerInfo.followerIds;
+        this.netPlayers[peerId] = new PlayerModel(name,actorId);
+        this.netPlayers[peerId].followerIds = followerIds;
+        this.netPlayers[peerId].setPeerId(peerId);
     }
-
-    /**
-     * @description move a net player 1 tile
-     * @param {*} moveData which direction on the key pad the player pressed, up/down/left/right as a number 8/6/4/2
-     * @param {*} id the id of the peer who's player moved
-     */
-    moveNetPlayer(moveData,id){
-        if(moveData.x){
-            if(moveData.t){
-                moveData.map = $gameMap.mapId();
-                this.transferNetPlayer(moveData,id);
-            }else{
-                this.netPlayers[id].$gamePlayer._x = moveData.x;
-                this.netPlayers[id].$gamePlayer._y = moveData.y;
-            }
-            //moveData.map = $gameMap.mapId();
-            
-            //this.transferNetPlayer(moveData,id);
-        }else{
-            try {
-                this.netPlayers[id].$gamePlayer.moveOneTile(moveData.d)
-            } catch (error) {
-                console.warn('something went wrong when moving the character' + error)
-            }
-        }
-        
-        
-    }
-
 
     updatePlayerInfo(){
         var actor = $gameParty.leader();
@@ -540,43 +631,18 @@ class BaseNetController extends EventEmitter {
         }
     
 
-     /**
-     * @description transfer a net player to a location
-     * @param {*} transData x,y,map
-     * @param {*} id the id of the peer who's player moved
-     */
-     transferNetPlayer(transData,id){
-        if(this.transferRetries <= this.maxTransferRetries){
-        try {
-            let x = transData.x;
-            let y = transData.y;
-            let map = transData.map;
-            this.netPlayers[id].setMap(map);
-            try {
-                SceneManager._scene.updateCharacters();
-                try {
-                    this.netPlayers[id].$gamePlayer.reserveTransfer(map, x, y, 0, 0)
-                    this.netPlayers[id].$gamePlayer.performTransfer(); 
-                } catch (error) {
-                    console.warn('player was not on the map when transfer was called')
-                }
 
-            } catch (error) {
-                console.warn('createSprites was called not on scene_map:')
-                this.transferRetries++;
-                setTimeout(() => {
-                    this.transferNetPlayer(transData,id)
-                }, 500);
-            }
-            
-            
-        } catch (error) {
-            console.warn('something went wrong when transferring the character:' + error)
-        }
-    }else{
-        this.transferRetries=0;
-    }
-        
+    //-----------------------------------------------------
+    // Control Switch Event
+    //-----------------------------------------------------
+    
+    
+    /** @emits ctrlSwitch */
+    emitSwitchEvent(ctrlSwitch){
+        let obj = {};
+        obj.ctrlSwitch = ctrlSwitch
+        this.sendViaMainRoute(obj)
+        this.emit("ctrlSwitch", obj)
     }
 
     onCtrlSwitchData(ctrlSwitch,id){
@@ -594,6 +660,10 @@ class BaseNetController extends EventEmitter {
         }
     }
 
+
+    //-----------------------------------------------------
+    // Command Event
+    //-----------------------------------------------------
 
     /** @emits commandEvent */
     emitCommandEvent(cmd){
@@ -618,22 +688,20 @@ class BaseNetController extends EventEmitter {
             } 
         } catch (error) {
             
+        } 
+    }
+
+
+    //-----------------------------------------------------
+    // MISC
+    //-----------------------------------------------------
+
+
+    initEmitterOverrides(){
+        if(MATTIE.multiplayer.isActive){
+            MATTIE.multiplayer.gamePlayer.override.call(this);
         }
-        
-
-        //TODO: host forward on event data events to other clients
-        
     }
-
-
-    /** @emits ctrlSwitch */
-    emitSwitchEvent(ctrlSwitch){
-        let obj = {};
-        obj.ctrlSwitch = ctrlSwitch
-        this.sendViaMainRoute(obj)
-        this.emit("ctrlSwitch", obj)
-    }
-
     
 }
 
