@@ -87,6 +87,7 @@ class ClientController extends BaseNetController {
             this.onBattleStartData(data.battleStart, id);
         }
         if(data.battleEnd){
+            var id = data.battleEnd.id;
             this.onBattleEndData(data.battleEnd, id);
         }
         if(data.ready){
@@ -95,7 +96,8 @@ class ClientController extends BaseNetController {
         }
 
         if(data.turnEnd){
-            this.onTurnEndData(data.turnEnd, data.id);
+            let id = data.turnEnd.id;
+            this.onTurnEndData(data.turnEnd, id);
             //this.distributeTurnEndDataToClients();
         }
     }

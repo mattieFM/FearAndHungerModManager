@@ -63,7 +63,7 @@ BattleManager.getAllPlayerActions = function () {
 }
 /** start the combat round */
 BattleManager.startTurn = function() {
-    if(MATTIE.multiplayer.currentBattleEvent.totalCombatants() == 1){ //if solo, start next phase
+    if($gameTroop.totalCombatants() == 1){ //if solo, start next phase
         MATTIE.BattleManagerStartTurn.call(this);
     }else{ //if the player is fighting with allies enter "ready" state
         this.ready();
@@ -143,7 +143,7 @@ Game_Action.prototype.setNetPartyId = function(id){
 
   /** check that all combatants on this event are ready */
   BattleManager.checkAllPlayersReady = function(){
-    return MATTIE.multiplayer.currentBattleEvent.allReady();
+    return $gameTroop.allReady();
   }
 
   //override YANFly's update function to have the ready state aswell

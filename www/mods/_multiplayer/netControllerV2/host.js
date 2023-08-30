@@ -284,18 +284,19 @@ class HostController extends BaseNetController {
     }
 
     onBattleEndEvent(battleEndObj){
-        battleEndObj.id = this.peerId;
+        battleEndObj.battleEnd.id = this.peerId;
         this.sendAll(battleEndObj);
     }
 
     //send all clients the turn end event
     onTurnEndEvent(obj){
-        obj.id = this.peerId;
+        obj.turnEnd.id = this.peerId;
         this.sendAll(obj);
     }
 
-    distributeBattleEndToClients(battleEndObj, senderId){
-
+    distributeBattleEndToClients(obj, senderId){
+        obj.turnEnd.id = senderId;
+        this.sendAll(obj);
     }
 
     distributeReadyEventToClients(readyObj, senderId){

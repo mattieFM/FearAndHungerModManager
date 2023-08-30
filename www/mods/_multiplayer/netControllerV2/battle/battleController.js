@@ -14,7 +14,7 @@ class BattleController extends EventEmitter {
         obj.ready = {};
         obj.ready.val = true;
         obj.ready.actions = actions;
-        MATTIE.multiplayer.currentBattleEvent.setReadyIfExists(MATTIE.multiplayer.getCurrentNetController().peerId,1);
+        $gameTroop.setReadyIfExists(MATTIE.multiplayer.getCurrentNetController().peerId,1);
         MATTIE.multiplayer.getCurrentNetController().onReadyEvent(obj);
     }
 
@@ -23,7 +23,7 @@ class BattleController extends EventEmitter {
         var obj = {};
         obj.ready = {};
         obj.ready.val = false;
-        MATTIE.multiplayer.currentBattleEvent.setReadyIfExists( MATTIE.multiplayer.getCurrentNetController().peerId,0);
+        $gameTroop.setReadyIfExists( MATTIE.multiplayer.getCurrentNetController().peerId,0);
         MATTIE.multiplayer.getCurrentNetController().onReadyEvent(obj);
     }
 

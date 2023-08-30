@@ -16,7 +16,6 @@ DataManager.setCallbackOnObj(MATTIE.static.skills.hurting, ()=>{
             let isEnemy = event.page().list.some(entry=>{
                 return entry.code == MATTIE.static.rpg.battleProcessingId;
             });
-            console.log(isEnemy);
             if(isEnemy){
                 let thisDist = Math.sqrt((event._x - x)**2 + (event._y - y)**2);
                 if(thisDist < dist){
