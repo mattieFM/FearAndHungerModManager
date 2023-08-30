@@ -398,20 +398,25 @@ MATTIE.onError = function(e) {
     console.error(e.filename, e.lineno);
     try {
         this.stop();
-        Graphics.printError('Error', e.message+"<br>Press Any Key To Reboot without mods. <br> Press n to try to continue despite this error. <br><br> If you are reporting a bug, <br> include this screen with the error and what mod/mods you were using and when you were doing when the bug occurred. <br> Thanks <br> -Mattie");
+        Graphics.printError('Error', e.message+"<br>Press 'Y' To Reboot without mods. <br> Press 'R' to try to continue despite this error. <br> Press 'N' to reboot with mods. <br><br> If you are reporting a bug, <br> include this screen with the error and what mod/mods you were using and when you were doing when the bug occurred. <br> Thanks <br> -Mattie");
         AudioManager.stopAll();
-        document.addEventListener('keydown', ((key)=>{
-            if(key.key === 'n'){
-                document.removeEventListener('keydown', arguments.callee)
+        let cb = ((key)=>{
+            console.log(key.key);
+            if(key.key === 'y'){
+                MATTIE_ModManager.modManager.disableAndReload();
+                MATTIE_ModManager.modManager.reloadGame();
+            } else if(key.key === 'r'){
+                document.removeEventListener('keydown', cb, false)
                 Graphics.hideError();
                 this.resume()
-                
-            }else{
-                MATTIE_ModManager.modManager.disableAndReload();
+            }
+            
+            else if (key.key === 'n'){
                 MATTIE_ModManager.modManager.reloadGame();
             }
             
-        }), {once:true});
+        })
+        document.addEventListener('keydown', cb, false);
         
     } catch (e2) {
         Graphics.printError('Error', e.message+"\nFUBAR");

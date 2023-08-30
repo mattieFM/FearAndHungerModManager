@@ -8,19 +8,19 @@ function initQuickSave (){
     Input.addKeyBind('l', ()=>{
         $gameSystem.onBeforeSave();
         DataManager.saveGame(MATTIE.quickSaves.quickSaveId,true);
-    }, "Quick Save")
+    }, "Quick Save", 0)
 
     Input.addKeyBind('o', ()=>{
         MATTIE.menus.loadGameAndGoTo(MATTIE.quickSaves.quickSaveId);
-    }, "Quick Load")
+    }, "Quick Load", 1)
 
     Input.addKeyBind('u', ()=>{
         Game_Interpreter.prototype.command352();
-    }, "Save")
+    }, "Save", 1)
 
     Input.addKeyBind('i', ()=>{
         SceneManager.push(Scene_Load);
-    }, "Load")
+    }, "Load", 1)
 
 
     //maxSavefiles

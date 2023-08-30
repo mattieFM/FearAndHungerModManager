@@ -23,6 +23,7 @@ BattleManager.endBattle = function(result) {
     var res = MATTIE.multiplayer.BattleManager_EndBattle.call(this, result);
     var obj = {};
     obj.battleEnd = MATTIE.multiplayer.currentBattleEnemy;
+    obj.battleEnd.troopId = $gameTroop._troopId;
     MATTIE.multiplayer.getCurrentNetController().emitBattleEndEvent(obj);
     MATTIE.multiplayer.inBattle = false;
     enemyLog("Battle Ended" + JSON.stringify(obj));
@@ -46,17 +47,30 @@ Game_System.prototype.onBattleEscape = function() {
 
 MATTIE.multiplayer.battleProcessing = Game_Interpreter.prototype.command301;
 Game_Interpreter.prototype.command301 = function() {
-    
+    var troopId;
+    if (!$gameParty.inBattle()) {
+        
+        if (this._params[0] === 0) {  // Direct designation
+            troopId = this._params[1];
+        } else if (this._params[0] === 1) {  // Designation with a variable
+            troopId = $gameVariables.value(this._params[1]);
+        } else {  // Same as Random Encounter
+            troopId = $gamePlayer.makeEncounterTroopId();
+        }
+    }else{
+        troopId = $gameTroop._troopId;
+    }
     MATTIE.multiplayer.battleProcessing.call(this);
     var obj = {};
     obj.battleStart = {};
     obj.battleStart.eventId = this.eventId();
     obj.battleStart.mapId = this._mapId;
+    obj.battleStart.troopId = troopId;
     MATTIE.multiplayer.currentBattleEnemy = obj.battleStart;
     MATTIE.multiplayer.currentBattleEvent = $gameMap.event(this.eventId());
     MATTIE.multiplayer.getCurrentNetController().emitBattleStartEvent(obj);
     MATTIE.multiplayer.hasImmunityToBattles = true;
-    enemyLog("Battle Processing for event #" + this.eventId() + " on map #"+this._mapId);
+    enemyLog("Battle Processing for event #" + this.eventId() + " on map #"+this._mapId + "\n with troopID: "+ troopId);
     return true;
 }
 
@@ -72,6 +86,8 @@ Game_Map.prototype.unlockEvent = function(eventId) {
         this._events[eventId].unlock();
     }
 };
+
+
 
 Game_CharacterBase.prototype.getIdsInCombatWith = function () {
     return Object.keys(this._combatants);
@@ -92,7 +108,43 @@ Game_CharacterBase.prototype.inCombat = function () {
     return this.totalCombatants() > 0;
 }
 
-Game_CharacterBase.prototype.addIdToCombatArr = function (id) {
+MATTIE.multiplayer.gameTroopSetup = Game_Troop.prototype.setup;
+Game_Troop.prototype.setup = function(troopId) {
+    MATTIE.multiplayer.gameTroopSetup.call(this, troopId);
+    console.log(this.troop()._combatants);
+    this._combatants = this.troop()._combatants || {};
+}
+Game_Troop.prototype.getIdsInCombatWithExSelf = function () {
+    let selfId = MATTIE.multiplayer.getCurrentNetController().peerId;
+    return Object.keys(this._combatants).filter(id => id!=selfId);
+}
+
+Game_Troop.prototype.totalCombatants = function () {
+    return Object.keys(this._combatants).length;
+}
+
+Game_Troop.prototype.inCombat = function () {
+    if(!this._combatants) this._combatants = {};
+    if(MATTIE.multiplayer.devTools.battleLogger) console.info("incombat. The following players are in combat with this event: " + this.totalCombatants());
+    return this.totalCombatants() > 0;
+}
+
+Game_Troop.prototype.addIdToCombatArr = function(id){
+    if(this._combatants){
+        this._combatants[id] = 0
+    } else{
+        this._combatants = {};
+        this._combatants[id] = 0;
+    }
+    
+}
+
+Game_Troop.prototype.removeIdFromCombatArr = function(id){
+    if(this._combatants)
+    delete this._combatants[id];
+}
+
+Game_CharacterBase.prototype.addIdToCombatArr = function (id, troopId = null) {
     if(this._combatants)
     this._combatants[id] = 0;
     else{
@@ -100,6 +152,7 @@ Game_CharacterBase.prototype.addIdToCombatArr = function (id) {
     this._combatants[id] = 0;
 
     }
+
 
     if(MATTIE.multiplayer.devTools.battleLogger) console.info("The following players are in combat with this event: " + this.totalCombatants());
 }
