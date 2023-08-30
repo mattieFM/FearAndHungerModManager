@@ -40,7 +40,6 @@ MATTIE.multiplayer.renderer._renderNetPlayers = function(target) {
                 this.playersSprites.push(p2Sprite);
                 netPlayer.$gamePlayer.followers().forEach(follower => {
                     let followerSprite = new Sprite_Character(follower);
-                    console.log(followerSprite);
                     follower.setTransparent(false);
                     this.playersSprites.push(followerSprite);
                 });
