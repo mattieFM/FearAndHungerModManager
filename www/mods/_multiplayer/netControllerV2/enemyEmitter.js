@@ -21,12 +21,9 @@ Game_System.prototype.onBattleStart = function() {
 MATTIE.multiplayer.BattleManager_EndBattle = BattleManager.endBattle;
 BattleManager.endBattle = function(result) {
     var res = MATTIE.multiplayer.BattleManager_EndBattle.call(this, result);
-    var obj = {};
-    obj.battleEnd = MATTIE.multiplayer.currentBattleEnemy;
-    obj.battleEnd.troopId = $gameTroop._troopId;
-    MATTIE.multiplayer.getCurrentNetController().emitBattleEndEvent(obj);
+    MATTIE.multiplayer.getCurrentNetController().emitBattleEndEvent($gameTroop._troopId, MATTIE.multiplayer.currentBattleEnemy);
     MATTIE.multiplayer.inBattle = false;
-    enemyLog("Battle Ended" + JSON.stringify(obj));
+    enemyLog("Battle Ended");
     return res;
 }
 
@@ -61,14 +58,8 @@ Game_Interpreter.prototype.command301 = function() {
         troopId = $gameTroop._troopId;
     }
     MATTIE.multiplayer.battleProcessing.call(this);
-    var obj = {};
-    obj.battleStart = {};
-    obj.battleStart.eventId = this.eventId();
-    obj.battleStart.mapId = this._mapId;
-    obj.battleStart.troopId = troopId;
-    MATTIE.multiplayer.currentBattleEnemy = obj.battleStart;
-    MATTIE.multiplayer.currentBattleEvent = $gameMap.event(this.eventId());
-    MATTIE.multiplayer.getCurrentNetController().emitBattleStartEvent(obj);
+    
+    MATTIE.multiplayer.getCurrentNetController().emitBattleStartEvent(this.eventId(), this._mapId, troopId);
     MATTIE.multiplayer.hasImmunityToBattles = true;
     enemyLog("Battle Processing for event #" + this.eventId() + " on map #"+this._mapId + "\n with troopID: "+ troopId);
     return true;

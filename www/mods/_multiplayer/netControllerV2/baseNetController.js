@@ -15,15 +15,94 @@ class BaseNetController extends EventEmitter {
 
         this.transferRetries = 0;
         this.maxTransferRetries = 10;
+    }
 
-
-
+    /**
+     * @description send a json object to the main connection.
+     * For host this will send to all, for client this will send to host.
+     * this is left blank intentionally as it is overridden by host and client
+     * @param {*} obj the object to send
+     */
+    sendViaMainRoute(obj){
 
     }
 
-    /**left blank by default ment to be overriden by host and client */
-    onTurnEndEvent(obj){
+    /**
+     * @description a function that will preprocess the data for onData, before it is read/
+     * this is overridden by host and client
+     * @param data the data that was sent
+     * @param conn the connection that is sending the data
+     */
+    preprocessData(data, conn){
+        
+    }
 
+    /**
+     * @description the main controller receiving data
+     * @param data the data obj
+     * @param conn the connection object
+     */
+    onData(data, conn){
+        data = this.preprocessData(data,conn);
+        let id = data.id;
+        if(data.updateNetPlayers){//only used by client
+            this.onUpdateNetPlayersData(data.updateNetPlayers);
+        }
+        if(data.playerInfo){ //only used by host
+            this.onPlayerInfoData(data.playerInfo);
+        }
+        if(data.startGame){ //only used by client
+            this.onStartGameData(data.startGame)
+        }
+        if(data.move){
+            this.onMoveData(data.move, id);
+        }
+        if(data.transfer){
+            this.onTransferData(data.transfer,id)
+        }
+        if(data.ctrlSwitch){
+            if(SceneManager._scene.isActive())
+            this.onCtrlSwitchData(data.ctrlSwitch, id)
+        }
+        if(data.cmd) {
+            if(SceneManager._scene.isActive())
+            this.onCmdEventData(data.cmd,data.id)
+        }
+        if(data.event){
+            if(SceneManager._scene.isActive())
+            this.onEventMoveEventData(data.event)
+        }
+        if(data.battleStart){
+            this.onBattleStartData(data.battleStart, id);
+        }
+        if(data.battleEnd){
+            this.onBattleEndData(data.battleEnd, id);
+        }
+        if(data.ready){
+            this.onReadyData(data.ready, id);
+        }
+
+        if(data.turnEnd){
+            this.onTurnEndData(data.turnEnd, id);
+        }
+    }
+
+    /**
+     * 
+     * @description emit the turnend event, sending data to connected peers.
+     * @param enemyHps {int[]} an array of ints corrispoding to the enemy hps
+     *  @param enemyHps {int[][]} an array of arrays of ints which are the state ids of the enemies
+     * @emits turnend
+     */
+    emitTurnEndEvent(enemyHps,enemyStates,actorData){
+        var obj = {};
+        obj.turnEnd = {};
+        obj.turnEnd.enemyHps = enemyHps;
+        obj.turnEnd.enemyStates = enemyStates;
+        obj.turnEnd.actorData = actorData;
+        console.log(obj)
+        this.emit("turnend")
+        this.sendViaMainRoute(obj);
     }
 
     /**
@@ -82,17 +161,45 @@ class BaseNetController extends EventEmitter {
     }
 
 
-    /**left blank by default ment to be overriden by host and client */
-    onReadyEvent(obj){
-
+    /**
+     * @description trigger the ready event. This event is called when a player enters the ready state in combat.
+     * @param {Game_Action[]} an array of the actions that the player has entered.
+     * @emits ready
+     */
+    emitReadyEvent(actions){
+        this.emit("ready")
+        var obj = {};
+        obj.ready = {};
+        obj.ready.val = true;
+        obj.ready.actions = actions;
+        $gameTroop.setReadyIfExists(MATTIE.multiplayer.getCurrentNetController().peerId,1);  //set the player as ready in combat arr
+        this.sendViaMainRoute(obj)
     }
 
+    /**
+     * @description trigger the unready event. This event is called when a player exits the ready state in combat.
+     * @emits unready
+     */
+    emitUnreadyEvent(){
+        this.emit("unready")
+        var obj = {};
+        obj.ready = {};
+        obj.ready.val = false;
+        $gameTroop.setReadyIfExists(MATTIE.multiplayer.getCurrentNetController().peerId,0); //set the player as unready in combat arr
+        this.sendViaMainRoute(obj)
+    }
+
+    /**
+     * @description handles logic for readying and unreadying in combat. 
+     * @param {*} readyObj the net obj for the ready event
+     * @param {*} senderId the sender's id
+     */
     onReadyData(readyObj, senderId){
         let val = readyObj.val;
         let id = senderId;
         if(MATTIE.multiplayer.currentBattleEvent){
-            MATTIE.multiplayer.currentBattleEvent.setReadyIfExists(id,val);
-            $gameTroop.setReadyIfExists(id,val);
+            MATTIE.multiplayer.currentBattleEvent.setReadyIfExists(id,val); //set the player as unready in combat arr @legacy
+            $gameTroop.setReadyIfExists(id,val); //set the player as unready in combat arr <- this one is actually used
         }
             
 
@@ -121,7 +228,8 @@ class BaseNetController extends EventEmitter {
     }
 
 
-    /** a function to emit the move event for the client
+    /** 
+     * @descriptiona function to emit the move event for the client
      * @emits moveEvent
      * @param {number} direction see below:
      * 8: up
@@ -130,13 +238,18 @@ class BaseNetController extends EventEmitter {
      * 2: down
      */
     emitMoveEvent(direction,x=undefined,y=undefined,transfer=false) {
-        this.onMoveEvent(direction,x,y,transfer);
         this.emit("moveEvent",direction,x,y,transfer);
-    }
-
-    /** does nothing by defualt, overridden by both host and client */
-    onMoveEvent(direction,x=undefined,y=undefined,transfer=false){
-
+        let obj = {};
+        obj.move = {};
+        obj.move.d = direction;
+        if(x){
+            obj.move.x = x;
+            obj.move.y = y;
+        }
+        if(transfer){
+            obj.move.t=true
+        }
+        this.sendViaMainRoute(obj)
     }
 
     /**
@@ -157,20 +270,30 @@ class BaseNetController extends EventEmitter {
      * 2: down
      */
     emitTransferEvent(transferObj) {
-    this.onTransferEvent(transferObj);
-    this.emit("transferEvent",transferObj);
+        this.emit("transferEvent",transferObj);
+        this.sendViaMainRoute(transferObj)
     }
 
     /**
-     * a function to emit the battle start event
-     * @param {*} battleStartObj a obj containing eventid and mapid of the battle triggered 
+     * @description send the battle start event to connections
+     * @param {*} eventId the id of the event tile the battle was triggered from 
+     * @param {*} mapId the id of the map that that tile is on
+     * @param {*} troopId the troop id that the player is now incombat with
      */
-    emitBattleStartEvent(battleStartObj){
-        this.onBattleStartEvent(battleStartObj);
-        this.emitChangeInBattlersEvent(this.formatChangeInBattleObj(battleStartObj.eventId,battleStartObj.mapid,this.peerId));
-        $gameMap.event(battleStartObj.battleStart.eventId).addIdToCombatArr(this.peerId)
-        this.battleStartAddCombatant(battleStartObj.battleStart.troopId, this.peerId);
-        this.emit("battleStartEvent", battleStartObj);
+    emitBattleStartEvent(eventId,mapId,troopId){
+        var obj = {};
+        obj.battleStart = {};
+        obj.battleStart.eventId = eventId;
+        obj.battleStart.mapId = mapId;
+        obj.battleStart.troopId = troopId;
+        MATTIE.multiplayer.currentBattleEnemy = obj.battleStart;
+        MATTIE.multiplayer.currentBattleEvent = $gameMap.event(eventId);
+        this.emit("battleStartEvent", obj);
+        this.sendViaMainRoute(obj);
+        this.emitChangeInBattlersEvent(this.formatChangeInBattleObj(obj.eventId,obj.mapid,this.peerId));
+        $gameMap.event(obj.battleStart.eventId).addIdToCombatArr(this.peerId)
+        this.battleStartAddCombatant(obj.battleStart.troopId, this.peerId);
+       
     }
 
     /** called whenever anyone enters or leaves a battle, contains the id of the player and the battle */
@@ -186,10 +309,6 @@ class BaseNetController extends EventEmitter {
         return obj;
     }
 
-    /** does nothing by default --should be overridden by host and client */
-    onBattleStartEvent(battleStartObj){
-        
-    }
     
     battleEndRemoveCombatant(troopId,id){
         
@@ -256,20 +375,19 @@ class BaseNetController extends EventEmitter {
 
     /**
      * a function to emit the battle end event
-     * @param {*} battleEndObj a obj containing eventid and mapid of the battle that has ended
+     * @param {int} troopId the id of the troop
+     * @param {obj} enemy the net obj for an enemy
      */
-    emitBattleEndEvent(battleEndObj){
-        this.emit("battleEndEvent", battleEndObj);
-        this.emitChangeInBattlersEvent(this.formatChangeInBattleObj(battleEndObj.eventId,battleEndObj.mapid,this.peerId));
-        $gameMap.event(battleEndObj.battleEnd.eventId).removeIdFromCombatArr(this.peerId);
-        this.battleEndRemoveCombatant(battleEndObj.battleEnd.troopId,this.peerId);
+    emitBattleEndEvent(troopId, enemy){
+        var obj = {};
+        obj.battleEnd = enemy;
+        obj.battleEnd.troopId = troopId;
+        this.emit("battleEndEvent", obj);
+        this.emitChangeInBattlersEvent(this.formatChangeInBattleObj(obj.eventId,obj.mapid,this.peerId));
+        $gameMap.event(obj.battleEnd.eventId).removeIdFromCombatArr(this.peerId);
+        this.battleEndRemoveCombatant(obj.battleEnd.troopId,this.peerId);
         
-        this.onBattleEndEvent(battleEndObj);
-    }
-
-    /** does nothing by default --should be overridden by host and client */
-    onBattleEndEvent(battleEndObj){
-
+        this.sendViaMainRoute(obj);
     }
 
     onBattleEndData(battleEndObj, id){ //take the battleEndObj and set that enemy as "out of combat" with id
@@ -286,10 +404,6 @@ class BaseNetController extends EventEmitter {
             this.emitChangeInBattlersEvent(this.formatChangeInBattleObj(battleEndObj.eventId,battleEndObj.mapid,id));
     }
 
-    /** does nothing by defualt, should be overridden by both host and client */
-    onTransferEvent(transferObj){
-
-    }
 
     /**
      *  triggers when the receiving transfer data from a netPlayer
@@ -401,7 +515,7 @@ class BaseNetController extends EventEmitter {
         onEventMoveEvent(event){
             let obj = {};
                 obj.event = event;
-            this.sendEventMoveEvent(obj);
+            this.sendViaMainRoute(obj);
         }
 
         onEventMoveEventData(eventData){
@@ -423,10 +537,6 @@ class BaseNetController extends EventEmitter {
 
             
            
-        }
-
-        sendEventMoveEvent(event){
-
         }
     
 
@@ -482,9 +592,6 @@ class BaseNetController extends EventEmitter {
         } else if(s==2) {
             $gameVariables.setValue(index, val,true);
         }
-        //this.sendSwitchEvent(ctrlSwitch,[id]);
-        //TODO: host forward on switch events to other clients
-
     }
 
 
@@ -492,17 +599,10 @@ class BaseNetController extends EventEmitter {
     emitCommandEvent(cmd){
         let obj = {};
         obj.cmd = cmd;
-        this.onCommandEvent(obj)
+        this.sendViaMainRoute(obj);
         this.emit("commandEvent", cmd)
     }
 
-    onCommandEvent(obj){
-        this.sendCommandEvent(obj);
-    }
-
-    sendCommandEvent(obj){
-
-    }
 
     /** the cmd object */
     onCmdEventData(cmd, peerId){
@@ -530,12 +630,8 @@ class BaseNetController extends EventEmitter {
     emitSwitchEvent(ctrlSwitch){
         let obj = {};
         obj.ctrlSwitch = ctrlSwitch
-        this.onSwitchEvent(obj)
+        this.sendViaMainRoute(obj)
         this.emit("ctrlSwitch", obj)
-    }
-
-    onSwitchEvent(obj){
-        this.sendSwitchEvent(obj);
     }
 
     

@@ -8,35 +8,37 @@ var EventEmitter = require("events");
 
 
 class BattleController extends EventEmitter {
+
+    /**
+     * @description trigger the ready event on battle controller and net controller.
+     * @param {Game_Action[]} actions an array of the actions the player is taking
+     * @emits ready
+     */
     emitReadyEvent(actions){
         this.emit("ready")
-        var obj = {};
-        obj.ready = {};
-        obj.ready.val = true;
-        obj.ready.actions = actions;
-        $gameTroop.setReadyIfExists(MATTIE.multiplayer.getCurrentNetController().peerId,1);
-        MATTIE.multiplayer.getCurrentNetController().onReadyEvent(obj);
+        MATTIE.multiplayer.getCurrentNetController().emitReadyEvent(actions);
     }
 
+    /**
+     * @description trigger the unready event on battle controller and net controller
+     * @emits unready
+     */
     emitUnreadyEvent(){
         this.emit("unready")
-        var obj = {};
-        obj.ready = {};
-        obj.ready.val = false;
-        $gameTroop.setReadyIfExists( MATTIE.multiplayer.getCurrentNetController().peerId,0);
-        MATTIE.multiplayer.getCurrentNetController().onReadyEvent(obj);
+        MATTIE.multiplayer.getCurrentNetController().emitUnreadyEvent();
     }
 
 
+    /**
+     * @description emits the turn end event on the battle controller and net controller
+     * @emits turnEnd
+     */
     emitTurnEndEvent(){
         this.emit("turnEnd");
-        var obj = {};
-        obj.turnEnd = {};
-        obj.turnEnd.enemyHps = $gameTroop._enemies.map(enemy=>{return enemy._hp});
-        obj.turnEnd.enemyStates = $gameTroop._enemies.map(enemy=>{return enemy.states().map(state=>state.id)});
-        obj.turnEnd.actorData = null;
-        console.log(obj)
-        MATTIE.multiplayer.getCurrentNetController().onTurnEndEvent(obj);
+
+        let enemyHps = $gameTroop._enemies.map(enemy=>{return enemy._hp});
+        let enemyStates = $gameTroop._enemies.map(enemy=>{return enemy.states().map(state=>state.id)});
+        MATTIE.multiplayer.getCurrentNetController().emitTurnEndEvent(enemyHps, enemyStates, null);
     }
 }
 
