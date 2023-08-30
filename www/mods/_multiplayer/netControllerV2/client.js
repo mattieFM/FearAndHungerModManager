@@ -39,10 +39,6 @@ class ClientController extends BaseNetController {
             console.info(`Attempting to connect to host at: ${this.hostId}`)
             MATTIE.multiplayer.clientController.connect();
         })
-
-        this.self.on('data', (data) => {
-            this.onData(data);
-        })
     }
 
     connect(hostId=this.hostId){
@@ -53,53 +49,27 @@ class ClientController extends BaseNetController {
             })
 
             this.conn.on("data", (data) => {
-                this.onData(data);
+                this.onData(data,this.conn);
             })
     }
 
-    onData(data){
-        if(MATTIE.multiplayer.devTools.dataLogger) console.info(data);
-        if(data.updateNetPlayers){
-            this.onUpdateNetPlayers(data.updateNetPlayers);
-        }
-        if(data.startGame){
-            this.onStartGame(data.startGame)
-        }
-        if(data.move){
-            let id = data.move.id;
-            this.onMoveData(data.move, id);
-        }
-        if(data.transfer){
-            let transfer = data.transfer.data.transfer;
-            let id = data.transfer.id;
-            this.onTransferData(transfer,id)
-        }
-        if(data.ctrlSwitch){
-            if(SceneManager._scene.isActive())
-            this.onCtrlSwitchData(data.ctrlSwitch,0)
-        }
-        if(data.event){
-            if(SceneManager._scene.isActive())
-            this.onEventMoveEventData(data.event)
-        }
-        if(data.battleStart){
-            var id = data.id;
-            this.onBattleStartData(data.battleStart, id);
-        }
-        if(data.battleEnd){
-            var id = data.battleEnd.id;
-            this.onBattleEndData(data.battleEnd, id);
-        }
-        if(data.ready){
-            let id = data.ready.id;
-            this.onReadyData(data.ready, id);
-        }
+    /**
+     * @description a function that will preprocess the data for onData.
+     * this adds the field .id equal to the host's id or the sender id
+     * @param data the data that was sent
+     * @param conn the connection that is sending the data
+     */
+    preprocessData(data, conn){
+        if(!data.id) data.id = conn.peer;
+        return data;
+    }
 
-        if(data.turnEnd){
-            let id = data.turnEnd.id;
-            this.onTurnEndData(data.turnEnd, id);
-            //this.distributeTurnEndDataToClients();
-        }
+    /**
+     * @description send a json object to the main connection. Since this is the client this will just send to host.
+     * @param {*} obj the object to send
+     */
+    sendViaMainRoute(obj){
+        this.sendHost(obj);
     }
 
     sendHost(data){
@@ -110,7 +80,7 @@ class ClientController extends BaseNetController {
      * @param {*} startGame unused var
      * @emits startGame;
      */
-    onStartGame(startGame){
+    onStartGameData(startGame){
         this.emit('startGame')
     }
 
@@ -118,7 +88,8 @@ class ClientController extends BaseNetController {
      * handle when the host sends an updated list of netplayers
      * @emits updateNetPlayers
      */
-    onUpdateNetPlayers(netPlayers){
+    onUpdateNetPlayersData(netPlayers){
+        console.log("update net players")
         this.updateNetPlayers(netPlayers)
         this.updateNetPlayerFollowers(netPlayers);
         this.emit('updateNetPlayers', netPlayers);
@@ -131,67 +102,7 @@ class ClientController extends BaseNetController {
     sendPlayerInfo(){
         let obj = {};
         obj.playerInfo = this.player.getCoreData();
-        this.sendHost(obj);
-    }
-
-    sendEventMoveEvent(obj){
-        this.sendHost(obj);
-    }
-
-    /** 
-     * send's a switch event to the host
-     */
-    sendSwitchEvent(obj){
-        this.sendHost(obj);
-    }
-
-    /**
-     * called through baseNetController and playerEmitter.
-     * sends data to the host when the player moves
-     * @param {number} direction 2 / 4 / 6 / 8 representing down right left up
-     */
-    onMoveEvent(direction,x=undefined,y=undefined,transfer=false){
-        let obj = {};
-        obj.move = {};
-        obj.move.d = direction;
-        if(x){
-            obj.move.x = x;
-            obj.move.y = y;
-        }
-        if(transfer){
-            obj.move.t=true
-        }
-        this.sendHost(obj)
-    }
-
-    onTurnEndEvent(obj){
-        this.sendHost(obj);
-    }
-
-    /**
-     * called through baseNetController and playerEmitter.
-     * sends data to the clients when the host transfers
-     * @param {Object} an obj with 3 members, x, y and map all numbers
-     */
-    onTransferEvent(transferObj){
-        this.sendHost(transferObj)
-    }
-
-    sendCommandEvent(obj){
-        this.sendHost(obj)
-    }
-
-    /** send the battle start event to the host */
-    onBattleStartEvent(battleStartObj){
-        this.sendHost(battleStartObj);
-    }
-    
-    onBattleEndEvent(battleEndObj){
-        this.sendHost(battleEndObj);
-    }
-
-    onReadyEvent(obj){
-        this.sendHost(obj)
+        this.sendViaMainRoute(obj);
     }
     
 
