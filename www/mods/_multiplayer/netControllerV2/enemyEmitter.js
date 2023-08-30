@@ -90,10 +90,12 @@ Game_Troop.prototype.setup = function(troopId) {
 }
 Game_Troop.prototype.getIdsInCombatWithExSelf = function () {
     let selfId = MATTIE.multiplayer.getCurrentNetController().peerId;
+    if(!this._combatants)this._combatants = {};
     return Object.keys(this._combatants).filter(id => id!=selfId);
 }
 
 Game_Troop.prototype.totalCombatants = function () {
+    if(!this._combatants)this._combatants = {};
     return Object.keys(this._combatants).length;
 }
 
