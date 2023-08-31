@@ -188,7 +188,7 @@ let eventAndSwitchEmitterInit = function () {
     Game_Switches.prototype.setValue = function(id,val,skipEvent=false) {
         let i = id;
         MATTIE.RPG.gameSwitchSetVal.call(this,id,val);
-        if(i !== 719 && i !== 729 && i !==815 && i !==814 && i !== 695 && i !== 247 && i !== 2434 && i !== 107 && i !== 106 && i !== 200 && i !== 246 && i !== 816)   
+        if(!MATTIE.static.switch.ignoredSwitches.includes(id))  
             if(!skipEvent){
                 let obj = {}
                 obj.i = i;
@@ -254,7 +254,7 @@ Game_Interpreter.prototype.operateVariable = function(variableId, operationType,
     Game_Variables.prototype.setValue = function (id,val, shouldSkip=false) {
         MATTIE.RPG.gameVarSetVal.call(this,id,val)
         if(MATTIE.multiplayer.isActive) {
-            if(!MATTIE.multiplayer.ignoredVars.includes(id)){ //party size check //game timer //fear check
+            if(!MATTIE.multiplayer.ignoredVars.includes(id) && !MATTIE.static.variable.ignoredVars.includes(id)){ //party size check //game timer //fear check
                 if(!shouldSkip){
                     let obj = {}
                     obj.i = key;
@@ -274,80 +274,5 @@ Game_Interpreter.prototype.operateVariable = function(variableId, operationType,
        
     }
 }
-
-//override the on map event start event
-
-
-//commands to ignore 
-// if(methodName !== "command111" && methodName !== "command411" && methodName !== "command122" && methodName !== "command356" && methodName !== "command230" && methodName !== "command108" && methodName !== "command313" && methodName !== "command121" && methodName !== "command355" && methodName !== "command117" && methodName !== "command205" && methodName !== "command322" && methodName !== "command205" && methodName !== "command322"  && methodName !== "command223"  && methodName !== "command250"  && methodName !== "command312"  && methodName !== "command315")
-//             console.log(methodName)
-
-// // If Win
-// Game_Interpreter.prototype.command601 = function() {
-//     if (this._branch[this._indent] !== 0) {
-//         this.skipBranch();
-//     }
-//     return true;
-// };
-
-// // If Escape
-// Game_Interpreter.prototype.command602 = function() {
-//     if (this._branch[this._indent] !== 1) {
-//         this.skipBranch();
-//     }
-//     return true;
-// };
-
-// // If Lose
-// Game_Interpreter.prototype.command603 = function() {
-//     if (this._branch[this._indent] !== 2) {
-//         this.skipBranch();
-//     }
-//     return true;
-// };
-
-// // Common Event
-// Game_Interpreter.prototype.command117 = function() {
-//     var commonEvent = $dataCommonEvents[this._params[0]];
-//     if (commonEvent) {
-//         var eventId = this.isOnCurrentMap() ? this._eventId : 0;
-//         this.setupChild(commonEvent.list, eventId);
-//     }
-//     return true;
-// };
-
-
-
-// // Control Variables
-// Game_Interpreter.prototype.command122 = function() {
-//     var value = 0;
-//     switch (this._params[3]) { // Operand
-//         case 0: // Constant
-//             value = this._params[4];
-//             break;
-//         case 1: // Variable
-//             value = $gameVariables.value(this._params[4]);
-//             break;
-//         case 2: // Random
-//             value = this._params[5] - this._params[4] + 1;
-//             for (var i = this._params[0]; i <= this._params[1]; i++) {
-//                 this.operateVariable(i, this._params[2], this._params[4] + Math.randomInt(value));
-//             }
-//             return true;
-//             break;
-//         case 3: // Game Data
-//             value = this.gameDataOperand(this._params[4], this._params[5], this._params[6]);
-//             break;
-//         case 4: // Script
-//             value = eval(this._params[4]);
-//             break;
-//     }
-//     for (var i = this._params[0]; i <= this._params[1]; i++) {
-//         this.operateVariable(i, this._params[2], value);
-//     }
-//     return true;
-// };
-//game switches 
-
 
 eventAndSwitchEmitterInit();

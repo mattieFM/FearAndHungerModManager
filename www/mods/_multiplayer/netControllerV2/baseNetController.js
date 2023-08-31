@@ -57,6 +57,9 @@ class BaseNetController extends EventEmitter {
         if(data.syncedVars){ //used only by client
             this.onUpdateSyncedVarsData(data.syncedVars);
         }
+        if(data.syncedSwitches){
+            this.onUpdateSyncedSwitchData(data.syncedSwitches);
+        }
         if(data.requestedVarSync){ //used only by host 
             this.emitUpdateSyncedVars();
         }
@@ -148,6 +151,7 @@ class BaseNetController extends EventEmitter {
     }
 
     syncEnemyHealths(enemyHealthArr){
+        console.log("synced healths")
         for (let index = 0; index < $gameTroop._enemies.length; index++) {
             const enemy = $gameTroop._enemies[index];
             let orgHp = enemy._hp;
@@ -680,8 +684,14 @@ class BaseNetController extends EventEmitter {
         console.log("host var sync sent")
         let obj = {};
         obj.syncedVars = {};
+        obj.syncedSwitches = {};
         MATTIE.static.variable.syncedVars.forEach(id=>{
+            console.log(id);
             obj.syncedVars[id] = $gameVariables.value(id);
+        })
+        MATTIE.static.switch.syncedSwitches.forEach(id=>{
+            console.log(id);
+            obj.syncedSwitches[id] = $gameSwitches.value(id);
         })
         this.sendViaMainRoute(obj)
         this.emit("randomVars", obj)
@@ -709,6 +719,18 @@ class BaseNetController extends EventEmitter {
         Object.keys(syncedVars).forEach(id=>{
             let val = syncedVars[id];
             $gameVariables.setValue(id,val,true); //last var as true to skip net broadcast
+        })
+    }
+
+     /**
+     * @description process the data for synced var updates
+     * @param {{id:val}[]} syncedSwitch an array of key pair values
+     */
+     onUpdateSyncedSwitchData(syncedSwitch){
+        console.log("client vars synced")
+        Object.keys(syncedSwitch).forEach(id=>{
+            let val = syncedSwitch[id];
+            $gameSwitches.setValue(id,val,true); //last var as true to skip net broadcast
         })
     }
 

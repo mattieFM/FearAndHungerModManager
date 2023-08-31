@@ -113,19 +113,23 @@ MATTIE.multiplayer.gamePlayer.override = function() {
 
 
     //extend the follower change command to emit the event we need
-    MATTIE.RPG.partyChangeCommand = Game_Interpreter.prototype.command129;
-    Game_Interpreter.prototype.command129 = function (){
-            var actor = $gameActors.actor(this._params[0]);
-            let returnVal = MATTIE.RPG.partyChangeCommand.call(this);
-            if(actor){
-                console.info("follower change event")
-                MATTIE.multiplayer.getCurrentNetController().updatePlayerInfo();
-            }
-            return returnVal;
-      
-        
-       
-    }
+    MATTIE.RPG.addActor = Game_Party.prototype.addActor;
+    MATTIE.RPG.removeActor = Game_Party.prototype.removeActor;
+    Game_Party.prototype.addActor = function(actorId) {
+        console.info("follower change event")
+        MATTIE.multiplayer.getCurrentNetController().updatePlayerInfo();
+        MATTIE.RPG.addActor.call(this,actorId)
+    };
+    
+    let removedActorIds = [];
+    Game_Party.prototype.removeActor = function(actorId) {
+        if(!removedActorIds.includes(actorId)) {
+            MATTIE.multiplayer.getCurrentNetController().updatePlayerInfo();
+            console.info("follower change event")
+        }
+        removedActorIds.push(actorId);
+        MATTIE.RPG.removeActor.call(this,actorId)
+    };
 
 
 
