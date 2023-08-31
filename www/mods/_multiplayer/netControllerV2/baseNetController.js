@@ -54,6 +54,12 @@ class BaseNetController extends EventEmitter {
         if(data.startGame){ //only used by client
             this.onStartGameData(data.startGame)
         }
+        if(data.syncedVars){ //used only by client
+            this.onUpdateSyncedVarsData(data.syncedVars);
+        }
+        if(data.requestedVarSync){ //used only by host 
+            this.emitUpdateSyncedVars();
+        }
         if(data.move){
             this.onMoveData(data.move, id);
         }
@@ -660,6 +666,51 @@ class BaseNetController extends EventEmitter {
         }
     }
 
+    //-----------------------------------------------------
+    // Update Random Vars Event
+    //-----------------------------------------------------
+
+    /**
+     * @hostOnly this should only be used by the host
+     * @description send the local synced vars to connection
+     * @param {{id:val}[]} syncedVars an array of key pair values of variables
+     * @emits randomVars
+     */
+    emitUpdateSyncedVars(){
+        console.log("host var sync sent")
+        let obj = {};
+        obj.syncedVars = {};
+        MATTIE.static.variable.syncedVars.forEach(id=>{
+            obj.syncedVars[id] = $gameVariables.value(id);
+        })
+        this.sendViaMainRoute(obj)
+        this.emit("randomVars", obj)
+    }
+
+    /**
+     * @description used by the client to request vars to be synced
+     * @emits requestedVarSync
+     */
+    emitRequestedVarSync(){
+        console.log("client  var sync requested")
+        let obj = {};
+        obj.requestedVarSync = 1;
+        this.sendViaMainRoute(obj);
+        this.emit("requestedVarSync")
+
+    }
+
+    /**
+     * @description process the data for synced var updates
+     * @param {{id:val}[]} syncedVars an array of key pair values
+     */
+    onUpdateSyncedVarsData(syncedVars){
+        console.log("client vars synced")
+        Object.keys(syncedVars).forEach(id=>{
+            let val = syncedVars[id];
+            $gameVariables.setValue(id,val,true); //last var as true to skip net broadcast
+        })
+    }
 
     //-----------------------------------------------------
     // Command Event

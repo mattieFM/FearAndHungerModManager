@@ -97,20 +97,6 @@ MATTIE.multiplayer.ignoredVars = [
 
 
 let eventAndSwitchEmitterInit = function () {
-    // MATTIE.RPG.sceneMapOnStartEvent = Game_Player.prototype.startMapEvent;
-    // Game_Player.prototype.startMapEvent = function(x, y, triggers, normal) {
-    // if (!$gameMap.isEventRunning()) {
-    //     $gameMap.eventsXy(x, y).forEach(function(event) {
-    //         if (event.isTriggerIn(triggers) && event.isNormalPriority() === normal) {
-    //             if(MATTIE.multiplayer.devTools.eventLogger)console.info(`Event Code: ${event.eventId()} triggered`)
-    //             if(MATTIE.multiplayer.devTools.eventLogger)console.info(`Event List: ${JSON.stringify(event.list())} triggered`)
-    //             event.start();
-    //         }
-    //     });
-    //     }
-        
-
-    // }
 
 
     // --dont call send parralell events --
