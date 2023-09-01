@@ -17,6 +17,10 @@ class BaseNetController extends EventEmitter {
         this.maxTransferRetries = 10;
     }
 
+    closeAllConns(){
+        
+    }
+
     /**
      * @description send a json object to the main connection.
      * For host this will send to all, for client this will send to host.
@@ -94,6 +98,9 @@ class BaseNetController extends EventEmitter {
         if(data.turnEnd){
             this.onTurnEndData(data.turnEnd, id);
         }
+        if(data.equipChange){
+            this.onEquipmentChangeData(data.equipChange,id);
+        }
     }
 
     //-----------------------------------------------------
@@ -126,15 +133,23 @@ class BaseNetController extends EventEmitter {
         if($gameTroop.getIdsInCombatWithExSelf().includes(id)){
             let enemyHealthArr = data.enemyHps;
             let actorDataArr = data.actorData;
+            let actorHealthArr = actorDataArr.map(data=>data.hp);
             let enemyStatesArr = data.enemyStates;
+            this.syncActorData(actorDataArr, id)
             this.syncEnemyHealths(enemyHealthArr);
             this.syncEnemyStates(enemyStatesArr);
-        }
-        
+        }   
     }
 
-    syncActorHealths(){
-
+    syncActorData(actorDataArr, partyId){
+        let party = this.netPlayers[partyId].battleMembers();
+        for (let index = 0; index < actorDataArr.length; index++) {
+            const actorData = actorDataArr[index];
+            const newActorHealth = actorData.hp;
+            const newActorMana = actorData.mp;
+            party[index].setHp(newActorHealth)
+            party[index].setMp(newActorMana)
+        }
     }
 
     syncEnemyStates(enemyStatesArr){
@@ -151,7 +166,6 @@ class BaseNetController extends EventEmitter {
     }
 
     syncEnemyHealths(enemyHealthArr){
-        console.log("synced healths")
         for (let index = 0; index < $gameTroop._enemies.length; index++) {
             const enemy = $gameTroop._enemies[index];
             let orgHp = enemy._hp;
@@ -232,6 +246,7 @@ class BaseNetController extends EventEmitter {
                             action.forcedTargets = [];
                             let targetedNetParty = this.netPlayers[action.netPartyId].battleMembers()
                             action.forcedTargets.push(targetedNetParty[action._targetIndex])
+                            action._netTarget = action.netPartyId;
                         }
                     }
                     actor.setCurrentAction(action);
@@ -292,10 +307,16 @@ class BaseNetController extends EventEmitter {
         if(moveData.x){
             if(moveData.t){
                 moveData.map = $gameMap.mapId();
-                this.transferNetPlayer(moveData,id);
+                this.transferNetPlayer(moveData,id,false);
             }else{
-                this.netPlayers[id].$gamePlayer._x = moveData.x;
-                this.netPlayers[id].$gamePlayer._y = moveData.y;
+                if(Math.abs(moveData.x -$gamePlayer._x) > 3){
+                    moveData.map = $gameMap.mapId();
+                    this.transferNetPlayer(moveData,id,false);
+                }else{
+                    this.netPlayers[id].$gamePlayer._x = moveData.x;
+                    this.netPlayers[id].$gamePlayer._y = moveData.y;
+                }
+                
             }
             //moveData.map = $gameMap.mapId();
             
@@ -344,7 +365,7 @@ class BaseNetController extends EventEmitter {
      * @param {*} transData x,y,map
      * @param {*} id the id of the peer who's player moved
      */
-         transferNetPlayer(transData,id){
+         transferNetPlayer(transData,id,shouldSync=true){
             if(this.transferRetries <= this.maxTransferRetries){
             try {
                 let x = transData.x;
@@ -355,7 +376,7 @@ class BaseNetController extends EventEmitter {
                     SceneManager._scene.updateCharacters();
                     try {
                         this.netPlayers[id].$gamePlayer.reserveTransfer(map, x, y, 0, 0)
-                        this.netPlayers[id].$gamePlayer.performTransfer(); 
+                        this.netPlayers[id].$gamePlayer.performTransfer(shouldSync); 
                     } catch (error) {
                         console.warn('player was not on the map when transfer was called')
                     }
@@ -364,7 +385,7 @@ class BaseNetController extends EventEmitter {
                     console.warn('createSprites was called not on scene_map:')
                     this.transferRetries++;
                     setTimeout(() => {
-                        this.transferNetPlayer(transData,id)
+                        this.transferNetPlayer(transData,id,shouldSync)
                     }, 500);
                 }
                 
@@ -686,11 +707,9 @@ class BaseNetController extends EventEmitter {
         obj.syncedVars = {};
         obj.syncedSwitches = {};
         MATTIE.static.variable.syncedVars.forEach(id=>{
-            console.log(id);
             obj.syncedVars[id] = $gameVariables.value(id);
         })
         MATTIE.static.switch.syncedSwitches.forEach(id=>{
-            console.log(id);
             obj.syncedSwitches[id] = $gameSwitches.value(id);
         })
         this.sendViaMainRoute(obj)
@@ -763,6 +782,46 @@ class BaseNetController extends EventEmitter {
             
         } 
     }
+
+    //-----------------------------------------------------
+    // Equipment Change Event
+    //-----------------------------------------------------
+    /**
+     * @description emits the event for changing equipment
+     * @emits equipChange 
+     * */
+    emitEquipmentChange(actorId,itemSlot,itemId){
+        let obj = {};
+        obj.equipChange = {};
+        obj.equipChange.actorId = actorId;
+        obj.equipChange.itemSlot = itemSlot;
+        obj.equipChange.itemId = itemId;
+        this.sendViaMainRoute(obj);
+        this.emit("equipChange", obj)
+    }
+
+    /**
+     * @description updates the given net party's actor's equipment
+     * @param {*} equipChangeObj the net obj for equip change
+     */
+    onEquipmentChangeData(equipChangeObj, id){
+        console.log('equip chane data')
+        let actorId = equipChangeObj.actorId;
+        let itemSlot = equipChangeObj.itemSlot;
+        let itemId = equipChangeObj.itemId;
+        console.log(this.netPlayers[id].$netActors.length());
+        let actor =this.netPlayers[id].$netActors.baseActor(actorId);
+        if(actor){
+            if(itemSlot === 0){
+                actor.forceChangeEquip(itemSlot,$dataWeapons[itemId],true);
+            }else{
+                actor.forceChangeEquip(itemSlot,$dataArmors[itemId],true);
+            }
+        }
+        
+        
+    }
+
 
 
     //-----------------------------------------------------

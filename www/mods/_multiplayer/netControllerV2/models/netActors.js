@@ -83,6 +83,22 @@ MATTIE.multiplayer.NetActors.prototype.baseActor = function(baseActorId){
     return actor;
 }
 
+/**
+ * @description get the game actor of a net actor
+ * @param {*} netActorId the if of the data Actor to find
+ * @returns {Game_Actor}
+ */
+MATTIE.multiplayer.NetActors.prototype.dataActor = function(baseActorId){
+    let actor = null;
+    this._data.forEach(element => {
+        if(element.dataActorId == baseActorId) {
+            actor = element.gameActor;
+            return actor;
+        }
+    });
+    return actor;
+}
+
 MATTIE.multiplayer.NetActors.prototype.length = function(){
     return this._data.length;
 }

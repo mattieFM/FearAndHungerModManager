@@ -56,14 +56,32 @@ BattleManager.getAllPlayerActions = function () {
     let arr = [];
     this.makeActionOrders();
     this._actionBattlers.forEach(battler => {
-        if (battler.battlerInParty() && battler.isAlive())
-        arr.push(battler.currentAction());
+        if (battler.battlerInParty() && battler.isAlive()){
+            let action = battler.currentAction();
+            action.setNetTarget(MATTIE.multiplayer.getCurrentNetController().peerId)
+            arr.push(action);
+        }
     });
     return(arr);
 }
+Game_Action.prototype.setNetTarget = function(peerId){
+    this._netTarget = peerId;
+}
+MATTIE.multiplayer.gameActonSubject = Game_Action.prototype.subject;
+Game_Action.prototype.subject = function() {
+    if(this._netTarget) {
+        if(this._netTarget != MATTIE.multiplayer.getCurrentNetController().peerId){
+            let actor = MATTIE.multiplayer.getCurrentNetController().netPlayers[this._netTarget].$netActors.dataActor(this._subjectActorId);
+            return actor;
+        }
+        
+    }
+    return MATTIE.multiplayer.gameActonSubject.call(this);
+};
+
 /** start the combat round */
 BattleManager.startTurn = function() {
-    if($gameTroop.totalCombatants() == 1){ //if solo, start next phase
+    if($gameTroop.totalCombatants() == 1 && !Galv.EXTURN.active){ //if solo, start next phase
         MATTIE.BattleManagerStartTurn.call(this);
     }else{ //if the player is fighting with allies enter "ready" state
         this.ready();
@@ -105,10 +123,18 @@ BattleManager.startTurn = function() {
   BattleManager.makeActionOrders = function() {
     if(!this._netActionBattlers) this._netActionBattlers = [];
     MATTIE.multiplayer.multiCombat.makeActionOrders.call(this);
-    this._actionBattlers.splice.apply(this._actionBattlers, [4, 0].concat(this._netActionBattlers));
+    this._actionBattlers.splice.apply(this._actionBattlers, [$gameParty.maxBattleMembers, 0].concat(this._netActionBattlers));
+    this.sortActionOrders();
+  }
+
+  BattleManager.sortActionOrders = function(){
+    this._actionBattlers.sort(function(a, b) {
+        return b.speed() - a.speed();
+    });
   }
   Game_Battler.prototype.setCurrentAction = function(action) {
     this.forceAction(action._item._itemId,action._targetIndex, action.forcedTargets);
+    this._actions[this._actions.length-1]._netTarget = action._netTarget;
     if(action._item._dataClass==="item") this._actions[this._actions.length-1].setItem(action._item._itemId)
 
 };

@@ -35,10 +35,18 @@ class BattleController extends EventEmitter {
      */
     emitTurnEndEvent(){
         this.emit("turnEnd");
-
+        if($gameParty.leader().isDead()){
+            MATTIE.multiplayer.getCurrentNetController().emitBattleEndEvent($gameTroop._troopId, MATTIE.multiplayer.currentBattleEnemy)
+        }
         let enemyHps = $gameTroop._enemies.map(enemy=>{return enemy._hp});
         let enemyStates = $gameTroop._enemies.map(enemy=>{return enemy.states().map(state=>state.id)});
-        MATTIE.multiplayer.getCurrentNetController().emitTurnEndEvent(enemyHps, enemyStates, null);
+        let actorData = $gameParty.battleMembers().map(actor=>{
+            let obj = {};
+            obj.hp = actor.hp
+            obj.mp = actor.mp;
+            return obj;
+        })
+        MATTIE.multiplayer.getCurrentNetController().emitTurnEndEvent(enemyHps, enemyStates, actorData);
     }
 }
 
