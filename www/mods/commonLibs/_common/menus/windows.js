@@ -11,13 +11,25 @@ MATTIE.windows.horizontalBtns = function () {
 MATTIE.windows.horizontalBtns.prototype = Object.create(Window_HorzCommand.prototype);
 MATTIE.windows.horizontalBtns.prototype.constructor = MATTIE.windows.horizontalBtns;
 
-MATTIE.windows.horizontalBtns.prototype.initialize = function(y,btns,width) {
+MATTIE.windows.horizontalBtns.prototype.initialize = function(y,btns,width, enabled=null) {
         this._mattieBtns = btns;
         this._mattieMaxCols = width;
+        this.enabled = enabled;
         Window_HorzCommand.prototype.initialize.call(this,0,0)
         this.updatePlacement(y);
         
 };
+
+MATTIE.windows.horizontalBtns.prototype.updateWidth = function(width){
+    this.width = width;
+    this.refresh();
+    this.select(0);
+    this.activate();
+}
+
+MATTIE.windows.horizontalBtns.prototype.windowWidth = function(){
+    return this.width || 240;
+}
 
 MATTIE.windows.horizontalBtns.prototype.updatePlacement = function(y) {
     this.x = (Graphics.boxWidth - this.width) / 2;
@@ -34,7 +46,16 @@ MATTIE.windows.horizontalBtns.prototype.maxCols = function() {
  */
 MATTIE.windows.horizontalBtns.prototype.makeCommandList = function() {
     for(key in this._mattieBtns){
-        this.addCommand(key, this._mattieBtns[key])
+        let added = false;
+        if(this.enabled){
+            if(this.enabled[key]){
+                    this.addCommand(key, this._mattieBtns[key], this.enabled[key].val)
+                    added = true;
+            }
+        }
+        
+       
+        if(!added) this.addCommand(key, this._mattieBtns[key]);
     }
 };
 
@@ -239,38 +260,86 @@ MATTIE.windows.modListWin.prototype.initialize = function() {
     this.setUpHandlers();
 };
 
+MATTIE.windows.modListWin.prototype.refresh = function() {
+    Window_HorzCommand.prototype.refresh.call(this);
+    this.curRow = 0;
+}
+MATTIE.windows.modListWin.prototype.drawItem = function(index) {
+    this.curRow = this.curRow || 0;
+    if(index % this.maxCols() == 0) this.curRow++;
+    var rect = this.itemRect(index);
+    this.contents.paintOpacity = 5;
+    if(this.curRow == 1){
+        this.contents.paintOpacity = 15;
+        this.contents.fillRect(rect.x, rect.y, rect.width, rect.height, "white");
+    } else
+    if(this.curRow % 2 == 0){
+        this.contents.fillRect(rect.x, rect.y, rect.width, rect.height, "black");
+    }else{
+        this.contents.fillRect(rect.x, rect.y, rect.width, rect.height, "white");
+    }
+
+    var rect = this.itemRectForText(index);
+    var align = this.itemTextAlign();
+    this.resetTextColor();
+    this.changePaintOpacity(this._list[index].modActive);
+    this.drawText(this.commandName(index), rect.x, rect.y, rect.width, align);
+};
+
+MATTIE.windows.modListWin.prototype.addCommand = function(name, symbol, enabled){
+    Window_HorzCommand.prototype.addCommand.call(this,name,symbol);
+    this._list[this._list.length-1].modActive = enabled;
+}
+
+MATTIE.windows.modListWin.prototype.itemTextAlign = function() {
+    return 'left';
+};
+
 MATTIE.windows.modListWin.prototype.windowWidth = function() {
     return Graphics.boxWidth;
 };
 
 MATTIE.windows.modListWin.prototype.maxCols = function() {
-    return 1;
+    return 2;
 };
 
 MATTIE.windows.modListWin.prototype.numVisibleRows = function() {
-    return 8;
+    return 14;
 };
 
 MATTIE.windows.modListWin.prototype.makeCommandList = function() {
-    TextManager["MATTIE_"+"Vanilla_Fear_And_Hunger"] = "Vanilla Fear & Hunger" + "    " + (MATTIE_ModManager.modManager.checkVanilla()? "active": "not active")
-    this.addCommand(TextManager["MATTIE_"+"Vanilla_Fear_And_Hunger"], "MATTIE_"+"Vanilla_Fear_And_Hunger");
+    TextManager["MATTIE_"+"Vanilla_Fear_And_Hunger"] = "Vanilla Fear & Hunger"
+    this.addCommand(TextManager["MATTIE_"+"Vanilla_Fear_And_Hunger"], "MATTIE_"+"Vanilla_Fear_And_Hunger", MATTIE_ModManager.modManager.checkVanilla());
 
-    TextManager["MATTIE_"+"Vanilla_Save_Compatible"] = "Vanilla Save Compatible" + "    " + (!MATTIE_ModManager.modManager.checkSaveDanger()? "active": "not active")
-    this.addCommand(TextManager["MATTIE_"+"Vanilla_Save_Compatible"], "MATTIE_"+"Vanilla_Save_Compatible");
+    TextManager["MATTIE_"+"Vanilla_Save_Compatible"] = "Vanilla Save Compatible"
+    this.addCommand(TextManager["MATTIE_"+"Vanilla_Save_Compatible"], "MATTIE_"+"Vanilla_Save_Compatible", !MATTIE_ModManager.modManager.checkSaveDanger() && !MATTIE_ModManager.modManager.checkForceModdedSaves());
+
+    TextManager["MATTIE_"+"Force_Vanilla_Saves"] = "Force Vanilla Saves"
+    this.addCommand(TextManager["MATTIE_"+"Force_Vanilla_Saves"],"MATTIE_"+"Force_Vanilla_Saves", MATTIE_ModManager.modManager.checkForceVanillaSaves());
+
+    TextManager["MATTIE_"+"Force_Modded_Saves"] = "Force Modded Saves"
+    this.addCommand(TextManager["MATTIE_"+"Force_Modded_Saves"],"MATTIE_"+"Force_Modded_Saves", MATTIE_ModManager.modManager.checkForceModdedSaves());
+
+    this.addCommand("","",false);
+    this.addCommand("","",false);
 
 
     MATTIE_ModManager.modManager.getAllMods().forEach(mod=>{
         let name = mod.name;
         let status = mod.status;
-        TextManager["MATTIE_"+name] = name + "    " + (status? "active": "not active");
-        this.addCommand(TextManager["MATTIE_"+name],  "MATTIE_"+name);
+        TextManager["MATTIE_"+name] = name ;
+        this.addCommand(TextManager["MATTIE_"+name],  "MATTIE_"+name, status);
+        //TextManager["MATTIE_"+name+"_STATUS"] = (status? "active": "not active");
+        //this.addCommand(TextManager["MATTIE_"+name+"_STATUS"], "MATTIE_"+name, status);
+        TextManager["MATTIE_"+name+"_CONFIG"] = "Config";
+        this.addCommand(TextManager["MATTIE_"+name+"_CONFIG"],  "MATTIE_"+name +"_CONFIG", status);
         
 
         
     })
     TextManager["MATTIE_"+"Apply Changes"] = "Apply Changes";
     
-    this.addCommand(TextManager["MATTIE_"+"Apply Changes"], "MATTIE_"+"Apply Changes");
+    this.addCommand(TextManager["MATTIE_"+"Apply Changes"], "MATTIE_"+"Apply Changes",true);
 };
 
 MATTIE.windows.modListWin.prototype.reloadModsIfNeeded = function(){
@@ -297,6 +366,18 @@ MATTIE.windows.modListWin.prototype.setUpHandlers = function(){
         this.activate();
     }).bind(this));
 
+    this.setHandler("MATTIE_"+"Force_Vanilla_Saves", (()=>{
+        MATTIE_ModManager.modManager.switchForceVanillaSaves();
+        this.refresh();
+        this.activate();
+    }).bind(this));
+
+    this.setHandler("MATTIE_"+"Force_Modded_Saves", (()=>{
+        MATTIE_ModManager.modManager.switchForceModdedSaves();
+        this.refresh();
+        this.activate();
+    }).bind(this));
+
 
     
 
@@ -310,6 +391,12 @@ MATTIE.windows.modListWin.prototype.setUpHandlers = function(){
             this.activate();
         
         }).bind(this));
+
+        this.setHandler("MATTIE_"+name +"_CONFIG", (()=>{
+            alert("TODO: make config editable in game")
+            this.refresh();
+            this.activate();
+        }).bind(this))
     });
     
     this.setHandler("cancel", (()=>{this.reloadModsIfNeeded();}).bind(this))

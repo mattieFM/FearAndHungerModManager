@@ -29,8 +29,7 @@ class ClientController extends BaseNetController {
 
     open(){
         this.initEmitterOverrides(); //override stuff for interceptors
-        MATTIE.multiplayer.isClient = true;
-        MATTIE.multiplayer.isActive = true;
+        this.setIsClient();
         this.self = new Peer();
         this.self.on('open', ()=>{
             this.peerId = this.self.id;
@@ -49,6 +48,7 @@ class ClientController extends BaseNetController {
             })
 
             this.conn.on("data", (data) => {
+                if(!this.self.disconnected)
                 this.onData(data,this.conn);
             })
     }

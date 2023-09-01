@@ -3,6 +3,8 @@ MATTIE.multiplayer = MATTIE.multiplayer || {}
 MATTIE.menus.multiplayer = MATTIE.menus.multiplayer || {};
 MATTIE.scenes.multiplayer = MATTIE.scenes.multiplayer || {};
 MATTIE.windows.multiplayer = MATTIE.windows.multiplayer || {};
+
+MATTIE.multiplayer.emittedInit = false;
 var EventEmitter = require("events");
 class BaseNetController extends EventEmitter {
     constructor() {
@@ -15,10 +17,66 @@ class BaseNetController extends EventEmitter {
 
         this.transferRetries = 0;
         this.maxTransferRetries = 10;
+
+        this.canTryToReconnect = false;
     }
 
-    closeAllConns(){
-        
+    
+    disconnectAllConns(){
+        this.canTryToReconnect = true;
+        if(this.self){
+            this.self.disconnect();
+        }
+        // if(this.conn){
+        //     this.conn.disconnect();
+        // }
+    }
+
+    reconnectAllConns(){
+        if(this.self){
+            this.self.reconnect();
+        }
+        this.setIsClient();
+        // if(this.conn){
+        //     this.conn.reconnect();
+        // }
+    }
+
+    resetNet(){
+        this.clearPeerId();
+        this.clearControlVars();
+        this.destroyAllConns();
+    }
+
+    destroyAllConns(){
+        if(this.self){
+            this.self.destroy();
+        }
+        if(this.conn){
+            this.conn.destroy();
+        }
+    }
+
+    clearPeerId(){
+        this.peerId = null;
+    }
+
+    clearControlVars(){
+        MATTIE.multiplayer.isClient = false;
+        MATTIE.multiplayer.isHost = false;
+        MATTIE.multiplayer.isActive = false;
+    }
+
+    setIsHost(){
+        MATTIE.multiplayer.isActive = true;
+        MATTIE.multiplayer.isClient = false;
+        MATTIE.multiplayer.isHost = true;
+    }
+
+    setIsClient(){
+        MATTIE.multiplayer.isActive = true;
+        MATTIE.multiplayer.isHost = false;
+        MATTIE.multiplayer.isClient = true;
     }
 
     /**
@@ -830,7 +888,8 @@ class BaseNetController extends EventEmitter {
 
 
     initEmitterOverrides(){
-        if(MATTIE.multiplayer.isActive){
+        if(MATTIE.multiplayer.isActive && !MATTIE.multiplayer.emittedInit ){
+            MATTIE.multiplayer.emittedInit = true;
             MATTIE.multiplayer.gamePlayer.override.call(this);
         }
     }

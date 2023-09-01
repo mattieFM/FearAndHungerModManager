@@ -4,6 +4,10 @@ MATTIE.scenes.multiplayer = MATTIE.scenes.multiplayer || {};
 MATTIE.windows.multiplayer = MATTIE.windows.multiplayer || {};
 MATTIE.TextManager = MATTIE.TextManager || {};
 MATTIE.CmdManager = MATTIE.CmdManager || {};
+MATTIE.TextManager.disconnect = "Disconnect"
+MATTIE.CmdManager.disconnect = "MATTIE_Deconnect"
+MATTIE.TextManager.forceStart = "Join Mid Game"
+MATTIE.CmdManager.forceStart = "MATTIE_Force_start"
 /**
  * @description The scene for hosting a multiplayer game
  * @extends MATTIE.scenes.multiplayer.base
@@ -22,6 +26,23 @@ MATTIE.scenes.multiplayer.lobby.prototype.create = function(){
         this.addPlayerListWindow();
         this.initListController();
     });
+    let btns = {};
+    btns[MATTIE.TextManager.disconnect] = MATTIE.CmdManager.disconnect;
+    btns[MATTIE.TextManager.forceStart] = MATTIE.CmdManager.forceStart
+    this._optionsWindow = new MATTIE.windows.horizontalBtns(175+300+10, btns, 2);
+    this._optionsWindow.setHandler(MATTIE.CmdManager.disconnect, (()=>{
+        MATTIE.multiplayer.getCurrentNetController().disconnectAllConns();
+        MATTIE.menus.multiplayer.openMultiplayer();
+    }).bind(this))
+
+    this._optionsWindow.setHandler( MATTIE.CmdManager.forceStart, (()=>{
+        MATTIE.multiplayer.clientController.emit("startGame");
+    }).bind(this))
+
+
+    this.addWindow(this._optionsWindow)
+    this._optionsWindow.updateWidth(600);
+    this._optionsWindow.updatePlacement(175+300+10);
 }
 
 MATTIE.scenes.multiplayer.lobby.prototype.addPlayerListWindow = function(){

@@ -15,7 +15,8 @@
         "_common/static",
         "_common/items",
         "_common/optimisations",
-        "_common/menus/devMenu"
+        "_common/menus/devMenu",
+        "_common/clipboard"
     
     ],
     "danger": false

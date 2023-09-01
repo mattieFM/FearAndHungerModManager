@@ -9,6 +9,18 @@ MATTIE.menus.mainMenu = MATTIE.menus.mainMenu || {};
 var MATTIE_RPG = MATTIE_RPG || {};
 TextManager.Mods = "Mods";
 
+/** @description removes a */
+MATTIE.menus.mainMenu.removeBtnFromMainMenu = function(displayText,sym){
+    let prevFunc = Window_TitleCommand.prototype.addCommand
+    Window_TitleCommand.prototype.addCommand = function(name, symbol, enabled, ext){
+        console.log(name);
+        if(name != displayText && symbol !=sym){
+            prevFunc.call(this,name,symbol,enabled,ext);
+        }
+    }
+}
+
+
 /**
  * @description add a new button to the main menu
  * @param {string} displayText the text to display
