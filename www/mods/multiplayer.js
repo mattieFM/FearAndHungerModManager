@@ -97,9 +97,9 @@ Input.addKeyBind('n', ()=>{
 
 }, "TP", 0)
 
-Input.addKeyBind('z', ()=>{
-    SceneManager.goto(Scene_Gameover);
-}, "DIE", -2)
+// Input.addKeyBind('z', ()=>{
+//     SceneManager.goto(Scene_Gameover);
+// }, "DIE", -2)
 
 Input.addKeyBind('4', ()=>{
     console.log($gameTroop.totalCombatants());

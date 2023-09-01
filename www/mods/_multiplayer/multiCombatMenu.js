@@ -399,7 +399,7 @@ Scene_Battle.prototype.onActorOk = function() {
         var action = BattleManager.inputtingAction();
         let playersIds = $gameTroop.getIdsInCombatWithExSelf();
         let netCont = MATTIE.multiplayer.getCurrentNetController();
-        let id = playersIds[this._actorWindow.currentid-1] ? playersIds[this._actorWindow.currentid-1] :  netCont.peerId;
+        let id = playersIds[this._actorWindow.currentid-1] ? playersIds[this._actorWindow.currentid-1] :  undefined;
         action.setNetPartyId(id);
         MATTIE.multiplayer.sceneBattleOk.call(this);
         this.resetParty();

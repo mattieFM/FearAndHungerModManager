@@ -121,3 +121,62 @@ MATTIE.windows.multiplayer.startWin.prototype.makeCommandList = function() {
     this.addCommand(MATTIE.TextManager.newGame,   MATTIE.CmdManager.newGame);
     this.addCommand(MATTIE.TextManager.loadGame, MATTIE.CmdManager.loadGame,DataManager.isAnySavefileExists());
 };
+
+
+//-----------------------------------
+// Drop item menu stuff
+//-----------------------------------
+
+
+/**
+ * // Scene_DevItems
+ * @description a scene to spawn in items for dev
+ * @extends Scene_Item
+ */
+MATTIE.scenes.Scene_DropItem = function () {
+    this.initialize.apply(this, arguments);
+}
+
+MATTIE.scenes.Scene_DropItem.prototype = Object.create(Scene_Item.prototype);
+MATTIE.scenes.Scene_DropItem.prototype.constructor = MATTIE.scenes.Scene_DropItem;
+
+MATTIE.scenes.Scene_DropItem.prototype.initialize = function() {
+    Scene_Item.prototype.initialize.call(this);
+    this.lastItem = null;
+    
+};
+
+//override onItemOk to drop and remove item from inv rather than what it would do otherwise
+MATTIE.scenes.Scene_DropItem.prototype.onItemOk = function (){
+    $gameParty.loseItem(this.item(), 1, false);
+    SceneManager.pop();
+    SceneManager.pop();
+    setTimeout(() => {
+        MATTIE.eventAPI.addItemDropToCurrentMap(new Game_Item(this.item()));
+    }, 500);
+    
+}
+MATTIE_RPG.createItemWindow = MATTIE.scenes.Scene_DropItem.prototype.createItemWindow;
+MATTIE.scenes.Scene_DropItem.prototype.createItemWindow = function() {
+    MATTIE_RPG.createItemWindow.call(this);
+    this._itemWindow.forceEnableAll();
+};
+
+
+
+//add our drop items tab to the menu
+MATTIE_RPG.sceneMenuCmdwin = Scene_Menu.prototype.createCommandWindow;
+Scene_Menu.prototype.createCommandWindow = function (){
+    MATTIE_RPG.sceneMenuCmdwin.call(this);
+    this._commandWindow.setHandler("MATTIE_DROP", ()=>{
+        SceneManager.push(MATTIE.scenes.Scene_DropItem);
+    })
+}
+MATTIE_RPG.addMainCommands = Window_MenuCommand.prototype.addMainCommands;
+Window_MenuCommand.prototype.addMainCommands = function() {
+    MATTIE_RPG.addMainCommands.call(this);
+    this.addCommand("Drop","MATTIE_DROP",true)
+};
+
+
+//MATTIE.eventAPI.addItemDropToCurrentMap(new Game_Item(MATTIE.static.items.emptyScroll));

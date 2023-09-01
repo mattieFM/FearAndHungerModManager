@@ -12,6 +12,8 @@ TextManager.SkillCheatTab = "Skills"
 MATTIE.CmdManager.SkillCheatTab = "MATTIE_Skill_CHEAT";
 TextManager.ActorCheatTab = "Actors"
 MATTIE.CmdManager.ActorCheatTab = "MATTIE_ACTORS_CHEAT";
+TextManager.test = "Test"
+MATTIE.CmdManager.test = "test";
 
 
 
@@ -59,6 +61,12 @@ MATTIE.scenes.Scene_Dev.prototype.onSkillCheatTab = function(){
 MATTIE.scenes.Scene_Dev.prototype.onActorCheatTab = function(){
     SceneManager.push(MATTIE.scenes.Scene_DevActors);
 }
+
+MATTIE.scenes.Scene_Dev.prototype.onChangeMainActorCheatTab = function(){
+    SceneManager.push(MATTIE.scenes.Scene_ForceActors);
+}
+
+
 
 
 
