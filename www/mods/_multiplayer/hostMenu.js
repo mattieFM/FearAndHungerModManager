@@ -5,9 +5,15 @@ MATTIE.windows.multiplayer = MATTIE.windows.multiplayer || {};
 MATTIE.TextManager = MATTIE.TextManager || {};
 MATTIE.CmdManager = MATTIE.CmdManager || {};
 MATTIE.TextManager.startGame = "Start Game";
-MATTIE.TextManager.returnToMultiplayer = "Return";
+MATTIE.TextManager.returnToMultiplayer = "Close Server";
 MATTIE.CmdManager.startGame = "MATTIE_Start_Game"
 MATTIE.CmdManager.returnToMultiplayer = "MATTIE_ReturnToMulti"
+MATTIE.TextManager.copy = "Copy Code";
+MATTIE.CmdManager.copy = "MATTIE_Copy_Code"
+MATTIE.TextManager.show = "Show/Hide";
+MATTIE.CmdManager.show = "MATTIE_Show_Hide"
+
+
 
 /**
  * @description The scene for hosting a multiplayer game
@@ -43,10 +49,21 @@ MATTIE.scenes.multiplayer.host.prototype.initListController = function(){
     })
 }
 
+MATTIE.scenes.multiplayer.host.prototype.showHideCode = function(hidden){
+    let text = [
+        "People can join using this number:",
+        hidden ? "*".repeat(MATTIE.multiplayer.hostController.peerId.length) : MATTIE.multiplayer.hostController.peerId
+        ];
+        this._peerWindow.updateText(text);
+        
+}
+
+
 MATTIE.scenes.multiplayer.host.prototype.addPeerDisplayWindow = function(){
     let text = [
         "People can join using this number:",
-        MATTIE.multiplayer.hostController.peerId
+        "*".repeat(MATTIE.multiplayer.hostController.peerId.length)
+        
         ]
     this._peerWindow = new MATTIE.windows.textDisplay((Graphics.boxWidth - 600) / 2+100,0,600,100,text);
     this.addWindow(this._peerWindow);
@@ -54,14 +71,37 @@ MATTIE.scenes.multiplayer.host.prototype.addPeerDisplayWindow = function(){
 
 MATTIE.scenes.multiplayer.host.prototype.addOptionsBtns = function(){
     let btns = {}
+    btns[MATTIE.TextManager.copy] = MATTIE.CmdManager.copy;
     btns[MATTIE.TextManager.startGame] = MATTIE.CmdManager.startGame;
-    btns[MATTIE.TextManager.returnToMultiplayer] = MATTIE.CmdManager.returnToMultiplayer;
-    this._optionsWindow = new MATTIE.windows.horizontalBtns(175+300+10, btns, 2);
+    btns[MATTIE.TextManager.show] = MATTIE.CmdManager.show;
+    btns["Close Server"] = MATTIE.CmdManager.returnToMultiplayer;
+    
+    
+    this._optionsWindow = new MATTIE.windows.horizontalBtns(175+300+10, btns, 4);
     this._optionsWindow.setHandler(MATTIE.CmdManager.startGame, (()=>{
         MATTIE.multiplayer.hostController.startGame();
         MATTIE.menus.multiplayer.openGame();
     }).bind(this));
-    this._optionsWindow.setHandler(MATTIE.CmdManager.returnToMultiplayer,  MATTIE.menus.multiplayer.openMultiplayer.bind(this));
+    this._optionsWindow.setHandler(MATTIE.CmdManager.returnToMultiplayer,  (()=>{
+        MATTIE.multiplayer.getCurrentNetController().destroyAllConns();
+        MATTIE.menus.multiplayer.openMultiplayer();
+
+    }).bind(this));
+
+    let hidden = true;
+    this._optionsWindow.setHandler(MATTIE.CmdManager.show,  (()=>{
+        this.showHideCode(!hidden)
+        hidden = !hidden;
+        this._optionsWindow.activate();
+    }).bind(this));
+
+    this._optionsWindow.setHandler(MATTIE.CmdManager.copy,  (()=>{
+        MATTIE.clipboard.put(MATTIE.multiplayer.hostController.peerId);
+        this._optionsWindow.activate();
+    }).bind(this));
+
     this.addWindow(this._optionsWindow);
+    this._optionsWindow.updateWidth(600);
+    this._optionsWindow.updatePlacement(175+300+10);
 }
 

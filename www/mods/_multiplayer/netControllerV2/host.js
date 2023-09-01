@@ -27,8 +27,7 @@ class HostController extends BaseNetController {
 
     open(){
         this.initEmitterOverrides(); //override stuff for interceptors
-        MATTIE.multiplayer.isHost = true;
-        MATTIE.multiplayer.isActive = true;
+        this.setIsHost();
         this.self = new Peer();
         this.self.on('open', () => {
             console.info(`host opened at: ${this.self.id}`)

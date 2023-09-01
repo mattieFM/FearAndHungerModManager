@@ -34,7 +34,7 @@ MATTIE.multiplayer.currentBattleEvent;
 MATTIE.multiplayer.inBattle = false;
 
 MATTIE.multiplayer._interpreter = new Game_Interpreter();
-
+MATTIE.multiplayer.params = PluginManager.parameters('multiplayer');
 let lastmsg = Date.now();
 MATTIE.multiplayer.devTools.slowLog = function(data){
     if(Math.abs(lastmsg - Date.now()) > 500 ){ 
@@ -149,5 +149,14 @@ MATTIE.multiplayer.getCurrentNetController = ()=>{
 
 (()=>{
     MATTIE.menus.mainMenu.addBtnToMainMenu("Multiplayer","multiplayer", MATTIE.menus.multiplayer.openMultiplayer.bind(this))
+    MATTIE.menus.mainMenu.addBtnToMainMenu("Disable Multiplayer","Disable_Multiplayer", (()=>{
+        MATTIE_ModManager.modManager.switchStatusOfMod("multiplayer");
+        MATTIE_ModManager.modManager.reloadGame();
+    }
+    ).bind(this))
+    //multiplayer mod breaks solo play, so we remove these buttons
+    MATTIE.menus.mainMenu.removeBtnFromMainMenu("Continue","continue");
+    MATTIE.menus.mainMenu.removeBtnFromMainMenu("New Game","newgame");
+    MATTIE.menus.mainMenu.removeBtnFromMainMenu("Continue Suspended Run","suspend");
     console.log("Multiplayer Init")
 })();

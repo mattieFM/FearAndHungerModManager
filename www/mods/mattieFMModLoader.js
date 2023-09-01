@@ -58,6 +58,8 @@ class ModManager {
         this._path = path
         this._realMods = [];
         this._mods = []
+        this.forceModdedSaves = false;
+        this.forceVanillaSaves = false;
     }
     getModInfo(path,modName){
         const fs = require('fs');
@@ -178,6 +180,24 @@ class ModManager {
 
     checkSaveDanger(){
         return this.getActiveRealDangerMods().length > 0;
+    }
+
+    switchForceModdedSaves(){
+        this.forceModdedSaves = !this.forceModdedSaves;
+        this.forceVanillaSaves = false
+    }
+
+    switchForceVanillaSaves(){
+        this.forceModdedSaves = false;
+        this.forceVanillaSaves = !this.forceVanillaSaves;
+    }
+
+    checkForceModdedSaves(){
+        return this.forceModdedSaves;
+    }
+
+    checkForceVanillaSaves(){
+        return this.forceVanillaSaves;
     }
 
     checkVanilla(){
