@@ -19,6 +19,7 @@ class PlayerModel {
         this.$gamePlayer;
 
         this.$netActors = new MATTIE.multiplayer.NetActors();
+       
         
         /** the actor ids of any and all followers, -1 if not present */
         this.followerIds = [];
@@ -161,6 +162,43 @@ MATTIE.multiplayer.Secondary_Player.prototype.performTransfer = function () {
     MATTIE.RPG.performTransfer.call(this);
     MATTIE.multiplayer.updateEnemyHost();
 }
+
+MATTIE.multiplayer.Secondary_Player.prototype.locate = function(x, y) {
+    let leaderX =this.x;
+    let leaderY = this.y;
+    Game_Character.prototype.locate.call(this, x, y);
+    this.center(x, y);
+    this.makeEncounterCount();
+    if (this.isInVehicle()) {
+        this.vehicle().refresh();
+    }
+    this._followers.synchronize(x, y, this.direction(),leaderX,leaderY);
+};
+
+/**
+ * 
+ * @param {*} x target x
+ * @param {*} y target y
+ * @param {*} d target dir
+ * @param {*} leaderX leader x
+ * @param {*} leaderY leader y
+ */
+Game_Followers.prototype.synchronize = function(x, y, d,leaderX,leaderY) {
+    this.forEach(function(follower) {
+        let dist =Math.sqrt((follower.x - x)**2 + (follower.y -y)**2);
+        if(dist > $gameParty.maxBattleMembers()+1){ //only sync if follower too far away
+            follower.locate(x, y);
+            follower.setDirection(d);
+        }
+        // else if (dist > 0) {
+        //     let deltaY = y-leaderY;
+        //     let deltaX = x-leaderX;
+        //     console.log("deltaY" + deltaY + "deltax" + deltaX)
+        //     follower.setPosition(follower.x+deltaX,follower.y+deltaY);
+        // }
+
+    }, this);
+};
 
 MATTIE.multiplayer.Secondary_Player.prototype.reserveTransfer = function(mapId, x, y, d, fadeType){
     MATTIE.RPG.reserveTransfer.call(this, mapId, x, y, d, fadeType);

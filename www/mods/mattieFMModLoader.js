@@ -394,6 +394,7 @@ Graphics.hideError = function() {
 
 
 MATTIE.onError = function(e) {
+    console.error(e);
     console.error(e.message);
     console.error(e.filename, e.lineno);
     try {
