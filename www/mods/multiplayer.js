@@ -33,6 +33,9 @@ MATTIE.multiplayer.currentBattleEnemy = {};
 MATTIE.multiplayer.currentBattleEvent;
 MATTIE.multiplayer.inBattle = false;
 
+//spectating var
+MATTIE.multiplayer.isSpectator = false;
+
 MATTIE.multiplayer._interpreter = new Game_Interpreter();
 MATTIE.multiplayer.params = PluginManager.parameters('multiplayer');
 let lastmsg = Date.now();
@@ -93,6 +96,10 @@ Input.addKeyBind('n', ()=>{
     
 
 }, "TP", 0)
+
+Input.addKeyBind('z', ()=>{
+    SceneManager.goto(Scene_Gameover);
+}, "DIE", -2)
 
 Input.addKeyBind('4', ()=>{
     console.log($gameTroop.totalCombatants());
