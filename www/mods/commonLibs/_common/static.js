@@ -10,6 +10,10 @@ MATTIE.static.commonEvents = MATTIE.static.commonEvents || {};
 MATTIE.static.variable = MATTIE.static.variable || {};
 MATTIE.static.switch = MATTIE.static.switch || {};
 
+
+MATTIE.static.events = MATTIE.static.events || {};
+MATTIE.static.events.images = MATTIE.static.events.images || {};
+
 //items
 MATTIE.static.items.emptyScroll = null;
 
@@ -33,6 +37,13 @@ MATTIE.static.switch.syncedSwitches = [];
 //states
 /** this is the state that governs "death" in combat */
 MATTIE.static.states.knockout = 0;
+
+
+//events
+
+//images
+MATTIE.static.events.images.shiny = {};
+MATTIE.static.events.images.coin = MATTIE.static.events.images.shiny;
 
 MATTIE.static.update = function(){
     //common events
@@ -451,7 +462,14 @@ MATTIE.static.update = function(){
         MATTIE.static.variable.ignoredVars = [ //ignored vars
             398 //torch timer
         ]
-        
+
+
+
+        //events
+
+        //event images
+        MATTIE.static.events.images.shiny = MapEvent.generateImage(0,"!Flame",6,0,0); //the shiny coin incon
+        MATTIE.static.events.images.coin =  MATTIE.static.events.images.shiny;
 
     }else if (MATTIE.global.version === 2){
         //static values specific to funger 2

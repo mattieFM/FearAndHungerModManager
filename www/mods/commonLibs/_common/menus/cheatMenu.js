@@ -317,6 +317,8 @@ Window_SkillList.prototype.isEnabled = function(item) {
 };
 
 
+
+
 /**
  * Scene_DevActors
  * @description a scene to spawn in or remove actors
@@ -367,6 +369,28 @@ MATTIE.scenes.Scene_DevActors.prototype.onActorOk = function(){
     this._actorWindow.refresh();
 }
 
+/**
+ * Scene_ForceActors
+ * @description a scene to change what actor you are
+ * @extends Scene_DevActors
+ */
+MATTIE.scenes.Scene_ForceActors = function () {
+    this.initialize.apply(this, arguments);
+}
+
+MATTIE.scenes.Scene_ForceActors.prototype = Object.create(MATTIE.scenes.Scene_DevActors.prototype);
+MATTIE.scenes.Scene_ForceActors.prototype.constructor = MATTIE.scenes.Scene_ForceActors;
+
+MATTIE.scenes.Scene_ForceActors.prototype.initialize = function() {
+    MATTIE.scenes.Scene_DevActors.prototype.initialize.call(this);
+};
+
+MATTIE.scenes.Scene_ForceActors.prototype.onActorOk = function(){
+    let actor = $gameActors.actor(this._actorWindow.index());
+    if(actor) MATTIE.actorAPI.changeMainChar(actor._actorId);
+    this._actorWindow.activate();
+    this._actorWindow.refresh();
+}
 
 /**
  * Window_AllStatus

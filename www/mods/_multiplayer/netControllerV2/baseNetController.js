@@ -110,7 +110,7 @@ class BaseNetController extends EventEmitter {
         if(data.updateNetPlayers){//only used by client
             this.onUpdateNetPlayersData(data.updateNetPlayers);
         }
-        if(data.playerInfo){ //only used by host
+        if(data.playerInfo && MATTIE.multiplayer.isHost){ //only used by host
             this.onPlayerInfoData(data.playerInfo);
         }
         if(data.startGame){ //only used by client
@@ -158,6 +158,9 @@ class BaseNetController extends EventEmitter {
         }
         if(data.equipChange){
             this.onEquipmentChangeData(data.equipChange,id);
+        }
+        if(data.spawnEvent){
+            this.onEventSpawn(data.spawnEvent,data.id);
         }
     }
 
@@ -880,6 +883,40 @@ class BaseNetController extends EventEmitter {
         
     }
 
+    //-----------------------------------------------------
+    // Spawned events (handles item drops and any event spawned at run time)
+    //-----------------------------------------------------
+
+    /**
+     * @emits spawnEvent
+     * @param {*} data data of the event
+     */
+    emitEventSpawn(data){
+        let obj = {};
+        obj.spawnEvent = data;
+        this.sendViaMainRoute(obj);
+        this.emit("spawnEvent", obj)
+    }
+
+
+    
+    /**
+     * 
+     * @param {*} data event net obj
+     * @param id unused
+     */
+    onEventSpawn(data,id){
+        let event = new MapEvent();
+        event.data = data;
+        try {
+            event.spawn(data.x,data.y, true);
+        } catch (error) {
+            // setTimeout(() => {
+            //     this.onEventSpawn(data,id)
+            // }, 1000);
+        }
+        
+    }
 
 
     //-----------------------------------------------------

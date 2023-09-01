@@ -69,14 +69,20 @@ Game_Action.prototype.setNetTarget = function(peerId){
 }
 MATTIE.multiplayer.gameActonSubject = Game_Action.prototype.subject;
 Game_Action.prototype.subject = function() {
+    
     if(this._netTarget) {
         if(this._netTarget != MATTIE.multiplayer.getCurrentNetController().peerId){
-            let actor = MATTIE.multiplayer.getCurrentNetController().netPlayers[this._netTarget].$netActors.dataActor(this._subjectActorId);
-            return actor;
+            console.log(this._netTarget)
+            console.log(MATTIE.multiplayer.getCurrentNetController().peerId)
+            return MATTIE.multiplayer.getCurrentNetController().netPlayers[this._netTarget].$netActors.dataActor(this._subjectActorId);
         }
-        
     }
-    return MATTIE.multiplayer.gameActonSubject.call(this);
+
+    if (this._subjectActorId > 0) {
+        return $gameActors.actor(this._subjectActorId);
+    } else {
+        return $gameTroop.members()[this._subjectEnemyIndex];
+    }
 };
 
 /** start the combat round */
@@ -123,15 +129,18 @@ BattleManager.startTurn = function() {
   BattleManager.makeActionOrders = function() {
     if(!this._netActionBattlers) this._netActionBattlers = [];
     MATTIE.multiplayer.multiCombat.makeActionOrders.call(this);
-    this._actionBattlers.splice.apply(this._actionBattlers, [$gameParty.maxBattleMembers, 0].concat(this._netActionBattlers));
-    this.sortActionOrders();
-  }
-
-  BattleManager.sortActionOrders = function(){
-    this._actionBattlers.sort(function(a, b) {
+    //this._actionBattlers.splice.apply(this._actionBattlers, [$gameParty.maxBattleMembers, 0].concat(this._netActionBattlers));
+    let battlers = this._actionBattlers.concat(this._netActionBattlers)
+    
+    battlers.forEach(function(battler) {
+        battler.makeSpeed();
+    });
+    battlers.sort(function(a, b) {
         return b.speed() - a.speed();
     });
+    this._actionBattlers = battlers;
   }
+
   Game_Battler.prototype.setCurrentAction = function(action) {
     this.forceAction(action._item._itemId,action._targetIndex, action.forcedTargets);
     this._actions[this._actions.length-1]._netTarget = action._netTarget;
@@ -149,10 +158,13 @@ MATTIE.maketargets = Game_Action.prototype.makeTargets
 /** override make targets to return forced target if we need */
 Game_Action.prototype.makeTargets = function() {
     if(this.forcedTargets) { //net player targetting someone
+        console.log("net target")
         return this.forcedTargets;
+        
     }
 
     if(this.netPartyId) {//host targeting net player
+        console.log("host targetted nett")
         let net = MATTIE.multiplayer.getCurrentNetController().netPlayers[this.netPartyId];
         let netParty = []
         if(net){
@@ -160,6 +172,7 @@ Game_Action.prototype.makeTargets = function() {
         }
         return netParty;
     }
+    console.log("base target")
     return MATTIE.maketargets.call(this);
 };
 

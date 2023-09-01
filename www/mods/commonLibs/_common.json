@@ -16,7 +16,10 @@
         "_common/items",
         "_common/optimisations",
         "_common/menus/devMenu",
-        "_common/clipboard"
+        "_common/clipboard",
+        "_common/actorAPI",
+        "_common/eventAPI",
+        "_common/eventWrapper"
     
     ],
     "danger": false

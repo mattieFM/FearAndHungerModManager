@@ -46,3 +46,13 @@ Game_Event.prototype.start = function (){
     }
     return MATTIE.multiplayer.spectate.start.call(this);
 }
+
+//make sure player can't somehow wind up back on normal map
+MATTIE.multiplayer.spectate.init = Scene_Map.prototype.initialize;
+Scene_Map.prototype.initialize = function(){
+    MATTIE.multiplayer.spectate.init.call(this);
+    if(MATTIE.multiplayer.isSpectator) 
+    setTimeout(() => {
+        SceneManager.goto(MATTIE.scenes.multiplayer.Scene_Spectate);
+    }, 1000);
+}
