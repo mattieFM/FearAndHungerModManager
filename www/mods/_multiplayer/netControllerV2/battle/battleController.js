@@ -16,6 +16,8 @@ class BattleController extends EventEmitter {
      */
     emitReadyEvent(actions){
         this.emit("ready")
+        MATTIE.multiplayer.ready = true;
+        MATTIE.multiplayer.waitingOnAllies = true;
         MATTIE.multiplayer.getCurrentNetController().emitReadyEvent(actions);
     }
 
@@ -25,6 +27,8 @@ class BattleController extends EventEmitter {
      */
     emitUnreadyEvent(){
         this.emit("unready")
+        MATTIE.multiplayer.waitingOnAllies = false;
+        MATTIE.multiplayer.ready = false;
         MATTIE.multiplayer.getCurrentNetController().emitUnreadyEvent();
     }
 

@@ -1,0 +1,20 @@
+char creation (done), fixed by supressing self switches until player loads onto real game map
+drop weapons/armor X, fixed by changein _itemId to .id --just correcting params.
+
+make saves glboal X, done, easy enough.
+fix death /spectate / revive
+self switches on other maps X, might be fixed?
+crowmauler, appears to be working, might need some tweaking later
+
+Bugs:
+Fix item drop dupe bug. X, fixed by making the event wrapper not remove the self switch when it thinks its gone.
+cannot read isAnimationPlaying of undefined.... I still dont know where this comes from.
+Fix cannot unready. X, fixed, I forgot that you have to activate and deactivate the thing that has the handler for cancel/unready.
+Fixed first turn ready issue. X, fixed.
+
+
+fix blood golem
+ismoverouteforcing of undefined //cannot reproduce but is probably still not fixed
+
+girl extra attack?!??!?!??!?!?!? apparently girl just randomly has an extra attack out of no where? //never has been reproduced on prod.
+fix the issue where one player has dash and the other doesn't. //this is cosmetic only tho

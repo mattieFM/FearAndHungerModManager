@@ -8,24 +8,33 @@ MATTIE.multiplayer.equipmentEmitter = MATTIE.multiplayer.equipmentEmitter || {};
 MATTIE.multiplayer.varSyncer.onMapLoaded = Scene_Map.prototype.onMapLoaded;
 /** this var controls if the client will request a var sync on map load, it will set itself to false once one load is complete */
 MATTIE.multiplayer.varSyncer.shouldSync = true;
+MATTIE.multiplayer.varSyncer.syncEveryx = 100000 //sync every 100 seconds
+MATTIE.multiplayer.varSyncer.syncedOnce = false;
+
+setInterval(() => {
+    MATTIE.multiplayer.varSyncer.shouldSync = true
+}, MATTIE.multiplayer.varSyncer.syncEveryx);
+
+
+
 Scene_Map.prototype.onMapLoaded = function () {
     MATTIE.multiplayer.varSyncer.onMapLoaded.call(this);
-    if(MATTIE.multiplayer.varSyncer.shouldSync){
-        setTimeout(() => {
-            MATTIE.multiplayer.equipmentEmitter.emitAllEquipment();
-        }, 5000);
-    }
-    if(MATTIE.multiplayer.isClient){
-        //if the local machine is a client then request a var refresh the first time
+    if(!MATTIE.static.maps.menuMaps.includes($gameMap.mapId())){
         if(MATTIE.multiplayer.varSyncer.shouldSync){
-            MATTIE.multiplayer.getCurrentNetController().emitRequestedVarSync();
-            
-            MATTIE.multiplayer.varSyncer.shouldSync = false;
+            MATTIE.multiplayer.varSyncer.syncedOnce = true;
+            setTimeout(() => {
+                MATTIE.multiplayer.equipmentEmitter.emitAllEquipment();
+            }, 5000);
+        }
+        if(MATTIE.multiplayer.isClient){
+            //if the local machine is a client then request a var refresh the first time
+            if(MATTIE.multiplayer.varSyncer.shouldSync){
+                MATTIE.multiplayer.getCurrentNetController().emitRequestedVarSync();
+                
+                MATTIE.multiplayer.varSyncer.shouldSync = false;
+                
+            }
             
         }
-        
     }
-
-    
-
 }

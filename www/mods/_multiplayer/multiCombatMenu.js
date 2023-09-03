@@ -38,21 +38,13 @@ Scene_Battle.prototype.createAllWindows = function() {
 
     this._partyDisplay = new MATTIE.windows.textDisplay(155,0,400,75,"Viewing: Self");
     this.addWindow(this._partyDisplay);
-
-    this._readyDisplay = new Window_Selectable(0+this._textWindow.width,0,155,75);
-    this._readyDisplay.drawText("Ready!",0,0,155,75)
-    this._readyDisplay.setHandler('cancel', BattleManager.unready.bind(this));
-    this.addWindow(this._readyDisplay);
-    this._readyDisplay.hide();
-
+    this._statusWindow.setHandler('cancel', BattleManager.unready.bind(this));
     MATTIE.multiplayer.BattleController.addListener('ready', () =>{
-        this._readyDisplay.show();
-        this._readyDisplay.activate();
+        this._statusWindow.activate();
     })
 
     MATTIE.multiplayer.BattleController.addListener('unready', () =>{
-        this._readyDisplay.hide();
-        this._readyDisplay.deactivate();
+        this._statusWindow.deactivate();
     })
 
     MATTIE.multiplayer.getCurrentNetController().addListener('battleChange', () =>{
@@ -316,6 +308,11 @@ Window_BattleStatus.prototype.drawItem = function(index) {
     this.drawGaugeArea(this.gaugeAreaRect(index), actor);
 };
 
+Window_BattleStatus.prototype.maxItems = function() { //fix battles length on net parties viewing
+    let gameParty = this._gameParty || $gameParty;
+    return gameParty.battleMembers().length;
+};
+
 MATTIE.multiplayer.multiCombat.drawItem = Window_BattleStatus.prototype.drawItem;
 Window_BattleStatus.prototype.drawItem = function(index) {
 
@@ -436,3 +433,130 @@ Window_BattleActor.prototype.actor = function() {
     let gameParty = this._gameParty || $gameParty;
     return gameParty.members()[this.index()];
 };
+
+
+
+
+//-----------------------------------------------------------------------------
+// Galv Extra turn stuffs
+//-----------------------------------------------------------------------------
+
+
+    //-----------------------------------------------------------------------------
+    // SPRITE Net Ex Turn
+    //-----------------------------------------------------------------------------
+
+    MATTIE.multiplayer.spriteNetExTurn = function() {
+        this.initialize.apply(this, arguments);
+    }
+
+    MATTIE.multiplayer.spriteNetExTurn.prototype = Object.create(Sprite.prototype);
+    MATTIE.multiplayer.spriteNetExTurn.prototype.constructor = MATTIE.multiplayer.spriteNetExTurn;
+
+    MATTIE.multiplayer.spriteNetExTurn.prototype.initialize = function() {
+        Sprite.prototype.initialize.call(this);
+        this.createBitmap();
+    };
+
+    MATTIE.multiplayer.spriteNetExTurn.prototype.createBitmap = function() {
+        this.bitmap = ImageManager.loadBitmap("mods/_multiplayer/", "netExTurn",0 , true, true);
+        this.x = Galv.EXTURN.x+70;
+        this.y = Galv.EXTURN.y;
+        this.opacity = 0;
+    };
+
+    MATTIE.multiplayer.spriteNetExTurn.prototype.update = function() {
+        Sprite.prototype.update.call(this);
+        this.opacity += MATTIE.multiplayer.combatEmitter.netExTurn ? Galv.EXTURN.fade : -Galv.EXTURN.fade;
+    };
+
+
+    //-----------------------------------------------------------------------------
+    // SPRITE Ready
+    //-----------------------------------------------------------------------------
+
+    MATTIE.multiplayer.spriteReady = function() {
+        this.initialize.apply(this, arguments);
+    }
+
+    MATTIE.multiplayer.spriteReady.prototype = Object.create(Sprite.prototype);
+    MATTIE.multiplayer.spriteReady.prototype.constructor = MATTIE.multiplayer.spriteReady;
+
+    MATTIE.multiplayer.spriteReady.prototype.initialize = function() {
+        Sprite.prototype.initialize.call(this);
+        this.createBitmap();
+    };
+
+    MATTIE.multiplayer.spriteReady.prototype.createBitmap = function() {
+        this.bitmap = ImageManager.loadBitmap("mods/_multiplayer/", "ready",0 , true, true);
+        this.x = Galv.EXTURN.x + 70;
+        this.y = Galv.EXTURN.y - 60;
+        this.opacity = 0;
+    };
+
+    MATTIE.multiplayer.spriteReady.prototype.update = function() {
+        Sprite.prototype.update.call(this);
+        this.opacity += MATTIE.multiplayer.ready ? Galv.EXTURN.fade : -Galv.EXTURN.fade;
+    };
+
+    //-----------------------------------------------------------------------------
+    // SPRITE Awaiting Allies
+    //-----------------------------------------------------------------------------
+
+    MATTIE.multiplayer.spriteWaiting = function() {
+        this.initialize.apply(this, arguments);
+    }
+
+    MATTIE.multiplayer.spriteWaiting.prototype = Object.create(Sprite.prototype);
+    MATTIE.multiplayer.spriteWaiting.prototype.constructor = MATTIE.multiplayer.spriteWaiting;
+
+    MATTIE.multiplayer.spriteWaiting.prototype.initialize = function() {
+        Sprite.prototype.initialize.call(this);
+        this.createBitmap();
+    };
+
+    MATTIE.multiplayer.spriteWaiting.prototype.createBitmap = function() {
+        this.bitmap = ImageManager.loadBitmap("mods/_multiplayer/", "awaitingAllies",0 , true, true);
+        let readyBitMap = ImageManager.loadBitmap("mods/_multiplayer/", "ready",0 , true, true);
+        this.x = Galv.EXTURN.x + 68;
+        this.y = Galv.EXTURN.y - 30;
+        this.opacity = 0;
+    };
+
+    MATTIE.multiplayer.spriteWaiting.prototype.update = function() {
+        Sprite.prototype.update.call(this);
+        this.opacity += MATTIE.multiplayer.waitingOnAllies ? Galv.EXTURN.fade : -Galv.EXTURN.fade;
+    };
+
+    //-----------------------------------------------------------------------------
+    // SPRITESET BATTLE
+    //-----------------------------------------------------------------------------
+
+    MATTIE_RPG.Scene_battle_createDisplayObjects = Scene_Battle.prototype.createDisplayObjects;
+    Scene_Battle.prototype.createDisplayObjects = function() {
+        MATTIE_RPG.Scene_battle_createDisplayObjects.call(this);
+        this.createNetExTurnImg();
+        this.createReadyImg();
+        this.createAwaitingImg();
+    };
+
+    Scene_Battle.prototype.createNetExTurnImg = function() {
+        this._netExTurnImg = new MATTIE.multiplayer.spriteNetExTurn();
+        this.addChild(this._netExTurnImg);
+    };
+
+    Scene_Battle.prototype.createReadyImg = function() {
+        this._netExTurnImg = new MATTIE.multiplayer.spriteReady();
+        this.addChild(this._netExTurnImg);
+    };
+
+    Scene_Battle.prototype.createAwaitingImg = function() {
+        this._netExTurnImg = new MATTIE.multiplayer.spriteWaiting();
+        this.addChild(this._netExTurnImg);
+    };
+
+
+    Sprite_ExTurn.prototype.update = function() {
+        Sprite.prototype.update.call(this);
+        this.opacity += (Galv.EXTURN.active && !MATTIE.multiplayer.ready) ? Galv.EXTURN.fade : -Galv.EXTURN.fade;
+    };

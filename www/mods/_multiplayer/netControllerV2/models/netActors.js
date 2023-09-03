@@ -11,7 +11,7 @@ DataManager.createGameObjects = function(){
     try {
         MATTIE.multiplayer.getCurrentNetController().player.$gamePlayer = $gamePlayer;
     } catch (error) {
-        
+        console.log("could not create local player")
     }
     
 }
@@ -22,7 +22,7 @@ DataManager.extractSaveContents = function(contents) {
     try {
         MATTIE.multiplayer.getCurrentNetController().player.$gamePlayer = $gamePlayer;
     } catch (error) {
-        
+        console.log("could not create local player")
     }
 }
 /** a simple class containing the game actor and the assosiated dataActor id (for clean up) */
@@ -64,7 +64,9 @@ MATTIE.multiplayer.NetActors.prototype.createNewNetActor = function(baseActorId)
  * @returns {Game_Actor}
  */
 MATTIE.multiplayer.NetActors.prototype.actor = function(netActorId){
-    return this._data[netActorId].gameActor;
+    let data =this._data[netActorId]
+    if(data) return data.gameActor;
+    return null;
 }
 
 /**

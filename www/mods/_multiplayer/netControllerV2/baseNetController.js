@@ -162,6 +162,18 @@ class BaseNetController extends EventEmitter {
         if(data.spawnEvent){
             this.onEventSpawn(data.spawnEvent,data.id);
         }
+        if(data.transformEnemy){
+            this.onTransformEventData(data.transformEnemy,data.id);
+        }
+        if(data.appearEnemy){
+            this.onAppearEnemyEventData(data.appearEnemy,data.id);
+        }
+        if(data.enemyState){
+            this.onEnemyStateEventData(data.enemyState,data.id)
+        }
+        if(data.saveEvent){
+            this.onSaveEventData();
+        }
     }
 
     //-----------------------------------------------------
@@ -199,17 +211,27 @@ class BaseNetController extends EventEmitter {
             this.syncActorData(actorDataArr, id)
             this.syncEnemyHealths(enemyHealthArr);
             this.syncEnemyStates(enemyStatesArr);
+            setTimeout(() => {
+                BattleManager.doneSyncing(); //done syncing  
+            }, MATTIE.multiplayer.combatEmitter.minSyncTime);
+            
         }   
     }
 
     syncActorData(actorDataArr, partyId){
+        
         let party = this.netPlayers[partyId].battleMembers();
         for (let index = 0; index < actorDataArr.length; index++) {
+            /**@type {Game_Actor} */
+            let actor = party[index]
             const actorData = actorDataArr[index];
             const newActorHealth = actorData.hp;
             const newActorMana = actorData.mp;
-            party[index].setHp(newActorHealth)
-            party[index].setMp(newActorMana)
+            if(actor.hp > newActorHealth){
+                actor.performDamage();
+            }
+            actor.setHp(newActorHealth)
+            actor.setMp(newActorMana)
         }
     }
 
@@ -229,21 +251,23 @@ class BaseNetController extends EventEmitter {
     syncEnemyHealths(enemyHealthArr){
         for (let index = 0; index < $gameTroop._enemies.length; index++) {
             const enemy = $gameTroop._enemies[index];
-            let orgHp = enemy._hp;
-            $gameTroop._enemies[index].setHp(Math.min(enemy._hp,enemyHealthArr[index]));
-            //enemy.performDamage();
-            if(orgHp > 0 && enemy._hp <= 0) {
-                let ids = $gameTroop.getIdsInCombatWithExSelf();
-                if(ids){
-                    if(ids.length > 0){
-                        this.netPlayers[ids[parseInt(Math.random()*ids.length)]].battleMembers()[0].performAttack();
+            if(enemy){
+                let orgHp = enemy._hp;
+                $gameTroop._enemies[index].setHp(Math.min(enemy._hp,enemyHealthArr[index]));
+                if(orgHp > 0 && enemy._hp <= 0) {
+                    let ids = $gameTroop.getIdsInCombatWithExSelf();
+                    if(ids){
+                        if(ids.length > 0){
+                            this.netPlayers[ids[parseInt(Math.random()*ids.length)]].battleMembers()[0].performAttack();
+                        }
                     }
+                    
+                    enemy.addState(enemy.deathStateId());
+                    enemy.performCollapse();
+                    enemy.hide();
                 }
-                
-                enemy.addState(enemy.deathStateId());
-                enemy.performCollapse();
-                enemy.hide();
             }
+            
 
            
         }
@@ -265,6 +289,7 @@ class BaseNetController extends EventEmitter {
         obj.ready = {};
         obj.ready.val = true;
         obj.ready.actions = actions;
+        obj.ready.isExtraTurn = Galv.EXTURN.active;
         $gameTroop.setReadyIfExists(MATTIE.multiplayer.getCurrentNetController().peerId,1);  //set the player as ready in combat arr
         this.sendViaMainRoute(obj)
     }
@@ -278,6 +303,7 @@ class BaseNetController extends EventEmitter {
         var obj = {};
         obj.ready = {};
         obj.ready.val = false;
+        obj.ready.isExtraTurn = Galv.EXTURN.active;
         $gameTroop.setReadyIfExists(MATTIE.multiplayer.getCurrentNetController().peerId,0); //set the player as unready in combat arr
         this.sendViaMainRoute(obj)
     }
@@ -289,10 +315,12 @@ class BaseNetController extends EventEmitter {
      */
     onReadyData(readyObj, senderId){
         let val = readyObj.val;
+        let isExtraTurn = readyObj.isExtraTurn;
         let id = senderId;
         if(MATTIE.multiplayer.currentBattleEvent){
             MATTIE.multiplayer.currentBattleEvent.setReadyIfExists(id,val); //set the player as unready in combat arr @legacy
-            $gameTroop.setReadyIfExists(id,val); //set the player as unready in combat arr <- this one is actually used
+            $gameTroop.setReadyIfExists(id,val,isExtraTurn); //set the player as unready in combat arr <- this one is actually used
+            if(val===false)console.log("net unready recived")
         }
             
 
@@ -310,8 +338,9 @@ class BaseNetController extends EventEmitter {
                             action._netTarget = action.netPartyId;
                         }
                     }
+                    actor.partyIndex = ()=>this.netPlayers[senderId].battleMembers().indexOf(actor); //set the party index function
                     actor.setCurrentAction(action);
-                    BattleManager.addNetActionBattler(actor);
+                    BattleManager.addNetActionBattler(actor,isExtraTurn);
                 }
                 
             });
@@ -365,30 +394,37 @@ class BaseNetController extends EventEmitter {
      * @param {*} id the id of the peer who's player moved
      */
     moveNetPlayer(moveData,id){
-        if(moveData.x){
-            if(moveData.t){
-                moveData.map = $gameMap.mapId();
-                this.transferNetPlayer(moveData,id,false);
-            }else{
-                if(Math.abs(moveData.x -$gamePlayer._x) > 3){
+        if(this.netPlayers[id].map ===$gameMap.mapId()){//only call if on same map
+            if(moveData.x){
+                let dist =Math.sqrt((moveData.x - $gamePlayer._x)**2 + (moveData.y -$gamePlayer._y)**2);
+                if(moveData.t){
                     moveData.map = $gameMap.mapId();
                     this.transferNetPlayer(moveData,id,false);
                 }else{
-                    this.netPlayers[id].$gamePlayer._x = moveData.x;
-                    this.netPlayers[id].$gamePlayer._y = moveData.y;
+                    
+                    if(dist > 4){
+                        moveData.map = $gameMap.mapId();
+                        this.transferNetPlayer(moveData,id,false);
+                    }else if (dist > 2){
+                        this.netPlayers[id].$gamePlayer._x = moveData.x;
+                        this.netPlayers[id].$gamePlayer._y = moveData.y;
+                    }
+                    
                 }
-                
+            }else{
+                try {
+                    this.netPlayers[id].$gamePlayer.moveOneTile(moveData.d)
+                } catch (error) {
+                    console.warn('something went wrong when moving the character' + error)
+                }
             }
-            //moveData.map = $gameMap.mapId();
-            
-            //this.transferNetPlayer(moveData,id);
-        }else{
-            try {
-                this.netPlayers[id].$gamePlayer.moveOneTile(moveData.d)
-            } catch (error) {
-                console.warn('something went wrong when moving the character' + error)
+        } else{ //if player not on map update pos ONLY
+            if(moveData.x){ 
+                this.netPlayers[id].$gamePlayer._x = moveData.x; //update pos only
+                this.netPlayers[id].$gamePlayer._y = moveData.y; //update pos only
             }
         }
+        
         
         
     }
@@ -486,6 +522,7 @@ class BaseNetController extends EventEmitter {
         this.emitChangeInBattlersEvent(this.formatChangeInBattleObj(obj.eventId,obj.mapid,this.peerId));
         $gameMap.event(obj.battleStart.eventId).addIdToCombatArr(this.peerId)
         this.battleStartAddCombatant(obj.battleStart.troopId, this.peerId);
+        MATTIE.emitTransfer(); //emit transfer event to make sure player is positioned correctly on other players screens
        
     }
 
@@ -551,10 +588,14 @@ class BaseNetController extends EventEmitter {
             if(element){
                 if(element.name === troopName){
                     if(element._combatants){
-                        element._combatants[id] = 0
+                        element._combatants[id] = {};
+                        element._combatants[id].bool = 0
+                        element._combatants[id].isExtraTurn = 0
                     }else{
                         element._combatants = {};
-                        element._combatants[id] = 0
+                        element._combatants[id] = {};
+                        element._combatants[id].bool = 0
+                        element._combatants[id].isExtraTurn = 0
                     }
                 }
         }
@@ -569,10 +610,14 @@ class BaseNetController extends EventEmitter {
             $gameTroop.addIdToCombatArr(id)
         } else { 
             if($dataTroops[troopId]._combatants){
-                $dataTroops[troopId]._combatants[id] = 0
+                $dataTroops[troopId]._combatants[id] = {};
+                $dataTroops[troopId]._combatants[id].bool = 0
+                $dataTroops[troopId]._combatants[id].isExtraTurn = 0
             }else{
                 $dataTroops[troopId]._combatants = {};
-                $dataTroops[troopId]._combatants[id] = 0
+                $dataTroops[troopId]._combatants[id] = {};
+                $dataTroops[troopId]._combatants[id].bool = 0
+                $dataTroops[troopId]._combatants[id].isExtraTurn = 0
             }
         }
     }
@@ -676,6 +721,9 @@ class BaseNetController extends EventEmitter {
         this.netPlayers[peerId] = new PlayerModel(name,actorId);
         this.netPlayers[peerId].followerIds = followerIds;
         this.netPlayers[peerId].setPeerId(peerId);
+        if(!this.netPlayers[peerId].$gamePlayer){
+            this.netPlayers[peerId].initSecondaryGamePlayer();
+        }
     }
 
     updatePlayerInfo(){
@@ -737,6 +785,7 @@ class BaseNetController extends EventEmitter {
         this.emit("ctrlSwitch", obj)
     }
 
+    
     onCtrlSwitchData(ctrlSwitch,id){
         if(MATTIE.multiplayer.devTools.eventLogger)console.debug("on ctrl switch data")
         let index = ctrlSwitch.i;
@@ -746,9 +795,12 @@ class BaseNetController extends EventEmitter {
         if(s==0){
             $gameSwitches.setValue(index, val, true);
         } else if(s==1) {
-            $gameSelfSwitches.setValue(index, val);
+            if(MATTIE.multiplayer.varSyncer.syncedOnce) //self switches only update if vars are synced, this fixes menus.
+            $gameSelfSwitches.setValue(index, val, true);
         } else if(s==2) {
-            $gameVariables.setValue(index, val,true);
+            if(MATTIE.multiplayer.devTools.varLogger)
+            console.log("NetPlayer Set " + index + " to " + val)
+            $gameVariables.setValue(index, val, true);
         }
     }
 
@@ -770,6 +822,11 @@ class BaseNetController extends EventEmitter {
         MATTIE.static.variable.syncedVars.forEach(id=>{
             obj.syncedVars[id] = $gameVariables.value(id);
         })
+
+        MATTIE.static.variable.secondarySyncedVars.forEach(id=>{
+            obj.syncedVars[id] = $gameVariables.value(id);
+        })
+
         MATTIE.static.switch.syncedSwitches.forEach(id=>{
             obj.syncedSwitches[id] = $gameSwitches.value(id);
         })
@@ -916,6 +973,133 @@ class BaseNetController extends EventEmitter {
             // }, 1000);
         }
         
+    }
+
+    //-----------------------------------------------------
+    //Transform Event
+    //-----------------------------------------------------
+
+    /**
+     * @description emit the transform enemy event
+     * @emits transformEnemy
+     * @param {*} enemyIndex the index of the enemy to transform
+     * @param {*} transformIndex the transform index
+     */
+    emitTransformEvent(enemyIndex,transformIndex){
+        let obj = {};
+        obj.transformEnemy = {};
+        obj.transformEnemy.enemyIndex = enemyIndex;
+        obj.transformEnemy.transformIndex = transformIndex
+        this.sendViaMainRoute(obj);
+        this.emit("transformEnemy");
+    }
+
+    /**
+     * @description transform an enemy based on net event
+     * @param {*} enemyTransformObj the net obj for enemy transform
+     * @param {*} id sender id, make sure local player is in combat with this troop before doing anything
+     */
+    onTransformEventData(enemyTransformObj,id){
+        if($gameTroop.getIdsInCombatWithExSelf().includes(id)){
+            let enemyIndex = enemyTransformObj.enemyIndex;
+            let transformIndex = enemyTransformObj.transformIndex;
+            MATTIE.multiplayer.enemyCommandEmitter.transformEnemy(enemyIndex, transformIndex);
+        }
+    }
+
+    //-----------------------------------------------------
+    //Enemy Appear Event
+    //-----------------------------------------------------
+
+    /**
+     * @description emit the transform enemy event
+     * @emits appearEnemy
+     * @param {*} enemyIndex the index of the enemy to appear
+     */
+    emitAppearEnemyEvent(enemyIndex){
+        let obj = {};
+        obj.appearEnemy = {};
+        obj.appearEnemy.enemyIndex = enemyIndex;
+        this.sendViaMainRoute(obj);
+        this.emit("appearEnemy");
+    }
+
+    /**
+     * @description appear an enemy based on net event
+     * @param {*} enemyAppearObj the net obj for enemy transform
+     * @param {*} id sender id, make sure local player is in combat with this troop before doing anything
+     */
+    onAppearEnemyEventData(enemyAppearObj,id){
+        if($gameTroop.getIdsInCombatWithExSelf().includes(id)){
+            let enemyIndex = enemyAppearObj.enemyIndex;
+            MATTIE.multiplayer.enemyCommandEmitter.appearEnemy(enemyIndex);
+        }
+    }
+
+    //-----------------------------------------------------
+    //Enemy Add State Event
+    //-----------------------------------------------------
+
+    /**
+     * @description emit the state enemy event
+     * @emits enemyState
+     * @param {int} enemyIndex the index of the enemy to appear
+     * @param {bool} addState add or remove the state
+     * @param {int} stateId the state id
+     */
+    emitEnemyStateEvent(enemyIndex, addState,stateId ){
+        let obj = {};
+        obj.enemyState = {};
+        obj.enemyState.enemyIndex = enemyIndex;
+        obj.enemyState.addState = addState;
+        obj.enemyState.stateId = stateId;
+        this.sendViaMainRoute(obj);
+        this.emit("enemyState");
+    }
+
+    /**
+     * @description change enemy state based on net eobj
+     * @param {*} enemyStateObj the net obj for enemy state event
+     * @param {*} id sender id, make sure local player is in combat with this troop before doing anything
+     */
+    onEnemyStateEventData(enemyStateObj,id){
+        if($gameTroop.getIdsInCombatWithExSelf().includes(id)){
+            let enemyIndex = enemyStateObj.enemyIndex;
+            let addState = enemyStateObj.addState;
+            let stateId = enemyStateObj.stateId;
+            MATTIE.multiplayer.enemyCommandEmitter.stateChange(enemyIndex, addState, stateId)
+        }
+    }
+
+    //-----------------------------------------------------
+    // Save Event
+    //-----------------------------------------------------
+
+    /**
+     * @description used for syncing saves
+     * @emits saveEvent
+     */
+    emitSaveEvent(){
+        if(MATTIE.multiplayer.params.syncSaves){
+            let obj = {};
+            obj.saveEvent = 1;
+            this.emit("saveEvent");
+            this.sendViaMainRoute(obj)
+        }
+    }
+
+    /**
+     * @description open save menu
+     */
+    onSaveEventData(){
+        let prevFunc = Scene_Save.prototype.helpWindowText;
+        Scene_Save.prototype.helpWindowText = () => "An ally trigged a save. Please choose a slot to save."
+        Game_Interpreter.prototype.command352();
+        setTimeout(() => { 
+            //we are changing the getter for a few seconds just to retrive a string once and then go back to normal
+            //this is easier than properly extending.
+            Scene_Save.prototype.helpWindowText = prevFunc;
+        }, 2000);
     }
 
 

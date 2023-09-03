@@ -12,13 +12,13 @@ MATTIE.eventAPI.addItemDropToCurrentMap = function(item){
     event.addPage();
     event.data.pages[1].conditions.selfSwitchValid=true;
     event.setImage(0, MATTIE.static.events.images.shiny);
-    event.addCommand(0,101,["", 0, 0, 2])
-    event.addCommand(0,401,["There is something shining here...."])
-    event.addCommand(0,101,["", 0, 0, 2])
-    event.addCommand(0,401,["You find... A " + itemObj.name])
-    if(item.isArmor()) event.addCommand(0,128,[itemObj._itemId,0,0,1]) //give armor
-    else if (item.isWeapon()) event.addCommand(0,127,[itemObj._itemId,0,0,1]) //give weapon
-    else event.addCommand(0,126,[itemObj.id,0,0,1]) //give item
+    event.addCommand(0,101,["", 0, 0, 2]);
+    event.addCommand(0,401,["There is something shining here...."]);
+    event.addCommand(0,101,["", 0, 0, 2]);
+    event.addCommand(0,401,["You find... A " + itemObj.name]);
+    if(item.isArmor()) event.addCommand(0,128,[itemObj.id,0,0,1]); //give armor
+    else if (item.isWeapon()) event.addCommand(0,127,[itemObj.id,0,0,1]); //give weapon
+    else event.addCommand(0,126,[itemObj.id,0,0,1]); //give item
     event.addCommand(0,123,["A",0])//set self switch
 
     event.spawn($gamePlayer.x,$gamePlayer.y);

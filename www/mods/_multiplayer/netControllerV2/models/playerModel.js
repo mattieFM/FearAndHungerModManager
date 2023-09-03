@@ -42,13 +42,21 @@ class PlayerModel {
         return this.battleMembers();
     }
 
-    battleMembers(){
+    displayMembers(){
         let arr = [];
         arr.push(this.$gamePlayer.actor());
         this.followerIds.forEach(followerId=>{
             let actor = this.$netActors.baseActor(followerId);
-            if(actor.isAlive()) arr.push(actor);
+            arr.push(actor);
         })
+        return arr;
+    }
+
+    battleMembers(){
+        let arr = this.displayMembers();
+        // while(arr.length < $gameParty.maxBattleMembers()){
+        //     arr.push(new Game_Actor());
+        // }
         return arr;
     }
 
@@ -95,7 +103,9 @@ class PlayerModel {
         this.actorId = id;
         if(this.$gamePlayer && typeof this.$gamePlayer === typeof MATTIE.multiplayer.Secondary_Player){
             this.$gamePlayer.setActor(id);
+            this.$gamePlayer.refresh();
         }
+        
     }
     
     initSecondaryGamePlayer(){
@@ -164,14 +174,14 @@ MATTIE.multiplayer.Secondary_Player.prototype.performTransfer = function () {
 }
 
 MATTIE.multiplayer.Secondary_Player.prototype.locate = function(x, y) {
-    let leaderX =this.x;
-    let leaderY = this.y;
     Game_Character.prototype.locate.call(this, x, y);
     this.center(x, y);
     this.makeEncounterCount();
     if (this.isInVehicle()) {
         this.vehicle().refresh();
     }
+    let leaderX =this.x;
+    let leaderY = this.y;
     this._followers.synchronize(x, y, this.direction(),leaderX,leaderY);
 };
 
@@ -183,9 +193,11 @@ MATTIE.multiplayer.Secondary_Player.prototype.locate = function(x, y) {
  * @param {*} leaderX leader x
  * @param {*} leaderY leader y
  */
-Game_Followers.prototype.synchronize = function(x, y, d,leaderX,leaderY) {
+Game_Followers.prototype.synchronize = function(x, y, d,leaderX=null,leaderY=null) {
+    if(!leaderX) leaderX = $gamePlayer.x;
+    if(!leaderY) leaderY = $gamePlayer.y;
     this.forEach(function(follower) {
-        let dist =Math.sqrt((follower.x - x)**2 + (follower.y -y)**2);
+        let dist = Math.sqrt((follower.x - leaderX)**2 + (follower.y -leaderY)**2);
         if(dist > $gameParty.maxBattleMembers()+1){ //only sync if follower too far away
             follower.locate(x, y);
             follower.setDirection(d);

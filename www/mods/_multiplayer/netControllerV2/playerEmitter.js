@@ -81,9 +81,9 @@ MATTIE.multiplayer.gamePlayer.override = function() {
 
     //override performTransfer to emit events with the data we stored
     MATTIE.RPG.performTransfer = Game_Player.prototype.performTransfer;
-    Game_Player.prototype.performTransfer = function(){
+    Game_Player.prototype.performTransfer = function(shouldSync=true){
         MATTIE.RPG.performTransfer.call(this);
-        if(MATTIE.multiplayer.isActive){
+        if(MATTIE.multiplayer.isActive && shouldSync){
             let netController = MATTIE.multiplayer.getCurrentNetController();
             netController.emitTransferEvent(MATTIE.multiplayer.renderer.currentTransferObj)
         }        
@@ -95,20 +95,24 @@ MATTIE.multiplayer.gamePlayer.override = function() {
         //console.log("map loaded")
         MATTIE.RPG.sceneMapOnLoaded .call(this);
         if(MATTIE.multiplayer.isActive){
-            MATTIE.multiplayer.renderer.currentTransferObj = {};
-            MATTIE.multiplayer.renderer.currentTransferObj.transfer = {};
-            MATTIE.multiplayer.renderer.currentTransferObj.transfer.x = $gamePlayer.x;
-            MATTIE.multiplayer.renderer.currentTransferObj.transfer.y = $gamePlayer.y;
-            MATTIE.multiplayer.renderer.currentTransferObj.transfer.map = $gameMap.mapId();
-            let netController = MATTIE.multiplayer.getCurrentNetController();
-
-            //handle setting the proper actor id when the player loads into a map 
-            //this does also allow the main actor changing if we want
-            netController.updatePlayerInfo();
-            netController.emitTransferEvent( MATTIE.multiplayer.renderer.currentTransferObj)
+            MATTIE.emitTransfer();
             MATTIE.multiplayer.setEnemyHost();
         
         }
+    }
+
+    MATTIE.emitTransfer =function(){
+        MATTIE.multiplayer.renderer.currentTransferObj = {};
+        MATTIE.multiplayer.renderer.currentTransferObj.transfer = {};
+        MATTIE.multiplayer.renderer.currentTransferObj.transfer.x = $gamePlayer.x;
+        MATTIE.multiplayer.renderer.currentTransferObj.transfer.y = $gamePlayer.y;
+        MATTIE.multiplayer.renderer.currentTransferObj.transfer.map = $gameMap.mapId();
+        let netController = MATTIE.multiplayer.getCurrentNetController();
+
+        //handle setting the proper actor id when the player loads into a map 
+        //this does also allow the main actor changing if we want
+        netController.updatePlayerInfo();
+        netController.emitTransferEvent( MATTIE.multiplayer.renderer.currentTransferObj)
     }
 
 
