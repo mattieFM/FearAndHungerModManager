@@ -10,10 +10,12 @@ MATTIE.static.commonEvents = MATTIE.static.commonEvents || {};
 MATTIE.static.variable = MATTIE.static.variable || {};
 MATTIE.static.switch = MATTIE.static.switch || {};
 
-
+MATTIE.static.maps = MATTIE.static.maps || {};
 MATTIE.static.events = MATTIE.static.events || {};
 MATTIE.static.events.images = MATTIE.static.events.images || {};
+//maps
 
+MATTIE.static.maps.menuMaps = [];
 //items
 MATTIE.static.items.emptyScroll = null;
 
@@ -29,6 +31,8 @@ MATTIE.static.rpg.battleProcessingId = 301;
 //Variableids
 MATTIE.static.variable.syncedVars = [];
 MATTIE.static.variable.ignoredVars = [];
+MATTIE.static.variable.secondarySyncedVars = [];
+MATTIE.static.variable.godAffinityAndPrayerVars = [];
 
 //switchids
 MATTIE.static.switch.ignoredSwitches = [];
@@ -51,6 +55,22 @@ MATTIE.static.update = function(){
 
     if(MATTIE.global.version === 1){
         //static values specific to funger 1
+
+        //maps
+        
+        MATTIE.static.maps.menuMaps = [
+            10, //start
+            2, //char creation
+            72,
+            73, //fortress intro
+            86, //fortress ending
+            130, //dungoen knights
+            61, //unused hexen map
+            64, //unused test map
+
+
+        ]
+        MATTIE.static.maps.menuMaps = MATTIE.static.rangeParser(MATTIE.static.maps.menuMaps);
 
 
         //items
@@ -225,7 +245,8 @@ MATTIE.static.update = function(){
             //          Menu Switches
             //-------------------------------------------------------
             "5-8", //probably char creation switches
-            "285-296", //intro
+            "213-214", //more menus
+            "295-296", //intro
             411, //scene skip allowed
             952,
             1210, //hexen cursor
@@ -272,6 +293,7 @@ MATTIE.static.update = function(){
             660, //demon kid give to pocket cat
             695, //demon kid growing
             3350, //NO_DECREASING, this blocks stats from lowering?
+            "1181-1184", //souls should not be shared
 
             //--------------------------------------------------------------------------
             //          Ending Switches
@@ -412,9 +434,20 @@ MATTIE.static.update = function(){
             //wall randoms? I think crowmauler vars mabye
             3392,
             3393,
+
+            //blood portal vars
+            "1157-1166",
+            1168,
+
         ] 
         //vars
-        MATTIE.static.variable.syncedVars = [
+        MATTIE.static.switch.syncedSwitches = MATTIE.static.rangeParser(MATTIE.static.switch.syncedSwitches);
+
+        MATTIE.static.variable.secondarySyncedVars = [
+            //these are vars that will be synced based on a cooldown when the map is loaded.
+            //put anything in here that need to be synced, but not imidietly. things like enemy death, lever states etc...
+
+
             //main random vars, mostly for the floors and big stuff
             68,
             69,
@@ -438,10 +471,10 @@ MATTIE.static.update = function(){
             260, //cave dweller massacre
             208, //black witch rand
             209, //random hole
-        
+
 
             354,  //elite guard rand
-           
+
 
             //darce random
             83, //darce variable
@@ -454,17 +487,171 @@ MATTIE.static.update = function(){
 
             //merc random
             86, //merc variable
+
+            //---------------------------
+            //timer vars
+            //---------------------------
+            "155-157",
+            "281-283", //buckman timer
+        ]
+        MATTIE.static.variable.secondarySyncedVars = MATTIE.static.rangeParser(MATTIE.static.variable.secondarySyncedVars);
+        MATTIE.static.variable.syncedVars = [
+            //these are vars that will always be synced
+            //these ignore silenced interpreters, so be very careful adding something.
+            //if something is changed constantly in here it will be forwarded along net, and take up a lot of bandwidth.
+           
+            
+
+
+            
+
+            //---------------------------
+            //temple of torment vars
+            //---------------------------
+            151,
+            152,
+            153, //conciousness
+
+            //---------------------------
+            //tomb of the gods vars
+            //---------------------------
+            "284-299",
+
+
+
+
+
+            //---------------------------
+            //portal vars
+            //---------------------------
+            161,
+            
+
+
+            
+
+
+            
+
+
+            
+
+
+
             
         ]
 
         MATTIE.static.variable.syncedVars = MATTIE.static.rangeParser(MATTIE.static.variable.syncedVars);
-
-        MATTIE.static.variable.ignoredVars = [ //ignored vars
-            398 //torch timer
+        MATTIE.static.variable.godAffinityAndPrayerVars = [
+            //---------------------------
+            //God Affinities
+            //---------------------------
+            "35-38", //GOD Vars... GROGAROTH_VAR
+            79, //god of the depths var 2
+            "162-165", //more affinities... Afinity_God
         ]
 
+        MATTIE.static.variable.godAffinityAndPrayerVars = MATTIE.static.rangeParser(MATTIE.static.variable.godAffinityAndPrayerVars);
+        MATTIE.static.variable.ignoredVars = [ //ignored vars
+            
+
+            1, //Lightswitch
+            2, //daynightsave
+            "5-8", //charHp, Char x, Char y
+            9, //menu
+            10, //daynight cycle
+            13, //class_select
+            14, //coinflip
+            "15-16", //random items
+            "17-18", //bleeding
+            19, //battle turn
+            27, //HUNGER
+            33, //love corner
+            34, //party size
+
+            "41-51", //MONSTER POS vars? not sure. I think the code that handles monsters moving should override these anyways.
+            "72-75", //MONSTER POS VARS
+            "92-95", //More pos
+            "159-160", //more pos
+            "256-259",
+            "321-332", //more pos
+            "351-352", //more pos
+            "351-395", //rolling (probably the poorly animated 3d boulders)
+
+            58, //night lerch leap.
+
+            "62-65", //Dungeon Knights Affection
+            70, //dungoen knights merc affection
+            "87-88", //dungeon knights more affection
+            "303-313", //more affection
+            "334-343", //more affection
+
+            90, //demon baby growing
+
+            67, //char name
+
+            96,//silver coins?
+
+            "102-103", //mapID, mapX, mapY
 
 
+            "107-119", //crippled vars
+            "137-150", //hunger and paranoia
+            158, //player mp fear
+
+
+            //---------------------------
+            //menu vars
+            //---------------------------
+            "166-167",//hexen
+            254, //cube cooldown
+            "357-359", //coin flip vars
+            253, //mapid2
+            396, //battleturns2
+            405, //sleeping_bed
+            406, //partymember
+
+            //---------------------------
+            //trap vars
+            //---------------------------
+            "168-203", //spikes
+            "212-227", //fire
+
+            "204-206", //sawing_off
+
+
+            "230-250", //infection vars
+
+
+            255, //char hp check
+
+
+
+
+
+            "261-278", //curse vars
+
+            
+
+            //timers
+            399,    
+            400,
+            398, //torch timer
+            403, //torch2
+        ]
+
+        MATTIE.static.variable.ignoredVars = MATTIE.static.rangeParser(MATTIE.static.variable.ignoredVars);
+
+
+
+        
+        if(MATTIE.multiplayer){
+            if(MATTIE.multiplayer.params.sharedAffinity){
+                MATTIE.static.variable.syncedVars = MATTIE.static.variable.syncedVars.concat(MATTIE.static.variable.godAffinityAndPrayerVars);
+            }else{
+                MATTIE.static.variable.ignoredVars = MATTIE.static.variable.ignoredVars.concat(MATTIE.static.variable.godAffinityAndPrayerVars);
+            }
+        }
         //events
 
         //event images

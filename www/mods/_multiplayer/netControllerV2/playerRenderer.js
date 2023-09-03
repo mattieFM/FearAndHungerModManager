@@ -21,9 +21,8 @@ MATTIE.multiplayer.renderer._renderNetPlayers = function(target) {
             /** @type {PlayerModel} */
             const netPlayer = players[key];
             if($gameMap.mapId() === netPlayer.map){//only render players on same map
-                if(!netPlayer.$gamePlayer){
-                    netPlayer.initSecondaryGamePlayer();
-                }
+                netPlayer.$gamePlayer.setActor(netPlayer.actorId);
+                netPlayer.$gamePlayer.refresh();
                 let p2 = netPlayer.$gamePlayer;
                 p2.setTransparent(false);
 

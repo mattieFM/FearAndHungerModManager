@@ -39,3 +39,36 @@ MATTIE.scenes.multiplayer.startGame.prototype.createBackground = function() {
     this.addChild(this._backSprite1);
     this.addChild(this._backSprite2);
 };
+
+
+/**
+ * new game scene
+ */
+
+MATTIE.scenes.multiplayer.newGame = function () {
+    this.initialize.apply(this, arguments);
+}
+
+MATTIE.scenes.multiplayer.newGame.prototype = Object.create(Scene_Title.prototype);
+MATTIE.scenes.multiplayer.newGame.prototype.constructor = MATTIE.scenes.multiplayer.newGame;
+
+MATTIE.scenes.multiplayer.newGame.prototype.create = function() {
+    Scene_Title.prototype.create.call(this);
+}
+
+MATTIE.scenes.multiplayer.newGame.prototype.createCommandWindow = function() {
+    this._commandWindow = new MATTIE.windows.multiplayer.newGameWin();
+    
+    this._commandWindow.setHandler(MATTIE.CmdManager.newGame, (() => {
+        MATTIE.menus.toNewMenu();
+    }).bind(this));
+
+    this.addWindow(this._commandWindow);
+};
+
+MATTIE.scenes.multiplayer.newGame.prototype.createBackground = function() {
+    this._backSprite1 = new Sprite(ImageManager.loadTitle1($dataSystem.title1Name));
+    this._backSprite2 = new Sprite(ImageManager.loadBitmap("mods/_multiplayer/","multiPlayerMenu",0,true, true));
+    this.addChild(this._backSprite1);
+    this.addChild(this._backSprite2);
+};

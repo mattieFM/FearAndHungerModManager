@@ -294,7 +294,7 @@ class MapEvent {
         if(this.data.mapId === $gameMap.mapId()){
             this.setPosition(x, y);
             MATTIE.eventAPI.dataEvents[this.data.id] = (this.data);
-            $dataMap.events[this.data.id] = this.data;
+            $dataMap.events[this.data.id] = MATTIE.eventAPI.dataEvents[this.data.id];
             var event = this.createGameEvent();
             var sprite = this.createCharacterSprite(event);
             this.addSpriteToTilemap(sprite);
@@ -318,6 +318,10 @@ class MapEvent {
 
         // Get all existing event ids
         var eventIds = [];
+        Object.keys(MATTIE.eventAPI.dataEvents).forEach(key=>{
+            let event = MATTIE.eventAPI.dataEvents[key];
+            if(event) eventIds.push(event.id);
+        })
         $dataMap.events.forEach(function(object) {
             if (object === null)
                 return;

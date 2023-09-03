@@ -15,7 +15,7 @@ MATTIE.multiplayer.isHost = false;
 MATTIE.multiplayer.isEnemyHost = false;
 MATTIE.multiplayer.isDev = true;
 MATTIE.multiplayer.devTools = {};
-MATTIE.multiplayer.devTools.shouldTint = true;
+MATTIE.multiplayer.devTools.shouldTint = false;
 MATTIE.multiplayer.devTools.eventLogger = false;
 MATTIE.multiplayer.devTools.varLogger = false;
 MATTIE.multiplayer.devTools.cmdLogger = false;
@@ -82,24 +82,11 @@ MATTIE.multiplayer.devTools.randBetween = function(min, max) {
     return min + Math.floor(Math.random() * (max-min+1))
 }
 
-Input.addKeyBind('n', ()=>{
-    let netPlayers = MATTIE.multiplayer.getCurrentNetController().netPlayers;
-    let netPlayerIds = Object.keys(netPlayers)
-    let randomPlayer = netPlayers[netPlayerIds[MATTIE.multiplayer.devTools.randBetween(0, netPlayerIds.length-1)]];
-    let mapId = randomPlayer.map;
-    let x = randomPlayer.$gamePlayer.x;
-    let y = randomPlayer.$gamePlayer.y;
-    $gamePlayer.reserveTransfer(mapId,x,y, 0, 2);
-    setTimeout(() => {
-        $gamePlayer.performTransfer();
-    }, 100);
-    
 
-}, "TP", 0)
 
-// Input.addKeyBind('z', ()=>{
-//     SceneManager.goto(Scene_Gameover);
-// }, "DIE", -2)
+Input.addKeyBind('z', ()=>{
+    SceneManager.goto(Scene_Gameover);
+}, "DIE", -2)
 
 Input.addKeyBind('4', ()=>{
     console.log($gameTroop.totalCombatants());
@@ -156,6 +143,7 @@ MATTIE.multiplayer.getCurrentNetController = ()=>{
 
 (()=>{
     MATTIE.menus.mainMenu.addBtnToMainMenu("Multiplayer","multiplayer", MATTIE.menus.multiplayer.openMultiplayer.bind(this))
+    MATTIE.menus.mainMenu.addBtnToMainMenu("Rejoin","Rejoin", MATTIE.menus.multiplayer.openGame, MATTIE.multiplayer.getCurrentNetController()?MATTIE.multiplayer.getCurrentNetController().isClient:false)
     MATTIE.menus.mainMenu.addBtnToMainMenu("Disable Multiplayer","Disable_Multiplayer", (()=>{
         MATTIE_ModManager.modManager.switchStatusOfMod("multiplayer");
         MATTIE_ModManager.modManager.reloadGame();

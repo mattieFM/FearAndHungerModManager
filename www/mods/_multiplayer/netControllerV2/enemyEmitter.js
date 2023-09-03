@@ -108,10 +108,14 @@ Game_Troop.prototype.inCombat = function () {
 
 Game_Troop.prototype.addIdToCombatArr = function(id){
     if(this._combatants){
-        this._combatants[id] = 0
+        this._combatants[id] = {};
+        this._combatants[id].bool = false;
+        this._combatants[id].isExtraTurn = false;
     } else{
         this._combatants = {};
-        this._combatants[id] = 0;
+        this._combatants[id] = {};
+        this._combatants[id].bool = false;
+        this._combatants[id].isExtraTurn = false;
     }
     
 }
@@ -122,16 +126,53 @@ Game_Troop.prototype.removeIdFromCombatArr = function(id){
     }
 }
 
-Game_Troop.prototype.setReadyIfExists = function (id, bool) {
+Game_Troop.prototype.setReadyIfExists = function (id, bool,isExtraTurn) {
     if(Object.keys(this._combatants).indexOf(id) != -1){
-        this._combatants[id] = bool;
+        this._combatants[id] = {};
+        this._combatants[id].bool = bool
+        this._combatants[id].isExtraTurn = isExtraTurn;
     }
 }
 
 Game_Troop.prototype.allReady = function () {
     let val = true;
+    console.log(this._combatants);
+    Object.keys(this._combatants).forEach(key => {
+        let element = this._combatants[key].bool;
+        if(element == false){
+            val = false
+        }
+    });
+    return val;
+}
+
+Game_Troop.prototype.allExTurnReady = function () {
+    let val = true;
+    let atleastOnExTurn = false
     Object.keys(this._combatants).forEach(key => {
         let element = this._combatants[key];
+        if(element.isExtraTurn) atleastOnExTurn = true;
+        if(element.isExtraTurn == true && element.bool == false) val = false
+        
+    });
+    return val && atleastOnExTurn;
+}
+
+Game_Troop.prototype.someExTurn = function () {
+    let val = false;
+    Object.keys(this._combatants).forEach(key => {
+        let element = this._combatants[key].isExtraTurn;
+        if(element == true){
+            val = true
+        }
+    });
+    return val;
+}
+
+Game_Troop.prototype.allExTurn = function () {
+    let val = true;
+    Object.keys(this._combatants).forEach(key => {
+        let element = this._combatants[key].isExtraTurn;
         if(element == 0){
             val = false
             return false;}
@@ -144,11 +185,15 @@ Game_Troop.prototype.getIdsInCombatWith = function () {
 }
 
 Game_CharacterBase.prototype.addIdToCombatArr = function (id, troopId = null) {
-    if(this._combatants)
-    this._combatants[id] = 0;
-    else{
+    if(this._combatants){
+    this._combatants[id] = {};
+    this._combatants[id].bool = false;
+    this._combatants[id].isExtraTurn = false;
+    }else{
     this._combatants = {};
-    this._combatants[id] = 0;
+    this._combatants[id] = {};
+    this._combatants[id].bool = false;
+    this._combatants[id].isExtraTurn = false;
 
     }
 
@@ -163,7 +208,7 @@ Game_CharacterBase.prototype.removeIdFromCombatArr = function (id) {
 
 Game_CharacterBase.prototype.setReadyIfExists = function (id, bool) {
     if(Object.keys(this._combatants).indexOf(id) != -1){
-        this._combatants[id] = bool;
+        this._combatants[id].bool = bool;
     }
 }
 

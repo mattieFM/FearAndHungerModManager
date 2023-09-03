@@ -56,21 +56,25 @@ MATTIE.scenes.multiplayer.main.prototype.createCommandWindow = function() {
     this._commandWindow = new MATTIE.windows.multiplayer.main();
     
     this._commandWindow.setHandler(MATTIE.CmdManager.host, (() => {
+        this._inputWin.close();
         MATTIE.multiplayer.clientController.player.name = this._inputWin.getInput();
         MATTIE.multiplayer.hostController.player.name = this._inputWin.getInput();
         MATTIE.menus.multiplayer.openHost();
     }).bind(this));
 
     this._commandWindow.setHandler(MATTIE.CmdManager.join,    (()=>{
+        this._inputWin.close();
         MATTIE.multiplayer.clientController.player.name = this._inputWin.getInput();
         MATTIE.multiplayer.hostController.player.name = this._inputWin.getInput();
         MATTIE.menus.multiplayer.openJoin();
     }).bind(this));
 
     this._commandWindow.setHandler(MATTIE.CmdManager.return,  (()=>{
+        this._inputWin.close();
         MATTIE.multiplayer.clientController.player.name = this._inputWin.getInput();
         MATTIE.multiplayer.hostController.player.name = this._inputWin.getInput();
         MATTIE.menus.toMainMenu();
+        
     }).bind(this));
     this.addWindow(this._commandWindow);
 };
@@ -121,6 +125,22 @@ MATTIE.windows.multiplayer.startWin.prototype.makeCommandList = function() {
     this.addCommand(MATTIE.TextManager.newGame,   MATTIE.CmdManager.newGame);
     this.addCommand(MATTIE.TextManager.loadGame, MATTIE.CmdManager.loadGame,DataManager.isAnySavefileExists());
 };
+
+
+/**
+ * new game win
+ */
+MATTIE.windows.multiplayer.newGameWin = function () {
+    this.initialize.apply(this, arguments);
+}
+
+MATTIE.windows.multiplayer.newGameWin.prototype = Object.create(Window_TitleCommand.prototype);
+MATTIE.windows.multiplayer.newGameWin.prototype.constructor = MATTIE.windows.multiplayer.newGameWin;
+
+MATTIE.windows.multiplayer.newGameWin.prototype.makeCommandList = function() {
+    this.addCommand(MATTIE.TextManager.newGame,   MATTIE.CmdManager.newGame);
+};
+
 
 
 //-----------------------------------

@@ -412,28 +412,35 @@ Graphics.hideError = function() {
     this.clearCanvasFilter();
 };
 
-
+MATTIE.suppressingAllErrors = false;
 MATTIE.onError = function(e) {
-    console.error(e);
+    if(!MATTIE.suppressingAllErrors){
+        console.error(e);
     console.error(e.message);
     console.error(e.filename, e.lineno);
     try {
         this.stop();
-        Graphics.printError('Error', e.message+"<br>Press 'Y' To Reboot without mods. <br> Press 'R' to try to continue despite this error. <br> Press 'N' to reboot with mods. <br><br> If you are reporting a bug, <br> include this screen with the error and what mod/mods you were using and when you were doing when the bug occurred. <br> Thanks <br> -Mattie");
+        Graphics.printError('Error', e.message+"<br>Press 'F7' or 'escape' to try to continue despite this error. <br><br>Press 'F9' to suppress all future errors. (be carful using this)<br><br>Press 'F6' To Reboot without mods. <br> Press 'F5' to reboot with mods. <br><br> If you are reporting a bug, <br> include this screen with the error and what mod/mods you were using and when you were doing when the bug occurred. <br> Thanks <br> -Mattie");
         AudioManager.stopAll();
         let cb = ((key)=>{
             console.log(key.key);
-            if(key.key === 'y'){
+            if(key.key === 'F6'){
                 MATTIE_ModManager.modManager.disableAndReload();
                 MATTIE_ModManager.modManager.reloadGame();
-            } else if(key.key === 'r'){
+            } else if(key.key === 'F7' || key.key === 'Escape'){
                 document.removeEventListener('keydown', cb, false)
                 Graphics.hideError();
                 this.resume()
             }
             
-            else if (key.key === 'n'){
+            else if (key.key === 'F5'){
                 MATTIE_ModManager.modManager.reloadGame();
+            }
+
+            else if (key.key === 'F9'){
+                MATTIE.suppressingAllErrors = true;
+                Graphics.hideError();
+                this.resume()
             }
             
         })
@@ -442,6 +449,8 @@ MATTIE.onError = function(e) {
     } catch (e2) {
         Graphics.printError('Error', e.message+"\nFUBAR");
     }
+    }
+    
 }
 
 //error handling woooooo

@@ -178,11 +178,12 @@ MATTIE.windows.textInput.prototype.initialize = function(x,y,width,height,header
 };
 MATTIE.windows.textInput.prototype.close = function(){
     MATTIE.windows.textDisplay.prototype.close.call(this);
-    document.removeEventListener('keydown', this._listenFunc);
+    document.removeEventListener('keydown', this._listenFunc, false);
 }
 MATTIE.windows.textInput.prototype.initEventHandler = function() {
     let lastKey = ""
     this._listenFunc = (event) => {
+        console.log(event.key)
         var key = event.key;
         //this is fucky but w/e its just a shitty menu so it shouldn't cause issues
         if(!key.startsWith("Arrow")) //no arrow key inputs

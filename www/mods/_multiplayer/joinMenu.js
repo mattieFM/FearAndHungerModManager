@@ -45,15 +45,18 @@ MATTIE.scenes.multiplayer.join.prototype.addOptionsBtns = function(){
     this._optionsWindow = new MATTIE.windows.horizontalBtns(175+300+10, btns, 3, enabled);
 
     this._optionsWindow.setHandler(MATTIE.CmdManager.joinGame, (()=>{
+        this._inputWin.close();
         MATTIE.multiplayer.clientController.hostId = this._inputWin.getInput()
         MATTIE.menus.multiplayer.openLobby();
     }).bind(this));
 
     this._optionsWindow.setHandler(MATTIE.CmdManager.returnToMultiplayer, (()=> {
+        this._inputWin.close();
         MATTIE.menus.multiplayer.openMultiplayer();
     }).bind(this));
 
     this._optionsWindow.setHandler(MATTIE.CmdManager.reconnect,  (()=>{
+        this._inputWin.close();
         MATTIE.multiplayer.getCurrentNetController().reconnectAllConns();
         MATTIE.menus.multiplayer.openGame();
 
