@@ -8,7 +8,9 @@ MATTIE.multiplayer.emittedInit = false;
 var EventEmitter = require("events");
 class BaseNetController extends EventEmitter {
     constructor() {
+        
         super();
+        this.netInterpreter = new Game_Interpreter();
         this.peerId;
         
         this.players = {};
@@ -535,6 +537,7 @@ class BaseNetController extends EventEmitter {
             var event = $gameMap.event(battleStartObj.eventId);
             event.addIdToCombatArr(id);
             event.lock();
+            event._trueLock = true;
         }    
         this.emitChangeInBattlersEvent(this.formatChangeInBattleObj(battleStartObj.eventId,battleStartObj.mapid,id));
 }
@@ -655,7 +658,11 @@ class BaseNetController extends EventEmitter {
                 var event = $gameMap.event(battleEndObj.eventId);
                 event.removeIdFromCombatArr(id);
                 
-                if(!event.inCombat()) setTimeout(() => event.unlock(), MATTIE.multiplayer.runTime);
+                if(!event.inCombat()) setTimeout(() => {
+                    event.unlock();
+                    event._trueLock = false;
+                
+                }, MATTIE.multiplayer.runTime);
                 else event.lock();
             }    
             this.emitChangeInBattlersEvent(this.formatChangeInBattleObj(battleEndObj.eventId,battleEndObj.mapid,id));
@@ -875,6 +882,8 @@ class BaseNetController extends EventEmitter {
     // Command Event
     //-----------------------------------------------------
 
+    
+
     /** @emits commandEvent */
     emitCommandEvent(cmd){
         let obj = {};
@@ -887,18 +896,16 @@ class BaseNetController extends EventEmitter {
     /** the cmd object */
     onCmdEventData(cmd, peerId){
         try {
-            if(MATTIE.multiplayer.devTools.cmdLogger)
-            console.debug(`${cmd.code} called in data event`)
-            /** @type {Game_Event} */
-            const event = $gameMap.event(cmd.eventId);
-            if(event._interpreter)
-            event._interpreter.executeCommand(cmd);
-            else{
-                $gameMap._interpreter.executeCommandFromParam(cmd);
-            } 
+            var interpreter = new Game_Interpreter();
+            interpreter.setup([cmd],cmd.parameters[0]);
+            var success = false;
+            do {
+                 success = interpreter.executeCommand(true);
+                 console.log(`${cmd.parameters[0]} called in data event` + JSON.stringify(cmd.parameters[1]))
+            } while (!success);
         } catch (error) {
-            
-        } 
+            console.log(error)
+        };
     }
 
     //-----------------------------------------------------
