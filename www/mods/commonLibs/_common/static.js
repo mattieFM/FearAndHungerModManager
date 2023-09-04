@@ -644,13 +644,15 @@ MATTIE.static.update = function(){
 
 
 
-        
+
         if(MATTIE.multiplayer){
-            if(MATTIE.multiplayer.params.sharedAffinity){
-                MATTIE.static.variable.syncedVars = MATTIE.static.variable.syncedVars.concat(MATTIE.static.variable.godAffinityAndPrayerVars);
-            }else{
-                MATTIE.static.variable.ignoredVars = MATTIE.static.variable.ignoredVars.concat(MATTIE.static.variable.godAffinityAndPrayerVars);
-            }
+            if(MATTIE.multiplayer.params){
+                if(MATTIE.multiplayer.params.sharedAffinity){
+                    MATTIE.static.variable.syncedVars = MATTIE.static.variable.syncedVars.concat(MATTIE.static.variable.godAffinityAndPrayerVars);
+                }else{
+                    MATTIE.static.variable.ignoredVars = MATTIE.static.variable.ignoredVars.concat(MATTIE.static.variable.godAffinityAndPrayerVars);
+                }
+            }   
         }
         //events
 

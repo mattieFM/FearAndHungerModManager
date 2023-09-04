@@ -36,7 +36,7 @@ Game_CharacterBase.prototype.moveStraight = function(d,callAnyways=false) {
 MATTIE.multiplayer.Game_EventCanPass = Game_Event.prototype.canPass;
 Game_Event.prototype.canPass = function(x, y, d) {
     var res = MATTIE.multiplayer.Game_EventCanPass.call(this,x,y,d);
-    if(this._locked) return false;
+    if(this._trueLock) return false;
     return res;
 }
 

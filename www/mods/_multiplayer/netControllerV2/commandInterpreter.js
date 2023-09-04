@@ -24,10 +24,11 @@ MATTIE.multiplayer.enabledNetCommands = [
 
 MATTIE.RPG.Game_InterpreterExecuteCommand = Game_Interpreter.prototype.executeCommand;
 
-Game_Interpreter.prototype.executeCommand = function () {
+Game_Interpreter.prototype.executeCommand = function (skip = false) {
     let cmd = this.currentCommand();
     
     let returnVal = MATTIE.RPG.Game_InterpreterExecuteCommand.call(this);
+    if(!skip)
     if(cmd){
         cmd.eventId = this.eventId();
         if(cmd.code)
@@ -40,10 +41,11 @@ Game_Interpreter.prototype.executeCommand = function () {
                     if(cmd.parameters[0] >= 0) { //not targeting $gamePlayer
                         if(MATTIE.multiplayer.devTools.enemyMoveLogger){
                             console.debug(this.eventId())
-                        console.debug(`set movement route emitted`);
+                            console.debug(`set movement route emitted`);
                         }
                         
                         if(MATTIE.multiplayer.isActive)
+                        console.log(cmd);
                         netController.emitCommandEvent(cmd)
                     }
                     break;
@@ -58,7 +60,6 @@ Game_Interpreter.prototype.executeCommand = function () {
     
     return returnVal;
 }
-
 
 MATTIE.multiplayer.runGameCmd = function(cmd){
     if (MATTIE.multiplayer._interpreter) {
@@ -89,4 +90,3 @@ Game_Interpreter.prototype.executeCommandFromParam = function(cmd) {
     }
     return true;
 };
-
