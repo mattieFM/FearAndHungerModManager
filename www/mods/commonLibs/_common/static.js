@@ -405,6 +405,11 @@ MATTIE.static.update = function(){
             //"3541-3548", //surprise events
             
 
+            //--------------------------
+            //switch vars
+            //--------------------------
+            1270, //mahbre door 1
+            117, //elevator lever
 
 
 
@@ -478,6 +483,8 @@ MATTIE.static.update = function(){
             //blood portal vars
             "1157-1166",
             1168,
+            2444,
+            2045,
 
             //crow mauler
             786, //crow activated
@@ -498,7 +505,15 @@ MATTIE.static.update = function(){
             2512,
             2657,
             2658,
-            2830
+            2830,
+
+
+            //dream vars
+            1773, //brothel scene finished
+            1767, //enki scene finished
+            1776, //outlander scene finished
+            1780, //outlander scene 2 finished
+            //1779, //outlander scene2_2
 
             
 
@@ -610,7 +625,15 @@ MATTIE.static.update = function(){
             //---------------------------
             //God Affinities
             //---------------------------
+            2171, //allmer god statue controll var
+            1397, //sylvian god statue
+            1396, //goroth statue 
             "35-38", //GOD Vars... GROGAROTH_VAR
+            409, //ritual circle 1 exhausted
+            476, //ritual circle 2 exhausted
+            486, //ritual circle 3 exhausted
+            2046, //ritual circle 4 exhausted
+            2445, //ritual circle 5 exhausted
             79, //god of the depths var 2
             "162-165", //more affinities... Afinity_God
         ]
