@@ -342,7 +342,7 @@ Window_ActorCommand.prototype.numVisibleRows = function() {
 MATTIE.multiplayer.multiCombat.window_actorcommandMakeCommandList=Window_ActorCommand.prototype.makeCommandList;
 Window_ActorCommand.prototype.makeCommandList = function() {
     MATTIE.multiplayer.multiCombat.window_actorcommandMakeCommandList.call(this);
-    if (this._actor) {
+    if (this._actor && MATTIE.isDev) {
         this.addMultiplayerCommand();
     }
 }
