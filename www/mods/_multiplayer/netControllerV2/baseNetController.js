@@ -8,9 +8,7 @@ MATTIE.multiplayer.emittedInit = false;
 var EventEmitter = require("events");
 class BaseNetController extends EventEmitter {
     constructor() {
-        
         super();
-        this.netInterpreter = new Game_Interpreter();
         this.peerId;
         
         this.players = {};
@@ -138,7 +136,7 @@ class BaseNetController extends EventEmitter {
             this.onCtrlSwitchData(data.ctrlSwitch, id)
         }
         if(data.cmd) {
-            if(SceneManager._scene.isActive())
+            //if(SceneManager._scene.isActive())
             this.onCmdEventData(data.cmd,data.id)
         }
         if(data.event){
@@ -328,21 +326,47 @@ class BaseNetController extends EventEmitter {
 
         if(readyObj.actions){
             let actions = JSON.parse(readyObj.actions);
+           
             actions.forEach(action => {
+                let shouldAddAction = true;
                 if(action){
+                    let partyAction = false;
+                    if(action._item._dataClass==="skill"){
+                        let tempAction = new Game_Action($gameActors.actor(1),0)
+                        tempAction.setSkill(action._item._itemId);
+                        tempAction.isForAll()
+                        partyAction = tempAction.isForAll();
+                    }
+                    console.log(action);
+                     //wether the action is targeting all members of the party
+                   
+                    /** @type {PlayerModel} */
+                    let netPlayer = this.netPlayers[senderId];
                     /** @type {Game_Actor} */
-                    let actor = this.netPlayers[senderId].$netActors.baseActor(action._subjectActorId);
+                    let actor = netPlayer.$netActors.baseActor(action._subjectActorId);
                     if(action.netPartyId){
-                        if(action.netPartyId != this.peerId){
+                        if(!partyAction) {
                             action.forcedTargets = [];
-                            let targetedNetParty = this.netPlayers[action.netPartyId].battleMembers()
+                            let targetedNetParty = action.netPartyId != this.peerId ? this.netPlayers[action.netPartyId].battleMembers() : action.netPartyId == this.peerId?  $gameParty.battleMembers() : null;
+                            if(targetedNetParty)
                             action.forcedTargets.push(targetedNetParty[action._targetIndex])
                             action._netTarget = action.netPartyId;
+                        } else {
+                            if(MATTIE.multiplayer.scaling.partyActionsTargetAll){
+
+                            }else{
+                                //force the action to target no one if this is a net action
+                                if(action.netPartyId != this.peerId) shouldAddAction = false;
+                            }
+                            MATTIE.multiplayer.BattleController.onPartyActionTargetingNet(action);
                         }
                     }
-                    actor.partyIndex = ()=>this.netPlayers[senderId].battleMembers().indexOf(actor); //set the party index function
-                    actor.setCurrentAction(action);
-                    BattleManager.addNetActionBattler(actor,isExtraTurn);
+                    if(shouldAddAction){
+                        actor.partyIndex = ()=>this.netPlayers[senderId].battleMembers().indexOf(actor); //set the party index function
+                        actor.setCurrentAction(action);
+                        BattleManager.addNetActionBattler(actor,isExtraTurn);
+                    }
+                    
                 }
                 
             });
@@ -544,6 +568,7 @@ class BaseNetController extends EventEmitter {
 
     /** called whenever anyone enters or leaves a battle, contains the id of the player and the battle */
     emitChangeInBattlersEvent(obj){
+        MATTIE.multiplayer.BattleController.emitNetBattlerRefresh();
         this.emit("battleChange",obj)
     }
 
@@ -646,6 +671,11 @@ class BaseNetController extends EventEmitter {
         this.battleEndRemoveCombatant(obj.battleEnd.troopId,this.peerId);
         
         this.sendViaMainRoute(obj);
+
+        Object.keys(this.netPlayers).forEach(key=>{
+            let netPlayer = this.netPlayers[key];
+            netPlayer.clearBattleOnlyMembers();
+        })
     }
 
     onBattleEndData(battleEndObj, id){ //take the battleEndObj and set that enemy as "out of combat" with id
@@ -882,8 +912,6 @@ class BaseNetController extends EventEmitter {
     // Command Event
     //-----------------------------------------------------
 
-    
-
     /** @emits commandEvent */
     emitCommandEvent(cmd){
         let obj = {};
@@ -896,16 +924,20 @@ class BaseNetController extends EventEmitter {
     /** the cmd object */
     onCmdEventData(cmd, peerId){
         try {
-            var interpreter = new Game_Interpreter();
-            interpreter.setup([cmd],cmd.parameters[0]);
-            var success = false;
-            do {
-                 success = interpreter.executeCommand(true);
-                 console.log(`${cmd.parameters[0]} called in data event` + JSON.stringify(cmd.parameters[1]))
-            } while (!success);
+            $gameMap.refreshIfNeeded();
+            let params = cmd.parameters;
+            let _character = $gameMap.event(params[0] > 0 ? params[0] : cmd.eventId)
+            if (_character) {
+                console.log("forced move route");
+                _character._netMoveRouteForcing = true; //we need this so that movestright calls
+                _character.forceMoveRoute(params[1]);
+                setTimeout(() => {
+                    _character._netMoveRouteForcing = false;
+                }, 8000);
+            }
         } catch (error) {
             console.log(error)
-        };
+        } 
     }
 
     //-----------------------------------------------------

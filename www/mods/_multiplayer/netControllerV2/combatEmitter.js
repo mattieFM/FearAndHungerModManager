@@ -194,8 +194,12 @@ BattleManager.startTurn = function() {
         if(val === 0 ){//if both palyers sort by speed
             val = b.speed() - a.speed();
         }
-        if(val === 0){//if speed is same... sort by hp, this is just so that the same exact order will display on all screens
+        if(val === 0){ //if speed is same... sort by hp, this is just so that the same exact order will display on all screens
             val = b.hp - a.hp;
+        }
+
+        if(val === 0 ){ //finnally sort by luck cus its funny
+            val = b.luk - a.luk;
         }
         return val;
     });
@@ -218,21 +222,22 @@ Game_Battler.prototype.forceAction = function(skillId, targetIndex, forcedTarget
 MATTIE.maketargets = Game_Action.prototype.makeTargets
 /** override make targets to return forced target if we need */
 Game_Action.prototype.makeTargets = function() {
-    if(this.forcedTargets) { //net player targetting someone
+    if(this.forcedTargets) { //net player targeting someone
         console.log("net target")
         return this.forcedTargets;
-        
     }
 
-    if(this.netPartyId) {//host targeting net player
+    if(this.netPartyId !== MATTIE.multiplayer.getCurrentNetController().peerId) {//host targeting net player
         console.log("host targetted nett")
         let net = MATTIE.multiplayer.getCurrentNetController().netPlayers[this.netPartyId];
         let netParty = []
         if(net){
             netParty = net.battleMembers();
+            return netParty;
         }
-        return netParty;
+        
     }
+
     console.log("base target")
     return MATTIE.maketargets.call(this);
 };
@@ -341,4 +346,15 @@ Game_Action.prototype.setNetPartyId = function(id){
             break;
         }
     }
+
 };
+
+
+MATTIE.multiplayer.combatEmitter.startAction = BattleManager.startAction;
+    BattleManager.startAction = function() {
+        var action = this._subject.currentAction();
+        let isNet = this._subject.isNetActor
+        MATTIE.multiplayer.BattleController.onSkillExecution(action, this._subject, isNet)
+
+        
+    };

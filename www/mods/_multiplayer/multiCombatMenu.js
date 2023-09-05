@@ -47,7 +47,7 @@ Scene_Battle.prototype.createAllWindows = function() {
         this._statusWindow.deactivate();
     })
 
-    MATTIE.multiplayer.getCurrentNetController().addListener('battleChange', () =>{
+    MATTIE.multiplayer.BattleController.addListener('refreshNetBattlers', () => {
         this.refreshNetBattlers();
     })
 
@@ -98,12 +98,12 @@ Scene_Battle.prototype.refreshNetBattlers = function(){
     let netCont = MATTIE.multiplayer.getCurrentNetController();
     if(!this._spriteset._netActorSprites) this._spriteset._netActorSprites = [];
     if(!this._spriteset._netActors) this._spriteset._netActors = [];
-    for (let index = 0; index < this._spriteset._netActorSprites.length; index++) {
-        this._spriteset.removeNetBattler(index);
+    for (let index = 0; index < this._spriteset._netActorSprites.length+1; index++) {
+        this._spriteset.removeNetBattler(0); //becouse this is destructive just remove index 0 for every time.
     }
     playersIds.forEach(id => {
         if(id !== netCont.peerId){
-            netCont.netPlayers[id].$gamePlayer.getBattleMembers().forEach(actor =>{
+            netCont.netPlayers[id].battleMembers().forEach(actor =>{
                 this._spriteset.addNetBattler(actor);
             });
         }
@@ -310,7 +310,7 @@ Window_BattleStatus.prototype.drawItem = function(index) {
 
 Window_BattleStatus.prototype.maxItems = function() { //fix battles length on net parties viewing
     let gameParty = this._gameParty || $gameParty;
-    return gameParty.battleMembers().length;
+    return gameParty.battleMembers().length+1;
 };
 
 MATTIE.multiplayer.multiCombat.drawItem = Window_BattleStatus.prototype.drawItem;
@@ -396,7 +396,7 @@ Scene_Battle.prototype.onActorOk = function() {
         var action = BattleManager.inputtingAction();
         let playersIds = $gameTroop.getIdsInCombatWithExSelf();
         let netCont = MATTIE.multiplayer.getCurrentNetController();
-        let id = playersIds[this._actorWindow.currentid-1] ? playersIds[this._actorWindow.currentid-1] :  undefined;
+        let id = playersIds[this._actorWindow.currentid-1] ? playersIds[this._actorWindow.currentid-1] :  MATTIE.multiplayer.getCurrentNetController().peerId;
         action.setNetPartyId(id);
         MATTIE.multiplayer.sceneBattleOk.call(this);
         this.resetParty();
