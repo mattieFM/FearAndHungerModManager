@@ -22,6 +22,10 @@ werid delay bug, should be fixed by fixing tthe self switch issue.
 temple of tormet, transfer when sacrifice
 
 
+girl extra attack?!??!?!??!?!?!? apparently girl just randomly has an extra attack out of no where? //never has been reproduced on prod.
+skin granny/ dream memories should be shared
+
+
 
 fixed bugs:
 
@@ -35,8 +39,6 @@ fix blood golem, Fixed, battlers are updated when blood golem is summoned
 
 
 
-girl extra attack?!??!?!??!?!?!? apparently girl just randomly has an extra attack out of no where? //never has been reproduced on prod.
-skin granny/ dream memories should be shared
 
 
 //Visual/Cosmetic Bugs
