@@ -5,6 +5,7 @@ make saves glboal X, done, easy enough.
 fix death /spectate / revive
 self switches on other maps X, might be fixed?
 crowmauler, appears to be working, might need some tweaking later
+added scaling for healing whispers.
 
 Bugs:
 Fix item drop dupe bug. X, fixed by making the event wrapper not remove the self switch when it thinks its gone.
@@ -13,8 +14,13 @@ Fix cannot unready. X, fixed, I forgot that you have to activate and deactivate 
 Fixed first turn ready issue. X, fixed.
 
 
-fix blood golem
+fix blood golem, Fixed, battlers are updated when blood golem is summoned
+
 ismoverouteforcing of undefined //cannot reproduce but is probably still not fixed
 
 girl extra attack?!??!?!??!?!?!? apparently girl just randomly has an extra attack out of no where? //never has been reproduced on prod.
+
+
+//Visual/Cosmetic Bugs
+Too many blood golems appear on ppls screens, doesn't do anything, but if you have 4 parties using blood golem there are like 8 blood golems
 fix the issue where one player has dash and the other doesn't. //this is cosmetic only tho

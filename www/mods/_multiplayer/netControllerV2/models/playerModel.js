@@ -20,6 +20,8 @@ class PlayerModel {
 
         this.$netActors = new MATTIE.multiplayer.NetActors();
        
+        /** battle members that only appear in battle */
+        this.battleOnlyMembers =[]
         
         /** the actor ids of any and all followers, -1 if not present */
         this.followerIds = [];
@@ -52,8 +54,23 @@ class PlayerModel {
         return arr;
     }
 
+    addBattleOnlyMember(actor){
+        this.battleOnlyMembers.push(actor);
+    }
+
+    removeBattleOnlyMember(id){
+        this.battleOnlyMembers.splice(id,1);
+    }
+
+    clearBattleOnlyMembers(){
+        this.battleOnlyMembers = [];
+    }
+
     battleMembers(){
         let arr = this.displayMembers();
+        if(MATTIE.multiplayer.inBattle){
+            arr = arr.concat(this.battleOnlyMembers)
+        }
         // while(arr.length < $gameParty.maxBattleMembers()){
         //     arr.push(new Game_Actor());
         // }
@@ -125,6 +142,7 @@ class PlayerModel {
 
     setPeerId(peerId){
         this.peerId = peerId;
+        this.$netActors.setPeerId(peerId);
     }
 }
 

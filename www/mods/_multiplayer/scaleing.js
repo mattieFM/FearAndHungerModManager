@@ -14,3 +14,23 @@ MATTIE.multiplayer.scaling.enemyBattleIndexScaler = 1;
  * @param {Game_Battler} battler 
  */
 MATTIE.multiplayer.scaling.enemyBattleIndex = (battler)=>((($gameParty.maxBattleMembers() / $gameTroop.totalCombatants())) * (battler.agi/10) * MATTIE.multiplayer.scaling.enemyBattleIndexScaler);
+
+
+/**
+ * @default true.
+ * @description whether or not healing whispers gets scaled 
+ */
+MATTIE.multiplayer.scaling.shouldScaleHealingWhispers = true;
+MATTIE.multiplayer.scaling._shouldScaleHealingWhispers = true; //not used for anything right now
+
+/**
+ * @description the function to scale healing whispers.
+ * @default 1 / number of combatants, so if there are 2 ppl fighting an enemy, this returns .5
+ */
+MATTIE.multiplayer.scaling.getHealingWhispersScaler = () => (1 / $gameTroop.totalCombatants())
+
+/**
+ * @default true, there are other scalers that nerf these abilities to make this fair
+ * @description whether party actions, like healing whispers target all parties
+ */
+MATTIE.multiplayer.scaling.partyActionsTargetAll = true;

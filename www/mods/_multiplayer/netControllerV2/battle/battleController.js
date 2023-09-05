@@ -52,6 +52,111 @@ class BattleController extends EventEmitter {
         })
         MATTIE.multiplayer.getCurrentNetController().emitTurnEndEvent(enemyHps, enemyStates, actorData);
     }
+
+    /**
+     * @emits "refreshNetBattlers"
+     */
+    emitNetBattlerRefresh(){
+        this.emit("refreshNetBattlers");
+    }
+
+
+    /**
+     * @description this is called anytime a skill is executed 
+     * @param {Game_Action} action 
+     * @param {Game_Actor} actor 
+     * @param {*} isNet 
+     */
+    onSkillExecution(action,actor,isNet){
+        let shouldExecute = true
+
+        
+
+        let skillId = action._item._itemId
+        switch (skillId) {
+            case MATTIE.static.skills.healingWhispers.id:
+                if(!this.baseHealingWhispersDamageFormula) this.baseHealingWhispersDamageFormula = action.item().damage.formula;
+                if(MATTIE.multiplayer.scaling.shouldScaleHealingWhispers){
+                    action.item().damage.formula = this.baseHealingWhispersDamageFormula * MATTIE.multiplayer.scaling.getHealingWhispersScaler();
+                    MATTIE.multiplayer.scaling.shouldScaleHealingWhispers = false;
+                }
+                break;
+        
+            default:
+                break;
+        }
+
+        if(shouldExecute){
+            if(isNet){
+                this.onNetSkillExecution(action,actor);
+            }else{
+                this.onLocalSkillExecution(action,actor);
+            }
+        }   
+    }
+
+
+    /**
+     * 
+     * @param {Game_Action} action the action
+     * @param {Game_Battler} actor the subject
+     * @param {Function} startAction the unoverriden battlemanager.startaction function
+     */
+    onLocalSkillExecution(action, actor){
+        MATTIE.multiplayer.combatEmitter.startAction.call(BattleManager);
+        if(action._item._itemId == MATTIE.static.skills.bloodGolem.id || action._item._itemId == MATTIE.static.skills.greaterBloodGolem.id){ //refresh battlers if we summon blood golem
+            this.emitNetBattlerRefresh()
+        }
+        
+    }
+
+    /**
+     * 
+     * @param {Game_Action} action  the action
+     * @param {Game_Battler} actor the subject
+     * @param {UUID} netPlayerId 
+     * @param {Function} startAction the unoverriden battlemanager.startaction function
+     */
+    onNetSkillExecution(action, actor){
+        let netCont =MATTIE.multiplayer.getCurrentNetController();
+        let netPlayer = netCont.netPlayers[actor.netID];
+        let skillId = action._item._itemId;
+        let shouldExecute = true;
+        switch (skillId) {
+            case MATTIE.static.skills.run.id:
+                shouldExecute = false;
+                break;
+            case MATTIE.static.skills.bloodGolem.id:
+            case MATTIE.static.skills.greaterBloodGolem.id:
+                netPlayer.addBattleOnlyMember(netPlayer.$netActors.baseActor(MATTIE.static.actors.bloodGolemId))
+                MATTIE.multiplayer.BattleController.emitNetBattlerRefresh()
+                shouldExecute = false;
+                break
+        
+            default:
+                break;
+        }
+
+        if(shouldExecute) MATTIE.multiplayer.combatEmitter.startAction.call(BattleManager);
+        
+    }
+
+
+    /**
+     * @description called when a party action targets a specific net party
+     * @param {Game_Action} action 
+     */
+    onPartyActionTargetingNet(action){
+        let skillId = action._item._itemId
+        switch (skillId) {
+            case MATTIE.static.skills.healingWhispers.id:
+                
+                break;
+        
+            default:
+                break;
+        }
+    }
 }
 
 

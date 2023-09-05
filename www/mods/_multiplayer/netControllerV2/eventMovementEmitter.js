@@ -6,8 +6,8 @@ MATTIE.multiplayer.moveStraight = Game_CharacterBase.prototype.moveStraight;
 Game_CharacterBase.prototype.moveStraight = function(d,callAnyways=false) {
     if(!MATTIE.multiplayer.inBattle){
         if(this instanceof Game_Event && !this._locked){
-            if(MATTIE.multiplayer.isEnemyHost || callAnyways) MATTIE.multiplayer.moveStraight.call(this, d);
-            if(MATTIE.multiplayer.isEnemyHost && !callAnyways){
+            if(MATTIE.multiplayer.isEnemyHost || callAnyways || this._moveRouteForcing) MATTIE.multiplayer.moveStraight.call(this, d);
+            if(MATTIE.multiplayer.isEnemyHost && !callAnyways && !this._moveRouteForcing){ //dont send if move route forcing
                 if(MATTIE.multiplayer.devTools.enemyMoveLogger){
                     console.debug("move straight: " + d);
                     console.debug("event id: " + this.eventId());

@@ -3,6 +3,7 @@ var MATTIE = MATTIE || {};
 MATTIE.global = MATTIE.global || {};
 MATTIE.static = MATTIE.static || {};
 MATTIE.static.items = MATTIE.static.items || {};
+MATTIE.static.actors = MATTIE.static.actors || {};
 MATTIE.static.skills = MATTIE.static.skills || {};
 MATTIE.static.states = MATTIE.static.states || {};
 MATTIE.static.rpg = MATTIE.static.rpg || {};
@@ -23,7 +24,10 @@ MATTIE.static.items.emptyScroll = null;
 //skills
 MATTIE.static.skills.bloodportal = null;
 MATTIE.static.skills.hurting = null;
-
+MATTIE.static.skills.bloodGolem = null;
+MATTIE.static.skills.greaterBloodGolem = null;
+MATTIE.static.skills.healingWhispers = null;
+MATTIE.static.skills.run = null;
 
 //RPGMaker Constants
 MATTIE.static.rpg.battleProcessingId = 301;
@@ -42,6 +46,10 @@ MATTIE.static.switch.syncedSwitches = [];
 /** this is the state that governs "death" in combat */
 MATTIE.static.states.knockout = 0;
 
+//actors
+MATTIE.static.actors.bloodGolemId = 0;
+MATTIE.static.actors.emptyActorSlotId = 0;
+
 
 //events
 
@@ -55,6 +63,10 @@ MATTIE.static.update = function(){
 
     if(MATTIE.global.version === 1){
         //static values specific to funger 1
+
+        //actors
+        MATTIE.static.actors.bloodGolemId = 10;
+        MATTIE.static.actors.emptyActorSlotId = 15;
 
         //maps
         
@@ -82,6 +94,10 @@ MATTIE.static.update = function(){
         //skills
         MATTIE.static.skills.bloodportal = $dataSkills[148];
         MATTIE.static.skills.hurting = $dataSkills[12];
+        MATTIE.static.skills.bloodGolem = $dataSkills[51];;
+        MATTIE.static.skills.greaterBloodGolem = $dataSkills[103];;
+        MATTIE.static.skills.healingWhispers = $dataSkills[151];
+        MATTIE.static.skills.run = $dataSkills[40];
 
 
         //common events
@@ -184,6 +200,7 @@ MATTIE.static.update = function(){
             
 
             342, //yellow mage hurting zone
+            343, //more yellow mage
             "399-405", //show love vars
             410, //cannot use bow 
             471, //merc show love  
@@ -263,6 +280,7 @@ MATTIE.static.update = function(){
             1530, //cube cooldown?
             1997, //can use cube
             2519, //purified eastern sword event.
+            120, //multiple copies of mockup book.
 
             //-------------------------------------------------------
             //          Coin Flip Attack Switches (switches that control coin flip attack, we will not forward these as that would make coin flip attacks happen twice).
@@ -377,7 +395,7 @@ MATTIE.static.update = function(){
 
 
 
-            //legacy --blocked by original code, reason unknown.
+            //legacy --blocked by original code, reason unknown. looks fine, just outfits and stuff
             729,
             815,
             814,
@@ -388,7 +406,10 @@ MATTIE.static.update = function(){
             106,
             200,
             246,
-            816
+            816,
+
+            //cave in vars
+            3142, //cave in main
            
 
         ]
@@ -398,6 +419,7 @@ MATTIE.static.update = function(){
             2930, //elite guard rand2
             2930, //elite guard rand3
             2931, //elite guard rand3
+            2956, //rope mines
 
             
             1563, //random hole 2
@@ -438,6 +460,11 @@ MATTIE.static.update = function(){
             //blood portal vars
             "1157-1166",
             1168,
+
+            //crow mauler
+            786, //crow activated
+            "767-789", //the rest of crow mauler vars
+
 
         ] 
         //vars

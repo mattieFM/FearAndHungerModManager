@@ -29,8 +29,10 @@ DataManager.extractSaveContents = function(contents) {
 MATTIE.multiplayer.NetActor = function(){
     this.initialize.apply(this, arguments);
 }
-MATTIE.multiplayer.NetActor.prototype.initialize = function(gameActor,dataActorId,baseActorId) {
+MATTIE.multiplayer.NetActor.prototype.initialize = function(gameActor,dataActorId,baseActorId,netId) {
     this.gameActor = gameActor;
+    this.gameActor.isNetActor = true;
+    this.gameActor.netID = netId;
     this.dataActorId = dataActorId;
     this.baseActorId = baseActorId;
 };
@@ -46,15 +48,20 @@ MATTIE.multiplayer.NetActors.prototype.initialize = function() {
     this._data = [];
 };
 
+MATTIE.multiplayer.NetActors.prototype.setPeerId = function(id) {
+    this.peerId = id;
+};
+
 /**
  * @description perform a deep copy of the dataActor and create a new net actor from this
  * @param {*} baseActorId the id of the base game actor to copy data from
  */
 MATTIE.multiplayer.NetActors.prototype.createNewNetActor = function(baseActorId){
+    if(!this.bloodGolemInited) {this.bloodGolemInited=true; this.createNewNetActor(MATTIE.static.actors.bloodGolemId);}//all parties have blood golem just to make stuff easier
     let newDataActor = JsonEx.makeDeepCopy($dataActors[baseActorId]);
     $dataActors.push(newDataActor);
     let dataActorId = $dataActors.length-1;
-    let newNetActor = new MATTIE.multiplayer.NetActor(new Game_Actor(dataActorId), dataActorId, baseActorId);
+    let newNetActor = new MATTIE.multiplayer.NetActor(new Game_Actor(dataActorId), dataActorId, baseActorId, this.peerId);
     this._data.push(newNetActor);
 }
 
