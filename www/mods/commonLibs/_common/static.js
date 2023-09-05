@@ -637,6 +637,7 @@ MATTIE.static.update = function(){
             79, //god of the depths var 2
             "162-165", //more affinities... Afinity_God
         ]
+        //
 
         MATTIE.static.variable.godAffinityAndPrayerVars = MATTIE.static.rangeParser(MATTIE.static.variable.godAffinityAndPrayerVars);
         MATTIE.static.variable.ignoredVars = [ //ignored vars
