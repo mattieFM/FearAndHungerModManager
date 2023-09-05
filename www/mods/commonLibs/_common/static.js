@@ -42,6 +42,9 @@ MATTIE.static.variable.godAffinityAndPrayerVars = [];
 MATTIE.static.switch.ignoredSwitches = [];
 MATTIE.static.switch.syncedSwitches = [];
 
+//selfSwitch ids
+MATTIE.static.switch.syncedSelfSwitches = [];
+
 //states
 /** this is the state that governs "death" in combat */
 MATTIE.static.states.knockout = 0;
@@ -88,7 +91,16 @@ MATTIE.static.update = function(){
         //items
         MATTIE.static.items.emptyScroll = $dataItems[88]
 
-
+        //selfSwitch ids
+        MATTIE.static.switch.syncedSelfSwitches = [
+            //self switches for temple of torment
+            //[mapid, eventid, letter]
+            [85,54,"A"],
+            [85,46,"A"],
+            [85,47,"A"],
+            [85,48,"A"],
+        ]
+        MATTIE.static.switch.syncedSelfSwitches = MATTIE.static.switch.syncedSelfSwitches.map(arr=>JSON.stringify(arr));
 
 
         //skills
@@ -115,7 +127,6 @@ MATTIE.static.update = function(){
             "242-246", //the switches that tell the game what char you are playing as\
             380, //fusion select
             375, //marrige select
-            "657-658", //merc or outlander in party
             "661-664", //inital chars
             "721-724", //moonless piss level
             
@@ -219,8 +230,9 @@ MATTIE.static.update = function(){
             //--mahabre
             "1321-1326", //flame traps
 
-            "2593-2608", //void logic? not sure if this should be sent or not.
-            "2615-1616", //void logic? not sure if this should be sent or not.
+            "2593-2594", //void logic
+            2588, //hiding switch
+            
             3508, //stepped on trap? probably handles rusty nail
 
             3539, //sleeping cooldown
@@ -324,6 +336,7 @@ MATTIE.static.update = function(){
             2662, //endingS_here we come!
             "2751-2752",
             2981, //bad ending 2
+            2748, //no legard var
 
 
            
@@ -372,7 +385,7 @@ MATTIE.static.update = function(){
             1566, //snatch (lord of flies?)
             1617, //passageway scene
             "2490-2494", //burning event
-            2512, //blight event
+            //2512, //blight event
             2532, //chara burning event
             2588, //hiding event
             2831, //darce burning? 
@@ -415,6 +428,11 @@ MATTIE.static.update = function(){
         ]
         MATTIE.static.switch.ignoredSwitches = MATTIE.static.rangeParser(MATTIE.static.switch.ignoredSwitches)
         MATTIE.static.switch.syncedSwitches = [
+
+            //this will cause some weirdness but also will make sure there is only one copy of them
+            "657-658", //merc or outlander in party
+
+
             2536, //vines 2
             2930, //elite guard rand2
             2930, //elite guard rand3
@@ -464,6 +482,25 @@ MATTIE.static.update = function(){
             //crow mauler
             786, //crow activated
             "767-789", //the rest of crow mauler vars
+
+            "685-686", //darce_scene
+            687, //darce in party
+            688, //darce dead
+            "1842-1843",//legard ending
+            "1845-1847", //legard ending
+            "1848-1849", //gauntlet door2-3
+
+
+            //temple of torment
+            "981-985", //on chains var
+
+            //blight
+            2512,
+            2657,
+            2658,
+            2830
+
+            
 
 
         ] 
@@ -661,10 +698,12 @@ MATTIE.static.update = function(){
             
 
             //timers
+            "155-157", //main timers
             399,    
             400,
             398, //torch timer
             403, //torch2
+            302, //blight random timer
         ]
 
         MATTIE.static.variable.ignoredVars = MATTIE.static.rangeParser(MATTIE.static.variable.ignoredVars);

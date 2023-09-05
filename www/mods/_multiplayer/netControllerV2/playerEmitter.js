@@ -5,6 +5,7 @@ MATTIE.menus.multiplayer = MATTIE.menus.multiplayer || {};
 MATTIE.scenes.multiplayer = MATTIE.scenes.multiplayer || {};
 MATTIE.windows.multiplayer = MATTIE.windows.multiplayer || {};
 MATTIE.multiplayer.gamePlayer = MATTIE.multiplayer.gamePlayer || {};
+MATTIE.multiplayer.movementEmitter = MATTIE.multiplayer.movementEmitter || {};
 MATTIE.RPG = MATTIE.RPG || {};
 
 
@@ -19,6 +20,29 @@ MATTIE.multiplayer.selfMax = 15;
 //every x moves send player x and y to transfer
 MATTIE.multiplayer.selfTransMoveCount = 0;
 MATTIE.multiplayer.selfTransMax = 100;
+
+MATTIE.multiplayer.movementEmitter.secondsTillPosSend = 10*1000;
+MATTIE.multiplayer.movementEmitter.secondsTillTrans = 100*1000;
+
+setInterval(() => {
+    if(MATTIE.multiplayer.isActive) {
+        var netController = MATTIE.multiplayer.getCurrentNetController();
+        if(netController){
+            if(netController.started)
+            netController.emitMoveEvent(0,$gamePlayer.x,$gamePlayer.y);
+        }
+    }
+}, MATTIE.multiplayer.movementEmitter.secondsTillPosSend);
+
+setInterval(() => {
+    if(MATTIE.multiplayer.isActive) {
+        var netController = MATTIE.multiplayer.getCurrentNetController();
+        if(netController){
+            if(netController.started)
+            netController.emitMoveEvent(0,$gamePlayer.x,$gamePlayer.y,true);
+        }
+    }
+}, MATTIE.multiplayer.movementEmitter.secondsTillTrans);
 
 
 MATTIE.multiplayer.gamePlayer.override = function() {

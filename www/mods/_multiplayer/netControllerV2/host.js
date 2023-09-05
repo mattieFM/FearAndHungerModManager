@@ -92,6 +92,7 @@ class HostController extends BaseNetController {
     startGame(){
         let obj = {};
         obj.startGame = "y"
+        this.started = true;
         this.sendViaMainRoute(obj);
     }
 

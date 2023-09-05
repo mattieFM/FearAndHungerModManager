@@ -341,7 +341,7 @@ MATTIE.windows.modListWin.prototype.makeCommandList = function() {
     TextManager["MATTIE_"+"Apply Changes"] = "Apply Changes";
     TextManager["MATTIE_"+"Toggle Dev"] = "Toggle Dev";
     this.addCommand(TextManager["MATTIE_"+"Apply Changes"], "MATTIE_"+"Apply Changes",true);
-    this.addCommand(TextManager["MATTIE_"+"Toggle Dev"], "Toggle Dev",MATTIE.isDev);
+    this.addCommand(TextManager["MATTIE_"+"Toggle Dev"], "MATTIE_"+"Toggle Dev", MATTIE.isDev);
 };
 
 MATTIE.windows.modListWin.prototype.reloadModsIfNeeded = function(){
@@ -409,8 +409,8 @@ MATTIE.windows.modListWin.prototype.setUpHandlers = function(){
     
 
     this.setHandler("MATTIE_"+"Apply Changes", (()=>{this.reloadModsIfNeeded();}).bind(this));
-    this.setHandler("MATTIE_"+"Apply Toggle Dev", (()=>{
-        MATTIE.isDev=!MATTIE.isDev;
+    this.setHandler("MATTIE_"+"Toggle Dev", (()=>{
+        MATTIE.isDev = !MATTIE.isDev;
         this.refresh();
         this.activate();
     
