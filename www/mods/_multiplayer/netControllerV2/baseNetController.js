@@ -10,7 +10,7 @@ class BaseNetController extends EventEmitter {
     constructor() {
         super();
         this.peerId;
-        
+        this.started = false;
         this.players = {};
         /** @type {[PlayerModel]} */
         this.netPlayers = {};
@@ -378,7 +378,7 @@ class BaseNetController extends EventEmitter {
 
 
     //-----------------------------------------------------
-    //Move Event
+    // Move Event
     //-----------------------------------------------------
 
     /** 
@@ -427,11 +427,12 @@ class BaseNetController extends EventEmitter {
                     moveData.map = $gameMap.mapId();
                     this.transferNetPlayer(moveData,id,false);
                 }else{
-                    
-                    if(dist > 4){
+                    console.log(dist)
+                    if(dist > 6){
+                        console.log("here")
                         moveData.map = $gameMap.mapId();
                         this.transferNetPlayer(moveData,id,false);
-                    }else if (dist > 2){
+                    }else if (dist > 4){
                         this.netPlayers[id].$gamePlayer._x = moveData.x;
                         this.netPlayers[id].$gamePlayer._y = moveData.y;
                     }

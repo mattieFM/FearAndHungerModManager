@@ -8,7 +8,6 @@ MATTIE.modLoader = MATTIE.modLoader || {};
 MATTIE.menus.mainMenu = MATTIE.menus.mainMenu || {};
 MATTIE.global = MATTIE.global || {};
 MATTIE.global.version = 1;
-MATTIE.isDev = false;
 MATTIE.GameInfo = {};
 MATTIE.GameInfo.getDifficulty = (data=$gameSwitches)=>{
     var difficulty = "Fear & Hunger"

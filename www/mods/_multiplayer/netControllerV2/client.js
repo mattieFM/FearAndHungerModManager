@@ -82,6 +82,7 @@ class ClientController extends BaseNetController {
      */
     onStartGameData(startGame){
         this.emit('startGame')
+        this.started = true;
     }
 
     /** 

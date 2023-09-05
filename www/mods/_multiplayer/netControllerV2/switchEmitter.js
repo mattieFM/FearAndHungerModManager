@@ -116,11 +116,35 @@ let eventAndSwitchEmitterInit = function () {
             }
     }
 
-    // Control Self Switch
-    MATTIE_RPG.cmdSelfSwitch = Game_SelfSwitches.prototype.setValue;
-    Game_SelfSwitches.prototype.setValue = function(key, val, shouldSkip=false){
-        let returnVal =  MATTIE_RPG.cmdSelfSwitch.call(this, key, val);
-        if(!shouldSkip){
+
+    //self switch cmd
+    Game_Interpreter.prototype.command123 = function() {
+        if(this.lastTime && !this._isParallel){
+            const secSinceLast = ((Date.now() - this.lastTime) / 1000);
+            //if command triggers more per second than our limit assume it is a parallel event
+            if(secSinceLast < MATTIE.multiplayer.switchEmitter.config.maxCps){
+                if(this.tolerance){ this.tolerance++}
+                else { this.tolerance = 1};
+            
+                if(this.tolerance > MATTIE.multiplayer.switchEmitter.config.tolerance){
+                    this._isParallel = true;
+                    console.info(`a game self switch interpreter was silenced`)
+                }
+                
+                //if it hasnt fired in a long time reset the count
+            } else if(secSinceLast > MATTIE.multiplayer.switchEmitter.config.maxCps*3){
+                this.tolerance = 0;
+            }
+    }
+        
+        if (this._eventId > 0) {
+            var key = [this._mapId, this._eventId, this._params[0]];
+            $gameSelfSwitches.setValue(key, this._params[1] === 0);
+        }
+
+
+        let stringKey = JSON.stringify(key);
+        if(!this._isParallel || MATTIE.static.switch.syncedSelfSwitches.includes(stringKey)) {//MATTIE.static.switch.syncedSelfSwitches.includes(key)
             let obj = {}
                 obj.i = key;
                 obj.b = val;
@@ -130,9 +154,31 @@ let eventAndSwitchEmitterInit = function () {
                 netController.emitSwitchEvent(obj);
                 if(MATTIE.multiplayer.devTools.eventLogger)
                 console.log(`Game Self Switch ${key} set to ${this._params[1] === 0}`);
-        }
-        return returnVal;
-    }
+            }
+        
+        return true;
+    };
+
+    // // Control Self Switch]
+    // MATTIE.multiplayer.switchEmitter.cmdSelfSwitchSilencedArr = [];
+    // MATTIE_RPG.cmdSelfSwitch = Game_SelfSwitches.prototype.setValue;
+    // Game_SelfSwitches.prototype.setValue = function(key, val, shouldSkip=false, silenced = false){
+    //     let returnVal =  MATTIE_RPG.cmdSelfSwitch.call(this, key, val);
+    //     if(!shouldSkip){
+    //         if(!silenced && !MATTIE.multiplayer.switchEmitter.cmdSelfSwitchSilencedArr.includes(key)) {//MATTIE.static.switch.syncedSelfSwitches.includes(key)
+    //         let obj = {}
+    //             obj.i = key;
+    //             obj.b = val;
+    //             obj.s = 1;
+    //             let netController = MATTIE.multiplayer.getCurrentNetController();
+    //             if(MATTIE.multiplayer.isActive) 
+    //             netController.emitSwitchEvent(obj);
+    //             if(MATTIE.multiplayer.devTools.eventLogger)
+    //             console.log(`Game Self Switch ${key} set to ${this._params[1] === 0}`);
+    //         }
+    //     }
+    //     return returnVal;
+    // }
 
 Game_Interpreter.prototype.operateVariable = function(variableId, operationType, value) {
     try {
