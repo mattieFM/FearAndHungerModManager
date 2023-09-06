@@ -50,13 +50,13 @@ class HostController extends BaseNetController {
         })
     }
 
-    /**
-     * @description send a json object to the main connection. Since this is the host this will just send to all clients
-     * @param {*} obj the object to send
-     */
-    sendViaMainRoute(obj, excludedIds = []){
-        this.sendAll(obj, excludedIds);
-    }
+    // /**
+    //  * @description send a json object to the main connection. Since this is the host this will just send to all clients
+    //  * @param {*} obj the object to send
+    //  */
+    // sendViaMainRoute(obj, excludedIds = []){
+    //     this.sendAll(obj, excludedIds);
+    // }
 
     /**
      * @description a function to redistribute data to all clients

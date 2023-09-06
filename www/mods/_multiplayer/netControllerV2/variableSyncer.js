@@ -20,7 +20,11 @@ setInterval(() => {
 Scene_Map.prototype.onMapLoaded = function () {
     MATTIE.multiplayer.varSyncer.onMapLoaded.call(this);
     if(!MATTIE.static.maps.menuMaps.includes($gameMap.mapId())){
-        if(MATTIE.multiplayer.varSyncer.shouldSync){
+        setTimeout(()=>{
+            MATTIE.multiplayer.hasLoadedVars = true;
+        }, 1000)
+        
+        if(MATTIE.multiplayer.varSyncer.shouldSync && !MATTIE.multiplayer.varSyncer.syncedOnce){
             MATTIE.multiplayer.varSyncer.syncedOnce = true;
             setTimeout(() => {
                 MATTIE.multiplayer.equipmentEmitter.emitAllEquipment();
@@ -29,9 +33,11 @@ Scene_Map.prototype.onMapLoaded = function () {
         if(MATTIE.multiplayer.isClient){
             //if the local machine is a client then request a var refresh the first time
             if(MATTIE.multiplayer.varSyncer.shouldSync){
-                MATTIE.multiplayer.getCurrentNetController().emitRequestedVarSync();
-                
                 MATTIE.multiplayer.varSyncer.shouldSync = false;
+                setTimeout(() => {
+                    MATTIE.multiplayer.getCurrentNetController().emitRequestedVarSync();
+                }, 5000);
+                
                 
             }
             

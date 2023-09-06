@@ -3,8 +3,21 @@ MATTIE.multiplayer = MATTIE.multiplayer || {}
 MATTIE.menus.multiplayer = MATTIE.menus.multiplayer || {};
 MATTIE.scenes.multiplayer = MATTIE.scenes.multiplayer || {};
 MATTIE.windows.multiplayer = MATTIE.windows.multiplayer || {};
-
 MATTIE.multiplayer.emittedInit = false;
+MATTIE.multiplayer.hasLoadedVars = false;
+
+MATTIE.multiplayer.varSyncRequested = false;
+
+MATTIE.multiplayer.maxPacketsPerSecond = 1500; //I dont know if this is useful
+MATTIE.multiplayer.packetsThisSecond = 0;
+
+
+setInterval(() => {
+    MATTIE.multiplayer.packetsThisSecond = 0;
+}, 1000);
+
+
+
 var EventEmitter = require("events");
 class BaseNetController extends EventEmitter {
     constructor() {
@@ -80,13 +93,29 @@ class BaseNetController extends EventEmitter {
     }
 
     /**
-     * @description send a json object to the main connection.
+     * @description que a json object to be sent to the main connection.
      * For host this will send to all, for client this will send to host.
      * this is left blank intentionally as it is overridden by host and client
      * @param {*} obj the object to send
      */
-    sendViaMainRoute(obj){
+    sendViaMainRoute(obj, excludedIds = []){
+        MATTIE.multiplayer.packetsThisSecond++;
+        if(MATTIE.multiplayer.packetsThisSecond >= MATTIE.multiplayer.maxPacketsPerSecond){
 
+        }else{
+            this.send(obj, excludedIds);
+        }
+
+        
+    }
+
+
+    send(obj, excludedIds = []){
+        if(MATTIE.multiplayer.isClient){
+            this.sendHost(obj);
+        }else if(MATTIE.multiplayer.isHost){
+            this.sendAll(obj, excludedIds);
+        }
     }
 
     /**
@@ -108,26 +137,27 @@ class BaseNetController extends EventEmitter {
         console.log(data);
         data = this.preprocessData(data,conn);
         let id = data.id;
+        if(data.move){
+            this.onMoveData(data.move, id);
+            return; //move data is sent by itself always
+        }
         if(data.updateNetPlayers){//only used by client
             this.onUpdateNetPlayersData(data.updateNetPlayers);
         }
         if(data.playerInfo && MATTIE.multiplayer.isHost){ //only used by host
             this.onPlayerInfoData(data.playerInfo);
         }
-        if(data.startGame){ //only used by client
+        if(data.startGame && MATTIE.multiplayer.isClient){ //only used by client
             this.onStartGameData(data.startGame)
         }
-        if(data.syncedVars){ //used only by client
+        if(data.syncedVars && MATTIE.multiplayer.isClient){ //used only by client
             this.onUpdateSyncedVarsData(data.syncedVars);
         }
         if(data.syncedSwitches){
             this.onUpdateSyncedSwitchData(data.syncedSwitches);
         }
-        if(data.requestedVarSync){ //used only by host 
+        if(data.requestedVarSync && MATTIE.multiplayer.isHost){ //used only by host 
             this.emitUpdateSyncedVars();
-        }
-        if(data.move){
-            this.onMoveData(data.move, id);
         }
         if(data.transfer){
             this.onTransferData(data.transfer,id)
@@ -854,23 +884,35 @@ class BaseNetController extends EventEmitter {
      * @emits randomVars
      */
     emitUpdateSyncedVars(){
-        console.log("host var sync sent")
-        let obj = {};
-        obj.syncedVars = {};
-        obj.syncedSwitches = {};
-        MATTIE.static.variable.syncedVars.forEach(id=>{
-            obj.syncedVars[id] = $gameVariables.value(id);
-        })
-
-        MATTIE.static.variable.secondarySyncedVars.forEach(id=>{
-            obj.syncedVars[id] = $gameVariables.value(id);
-        })
-
-        MATTIE.static.switch.syncedSwitches.forEach(id=>{
-            obj.syncedSwitches[id] = $gameSwitches.value(id);
-        })
-        this.sendViaMainRoute(obj)
-        this.emit("randomVars", obj)
+        if(!MATTIE.multiplayer.varSyncRequested){
+            MATTIE.multiplayer.varSyncRequested = true;
+            console.log("host var sync sent")
+            let obj = {};
+            obj.syncedVars = {};
+            obj.syncedSwitches = {};
+            if(MATTIE.multiplayer.hasLoadedVars){
+                MATTIE.static.variable.syncedVars.forEach(id=>{
+                    obj.syncedVars[id] = $gameVariables.value(id);
+                })
+        
+                MATTIE.static.variable.secondarySyncedVars.forEach(id=>{
+                    obj.syncedVars[id] = $gameVariables.value(id);
+                })
+        
+                MATTIE.static.switch.syncedSwitches.forEach(id=>{
+                    obj.syncedSwitches[id] = $gameSwitches.value(id);
+                })
+                this.sendViaMainRoute(obj)
+                this.emit("randomVars", obj)
+                MATTIE.multiplayer.varSyncRequested = false;
+            }else{
+                setTimeout(() => {
+                    this.emitUpdateSyncedVars();
+                }, 1000);
+            }
+        }
+        
+        
     }
 
     /**
@@ -891,6 +933,7 @@ class BaseNetController extends EventEmitter {
      * @param {{id:val}[]} syncedVars an array of key pair values
      */
     onUpdateSyncedVarsData(syncedVars){
+        MATTIE.multiplayer.varSyncer.shouldSync = false;
         console.log("client vars synced")
         Object.keys(syncedVars).forEach(id=>{
             let val = syncedVars[id];
@@ -903,6 +946,7 @@ class BaseNetController extends EventEmitter {
      * @param {{id:val}[]} syncedSwitch an array of key pair values
      */
      onUpdateSyncedSwitchData(syncedSwitch){
+        MATTIE.multiplayer.varSyncer.shouldSync = false;
         console.log("client vars synced")
         Object.keys(syncedSwitch).forEach(id=>{
             let val = syncedSwitch[id];

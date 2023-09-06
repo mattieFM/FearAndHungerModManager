@@ -64,13 +64,13 @@ class ClientController extends BaseNetController {
         return data;
     }
 
-    /**
-     * @description send a json object to the main connection. Since this is the client this will just send to host.
-     * @param {*} obj the object to send
-     */
-    sendViaMainRoute(obj){
-        this.sendHost(obj);
-    }
+    // /**
+    //  * @description send a json object to the main connection. Since this is the client this will just send to host.
+    //  * @param {*} obj the object to send
+    //  */
+    // sendViaMainRoute(obj){
+    //     this.sendHost(obj);
+    // }
 
     sendHost(data){
         this.conn.send(data);

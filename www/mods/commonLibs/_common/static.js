@@ -396,7 +396,7 @@ MATTIE.static.update = function(){
             "3261-3272", //fear talk events?
             "3281-3291", //more fear scenes?
             "3301-3347", //Captain_Spot1... Cahara_Spot1... more fear scenes?
-
+            1815, // fracioua domination scene
             "3463-3479", //misasma scenes
             "3481-3503", //more misasma scenes
 
@@ -484,6 +484,9 @@ MATTIE.static.update = function(){
             "1157-1166",
             1168,
             2444,
+            2456,
+            2455,
+            "2056-2061",
             2045,
 
             //crow mauler
@@ -515,7 +518,86 @@ MATTIE.static.update = function(){
             1780, //outlander scene 2 finished
             //1779, //outlander scene2_2
 
-            
+
+            //door switches
+            58,
+            116,
+            118,
+            647,
+            659,
+            806,
+            1030,
+            1243,
+            "1270-1273",
+            1534,
+            1538,
+            1548,
+            1642,
+            1643,
+            1759,
+            1763,
+            "1848-1849",
+            1947,
+            "2353-2356",
+            2368,
+            2380,
+            2381,
+            "2470-2472",
+            "2516-2517",
+            2724,
+            2726,
+            "2767-2770",
+            2842,
+            2897,
+            3549,
+
+
+
+            //enemy overworld alive states
+            23, //gaurd1
+            "67-68", //priest 1 and 2
+            "103-104", //hydra
+            146, //torture dead
+            "302-306", //gnome dead
+            652, //salmon snake dead
+            793, //harvestman1 dead
+            1024, //redman dead
+            1581, //harvestman2 dead
+            1586, //scarab1
+            1590, //scarab2
+            1594, //scarab3
+            2237, //harvestman3 dead
+            2238, //scarab4 dead
+            "2665-2673", //gnome 7-15 dead
+            2978, //semor dead
+            2979, //semor dead2
+            2874, //elite gaurd 2
+            2867, //elite guard 1
+            2211, //guard 6
+            2218, //guard 7
+            2205, //guard 5
+            2016, //guard 5 again
+            1872, //guard 4
+            1866, //guard 3
+            1860, //guard 2
+            1854, //guard 1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
         ] 
