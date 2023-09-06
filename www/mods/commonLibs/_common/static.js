@@ -642,7 +642,8 @@ MATTIE.static.update = function(){
         MATTIE.static.variable.godAffinityAndPrayerVars = MATTIE.static.rangeParser(MATTIE.static.variable.godAffinityAndPrayerVars);
         MATTIE.static.variable.ignoredVars = [ //ignored vars
             
-
+            30, //player_mp
+            "22-23", //arrow var
             1, //Lightswitch
             2, //daynightsave
             "5-8", //charHp, Char x, Char y
@@ -658,6 +659,7 @@ MATTIE.static.update = function(){
             34, //party size
 
             "41-51", //MONSTER POS vars? not sure. I think the code that handles monsters moving should override these anyways.
+            "56-57",
             "72-75", //MONSTER POS VARS
             "92-95", //More pos
             "159-160", //more pos
