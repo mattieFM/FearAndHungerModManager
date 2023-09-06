@@ -75,9 +75,10 @@ class HostController extends BaseNetController {
      * @param conn the connection that is sending the data
      */
     preprocessData(data, conn){
-        this.distributeDataToClients(data,conn.peer);
         if(MATTIE.multiplayer.devTools.dataLogger) console.log(data);
         data.id = conn.peer; //set the id of the data to the id of the peer on the other side of this connection
+        this.distributeDataToClients(data,conn.peer);
+        
         return data;
     }
 

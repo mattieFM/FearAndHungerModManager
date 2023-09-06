@@ -730,6 +730,10 @@ MATTIE.static.update = function(){
             398, //torch timer
             403, //torch2
             302, //blight random timer
+
+
+            "99-100",//crow
+            "52-55",//bear trap
         ]
 
         MATTIE.static.variable.ignoredVars = MATTIE.static.rangeParser(MATTIE.static.variable.ignoredVars);
