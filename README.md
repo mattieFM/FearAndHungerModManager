@@ -1,3 +1,6 @@
+# To the clever clogs that found this before the release
+I know this is an open repo, I didn't do much to hide this mod, its just in another branch. I ask that you don't spread the word of this, as the reason I have not released it publically yet is to allow more time so that more people will have a good first experience with the mod. Feel free to play it if you found this, just keep it a little secret. Press 'n" to teleport to other players if you get stuck, if the teleport takes you to the shadow realm ask a friend to press "v" and then try again, if that doesn't work you will have to reload the server.
+
 # FearAndHungerModManager  
 Welcome to MATTIE's Fear And Hunger Mod Manager. This mod manager works for both F&H 1 and 2.  
 
