@@ -105,6 +105,7 @@ class BaseNetController extends EventEmitter {
      * @param conn the connection object
      */
     onData(data, conn){
+        console.log(data);
         data = this.preprocessData(data,conn);
         let id = data.id;
         if(data.updateNetPlayers){//only used by client

@@ -723,6 +723,8 @@ MATTIE.static.update = function(){
 
             //timers
             "155-157", //main timers
+            "281-283", //buckman
+            
             399,    
             400,
             398, //torch timer
