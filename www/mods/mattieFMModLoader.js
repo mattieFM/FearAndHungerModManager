@@ -23,7 +23,7 @@
 
 var MATTIE_ModManager = MATTIE_ModManager || {};
 var MATTIE = MATTIE || {};
-MATTIE.isDev = false;
+MATTIE.isDev = true;
 
 MATTIE.global = MATTIE.global || {};
 MATTIE.menus = MATTIE.menus || {};

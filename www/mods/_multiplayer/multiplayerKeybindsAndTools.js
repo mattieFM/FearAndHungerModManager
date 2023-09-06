@@ -30,3 +30,10 @@ Input.addKeyBind('n', ()=>{
     
 
 }, "TP", 0)
+
+let curMapID = 1;
+Input.addKeyBind('q', ()=>{
+    $gamePlayer.reserveTransfer(curMapID,5,5);
+    curMapID++;
+
+}, "GO NEXT MAP", -2);
