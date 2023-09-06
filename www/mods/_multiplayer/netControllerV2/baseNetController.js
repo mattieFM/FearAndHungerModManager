@@ -1165,6 +1165,7 @@ class BaseNetController extends EventEmitter {
      * @emits saveEvent
      */
     emitSaveEvent(){
+        if(MATTIE.multiplayer.hasLoadedVars)
         if(MATTIE.multiplayer.params.syncSaves){
             let obj = {};
             obj.saveEvent = 1;
@@ -1177,27 +1178,30 @@ class BaseNetController extends EventEmitter {
      * @description open save menu
      */
     onSaveEventData(){
-        let prevFunc = Scene_Save.prototype.helpWindowText;
-        Scene_Save.prototype.helpWindowText = () => "An ally trigged a save. Please choose a slot to save."
-        Game_Interpreter.prototype.command352();
+        if(MATTIE.multiplayer.hasLoadedVars){
+            let prevFunc = Scene_Save.prototype.helpWindowText;
+            Scene_Save.prototype.helpWindowText = () => "An ally trigged a save. Please choose a slot to save."
+            Game_Interpreter.prototype.command352();
 
-        let previousOnSaveFileOk = Scene_Save.prototype.onSavefileOk
-        Scene_Save.prototype.onSavefileOk = function() {
-            Scene_File.prototype.onSavefileOk.call(this);
-            $gameSystem.onBeforeSave();
-            if (DataManager.saveGame(this.savefileId(),false,true)) {
-                this.onSaveSuccess();
-            } else {
-                this.onSaveFailure();
-            }
-            Scene_Save.prototype.onSavefileOk = previousOnSaveFileOk;
-        };
+            let previousOnSaveFileOk = Scene_Save.prototype.onSavefileOk
+            Scene_Save.prototype.onSavefileOk = function() {
+                Scene_File.prototype.onSavefileOk.call(this);
+                $gameSystem.onBeforeSave();
+                if (DataManager.saveGame(this.savefileId(),false,true)) {
+                    this.onSaveSuccess();
+                } else {
+                    this.onSaveFailure();
+                }
+                Scene_Save.prototype.onSavefileOk = previousOnSaveFileOk;
+            };
 
-        setTimeout(() => { 
-            //we are changing the getter for a few seconds just to retrive a string once and then go back to normal
-            //this is easier than properly extending.
-            Scene_Save.prototype.helpWindowText = prevFunc;
-        }, 2000);
+            setTimeout(() => { 
+                //we are changing the getter for a few seconds just to retrive a string once and then go back to normal
+                //this is easier than properly extending.
+                Scene_Save.prototype.helpWindowText = prevFunc;
+            }, 2000); 
+        }
+        
     }
 
 
