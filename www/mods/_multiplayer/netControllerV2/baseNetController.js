@@ -99,12 +99,12 @@ class BaseNetController extends EventEmitter {
      * @param {*} obj the object to send
      */
     sendViaMainRoute(obj, excludedIds = []){
-        MATTIE.multiplayer.packetsThisSecond++;
-        if(MATTIE.multiplayer.packetsThisSecond >= MATTIE.multiplayer.maxPacketsPerSecond){
+        //MATTIE.multiplayer.packetsThisSecond++;
+        // if(MATTIE.multiplayer.packetsThisSecond >= MATTIE.multiplayer.maxPacketsPerSecond){
 
-        }else{
+        // }else{
             this.send(obj, excludedIds);
-        }
+        //}
 
         
     }
@@ -886,7 +886,7 @@ class BaseNetController extends EventEmitter {
     emitUpdateSyncedVars(){
         if(!MATTIE.multiplayer.varSyncRequested){
             MATTIE.multiplayer.varSyncRequested = true;
-            console.log("host var sync sent")
+            
             let obj = {};
             obj.syncedVars = {};
             obj.syncedSwitches = {};
@@ -902,11 +902,13 @@ class BaseNetController extends EventEmitter {
                 MATTIE.static.switch.syncedSwitches.forEach(id=>{
                     obj.syncedSwitches[id] = $gameSwitches.value(id);
                 })
+                console.log("host var sync sent")
                 this.sendViaMainRoute(obj)
                 this.emit("randomVars", obj)
                 MATTIE.multiplayer.varSyncRequested = false;
             }else{
                 setTimeout(() => {
+                    console.log("delayed")
                     this.emitUpdateSyncedVars();
                 }, 1000);
             }
@@ -934,6 +936,7 @@ class BaseNetController extends EventEmitter {
      */
     onUpdateSyncedVarsData(syncedVars){
         MATTIE.multiplayer.varSyncer.shouldSync = false;
+        MATTIE.multiplayer.varSyncer.syncedOnce = true;
         console.log("client vars synced")
         Object.keys(syncedVars).forEach(id=>{
             let val = syncedVars[id];
@@ -947,6 +950,7 @@ class BaseNetController extends EventEmitter {
      */
      onUpdateSyncedSwitchData(syncedSwitch){
         MATTIE.multiplayer.varSyncer.shouldSync = false;
+        MATTIE.multiplayer.varSyncer.syncedOnce = true;
         console.log("client vars synced")
         Object.keys(syncedSwitch).forEach(id=>{
             let val = syncedSwitch[id];

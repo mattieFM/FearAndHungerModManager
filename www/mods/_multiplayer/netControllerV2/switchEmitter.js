@@ -3,27 +3,37 @@ MATTIE.multiplayer.switchEmitter = {};
 MATTIE.multiplayer.switchEmitter.config = {};
 MATTIE.multiplayer.switchEmitter.config.maxCps = .5;
 //the number of seconds an switch can fire above the max cps before getting silenced
-MATTIE.multiplayer.switchEmitter.config.tolerance = 6;
+MATTIE.multiplayer.switchEmitter.config.switchTolerance = 12;
+// same as above but for self switches
+MATTIE.multiplayer.switchEmitter.config.selfSwitchTolerance = 12;
+// same as above but for vars
+MATTIE.multiplayer.switchEmitter.config.varTolerance = 12;
 
-
-MATTIE.multiplayer.switchEmitter.parallelSetter = function(){
-    if(this.lastTime && !this._isParallel){
-        const secSinceLast = ((Date.now() - this.lastTime) / 1000);
-        //if command triggers more per second than our limit assume it is a parallel event
-        if(secSinceLast < MATTIE.multiplayer.switchEmitter.config.maxCps){
-            if(this.tolerance){ this.tolerance++}
-            else { this.tolerance = 1};
-        
-            if(this.tolerance > MATTIE.multiplayer.switchEmitter.config.tolerance){
-                this._isParallel = true;
-                console.info(`a game interpreter was silenced`)
-            }
+/**
+ * 
+ * @param {*} toleranceMax max calls in the cps limit before silence will fall. (not when the question is asked)
+ */
+MATTIE.multiplayer.switchEmitter.parallelSetter = function(toleranceMax){
+    if(this != $gameMap._interpreter){
+        if(!this._isParallel){
+            if(!this.lastTime) this.lastTime = Date.now();
+            const secSinceLast = ((Date.now() - this.lastTime) / 1000);
+            //if command triggers more per second than our limit assume it is a parallel event
+            if(secSinceLast < MATTIE.multiplayer.switchEmitter.config.maxCps){
+                if(this.tolerance){ this.tolerance++}
+                else { this.tolerance = 1};
             
-            //if it hasnt fired in a long time reset the count
-        } else if(secSinceLast > MATTIE.multiplayer.switchEmitter.config.maxCps*3){
-            this.tolerance = 0;
-        }
-}
+                if(this.tolerance > toleranceMax){
+                    this._isParallel = true;
+                    console.info(`a game interpreter was silenced`)
+                }
+                
+                //if it hasnt fired in a long time reset the count
+            } else if(secSinceLast > MATTIE.multiplayer.switchEmitter.config.maxCps*3){
+                this.tolerance = 0;
+            }
+        } 
+    }
 }
 
 let eventAndSwitchEmitterInit = function () {
@@ -62,9 +72,9 @@ let eventAndSwitchEmitterInit = function () {
             //console.log("is parallel")
             this._interpreter = new Game_Interpreter();
             this._interpreter._isParallel = true;
-            setTimeout(() => {
-                this._interpreter._isParallel = true;
-            }, 1000);
+            // setTimeout(() => {
+            //     if(this._interpreter) this._interpreter._isParallel = true;
+            // }, 1000);
         } else {
             this._interpreter = null;
         }
@@ -75,13 +85,12 @@ let eventAndSwitchEmitterInit = function () {
     //override the set var switch command making it work for both saves from my mod and saves from base game. 
     // bassically just silence anything that is sending too much data assuming it is a parellel event
     Game_Interpreter.prototype.command121 = function() {
-        MATTIE.multiplayer.switchEmitter.parallelSetter.call(this);
+        MATTIE.multiplayer.switchEmitter.parallelSetter.call(this, MATTIE.multiplayer.switchEmitter.config.switchTolerance);
         
         for (var i = this._params[0]; i <= this._params[1]; i++) {
             $gameSwitches.setValue(i, this._params[2] === 0, false, this._isParallel);
         }
-        if(!this._isParallel)
-        this.lastTime = Date.now();
+
         return true;
     };
     
@@ -121,15 +130,16 @@ let eventAndSwitchEmitterInit = function () {
     }
 
 
+
+
     //self switch cmd
     Game_Interpreter.prototype.command123 = function() {
-        MATTIE.multiplayer.switchEmitter.parallelSetter.call(this);
+        MATTIE.multiplayer.switchEmitter.parallelSetter.call(this, MATTIE.multiplayer.switchEmitter.config.selfSwitchTolerance);
         
         if (this._eventId > 0) {
             var key = [this._mapId, this._eventId, this._params[0]];
             $gameSelfSwitches.setValue(key, this._params[1] === 0);
         }
-
 
         let stringKey = JSON.stringify(key);
         if(!this._isParallel || MATTIE.static.switch.syncedSelfSwitches.includes(stringKey)) {//MATTIE.static.switch.syncedSelfSwitches.includes(key)
@@ -143,33 +153,24 @@ let eventAndSwitchEmitterInit = function () {
                 if(MATTIE.multiplayer.devTools.eventLogger)
                 console.log(`Game Self Switch ${key} set to ${this._params[1] === 0}`);
             }
+
+        
         
         return true;
     };
 
     // // Control Self Switch]
-    // MATTIE.multiplayer.switchEmitter.cmdSelfSwitchSilencedArr = [];
     // MATTIE_RPG.cmdSelfSwitch = Game_SelfSwitches.prototype.setValue;
     // Game_SelfSwitches.prototype.setValue = function(key, val, shouldSkip=false, silenced = false){
     //     let returnVal =  MATTIE_RPG.cmdSelfSwitch.call(this, key, val);
-    //     if(!shouldSkip){
-    //         if(!silenced && !MATTIE.multiplayer.switchEmitter.cmdSelfSwitchSilencedArr.includes(key)) {//MATTIE.static.switch.syncedSelfSwitches.includes(key)
-    //         let obj = {}
-    //             obj.i = key;
-    //             obj.b = val;
-    //             obj.s = 1;
-    //             let netController = MATTIE.multiplayer.getCurrentNetController();
-    //             if(MATTIE.multiplayer.isActive) 
-    //             netController.emitSwitchEvent(obj);
-    //             if(MATTIE.multiplayer.devTools.eventLogger)
-    //             console.log(`Game Self Switch ${key} set to ${this._params[1] === 0}`);
-    //         }
-    //     }
+    //     let stringKey = JSON.stringify(key);
+    //     if(!shouldSkip)
+        
     //     return returnVal;
     // }
 
 Game_Interpreter.prototype.operateVariable = function(variableId, operationType, value) {
-    MATTIE.multiplayer.switchEmitter.parallelSetter.call(this);
+    MATTIE.multiplayer.switchEmitter.parallelSetter.call(this, MATTIE.multiplayer.switchEmitter.config.varTolerance);
     try {
         var oldValue = $gameVariables.value(variableId);
         switch (operationType) {
