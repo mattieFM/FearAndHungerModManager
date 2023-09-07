@@ -96,6 +96,18 @@ class PlayerModel {
         return this.followerIds;
     }
 
+    followers(){
+        let displayMembers = this.displayMembers();
+        let followers = [];
+        for (let index = 0; index < displayMembers.length; index++) {
+            const actor = displayMembers[index];
+            if(actor.actorId() != this.actorId){
+                followers.push(actor);
+            }
+        }
+        return followers;
+    }
+
     setFollowers(ids){
         if(this.$gamePlayer){
             let netFollowers =  this.$gamePlayer._followers._data;

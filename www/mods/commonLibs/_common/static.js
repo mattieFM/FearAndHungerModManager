@@ -198,7 +198,11 @@ MATTIE.static.update = function(){
             //          Overworld switches (A bit general of a catagory, but think stuff like arrows, traps etc...)
             //-------------------------------------------------------
             //59, //"arrow1" has to do with arrow traps, might need to be disabled, but I think it should be forwarded.
-           
+            //loot needs vars:
+            "2064-2067",
+            3154,
+
+            3175,
             //--fear
             271, //something with fear
             "830-837", //fear_floor switches
@@ -723,7 +727,7 @@ MATTIE.static.update = function(){
 
         MATTIE.static.variable.godAffinityAndPrayerVars = MATTIE.static.rangeParser(MATTIE.static.variable.godAffinityAndPrayerVars);
         MATTIE.static.variable.ignoredVars = [ //ignored vars
-            
+            4,
             30, //player_mp
             "22-23", //arrow var
             1, //Lightswitch
