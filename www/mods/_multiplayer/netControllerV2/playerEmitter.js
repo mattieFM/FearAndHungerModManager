@@ -145,18 +145,20 @@ MATTIE.multiplayer.gamePlayer.override = function() {
     MATTIE.RPG.removeActor = Game_Party.prototype.removeActor;
     Game_Party.prototype.addActor = function(actorId) {
         console.info("follower change event")
-        MATTIE.multiplayer.getCurrentNetController().updatePlayerInfo();
         MATTIE.RPG.addActor.call(this,actorId)
+        MATTIE.multiplayer.getCurrentNetController().updatePlayerInfo();
+        
     };
     
     let removedActorIds = [];
     Game_Party.prototype.removeActor = function(actorId) {
+        MATTIE.RPG.removeActor.call(this,actorId)
         if(!removedActorIds.includes(actorId)) {
             MATTIE.multiplayer.getCurrentNetController().updatePlayerInfo();
             console.info("follower change event")
         }
         removedActorIds.push(actorId);
-        MATTIE.RPG.removeActor.call(this,actorId)
+        
     };
 
 

@@ -19,8 +19,12 @@ MATTIE.multiplayer.NetFollower.prototype.initialize = function(memberIndex, netP
 };
 
 MATTIE.multiplayer.NetFollower.prototype.setActor = function(actorId) {
+    if(actorId)
     if(!this.netPlayer.$netActors.baseActor(actorId)) this.netPlayer.$netActors.createNewNetActor(actorId);
+    console.log("from" + this.actorId);
+    console.log("set actor id to " + actorId);
     this.actorId = actorId;
+   
     this.refresh();
 };
 
@@ -51,16 +55,18 @@ MATTIE.multiplayer.NetFollower.prototype.update = function() {
 };
 
 MATTIE.multiplayer.NetFollower.prototype.chaseCharacter = function(character) {
-    var sx = this.deltaXFrom(character.x);
-    var sy = this.deltaYFrom(character.y);
-    if (sx !== 0 && sy !== 0) {
-        this.moveDiagonally(sx > 0 ? 4 : 6, sy > 0 ? 8 : 2);
-    } else if (sx !== 0) {
-        this.moveStraight(sx > 0 ? 4 : 6);
-    } else if (sy !== 0) {
-        this.moveStraight(sy > 0 ? 8 : 2);
+    if(character){
+        var sx = this.deltaXFrom(character.x);
+        var sy = this.deltaYFrom(character.y);
+        if (sx !== 0 && sy !== 0) {
+            this.moveDiagonally(sx > 0 ? 4 : 6, sy > 0 ? 8 : 2);
+        } else if (sx !== 0) {
+            this.moveStraight(sx > 0 ? 4 : 6);
+        } else if (sy !== 0) {
+            this.moveStraight(sy > 0 ? 8 : 2);
+        }
+        this.setMoveSpeed(this.netPlayer.realMoveSpeed());
     }
-    this.setMoveSpeed(this.netPlayer.realMoveSpeed());
 };
 
 
@@ -83,15 +89,35 @@ MATTIE.multiplayer.NetFollowers.prototype.initialize = function(netPlayer) {
     this._data = [];
     this.netPlayer = netPlayer;
     this.$netActors = this.netPlayer.$netActors;
+    this.setup(netPlayer);
+};
+/**
+ * create a set of new empty followers
+ */
+MATTIE.multiplayer.NetFollowers.prototype.setup = function(netPlayer) {
+    if(!netPlayer) netPlayer = this.netPlayer;
     for (var i = 1; i < $gameParty.maxBattleMembers(); i++) {
-        this._data.push(new MATTIE.multiplayer.NetFollower(i,netPlayer));
+        this._data[i]=(new MATTIE.multiplayer.NetFollower(i,netPlayer));
     }
 };
 
+/**
+ * clear the ids of all followers
+ */
+MATTIE.multiplayer.NetFollowers.prototype.clear = function() {
+    for (var i = 1; i < $gameParty.maxBattleMembers(); i++) {
+        this._data[i].setActor(null);
+    }
+};
+
+
 MATTIE.multiplayer.NetFollowers.prototype.updateMove = function() {
     for (var i = this._data.length - 1; i >= 0; i--) {
-        var precedingCharacter = (i > 0 ? this._data[i - 1] : this.netPlayer);
-        this._data[i].chaseCharacter(precedingCharacter);
+        if(this._data.actorId){
+            var precedingCharacter = (i > 0 ? this._data[i - 1] : this.netPlayer);
+            this._data[i].chaseCharacter(precedingCharacter);
+        }
+        
     }
 };
 
