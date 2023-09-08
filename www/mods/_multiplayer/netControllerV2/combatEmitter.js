@@ -140,6 +140,9 @@ BattleManager.startTurn = function() {
 };
     MATTIE.multiplayer.battlemanageronStart = BattleManager.startBattle;
     BattleManager.startBattle = function() {
+        MATTIE.multiplayer.combatEmitter.netExTurn = false;
+        MATTIE.multiplayer.ready = false;
+        MATTIE.multiplayer.waitingOnAllies = false;
         MATTIE.multiplayer.battlemanageronStart.call(this);
         this._netActors = [];
     };

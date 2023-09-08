@@ -432,6 +432,19 @@ MATTIE.static.update = function(){
             "3463-3479", //misasma scenes
             "3481-3503", //more misasma scenes
 
+             //fallscenes 
+            "2341-2342",
+            2828,
+            "3024-3025",
+            105,
+            111,
+            412,
+            413,
+
+
+
+
+
             //sleep / surprise event
             3540, //sleep event
             //"3541-3548", //surprise events
