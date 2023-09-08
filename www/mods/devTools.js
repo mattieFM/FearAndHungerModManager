@@ -6,7 +6,7 @@ MATTIE.devTools = MATTIE.devTools || {};
 //
 (()=>{
     Input.addKeyBind('-', ()=>{
-        MATTIE.devTools.switchCheatScene();
+        SceneManager.push(MATTIE.scenes.Scene_Dev);
     }, "CHEAT", 1)
 
     Input.addKeyBind(';', ()=>{
