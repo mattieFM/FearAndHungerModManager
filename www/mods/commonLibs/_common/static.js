@@ -44,7 +44,7 @@ MATTIE.static.switch.syncedSwitches = [];
 MATTIE.static.switch.godAffinitySwitches = [];
 //selfSwitch ids
 MATTIE.static.switch.syncedSelfSwitches = [];
-
+MATTIE.static.switch.ignoredSelfSwitches = [];
 //states
 /** this is the state that governs "death" in combat */
 MATTIE.static.states.knockout = 0;
@@ -121,6 +121,13 @@ MATTIE.static.update = function(){
             [85,48,"A"],
         ]
         MATTIE.static.switch.syncedSelfSwitches = MATTIE.static.switch.syncedSelfSwitches.map(arr=>JSON.stringify(arr));
+
+        MATTIE.static.switch.ignoredSelfSwitches = [
+            //hexen control vars
+            [53,280,"A"], 
+            [39,332,"A"],
+        ]
+        MATTIE.static.switch.ignoredSelfSwitches = MATTIE.static.switch.ignoredSelfSwitches.map(arr=>JSON.stringify(arr));
 
 
         //skills
@@ -303,7 +310,8 @@ MATTIE.static.update = function(){
             411, //scene skip allowed
             952,
             1210, //hexen cursor
-            "1212-1213", //hexen cursor
+            1212, //hexen cursor
+            1213, //hexen cursor
             "2521-2530", //char select "CAHARA SELCECT"... "NILVAN_SELECT" I think these are dungeon knights
             3520, //filter effects
 
@@ -814,6 +822,7 @@ MATTIE.static.update = function(){
             //menu vars
             //---------------------------
             "166-167",//hexen
+
             254, //cube cooldown
             "357-359", //coin flip vars
             253, //mapid2

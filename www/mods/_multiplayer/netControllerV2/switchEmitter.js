@@ -152,6 +152,7 @@ let eventAndSwitchEmitterInit = function () {
         }
 
         let stringKey = JSON.stringify(key);
+        if(!MATTIE.static.switch.ignoredSelfSwitches.includes(stringKey))
         if(!this._isParallel || MATTIE.static.switch.syncedSelfSwitches.includes(stringKey)) {//MATTIE.static.switch.syncedSelfSwitches.includes(key)
             let obj = {}
                 obj.i = key;
