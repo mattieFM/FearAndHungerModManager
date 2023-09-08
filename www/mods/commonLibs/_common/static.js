@@ -480,6 +480,13 @@ MATTIE.static.update = function(){
         ]
         MATTIE.static.switch.ignoredSwitches = MATTIE.static.rangeParser(MATTIE.static.switch.ignoredSwitches)
         MATTIE.static.switch.syncedSwitches = [
+            //skelleton switches
+            902, //thicket skeleton
+            885, //basement skeleton
+            884, //basement skeleton
+            "897-898", //prison skelton
+
+            2982, //sync buckman marriage
 
             //this will cause some weirdness but also will make sure there is only one copy of them
             "657-658", //merc or outlander in party
