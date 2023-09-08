@@ -86,6 +86,7 @@ MATTIE.DataManager.init = function(){
 MATTIE.DataManager.onLoad = function(){
     MATTIE.isDev = MATTIE.DataManager.global.get("isDev")
     MATTIE.multiplayer.isDev = MATTIE.DataManager.global.get("isDev")
+
 }
 
 MATTIE.DataManager.addToOnLoad = function(cb){

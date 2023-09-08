@@ -165,6 +165,9 @@ MATTIE.Prev_Input_Update = Input.update;
             
     }
 
+
+    this.forceModdedSaves = MATTIE.DataManager.global.get("forceModded");
+    this.forceVanillaSaves = MATTIE.DataManager.global.get("forceVanilla");
     console.log(MATTIE);
     MATTIE.menus.mainMenu.addBtnToMainMenu(TextManager.Mods,TextManager.Mods,
     MATTIE.menus.toModMenu.bind(this));
