@@ -41,7 +41,7 @@ MATTIE.static.variable.godAffinityAndPrayerVars = [];
 //switchids
 MATTIE.static.switch.ignoredSwitches = [];
 MATTIE.static.switch.syncedSwitches = [];
-
+MATTIE.static.switch.godAffinitySwitches = [];
 //selfSwitch ids
 MATTIE.static.switch.syncedSelfSwitches = [];
 
@@ -707,24 +707,36 @@ MATTIE.static.update = function(){
         ]
 
         MATTIE.static.variable.syncedVars = MATTIE.static.rangeParser(MATTIE.static.variable.syncedVars);
+        MATTIE.static.switch.godAffinitySwitches = [
+            //---------------------------
+            //God Affinities
+            //---------------------------
+            "2169-2172", //allmer and sylvian and grogorth god statue controll switches
+            1397, //sylvian god statue
+            1396, //goroth statue 
+            2043,
+            2042,
+            "406-408", //ritual circle 1 prayer switches
+            409, //ritual circle 1 exhausted
+            "479-481", //ritual circle 2 prayer switches
+            476, //ritual circle 2 exhausted
+            "488-490", //ritual circle 3 prayer switches
+            486, //ritual circle 3 exhausted
+            "2053-2055", //ritual circle 4 prayer switches
+            2046, //ritual circle 4 exhausted
+            "2452-2454", //ritual circle 5 prayer switches
+            2445, //ritual circle 5 exhausted
+        ]
         MATTIE.static.variable.godAffinityAndPrayerVars = [
             //---------------------------
             //God Affinities
             //---------------------------
-            2171, //allmer god statue controll var
-            1397, //sylvian god statue
-            1396, //goroth statue 
             "35-38", //GOD Vars... GROGAROTH_VAR
-            409, //ritual circle 1 exhausted
-            476, //ritual circle 2 exhausted
-            486, //ritual circle 3 exhausted
-            2046, //ritual circle 4 exhausted
-            2445, //ritual circle 5 exhausted
             79, //god of the depths var 2
             "162-165", //more affinities... Afinity_God
         ]
         //
-
+        MATTIE.static.switch.godAffinitySwitches = MATTIE.static.rangeParser(MATTIE.static.switch.godAffinitySwitches);
         MATTIE.static.variable.godAffinityAndPrayerVars = MATTIE.static.rangeParser(MATTIE.static.variable.godAffinityAndPrayerVars);
         MATTIE.static.variable.ignoredVars = [ //ignored vars
             4,
@@ -832,8 +844,10 @@ MATTIE.static.update = function(){
         if(MATTIE.multiplayer){
             if(MATTIE.multiplayer.params){
                 if(MATTIE.multiplayer.params.sharedAffinity){
+                    MATTIE.static.switch.syncedSwitches = MATTIE.static.switch.syncedSwitches.concat(MATTIE.static.switch.godAffinitySwitches);
                     MATTIE.static.variable.syncedVars = MATTIE.static.variable.syncedVars.concat(MATTIE.static.variable.godAffinityAndPrayerVars);
                 }else{
+                    MATTIE.static.switch.ignoredSwitches = MATTIE.static.switch.ignoredSwitches.concat(MATTIE.static.switch.godAffinitySwitches);
                     MATTIE.static.variable.ignoredVars = MATTIE.static.variable.ignoredVars.concat(MATTIE.static.variable.godAffinityAndPrayerVars);
                 }
             }   
