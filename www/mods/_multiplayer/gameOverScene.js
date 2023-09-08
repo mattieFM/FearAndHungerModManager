@@ -60,8 +60,7 @@ MATTIE.scenes.multiplayer.Scene_GameOver .prototype.create = function() {
         this.animateText("Your body was claimed by the dungeons, but your soul\n roams freely, may you live again.",.5);
         //this.animateText("You give your soul to the god of fear and hunger, may \nyou live again.",.5);
         setTimeout(() => {
-            SceneManager.goto(MATTIE.scenes.multiplayer.Scene_Spectate);
-            MATTIE.multiplayer.isSpectator = true;
+            MATTIE.multiplayer.getCurrentNetController().player.setSpectate(true);
         }, 4000);
     }).bind(this))
 

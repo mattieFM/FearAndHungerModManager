@@ -23,7 +23,7 @@
 
 var MATTIE_ModManager = MATTIE_ModManager || {};
 var MATTIE = MATTIE || {};
-MATTIE.isDev = true;
+MATTIE.isDev = false;
 
 MATTIE.global = MATTIE.global || {};
 MATTIE.menus = MATTIE.menus || {};
@@ -366,6 +366,7 @@ class ModManager {
 
 MATTIE_ModManager.init =
 function () {
+    
     const defaultPath = PluginManager._path;
         const path = "mods/";
         const commonLibsPath = path+"commonLibs/";
@@ -375,6 +376,7 @@ function () {
         const commonModManager = new ModManager(commonLibsPath);
         const commonMods = modManager.parseMods(commonLibsPath)
         setTimeout(() => {
+            
             new Promise(res=>{
                 
                 PluginManager._path = commonLibsPath;
@@ -392,6 +394,7 @@ function () {
                     
                     PluginManager._path = defaultPath;
                 }, 2000);
+                
                 
                 
             })

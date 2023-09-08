@@ -28,6 +28,39 @@ class PlayerModel {
 
         this.map = 0;
 
+        this.isSpectating = false;
+
+        this.conversationModel = new MATTIE.multiplayer.conversations();
+    }
+
+    onInteract(){
+        //called when this player is interacted with by pressing okay.
+        this.conversationModel.talk($gameParty.leader().actorId(),this);
+    }
+
+    resurrect(){
+        this.setSpectate(false);
+    }
+
+    canResurrect(){
+        return this.isSpectating;
+    }
+
+    setSpectate(bool, doNotEmit = false){
+        let netCont = MATTIE.multiplayer.getCurrentNetController();
+        if(!doNotEmit) netCont.emitSpectateEvent(bool,this.peerId);
+        if(this.peerId === netCont.peerId) {
+            console.log("resurrect event")
+            MATTIE.multiplayer.isSpectator = bool;
+            if(!bool) {
+                SceneManager.goto(Scene_Map); 
+                MATTIE.actorAPI.changePartyLeader(MATTIE.actorAPI.lastLeader);
+            } else {
+                SceneManager.goto(MATTIE.scenes.multiplayer.Scene_Spectate);
+                MATTIE.actorAPI.changePartyLeader(MATTIE.static.actors.ghost._data.id);
+            }
+        }
+        this.isSpectating = bool
     }
 
     select(activeMember){

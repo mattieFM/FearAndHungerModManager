@@ -52,27 +52,31 @@ MATTIE.scenes.multiplayer.main.prototype.create = function() {
     this._inputWin.updateText(MATTIE.multiplayer.clientController.player.name);
 }
 
+MATTIE.scenes.multiplayer.main.prototype.updateName = function(){
+    let name = this._inputWin.getInput()
+    MATTIE.multiplayer.clientController.player.name = name;
+    MATTIE.multiplayer.hostController.player.name = name;
+    MATTIE.DataManager.global.set("name",name)
+}
+
 MATTIE.scenes.multiplayer.main.prototype.createCommandWindow = function() {
     this._commandWindow = new MATTIE.windows.multiplayer.main();
     
     this._commandWindow.setHandler(MATTIE.CmdManager.host, (() => {
         this._inputWin.close();
-        MATTIE.multiplayer.clientController.player.name = this._inputWin.getInput();
-        MATTIE.multiplayer.hostController.player.name = this._inputWin.getInput();
+        this.updateName()
         MATTIE.menus.multiplayer.openHost();
     }).bind(this));
 
     this._commandWindow.setHandler(MATTIE.CmdManager.join,    (()=>{
         this._inputWin.close();
-        MATTIE.multiplayer.clientController.player.name = this._inputWin.getInput();
-        MATTIE.multiplayer.hostController.player.name = this._inputWin.getInput();
+        this.updateName()
         MATTIE.menus.multiplayer.openJoin();
     }).bind(this));
 
     this._commandWindow.setHandler(MATTIE.CmdManager.return,  (()=>{
         this._inputWin.close();
-        MATTIE.multiplayer.clientController.player.name = this._inputWin.getInput();
-        MATTIE.multiplayer.hostController.player.name = this._inputWin.getInput();
+        this.updateName()
         MATTIE.menus.toMainMenu();
         
     }).bind(this));
@@ -80,8 +84,8 @@ MATTIE.scenes.multiplayer.main.prototype.createCommandWindow = function() {
 };
 
 MATTIE.scenes.multiplayer.main.prototype.addTextField = function (){
-    this._inputWin = new MATTIE.windows.textInput(0,0,237,150,"Type Username:");
-    this._inputWin.updateText(MATTIE.multiplayer.clientController.player.name);
+    this._inputWin = new MATTIE.windows.textInput(0,0,500,150,"Type Username:");
+    this._inputWin.updateText(MATTIE.util.getName());
     this.addWindow(this._inputWin);
 }
 

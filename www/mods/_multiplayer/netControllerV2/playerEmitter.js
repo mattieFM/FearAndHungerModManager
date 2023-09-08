@@ -6,6 +6,7 @@ MATTIE.scenes.multiplayer = MATTIE.scenes.multiplayer || {};
 MATTIE.windows.multiplayer = MATTIE.windows.multiplayer || {};
 MATTIE.multiplayer.gamePlayer = MATTIE.multiplayer.gamePlayer || {};
 MATTIE.multiplayer.movementEmitter = MATTIE.multiplayer.movementEmitter || {};
+MATTIE.multiplayer.playerEmitter = MATTIE.multiplayer.playerEmitter || {};
 MATTIE.RPG = MATTIE.RPG || {};
 
 
@@ -162,6 +163,27 @@ MATTIE.multiplayer.gamePlayer.override = function() {
     };
 
 
+
+    MATTIE_RPG.Game_PlayerStartMapEvent = Game_Player.prototype.startMapEvent;
+
+    Game_Player.prototype.startMapEvent = function(x, y, triggers, normal) {
+        MATTIE_RPG.Game_PlayerStartMapEvent.call(this,x,y,triggers,normal);
+        MATTIE.multiplayer.playerEmitter.checkPlayerActionBtnEvent.call(this,x,y, triggers);
+        
+    };
+
+
+    MATTIE.multiplayer.playerEmitter.checkPlayerActionBtnEvent = function(x, y, triggers){
+        let netCont =MATTIE.multiplayer.getCurrentNetController()
+        Object.keys(netCont.netPlayers).forEach(key=>{
+            let netPlayer = netCont.netPlayers[key];
+            if(netPlayer.$gamePlayer.x === x && netPlayer.$gamePlayer.y ===y){
+                if(triggers.contains(0)){ //if this is an action button trigger
+                    netPlayer.onInteract();
+                }
+            }
+        }) 
+    }
 
 }
 
