@@ -80,6 +80,17 @@ let eventAndSwitchEmitterInit = function () {
         }
     };
 
+    Game_CommonEvent.prototype.refresh = function() {
+        if (this.isActive()) {
+            if (!this._interpreter) {
+                this._interpreter = new Game_Interpreter();
+                this._interpreter._isParallel = true;
+            }
+        } else {
+            this._interpreter = null;
+        }
+    };
+
 
 
     //override the set var switch command making it work for both saves from my mod and saves from base game. 
@@ -128,7 +139,6 @@ let eventAndSwitchEmitterInit = function () {
                
             }
     }
-
 
 
 
