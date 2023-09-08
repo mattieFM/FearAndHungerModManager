@@ -49,13 +49,13 @@ class PlayerModel {
     setSpectate(bool, doNotEmit = false){
         let netCont = MATTIE.multiplayer.getCurrentNetController();
         if(!doNotEmit) netCont.emitSpectateEvent(bool,this.peerId);
-        if(this.peerId === netCont.peerId) {
-            console.log("resurrect event")
+        if(this.peerId === netCont.peerId) { //self change spectate event
             MATTIE.multiplayer.isSpectator = bool;
             if(!bool) {
                 SceneManager.goto(Scene_Map); 
                 MATTIE.actorAPI.changePartyLeader(MATTIE.actorAPI.lastLeader);
-            } else {
+            } else { //
+                $gameParty.leader().setHp(50);
                 SceneManager.goto(MATTIE.scenes.multiplayer.Scene_Spectate);
                 MATTIE.actorAPI.changePartyLeader(MATTIE.static.actors.ghost._data.id);
             }
