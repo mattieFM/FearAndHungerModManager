@@ -432,6 +432,8 @@ MATTIE.static.update = function(){
 
             //cave in vars
             3142, //cave in main
+
+            "3151-3152", //torch
            
 
         ]
