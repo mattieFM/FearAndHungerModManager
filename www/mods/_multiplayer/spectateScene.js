@@ -23,6 +23,7 @@ MATTIE.scenes.multiplayer.Scene_Spectate.prototype.constructor = MATTIE.scenes.m
 
 MATTIE.scenes.multiplayer.Scene_Spectate.prototype.initialize = function() {
     Scene_Map.prototype.initialize.call(this);
+    MATTIE.actorAPI.changePartyLeader(MATTIE.static.actors.ghost._data.id);
 };
 
 //functions to make do nothing --make the ghost unable to interact with the world

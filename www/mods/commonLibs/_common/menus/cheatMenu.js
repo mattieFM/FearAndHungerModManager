@@ -174,7 +174,6 @@ MATTIE.windows.emptyScrollHelpWindow.prototype.setText = function(text) {
             if(index >= wantedText.length-1) doneTyping = true;
             index++;
         }
-        console.log("done typing");
 
         index = 0;
         this.interval = setInterval(() => {
@@ -357,8 +356,6 @@ MATTIE.scenes.Scene_DevActors.prototype.onActorOk = function(){
     if($gameParty.allMembers().includes(actor)){
         $gameParty.removeActor(actor._actorId)
     }else{
-        console.log(actor);
-        console.log($gameActors.actor(actor._actorId));
         if(actor.hp <= 0){//resurrect actor if dead
             actor.setHp(1);
             actor.revive();
@@ -451,7 +448,6 @@ MATTIE.windows.Window_AllStatus.prototype.selectLast = function() {
 };
 
 MATTIE.windows.Window_AllStatus.prototype.loadImages = function() {
-    console.log($gameActors)
     $gameActors._data.forEach(function(actor) {
         if(actor)
         ImageManager.reserveFace(actor.faceName());
