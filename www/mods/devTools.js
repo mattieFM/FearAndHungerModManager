@@ -5,7 +5,6 @@ var MATTIE = MATTIE || {};
 MATTIE.devTools = MATTIE.devTools || {};
 //
 (()=>{
-    MATTIE.isDev = true
     Input.addKeyBind('-', ()=>{
         MATTIE.devTools.switchCheatScene();
     }, "CHEAT", 1)

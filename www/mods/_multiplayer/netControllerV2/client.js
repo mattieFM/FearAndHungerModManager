@@ -18,7 +18,7 @@ class ClientController extends BaseNetController {
         this.conn;
 
         /** the player on the local machine */
-        this.player = new PlayerModel("MattieClient",4)
+        this.player = new PlayerModel(MATTIE.util.getName(),4)
 
         /**
          *  players not on the local machine 

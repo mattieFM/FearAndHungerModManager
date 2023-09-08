@@ -411,6 +411,7 @@ MATTIE.windows.modListWin.prototype.setUpHandlers = function(){
     this.setHandler("MATTIE_"+"Apply Changes", (()=>{this.reloadModsIfNeeded();}).bind(this));
     this.setHandler("MATTIE_"+"Toggle Dev", (()=>{
         MATTIE.isDev = !MATTIE.isDev;
+        MATTIE.DataManager.global.set("isDev",MATTIE.isDev)
         this.refresh();
         this.activate();
     

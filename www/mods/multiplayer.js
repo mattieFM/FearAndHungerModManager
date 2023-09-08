@@ -88,10 +88,6 @@ Input.addKeyBind('z', ()=>{
     SceneManager.goto(Scene_Gameover);
 }, "DIE", -2)
 
-Input.addKeyBind('4', ()=>{
-    console.log($gameTroop.totalCombatants());
-    
-});
 
 MATTIE.multiplayer.devTools.getTint = function() {
     let min = 180;

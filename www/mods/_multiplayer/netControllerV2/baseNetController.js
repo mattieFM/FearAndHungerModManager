@@ -205,6 +205,9 @@ class BaseNetController extends EventEmitter {
         if(data.saveEvent){
             this.onSaveEventData();
         }
+        if(data.spectate){
+            this.onSpectateEventData(data.spectate,data.id)
+        }
     }
 
     //-----------------------------------------------------
@@ -458,12 +461,10 @@ class BaseNetController extends EventEmitter {
                     moveData.map = $gameMap.mapId();
                     this.transferNetPlayer(moveData,id,false);
                 }else{
-                    console.log(dist)
-                    if(dist > 6){
-                        console.log("here")
+                    if(dist > 4){
                         moveData.map = $gameMap.mapId();
                         this.transferNetPlayer(moveData,id,false);
-                    }else if (dist > 4){
+                    }else if (dist > 2){
                         this.netPlayers[id].$gamePlayer._x = moveData.x;
                         this.netPlayers[id].$gamePlayer._y = moveData.y;
                     }
@@ -1203,6 +1204,41 @@ class BaseNetController extends EventEmitter {
                 //this is easier than properly extending.
                 Scene_Save.prototype.helpWindowText = prevFunc;
             }, 2000); 
+        }
+        
+    }
+
+    //-----------------------------------------------------
+    //Spectate Event
+    //-----------------------------------------------------
+
+    /**
+     * @description emit the spectate event
+     * @emits spectate
+     * @param {boolean} bool  true if spectating, false if nolonger spectating
+     * @param {UUID} id, the id of the user that is changing specatting
+     */
+    emitSpectateEvent(bool, id){
+        let obj = {};
+        obj.spectate = {};
+        obj.spectate.val = bool;
+        obj.spectate.id = id;
+        this.sendViaMainRoute(obj)
+    }
+
+    /**
+     * 
+     * @param {*} spectateObj the net spectate event,
+     * @param {*} id the sender id
+     */
+    onSpectateEventData(spectateObj,id){
+        console.log("spectate event data")
+        let bool = spectateObj.val;
+        let spectatorId = spectateObj.id;
+        if(spectatorId === this.peerId){
+            this.player.setSpectate(bool,true);
+        }else{
+            this.netPlayers[spectatorId].setSpectate(bool,true);
         }
         
     }

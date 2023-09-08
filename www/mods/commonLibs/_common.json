@@ -19,7 +19,11 @@
         "_common/clipboard",
         "_common/actorAPI",
         "_common/eventAPI",
-        "_common/eventWrapper"
+        "_common/eventWrapper",
+        "_common/msgAPI",
+        "_common/supporters",
+        "_common/util",
+        "_common/dataManager"
     
     ],
     "danger": false

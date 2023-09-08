@@ -90,9 +90,6 @@ MATTIE.actorAPI.Data_Actor_Wrapper = class {
      */
     buildDataActorFromEventAndTroop (gameEvent, gameTroop, page =0){
         this.buildDataActorFromExistingActor($dataActors[1]); 
-
-        console.log(gameEvent)
-        console.log(gameTroop)
         let members =gameTroop.members;
         let traits = []
         let note = ""
@@ -141,7 +138,6 @@ MATTIE.actorAPI.Data_Actor_Wrapper = class {
     create () {
         let dataClass = new MATTIE.actorAPI.Data_Class();
         this.skills.forEach(skillId=>{
-            console.log(skillId);
             dataClass.addDefaultLearning(skillId);
         })
         dataClass.data.name = this._data.name;
@@ -252,7 +248,6 @@ MATTIE.actorAPI.Data_Class = class {
 
     create(){
         this.data.id = $dataClasses.length;
-        console.log(this.data)
         if(Yanfly){
             this.data.plusParams = [0, 0, 0, 0, 0, 0, 0, 0];
             this.data.rateParams = [1, 1, 1, 1, 1, 1, 1, 1];
@@ -371,13 +366,15 @@ MATTIE.actorAPI.Data_Actor = class {
     }
     
 }
-
+MATTIE.actorAPI.lastLeader = null
 /**
  * @description swap out the party leader
  * @param {int} i, actor index
  */
 MATTIE.actorAPI.changePartyLeader= function(i){
+    MATTIE.actorAPI.lastLeader = $gameParty.leader().actorId();
     MATTIE.actorAPI.changePartyMember(0,i);
+    
 }
 
 /**

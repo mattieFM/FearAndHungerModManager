@@ -3,6 +3,9 @@ MATTIE.multiplayer = MATTIE.multiplayer || {}
 MATTIE.multiplayer.scaling = MATTIE.multiplayer.scaling || {}
 
 
+//---------------------------------------------------------
+// Enemy Scaling
+//---------------------------------------------------------
 
 /** 
  * @default 1. 
@@ -15,6 +18,10 @@ MATTIE.multiplayer.scaling.enemyBattleIndexScaler = 1;
  */
 MATTIE.multiplayer.scaling.enemyBattleIndex = (battler)=>((($gameParty.maxBattleMembers() / $gameTroop.totalCombatants())) * (battler.agi/10) * MATTIE.multiplayer.scaling.enemyBattleIndexScaler);
 
+
+//---------------------------------------------------------
+// Healing Whispers Scaling
+//---------------------------------------------------------
 
 /**
  * @default true.
@@ -34,3 +41,71 @@ MATTIE.multiplayer.scaling.getHealingWhispersScaler = () => (1 / $gameTroop.tota
  * @description whether party actions, like healing whispers target all parties
  */
 MATTIE.multiplayer.scaling.partyActionsTargetAll = true;
+
+
+
+
+//---------------------------------------------------------
+// Resurrection Cost
+//---------------------------------------------------------
+/**
+ * @description whether resurrecting an ally has a cost
+ * @default true
+ */
+MATTIE.multiplayer.scaling.resurrectionHasCost = true;
+
+/**
+ * @description whether resurrecting an ally requires sacrificing an actor
+ * @default false
+ */
+MATTIE.multiplayer.scaling.resurrectionActorCost = false;
+
+/**
+ * @description whether resurrecting an ally has an item cost
+ * @default true
+ */
+MATTIE.multiplayer.scaling.resurrectionItemCost = true;
+
+/**
+ * @description the number of actors that must be sacrificed.
+ * @default 1
+ */
+MATTIE.multiplayer.scaling.actorCost = 1;
+
+/**
+ * @description the item id of the item that will be consumed to revive someone
+ * @default 116, lesser soul
+ */
+MATTIE.multiplayer.scaling.resurrectionItemId = 116;
+
+/** @description the number of that item that is needed */
+MATTIE.multiplayer.scaling.resurrectionItemAmount = 1;
+
+MATTIE.multiplayer.scaling.resurrectionCost = () =>{
+    if(!MATTIE.multiplayer.scaling.resurrectionHasCost) return true;
+    let item = $dataItems[MATTIE.multiplayer.scaling.resurrectionItemId];
+    let itemsNum = $gameParty.numItems(item)
+    let hasCost = true
+
+
+    if(MATTIE.multiplayer.scaling.resurrectionItemCost)
+    if(itemsNum < MATTIE.multiplayer.scaling.resurrectionItemAmount){
+        hasCost = false
+    }
+
+    if(MATTIE.multiplayer.scaling.resurrectionActorCost)
+    if($gameParty.battleMembers().length-1 < MATTIE.multiplayer.scaling.actorCost){
+        hasCost = false
+    }
+
+    if(!hasCost) return false
+    if(MATTIE.multiplayer.scaling.resurrectionActorCost)
+    for (let index = 1; index < MATTIE.multiplayer.scaling.actorCost+1; index++) {
+        const element = $gameParty.battleMembers()[index];
+        $gameParty.removeActor(element.actorId());
+    }
+    if(MATTIE.multiplayer.scaling.resurrectionItemCost)
+    $gameParty.loseItem(item,MATTIE.multiplayer.scaling.resurrectionItemAmount);
+
+    return true
+}

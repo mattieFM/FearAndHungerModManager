@@ -51,6 +51,16 @@ MATTIE.static.states.knockout = 0;
 
 //actors
 MATTIE.static.actors.bloodGolemId = 0;
+MATTIE.static.actors.mercenaryId = 0;
+MATTIE.static.actors.girlId = 0;
+MATTIE.static.actors.knightId = 0;
+MATTIE.static.actors.darkPriestId = 0;
+MATTIE.static.actors.outlanderId = 0;
+MATTIE.static.actors.leGardeId = 0;
+MATTIE.static.actors.demonKidId = 0;
+MATTIE.static.actors.marriageId = 0;
+MATTIE.static.actors.abominableMarriage = 0;
+MATTIE.static.actors.nashrahId = 0;
 MATTIE.static.actors.emptyActorSlotId = 0;
 
 
@@ -70,6 +80,16 @@ MATTIE.static.update = function(){
         //actors
         MATTIE.static.actors.bloodGolemId = 10;
         MATTIE.static.actors.emptyActorSlotId = 15;
+        MATTIE.static.actors.mercenaryId = 1;
+        MATTIE.static.actors.girlId = 2;
+        MATTIE.static.actors.knightId = 3;
+        MATTIE.static.actors.darkPriestId = 4;
+        MATTIE.static.actors.outlanderId = 5;
+        MATTIE.static.actors.leGardeId = 6;
+        MATTIE.static.actors.demonKidId = 8;
+        MATTIE.static.actors.marriageId = 9;
+        MATTIE.static.actors.abominableMarriage = 11;
+        MATTIE.static.actors.nashrahId = 14;
 
         //maps
         

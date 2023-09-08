@@ -5,7 +5,7 @@ MATTIE.multiplayer.spectate = MATTIE.multiplayer.spectate || {};
 MATTIE.menus.multiplayer = MATTIE.menus.multiplayer || {};
 MATTIE.scenes.multiplayer = MATTIE.scenes.multiplayer || {};
 MATTIE.windows.multiplayer = MATTIE.windows.multiplayer || {};
-
+MATTIE.multiplayer.spectate.init = Scene_Map.prototype.initialize;
 
 /**
  * Scene_Spectate
@@ -22,8 +22,7 @@ MATTIE.scenes.multiplayer.Scene_Spectate.prototype = Object.create(Scene_Map.pro
 MATTIE.scenes.multiplayer.Scene_Spectate.prototype.constructor = MATTIE.scenes.multiplayer.Scene_Spectate;
 
 MATTIE.scenes.multiplayer.Scene_Spectate.prototype.initialize = function() {
-    Scene_Map.prototype.initialize.call(this);
-    MATTIE.actorAPI.changePartyLeader(MATTIE.static.actors.ghost._data.id);
+    MATTIE.multiplayer.spectate.init.call(this);
 };
 
 //functions to make do nothing --make the ghost unable to interact with the world
@@ -49,7 +48,7 @@ Game_Event.prototype.start = function (){
 }
 
 //make sure player can't somehow wind up back on normal map
-MATTIE.multiplayer.spectate.init = Scene_Map.prototype.initialize;
+
 Scene_Map.prototype.initialize = function(){
     MATTIE.multiplayer.spectate.init.call(this);
     if(MATTIE.multiplayer.isSpectator) 
