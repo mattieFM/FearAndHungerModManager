@@ -24,7 +24,15 @@ MATTIE.eventAPI.addItemDropToCurrentMap = function(item){
     event.spawn($gamePlayer.x,$gamePlayer.y);
 }
 
-
+/**
+ * @description create a blank event
+ * @returns the id of the event
+ */
+MATTIE.eventAPI.createBlankEvent = function(){
+    var event = new MapEvent();
+    event.spawn(1,1);
+    return event.data.id;
+}
 
 MATTIE.eventAPI.createDataEvent = function(id,name,note,pages,x,y){
     let obj = {}

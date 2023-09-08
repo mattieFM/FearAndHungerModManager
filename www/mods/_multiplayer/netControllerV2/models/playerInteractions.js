@@ -11,9 +11,9 @@ MATTIE.multiplayer.conversations = function (){
     this.target = null
 }
 
-MATTIE.multiplayer.conversations.prototype.greeetings = [
+MATTIE.multiplayer.conversations.prototype.greetings = [
     "Hello there",
-    "The Dungeons of Fear and hunger truly are beautiful today",
+    "The Dungeons of Fear and hunger truly are beautiful today"
 
 ]
 /**
@@ -45,28 +45,36 @@ MATTIE.multiplayer.conversations.prototype.resurrect = function(){
                     if(n==0){
                         if(MATTIE.multiplayer.scaling.resurrectionCost()) {
                             this.target.resurrect();
-                            setTimeout(() => {
-                                MATTIE.msgAPI.displayMsgWithTitle("An Unknown God","I bring life"); 
-                            }, 100);
+                            this.nameSpeak("An Unknown God","I bring life"); 
                         }
-                        else{ setTimeout(() => {
+                        else{
                             if(MATTIE.multiplayer.scaling.resurrectionActorCost)
-                            MATTIE.msgAPI.displayMsgWithTitle("An Unknown God","Life is not cheep, do not take it lightly");
+                            this.nameSpeak("An Unknown God","Life is not cheep, do not take it lightly");
                             else if(MATTIE.multiplayer.scaling.resurrectionItemCost)
-                            MATTIE.msgAPI.displayMsgWithTitle("An Unknown God","Life is not cheep, a soul for a soul")
-                        }, 100);}
+                            this.nameSpeak("An Unknown God","Life is not cheep, a soul for a soul")
+                        }
                     }
                 }, msg)
             }, 100);
         
     }else{
-        setTimeout(() => {
-            MATTIE.msgAPI.displayMsgWithTitle(this.targetName,"I am not dead.")
-        }, 100);
+        this.speak("I am not dead.")
         
     }
 }
 
+MATTIE.multiplayer.conversations.prototype.speak = function(msg){
+    setTimeout(() => {
+        MATTIE.msgAPI.displayMsgWithTitle(this.targetName,msg)
+    }, 100);
+}
+
+
+MATTIE.multiplayer.conversations.prototype.nameSpeak = function(name,msg){
+    setTimeout(() => {
+        MATTIE.msgAPI.displayMsgWithTitle(name,msg)
+    }, 100);
+}
 /**
  * @description the cb of the main talk options
  * @param {*} n index that was chosen
@@ -74,22 +82,22 @@ MATTIE.multiplayer.conversations.prototype.resurrect = function(){
 MATTIE.multiplayer.conversations.prototype.talkOptionsCb = function(n){
     switch (n) {
         case 0: //Talk
-            MATTIE.msgAPI.displayMsgWithTitle(this.targetName,"That feature isn't implemented.")
+           this.nameSpeak("Mattie", "That feature isn't implemented.")
             break;
         case 1: //Trade
-            MATTIE.msgAPI.displayMsgWithTitle(this.targetName,"That feature isn't implemented.")
+            this.nameSpeak("Mattie", "That feature isn't implemented.")
             break;
         case 2: //Resurrect
             this.resurrect();
             break;
         case 3: //Attack
-            MATTIE.msgAPI.displayMsgWithTitle(this.targetName,"That feature isn't implemented.")
+            this.nameSpeak("Mattie", "That feature isn't implemented.")
             break;
         case 3: //Cancel
         
             break;
         default:
-            MATTIE.msgAPI.displayMsgWithTitle(this.targetName,"That feature isn't implemented.")
+            this.nameSpeak("Mattie", "That feature isn't implemented.")
     }
 }
 /**

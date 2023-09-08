@@ -205,6 +205,7 @@ MATTIE.windows.textInput.prototype.initEventHandler = function() {
                 this._text=this._text.slice(0,this._text.length-1)
                 break;
             case "v":
+            case "V":
                 if(lastKey === "Control"){
                     let data;
                     if(Utils.isNwjs){

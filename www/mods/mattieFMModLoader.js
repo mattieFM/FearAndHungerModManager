@@ -184,21 +184,24 @@ class ModManager {
     }
 
     switchForceModdedSaves(){
-        this.forceModdedSaves = !this.forceModdedSaves;
+        this.forceModdedSaves = !MATTIE.DataManager.global.get("forceModded");
+        MATTIE.DataManager.global.set("forceModded", this.forceModdedSaves);
         this.forceVanillaSaves = false
     }
 
     switchForceVanillaSaves(){
         this.forceModdedSaves = false;
-        this.forceVanillaSaves = !this.forceVanillaSaves;
+        
+        this.forceVanillaSaves = !MATTIE.DataManager.global.get("forceVanilla");
+        MATTIE.DataManager.global.set("forceVanilla", this.forceVanillaSaves);
     }
 
     checkForceModdedSaves(){
-        return this.forceModdedSaves;
+        return MATTIE.DataManager.global.get("forceModded");
     }
 
     checkForceVanillaSaves(){
-        return this.forceVanillaSaves;
+        return  MATTIE.DataManager.global.get("forceVanilla");
     }
 
     checkVanilla(){
@@ -223,6 +226,7 @@ class ModManager {
                 this.switchStatusOfMod(mod.name);
             }
         });
+        if(this.forceModdedSaves) this.switchForceModdedSaves();
     }
 
     checkModsChanged(){

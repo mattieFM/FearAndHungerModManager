@@ -61,15 +61,6 @@ Game_Interpreter.prototype.executeCommand = function (skip = false) {
     return returnVal;
 }
 
-MATTIE.multiplayer.runGameCmd = function(cmd){
-    if (MATTIE.multiplayer._interpreter) {
-        if (!MATTIE.multiplayer._interpreter.isRunning()) {
-            MATTIE.multiplayer._interpreter.setup(this.list(), this._eventId);
-        }
-        MATTIE.multiplayer._interpreter.update();
-    }
-}
-
 Game_Interpreter.prototype.executeCommandFromParam = function(cmd) {
     if(MATTIE.multiplayer.devTools.cmdLogger) console.debug(cmd)
     this._x = cmd.x;

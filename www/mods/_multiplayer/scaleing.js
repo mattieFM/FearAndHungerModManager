@@ -55,6 +55,12 @@ MATTIE.multiplayer.scaling.partyActionsTargetAll = true;
 MATTIE.multiplayer.scaling.resurrectionHasCost = true;
 
 /**
+ * @description whether resurrecting an allies requires necromancy
+ * @default false //not implemented yet
+ */
+MATTIE.multiplayer.scaling.resurrectionNeedsNecromancy = false;
+
+/**
  * @description whether resurrecting an ally requires sacrificing an actor
  * @default false
  */
