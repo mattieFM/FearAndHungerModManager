@@ -96,8 +96,8 @@ MATTIE.multiplayer.NetFollowers.prototype.initialize = function(netPlayer) {
  */
 MATTIE.multiplayer.NetFollowers.prototype.setup = function(netPlayer) {
     if(!netPlayer) netPlayer = this.netPlayer;
-    for (var i = 1; i < $gameParty.maxBattleMembers(); i++) {
-        this._data[i]=(new MATTIE.multiplayer.NetFollower(i,netPlayer));
+    for (var i = 0; i < $gameParty.maxBattleMembers(); i++) {
+        this._data[i]=new MATTIE.multiplayer.NetFollower(i,netPlayer);
     }
 };
 
@@ -113,10 +113,8 @@ MATTIE.multiplayer.NetFollowers.prototype.clear = function() {
 
 MATTIE.multiplayer.NetFollowers.prototype.updateMove = function() {
     for (var i = this._data.length - 1; i >= 0; i--) {
-        if(this._data.actorId){
-            var precedingCharacter = (i > 0 ? this._data[i - 1] : this.netPlayer);
-            this._data[i].chaseCharacter(precedingCharacter);
-        }
+        var precedingCharacter = (i > 0 ? this._data[i - 1] : this.netPlayer);
+        this._data[i].chaseCharacter(precedingCharacter);
         
     }
 };
