@@ -66,3 +66,43 @@ Game_Event.prototype.event = function() {
    
 //     this.refreshTileEvents();
 // };
+
+
+/**
+ * @description get a Game event obj from id and map id
+ * @param {int} id event id 
+ * @param {int} mapId mapid
+ * @returns {rm.types.Event} 
+ */
+MATTIE.eventAPI.getEventOnMap = function(id,mapId){
+    return new Promise((res)=>{
+        var url = 'data/Map%1.json'.format(mapId.padZero(3));
+        var xhr = new XMLHttpRequest();
+
+        xhr.open('GET', url, false);
+        xhr.overrideMimeType('application/json');
+
+        xhr.onload = function() {
+            if (xhr.status < 400) {
+                var mapData = JSON.parse(xhr.responseText);
+
+                if (! (id in mapData.events)){
+                    console.error('Error getting event data. Check to make sure an event with that specific id exists on the map.');
+                    res(null);
+                }
+                else {
+                    res(mapData.events[id])
+                }
+                    
+            }
+        }.bind(this);
+
+        xhr.onerror = function() {
+            console.error('Error getting map data. Check to make sure a map with that specific id exists.');
+            res(null);
+        };
+
+        xhr.send();
+    })
+    
+}

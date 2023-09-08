@@ -799,9 +799,6 @@ class BaseNetController extends EventEmitter {
         var actor = $gameParty.leader();
         if(this.player.actorId !== actor.actorId())
         this.player.setActorId(actor.actorId());
-
-        console.log(this.player.getFollowers());
-
         
 
         //update host/client about the new actor id /follower

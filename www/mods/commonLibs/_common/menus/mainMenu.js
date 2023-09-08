@@ -13,7 +13,6 @@ TextManager.Mods = "Mods";
 MATTIE.menus.mainMenu.removeBtnFromMainMenu = function(displayText,sym){
     let prevFunc = Window_TitleCommand.prototype.addCommand
     Window_TitleCommand.prototype.addCommand = function(name, symbol, enabled, ext){
-        console.log(name);
         if(name != displayText && symbol !=sym){
             prevFunc.call(this,name,symbol,enabled,ext);
         }

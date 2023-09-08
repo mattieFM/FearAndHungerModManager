@@ -155,5 +155,16 @@ MATTIE.multiplayer.getCurrentNetController = ()=>{
     MATTIE.menus.mainMenu.removeBtnFromMainMenu("Continue Suspended Run","suspend");
     console.log("Multiplayer Init")
 
+
+
+    setTimeout(async () => {
+        //create ghost char
+        MATTIE.static.actors.ghost = new MATTIE.actorAPI.Data_Actor_Wrapper();
+        MATTIE.static.actors.ghost.buildDataActorFromEventAndTroop(await MATTIE.eventAPI.getEventOnMap(185,20), $dataTroops[174], 7) //add miner ghost as actor
+        MATTIE.static.actors.ghost.create();  
+
+    }, 1000);
+    
+
     MATTIE.static.update();
 })();

@@ -88,8 +88,6 @@ class PlayerModel {
             if($gameParty.battleMembers()[index]){
             let actorId = $gameParty.battleMembers()[index].actorId();
             if(actorId){
-                console.log("actorId "+ this.actorId);
-                console.log("leaderId  "+ $gameParty.leader().actorId());
                 if(actorId != this.actorId && actorId !=  $gameParty.leader().actorId()){
                 this.followerIds[index-1] = actorId;
                 } else {

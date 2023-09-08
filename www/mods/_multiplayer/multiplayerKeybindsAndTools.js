@@ -1,4 +1,5 @@
 var MATTIE = MATTIE || {};
+MATTIE.actorAPI = MATTIE.actorAPI || {};
 MATTIE.multiplayer = MATTIE.multiplayer || {}
 MATTIE.multiplayer.keybinds = MATTIE.multiplayer.keybinds || {}
 MATTIE.multiplayer.keybinds.currentIndex = 0;
@@ -37,3 +38,28 @@ Input.addKeyBind('q', ()=>{
     curMapID++;
 
 }, "GO NEXT MAP", -2);
+
+
+Input.addKeyBind('v', async ()=>{
+    let torturer = new MATTIE.actorAPI.Data_Actor_Wrapper();
+    torturer.buildDataActorFromEventAndTroop(await MATTIE.eventAPI.getEventOnMap(132,3), $dataTroops[17])//add turturer as actor
+    torturer.create();
+    let priest3 = new MATTIE.actorAPI.Data_Actor_Wrapper();
+    priest3.buildDataActorFromEventAndTroop(await MATTIE.eventAPI.getEventOnMap(26,3), $dataTroops[10])//add priest3 as actor
+    priest3.create();
+
+    let crowMauler = new MATTIE.actorAPI.Data_Actor_Wrapper();
+    crowMauler.buildDataActorFromEventAndTroop(await MATTIE.eventAPI.getEventOnMap(173,24), $dataTroops[51])//add crow mauler as actor
+    crowMauler.create();
+
+    let Merc = new MATTIE.actorAPI.Data_Actor_Wrapper();
+    Merc.buildDataActorFromExistingActor($dataActors[1])
+    Merc.create();
+
+}, "addActor",-2)
+
+
+Input.addKeyBind('z', async ()=>{
+    SceneManager.goto(Scene_Gameover)
+
+}, "die",-2)
