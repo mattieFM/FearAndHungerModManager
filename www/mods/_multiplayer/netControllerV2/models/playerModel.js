@@ -83,12 +83,19 @@ class PlayerModel {
      * @param {int array} ids the actor ids of any and all followers, -1 if not present
      */
     getFollowers(){
+        this.followerIds = [];
         for (let index = 1; index < $gameParty.maxBattleMembers(); index++) {
             if($gameParty.battleMembers()[index]){
-            let actorId =$gameParty.battleMembers()[index].actorId()
-            if(actorId)
-            this.followerIds[index-1] = actorId;
-            else{
+            let actorId = $gameParty.battleMembers()[index].actorId();
+            if(actorId){
+                console.log("actorId "+ this.actorId);
+                console.log("leaderId  "+ $gameParty.leader().actorId());
+                if(actorId != this.actorId && actorId !=  $gameParty.leader().actorId()){
+                this.followerIds[index-1] = actorId;
+                } else {
+                    this.followerIds[index-1] = -1;
+                }
+            } else {
                 this.followerIds[index-1] = -1;
             }
         }
@@ -109,16 +116,21 @@ class PlayerModel {
     }
 
     setFollowers(ids){
+        console.log("set followers")
         if(this.$gamePlayer){
             let netFollowers =  this.$gamePlayer._followers._data;
             for (let index = 0; index < ids.length; index++) {
                 this.followerIds[index] = ids[index];
                 const follower = netFollowers[index];
                 if(follower){
-                    if(this.followerIds[index] >= 0)
-                    follower.setActor(this.followerIds[index])
+                    if(this.followerIds[index] >= 0){
+                        follower.setActor(this.followerIds[index])
+                    };
                 }
                 
+            }
+            if(ids.length === 0){
+                this.$gamePlayer._followers.setup(null);
             }
         }
       
@@ -140,10 +152,20 @@ class PlayerModel {
     initSecondaryGamePlayer(){
         this.$gamePlayer = new MATTIE.multiplayer.Secondary_Player(this.$netActors);
         this.$gamePlayer.setActor(this.actorId);
+        this.getFollowers();
         this.$gamePlayer.refresh();
     }
 
+    updateSelfCoreData(){
+        this.setActorId($gameParty.leader().actorId());
+        this.getFollowers();
+    }
+
     getCoreData(){
+        if(MATTIE.multiplayer.getCurrentNetController())
+        if(MATTIE.multiplayer.getCurrentNetController().peerId === this.peerId){
+            this.updateSelfCoreData();
+        }
         let obj = {};
         obj.name = this.name;
         obj.actorId = this.actorId;

@@ -38,9 +38,12 @@ MATTIE.multiplayer.renderer._renderNetPlayers = function(target) {
                 }
                 this.playersSprites.push(p2Sprite);
                 netPlayer.$gamePlayer.followers().forEach(follower => {
-                    let followerSprite = new Sprite_Character(follower);
-                    follower.setTransparent(false);
-                    this.playersSprites.push(followerSprite);
+                    if(follower.actorId){
+                        let followerSprite = new Sprite_Character(follower);
+                        follower.setTransparent(false);
+                        this.playersSprites.push(followerSprite);
+                    }
+                    
                 });
             }
         }

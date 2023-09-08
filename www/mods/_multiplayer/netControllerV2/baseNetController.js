@@ -141,8 +141,8 @@ class BaseNetController extends EventEmitter {
             this.onMoveData(data.move, id);
             return; //move data is sent by itself always
         }
-        if(data.updateNetPlayers){//only used by client
-            this.onUpdateNetPlayersData(data.updateNetPlayers);
+        if(data.updateNetPlayers && MATTIE.multiplayer.isClient){//only used by client
+            this.onUpdateNetPlayersData(data.updateNetPlayers, data.id);
         }
         if(data.playerInfo && MATTIE.multiplayer.isHost){ //only used by host
             this.onPlayerInfoData(data.playerInfo);
@@ -739,7 +739,7 @@ class BaseNetController extends EventEmitter {
      * handle when the host sends an updated list of netplayers
      * @emits updateNetPlayers
      */
-    onUpdateNetPlayersData(netPlayers){
+    onUpdateNetPlayersData(netPlayers, id){
         console.log("update net players")
         this.updateNetPlayers(netPlayers)
         this.updateNetPlayerFollowers(netPlayers);
@@ -797,10 +797,12 @@ class BaseNetController extends EventEmitter {
 
     updatePlayerInfo(){
         var actor = $gameParty.leader();
-        this.player.getFollowers();
-
         if(this.player.actorId !== actor.actorId())
         this.player.setActorId(actor.actorId());
+
+        console.log(this.player.getFollowers());
+
+        
 
         //update host/client about the new actor id /follower
         this.sendPlayerInfo();
