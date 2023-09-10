@@ -21,7 +21,7 @@ MATTIE.eventAPI.addItemDropToCurrentMap = function(item){
     else event.addCommand(0,126,[itemObj.id,0,0,1]); //give item
     event.addCommand(0,123,["A",0])//set self switch
 
-    event.spawn($gamePlayer.x,$gamePlayer.y);
+    event.spawn($gamePlayer.x,$gamePlayer.y);  
 }
 
 /**
@@ -47,33 +47,65 @@ MATTIE.eventAPI.createDataEvent = function(id,name,note,pages,x,y){
 MATTIE.eventAPI.command123 = Game_Interpreter.prototype.command123;
 Game_Interpreter.prototype.command123 = function() {
     let val = MATTIE.eventAPI.command123.call(this);
-    MATTIE.eventAPI.dataEvents[this._eventId] = $dataMap.events[this._eventId];
+    //MATTIE.eventAPI.dataEvents[this._eventId] = $dataMap.events[this._eventId];
     return val;
 };
+
 
 MATTIE.eventAPI.orgEvent = Game_Event.prototype.event;
 Game_Event.prototype.event = function() {
     let val = MATTIE.eventAPI.orgEvent.call(this);
-    if(!val){
+    if(MATTIE.eventAPI.dataEvents[this._eventId]){
         val = MATTIE.eventAPI.dataEvents[this._eventId];
-    }
+    } 
+    if(!val) val = MATTIE.eventAPI.dataEvents[this._eventId];
     return val;
 };
-// MATTIE.eventAPI.orgSetEventup = Game_Map.prototype.setupEvents;
-// Game_Map.prototype.setupEvents = function() {
-//     MATTIE.eventAPI.orgSetEventup.call(this);
-//     Object.keys(MATTIE.eventAPI.dataEvents).forEach(id => {
-//         let element = MATTIE.eventAPI.dataEvents[id];
-//         if(element.mapId === $gameMap.mapId()){
-//             this._events.push(element);
-//             var event = this.createGameEvent();
-//             var sprite = this.createCharacterSprite(event);
-//             this.addSpriteToTilemap(sprite);
+
+// MATTIE_RPG.loadMapData = Scene_Map.prototype.onMapLoaded;
+// Scene_Map.prototype.onMapLoaded = function() {
+//     MATTIE_RPG.loadMapData.call(this);
+//     let keys = Object.keys(MATTIE.eventAPI.dataEvents);
+//     for (let index = 0; index < keys.length; index++) {
+//         /** @type {rm.types.Event} */
+//         const dataEvent = MATTIE.eventAPI.dataEvents[keys[index]];
+//         if(dataEvent.mapId === $gameMap.mapId()){
+//             if(!$dataMap.events[dataEvent.id]) {
+//                 $dataMap.events[dataEvent.id] = dataEvent;
+//                 console.log("event tried to add");
+//                 let mapEvent = new MapEvent();
+//                 mapEvent.data = dataEvent;
+//                 mapEvent.refresh();
+//             }
+            
+                
 //         }
-//     });
-   
-//     this.refreshTileEvents();
+//     }
+    
 // };
+
+MATTIE.eventAPI.orgSetEventup = Game_Map.prototype.setupEvents;
+Game_Map.prototype.setupEvents = function() {
+    MATTIE.eventAPI.orgSetEventup.call(this);
+    let keys = Object.keys(MATTIE.eventAPI.dataEvents);
+    for (let index = 0; index < keys.length; index++) {
+        /** @type {rm.types.Event} */
+        const dataEvent = MATTIE.eventAPI.dataEvents[keys[index]];
+        if(dataEvent.mapId === $gameMap.mapId()){
+            if(!$dataMap.events[dataEvent.id]) {
+                $dataMap.events[dataEvent.id] = dataEvent;
+                console.log("event tried to add");
+                let mapEvent = new MapEvent();
+                mapEvent.data = dataEvent;
+                mapEvent.refresh();
+            }
+            
+                
+        }
+    }
+   
+    this.refreshTileEvents();
+};
 
 
 /**
@@ -113,4 +145,42 @@ MATTIE.eventAPI.getEventOnMap = function(id,mapId){
         xhr.send();
     })
     
+}
+
+/**
+ * @description create an enemy from an existing enemy handling death with a self switch
+ * the self switch "A" will be used for the death page
+ * the self switch "B" is used to signal if the player is in combat with it or not
+ * @param {*} mapId the map of the original enemy
+ * @param {*} eventId the id of the original enemy
+ * @param {*} alivePageId the alive page of the original enemy
+ * @param {*} deadPageId the dead page of the original enemy
+ */
+MATTIE.eventAPI.createEnemyFromExisting = function(mapId, eventId, alivePageId, deadPageId){
+    let enemy = new MapEvent();
+    var baseEnemy = new MapEvent();
+    baseEnemy.copyActionsFromEventOnMap(eventId,mapId) //create copy of crow mauler obj
+    let alivePage = baseEnemy.data.pages[alivePageId];
+    let deadPage  = baseEnemy.data.pages[deadPageId];
+
+    enemy.data.pages[0] = alivePage;
+
+    //set up changing self switch on victory
+    let indexOfIfWinCmd = enemy.indexOfCommandOnPage(0, MATTIE.static.commands.ifWin);
+    let indent = alivePage.list[alivePage.list.length-1].indent+1
+    enemy.addCommandAfterIndex(0,indexOfIfWinCmd, enemy.createCommand(MATTIE.static.commands.selfSwitch,["A",0],indent))
+
+    enemy.addPage();
+    //set up conditions for death page
+    enemy.data.pages[1] = deadPage;
+    enemy.data.pages[1].conditions = enemy.setDefaultConditions();
+    enemy.data.pages[1].conditions.selfSwitchValid=true;
+
+    enemy.setPersist(true);
+    return enemy;
+}
+
+
+MATTIE.eventAPI.removePersistingEvent = function(eventId) {
+    delete MATTIE.eventAPI.dataEvents[eventId];
 }

@@ -43,6 +43,7 @@ class MapEvent {
             y: 0,
             meta: {},
             mapId: $gameMap.mapId(),
+            persist: false
         };
 
         this.addPage();
@@ -53,8 +54,19 @@ class MapEvent {
      */
     setId() {
         val++;
-        if($dataMap.events) val = $dataMap.events.length + Object.keys(MATTIE.eventAPI.dataEvents).length;
+        if($dataMap.events) {
+            let openIndex = $dataMap.events.length + Object.keys(MATTIE.eventAPI.dataEvents).length-2;
+            do {
+                openIndex++;
+            } while (!!$gameMap.event(openIndex));
+
+            val = openIndex
+        }
         return val;
+    }
+
+    setPersist(bool){
+        this.data.persist = bool;
     }
 
     /**
@@ -142,11 +154,24 @@ class MapEvent {
      * @param {*} command 
      * @param {*} parameters 
      */
-    addCommand(pageId, command, parameters){
+    addCommand(pageId, command, parameters,indent=0){
+        this.data.pages[pageId].list.push(this.createCommand(command,parameters,indent))
+    }
+
+    /**
+     * @description create a command obj from these params
+     * @param {*} command the command code
+     * @param {*} parameters array of params
+     * @param {*} indent optional 
+     * @returns {rm.types.Event}
+     */
+    createCommand(command, parameters,indent=0){
         let cmd = {};
         cmd.code = command;
         cmd.parameters = parameters;
-        this.data.pages[pageId].list.push(cmd)
+        cmd.indent = indent;
+        cmd.eventId = this.data.id;
+        return cmd;
     }
 
     /**
@@ -206,8 +231,9 @@ class MapEvent {
      * Create a new Game_Event object and store it in $gameMap.
      */
     createGameEvent() {
-        $gameMap._events[this.data.id] = (new Game_Event($gameMap._mapId, this.data.id));
-
+        $dataMap.events[this.data.id] = MATTIE.eventAPI.dataEvents[this.data.id];
+        $gameMap._events[this.data.id] = (new Game_Event($gameMap.mapId(), this.data.id));
+      
         return $gameMap.event(this.data.id);
     }
 
@@ -294,14 +320,68 @@ class MapEvent {
         if(this.data.mapId === $gameMap.mapId()){
             this.setPosition(x, y);
             MATTIE.eventAPI.dataEvents[this.data.id] = (this.data);
-            $dataMap.events[this.data.id] = MATTIE.eventAPI.dataEvents[this.data.id];
-            var event = this.createGameEvent();
-            var sprite = this.createCharacterSprite(event);
-            this.addSpriteToTilemap(sprite);
+            this.refresh();
+            console.log('New event created!');
         }
+    }
+
+    removeThisEvent () {
+        MATTIE.eventAPI.dataEvents[this.data.id] = null;
+        delete MATTIE.eventAPI.dataEvents[this.data.id];
+    }
+
+    refresh(){
+            try {
+                var event = this.createGameEvent();
+                var sprite = this.createCharacterSprite(event);
+                this.addSpriteToTilemap(sprite);
+            } catch (error) {
+                console.error(error);
+            }
         
-        
-        console.log('New event created!');
+    }
+
+    /**
+     * @description return an array of all command codes on page
+     * @param {*} page page index
+     */
+    getListOfCommandCodesOnPage(page){
+        return this.data.pages[page].list.map(cmd=>cmd.code);
+    }
+
+    /**
+     * @description returns the index of the first occurence of the command code on the page
+     * @param {*} commandCode command code
+     * @param {*} page page index
+     */
+    indexOfCommandOnPage(page,commandCode){
+        let list = this.getListOfCommandCodesOnPage(page);
+        return list.indexOf(commandCode);
+    }
+
+    /**
+     * @description add
+     * @param {*} index the index in the list of commands to add this command after
+     * @param {*} command the command obj to add
+     * @param {int} pageIndex the page index of the page to add the command to
+     */
+    addCommandAfterIndex(pageIndex,index,command){
+        let page = this.data.pages[pageIndex];
+        let secondHalf = page.list.slice(index+2);
+        page.list = page.list.slice(0,index+1);
+        page.list.push(command);
+        page.list = page.list.concat(secondHalf);
+        this.data.pages[pageIndex] = page;
+    }
+
+
+    /**
+     * @description check a self switch of this event
+     * @param {*} letter the letter of the self switch
+     * @returns {boolean} whether the switch is true or false
+     */
+    checkSelfSwitch(letter){
+        return $gameSelfSwitches.value($gameSelfSwitches.formatKey(this.data.mapId, this.data.id, letter))
     }
 }
 
@@ -342,4 +422,5 @@ class MapEvent {
                 delete $gameSelfSwitches._data[key];
         }
     };
+
 })();

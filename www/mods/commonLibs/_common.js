@@ -173,3 +173,30 @@ MATTIE.Prev_Input_Update = Input.update;
     MATTIE.menus.toModMenu.bind(this));
 
 // --ENGINE OVERRIDES--
+
+MATTIE_RPG.Game_Map_Setup = Game_Map.prototype.setup;
+Game_Map.prototype.setup = function(mapId) {
+    /** @description the last map that the player was on */
+    this._lastMapId = mapId;
+    console.log(this._lastMapId);
+    MATTIE_RPG.Game_Map_Setup.call(this, mapId)
+};
+
+/**
+ * @description get the last map id
+ * @returns the id of the last map 
+ */
+Game_Map.prototype.lastMapId = function(){
+    return this._lastMapId;
+}
+/**
+ * @description format the key of a self swtich id
+ * @param {*} mapId the map id that this event is on
+ * @param {*} eventId the event id of this event
+ * @param {*} letter the letter of this switch
+ * @returns {[]}
+ */
+Game_SelfSwitches.prototype.formatKey = function(mapId, eventId, letter){
+    var key = [mapId, eventId, letter];
+    return key;
+}

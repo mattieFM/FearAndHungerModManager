@@ -36,3 +36,15 @@ MATTIE.msgAPI.showChoices = function(choices, defaultChoice, cancelChoice, cb, m
             cb(n);
         }.bind(this));
 }
+
+
+/**
+ * @description show a msg at the footer of the screen, using the gab text plugin
+ * @param {string} msg message to display
+ * @param {int} ms the milliseconds till the event is hidden
+ */
+MATTIE.msgAPI.footerMsg = function(msg){
+    if(typeof msg === typeof "string") msg = [msg]; //add msg to an array if it is a string
+    Game_Interpreter.prototype.setGabText(msg);
+    Game_Interpreter.prototype.showGab();
+}   
