@@ -60,12 +60,14 @@ MATTIE.eventAPI.updatePosOfRunTimeEvents = function (){
     for (let index = 0; index < keys.length; index++) {
         /** @type {rm.types.Event} */
         let eventId =keys[index];
-        if(MATTIE.eventAPI.dataEvents[eventId]){
+        const dataEvent = MATTIE.eventAPI.dataEvents[keys[index]];
+        if(dataEvent)
+        if(dataEvent.mapId === $gameMap.mapId()){
             MATTIE.eventAPI.dataEvents[eventId] = $dataMap.events[eventId] ? $dataMap.events[eventId] : MATTIE.eventAPI.dataEvents[eventId];
             let event = $gameMap.event(eventId);
             if(event){
                 MATTIE.eventAPI.dataEvents[eventId].x = event.x;
-            MATTIE.eventAPI.dataEvents[eventId].y = event.y;
+                MATTIE.eventAPI.dataEvents[eventId].y = event.y;
             }
             
         }
