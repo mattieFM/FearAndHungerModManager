@@ -451,6 +451,7 @@ function () {
             
         }).then(()=>{
             setTimeout(() => {
+                
                 PluginManager._path = path;
                 const mods = modManager.parseMods(path); //fs is in a different root dir so it needs this.
                 console.info(mods)
@@ -459,6 +460,13 @@ function () {
                     MATTIE.msgAPI.footerMsg("Mod loader successfully initialized") 
                     PluginManager._path = defaultPath;
                 }); 
+                
+                
+            }, 1000);
+            
+                
+            
+            
             
         })
         
