@@ -56,6 +56,10 @@ MATTIE.scenes.Scene_DevItems.prototype.onItemOk = function() {
     this._itemWindow.refresh();
 };
 
+MATTIE.scenes.Scene_DevItems.prototype.onItemCancel = function(){
+    this._categoryWindow.activate();
+}
+
 
 
 
