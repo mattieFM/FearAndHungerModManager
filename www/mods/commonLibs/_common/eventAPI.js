@@ -20,7 +20,6 @@ MATTIE.eventAPI.addItemDropToCurrentMap = function(item){
     else if (item.isWeapon()) event.addCommand(0,127,[itemObj.id,0,0,1]); //give weapon
     else event.addCommand(0,126,[itemObj.id,0,0,1]); //give item
     event.addCommand(0,123,["A",0])//set self switch
-
     event.spawn($gamePlayer.x,$gamePlayer.y);  
 }
 
@@ -62,7 +61,7 @@ MATTIE.eventAPI.updatePosOfRunTimeEvents = function (){
         let eventId =keys[index];
         const dataEvent = MATTIE.eventAPI.dataEvents[keys[index]];
         if(dataEvent)
-        if(dataEvent.mapId === $gameMap.mapId()){
+        if(dataEvent.mapId === $gameMap.mapId() && dataEvent.persist){
             MATTIE.eventAPI.dataEvents[eventId] = $dataMap.events[eventId] ? $dataMap.events[eventId] : MATTIE.eventAPI.dataEvents[eventId];
             let event = $gameMap.event(eventId);
             if(event){
@@ -77,18 +76,31 @@ MATTIE.eventAPI.updatePosOfRunTimeEvents = function (){
 }
 
    
-
-MATTIE.eventAPI.updateRunTimeEvents = function(){
+MATTIE.eventAPI.setupRunTimeDataEvents = function(){
+    for (let index = 0; index < keys.length; index++) {
+        /** @type {rm.types.Event} */
+        const dataEvent = MATTIE.eventAPI.dataEvents[keys[index]];
+        if(dataEvent.mapId === $gameMap.mapId() && dataEvent.persist){
+                $dataMap.events[dataEvent.id] = dataEvent;
+                let mapEvent = new MapEvent();
+                mapEvent.data = dataEvent;
+                mapEvent.createGameEvent();
+                if(!$dataMap.events[dataEvent.id]) $dataMap.events[dataEvent.id] = undefined;
+        }
+    }
+}
+MATTIE.eventAPI.setupRunTimeGameEvents = function(){
     let keys = Object.keys(MATTIE.eventAPI.dataEvents);
     for (let index = 0; index < keys.length; index++) {
         /** @type {rm.types.Event} */
         const dataEvent = MATTIE.eventAPI.dataEvents[keys[index]];
-        if(dataEvent.mapId === $gameMap.mapId()){
+        if(dataEvent.mapId === $gameMap.mapId() && dataEvent.persist){
             if(!$dataMap.events[dataEvent.id]) {
                 $dataMap.events[dataEvent.id] = dataEvent;
                 let mapEvent = new MapEvent();
                 mapEvent.data = dataEvent;
                 mapEvent.refresh();
+                if(!$dataMap.events[dataEvent.id]) $dataMap.events[dataEvent.id] = undefined;
             }
             
                 
@@ -103,11 +115,18 @@ Game_Player.prototype.reserveTransfer = function(mapId, x, y, d, fadeType){
     MATTIE.eventAPI.updatePosOfRunTimeEvents();
 }
 
+MATTIE.eventAPI.DataManager_loadMapData = DataManager.loadMapData;
+DataManager.loadMapData = function(mapId) {
+    MATTIE.eventAPI.DataManager_loadMapData.call(this,mapId);
+    MATTIE.eventAPI.setupRunTimeDataEvents();
+    
+};
+
 MATTIE.eventAPI.orgSetEventup = Game_Map.prototype.setupEvents;
 Game_Map.prototype.setupEvents = function() {
     MATTIE.eventAPI.orgSetEventup.call(this);
     
-    MATTIE.eventAPI.updateRunTimeEvents();
+    MATTIE.eventAPI.setupRunTimeGameEvents();
     
 };
 
@@ -179,8 +198,6 @@ MATTIE.eventAPI.createEnemyFromExisting = function(mapId, eventId, alivePageId, 
     enemy.data.pages[1] = deadPage;
     enemy.data.pages[1].conditions = enemy.setDefaultConditions();
     enemy.data.pages[1].conditions.selfSwitchValid=true;
-
-    enemy.setPersist(true);
     return enemy;
 }
 

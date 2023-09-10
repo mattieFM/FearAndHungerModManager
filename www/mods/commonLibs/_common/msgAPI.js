@@ -48,3 +48,19 @@ MATTIE.msgAPI.footerMsg = function(msg){
     Game_Interpreter.prototype.setGabText(msg);
     Game_Interpreter.prototype.showGab();
 }   
+
+
+//=============================================================================
+// Gab Plugin Message Extension
+//=============================================================================
+
+
+//=============================================================================
+// Scene_Base
+//=============================================================================
+
+MATTIE.msgAPI.Scene_Title_Create = Scene_Title.prototype.create;
+Scene_Title.prototype.create = function() {
+    MATTIE.msgAPI.Scene_Title_Create.call(this);
+    this.createGabWindow(false);
+};

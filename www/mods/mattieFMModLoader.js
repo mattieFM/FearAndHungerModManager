@@ -23,6 +23,8 @@
 
 var MATTIE_ModManager = MATTIE_ModManager || {};
 var MATTIE = MATTIE || {};
+var MATTIE_RPG = MATTIE_RPG || {};
+MATTIE.ignoredPlugins = ["HIME_PreTitleEvents"];
 MATTIE.isDev = false;
 
 MATTIE.global = MATTIE.global || {};
@@ -39,14 +41,59 @@ MATTIE.global.checkGameVersion = function(){
     return version;
 }
 
+/**
+ * 
+ * @param {*} plugins 
+ * @returns {Promise}
+ */
+PluginManager.loadScript = function(name) {
+    return new Promise(res =>{
+        var url = this._path + name;
+        var script = document.createElement('script');
+        script.type = 'text/javascript';
+        script.src = url;
+        script.async = false;
+        script.onerror = this.onError.bind(this);
+        script._url = url;
+        script.addEventListener("load", (ev) => {
+            res();
+        })
+        document.body.appendChild(script);
+    })
+    
+};
+/**
+ * 
+ * @param {*} plugins 
+ * @returns {Promise}
+ */
+PluginManager.setup = function(plugins) {
+    let promises = [];
+    plugins.forEach(function(plugin) {
+        console.log(plugin.name)
+        if (plugin.status && !this._scripts.contains(plugin.name)) {
+            if(!MATTIE.ignoredPlugins.includes(plugin.name)){ //this does not work as we load after the plugins, easy enough to implment later when we want to optimze tarrax lighting, but for not im going to leave it
+                this.setParameters(plugin.name, plugin.parameters);
+                promises.push(this.loadScript(plugin.name + '.js'));
+                this._scripts.push(plugin.name);
+            }
+        }
+    }, this);
+    return Promise.all(promises);
+
+}
 MATTIE.DataManagerLoaddatabase =DataManager.loadDatabase;
 DataManager.loadDatabase = function() {
     MATTIE.DataManagerLoaddatabase.call(this);
     let int = setInterval(() => {
         if(DataManager.isDatabaseLoaded()){
-            MATTIE.global.checkGameVersion();
-            MATTIE.static.update();
-            clearInterval(int);
+            if(MATTIE.global)
+            if(MATTIE.static){
+                MATTIE.global.checkGameVersion();
+                MATTIE.static.update();
+                clearInterval(int);
+            }
+            
         }
     }, 50);
     
@@ -62,6 +109,16 @@ class ModManager {
         this.forceModdedSaves = false;
         this.forceVanillaSaves = false;
     }
+
+    checkMod (name){
+        let allMods = this.getAllMods();
+        for (let index = 0; index < allMods.length; index++) {
+            const element = allMods[index];
+            if(element.name == name) return true;
+        }
+        return false;
+    }
+
     getModInfo(path,modName){
         const fs = require('fs');
         const modInfoPath =  path + modName;
@@ -358,18 +415,22 @@ class ModManager {
      * @param {*} mods a list of mods to load
      */
     setup(mods) {
+        let promises = [];
         mods.forEach((mod) => {
             if (mod.status && !this._mods.contains(mod.name)) {
                 this.setParameters(mod.name, mod.parameters);
-                this.loadScript(mod.name);
+                promises.push(this.loadScript(mod.name));
                 this._mods.push(mod.name);
             };
         });
+        return Promise.all(promises);
+        
     };
 }
 
 MATTIE_ModManager.init =
 function () {
+    
     
     const defaultPath = PluginManager._path;
         const path = "mods/";
@@ -379,30 +440,35 @@ function () {
         modManager.generateDefaultJsonForModsWithoutJsons();
         const commonModManager = new ModManager(commonLibsPath);
         const commonMods = modManager.parseMods(commonLibsPath)
-        setTimeout(() => {
             
-            new Promise(res=>{
-                
-                PluginManager._path = commonLibsPath;
-                commonModManager.setup(commonMods);
-                window.alert("mod loader successfully initialized")
-    
+        new Promise(res=>{
+            PluginManager._path = commonLibsPath;
+            commonModManager.setup(commonMods).then(()=>{
+                //common mods loaded
                 PluginManager._path = defaultPath
                 res();
-            }).then(()=>{
-                setTimeout(() => {
-                    PluginManager._path = path;
-                    const mods = modManager.parseMods(path); //fs is in a different root dir so it needs this.
-                    console.info(mods)
-                    modManager.setup(mods); //all mods load after plugins
-                    
+            });
+            
+        }).then(()=>{
+            setTimeout(() => {
+                MATTIE.static.update();
+                PluginManager._path = path;
+                const mods = modManager.parseMods(path); //fs is in a different root dir so it needs this.
+                console.info(mods)
+                modManager.setup(mods).then(()=>{ //all mods loaded after plugins
+                    SceneManager.goto(Scene_Title);
+                    MATTIE.msgAPI.footerMsg("Mod loader successfully initialized") 
                     PluginManager._path = defaultPath;
-                }, 2000);
+                }); 
                 
                 
+            }, 500);
+            
                 
-            })
-        }, 10);
+            
+            
+            
+        })
         
 
 }
@@ -471,4 +537,5 @@ SceneManager.catchException = function(e) {
     MATTIE.onError.call(this,e);
 };
 
-MATTIE_ModManager.init();
+
+MATTIE_ModManager.init();  

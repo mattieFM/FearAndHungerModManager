@@ -43,7 +43,7 @@ class MapEvent {
             y: 0,
             meta: {},
             mapId: $gameMap.mapId(),
-            persist: false
+            persist: true
         };
 
         this.addPage();
@@ -54,6 +54,7 @@ class MapEvent {
      */
     setId() {
         val++;
+        if($dataMap)
         if($dataMap.events) {
             let openIndex = $dataMap.events.length + Object.keys(MATTIE.eventAPI.dataEvents).length-2;
             do {
@@ -233,7 +234,7 @@ class MapEvent {
     createGameEvent() {
         $dataMap.events[this.data.id] = MATTIE.eventAPI.dataEvents[this.data.id];
         $gameMap._events[this.data.id] = (new Game_Event($gameMap.mapId(), this.data.id));
-      
+        if(!$dataMap.events[this.data.id]) $dataMap.events[this.data.id] = undefined; //if data is null set it to undefined instead
         return $gameMap.event(this.data.id);
     }
 
@@ -317,9 +318,9 @@ class MapEvent {
      * @param y (int)
      */
     spawn(x, y) {
+        MATTIE.eventAPI.dataEvents[this.data.id] = (this.data);
         if(this.data.mapId === $gameMap.mapId()){
             this.setPosition(x, y);
-            MATTIE.eventAPI.dataEvents[this.data.id] = (this.data);
             this.refresh();
             console.log('New event created!');
         }
