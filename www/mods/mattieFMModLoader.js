@@ -460,7 +460,8 @@ function () {
                     PluginManager._path = defaultPath;
                 }); 
             
-        })
+        },1500);
+    });
         
 
 }
