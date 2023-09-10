@@ -44,13 +44,6 @@ MATTIE.eventAPI.createDataEvent = function(id,name,note,pages,x,y){
     obj.y = y;
     return obj;
 }
-MATTIE.eventAPI.command123 = Game_Interpreter.prototype.command123;
-Game_Interpreter.prototype.command123 = function() {
-    let val = MATTIE.eventAPI.command123.call(this);
-    //MATTIE.eventAPI.dataEvents[this._eventId] = $dataMap.events[this._eventId];
-    return val;
-};
-
 
 MATTIE.eventAPI.orgEvent = Game_Event.prototype.event;
 Game_Event.prototype.event = function() {
@@ -62,31 +55,28 @@ Game_Event.prototype.event = function() {
     return val;
 };
 
-// MATTIE_RPG.loadMapData = Scene_Map.prototype.onMapLoaded;
-// Scene_Map.prototype.onMapLoaded = function() {
-//     MATTIE_RPG.loadMapData.call(this);
-//     let keys = Object.keys(MATTIE.eventAPI.dataEvents);
-//     for (let index = 0; index < keys.length; index++) {
-//         /** @type {rm.types.Event} */
-//         const dataEvent = MATTIE.eventAPI.dataEvents[keys[index]];
-//         if(dataEvent.mapId === $gameMap.mapId()){
-//             if(!$dataMap.events[dataEvent.id]) {
-//                 $dataMap.events[dataEvent.id] = dataEvent;
-//                 console.log("event tried to add");
-//                 let mapEvent = new MapEvent();
-//                 mapEvent.data = dataEvent;
-//                 mapEvent.refresh();
-//             }
+MATTIE.eventAPI.updatePosOfRunTimeEvents = function (){
+    let keys = Object.keys(MATTIE.eventAPI.dataEvents);
+    for (let index = 0; index < keys.length; index++) {
+        /** @type {rm.types.Event} */
+        let eventId =keys[index];
+        if(MATTIE.eventAPI.dataEvents[eventId]){
+            MATTIE.eventAPI.dataEvents[eventId] = $dataMap.events[eventId] ? $dataMap.events[eventId] : MATTIE.eventAPI.dataEvents[eventId];
+            let event = $gameMap.event(eventId);
+            if(event){
+                MATTIE.eventAPI.dataEvents[eventId].x = event.x;
+            MATTIE.eventAPI.dataEvents[eventId].y = event.y;
+            }
             
-                
-//         }
-//     }
-    
-// };
+        }
+        
 
-MATTIE.eventAPI.orgSetEventup = Game_Map.prototype.setupEvents;
-Game_Map.prototype.setupEvents = function() {
-    MATTIE.eventAPI.orgSetEventup.call(this);
+    }
+}
+
+   
+
+MATTIE.eventAPI.updateRunTimeEvents = function(){
     let keys = Object.keys(MATTIE.eventAPI.dataEvents);
     for (let index = 0; index < keys.length; index++) {
         /** @type {rm.types.Event} */
@@ -94,7 +84,6 @@ Game_Map.prototype.setupEvents = function() {
         if(dataEvent.mapId === $gameMap.mapId()){
             if(!$dataMap.events[dataEvent.id]) {
                 $dataMap.events[dataEvent.id] = dataEvent;
-                console.log("event tried to add");
                 let mapEvent = new MapEvent();
                 mapEvent.data = dataEvent;
                 mapEvent.refresh();
@@ -103,8 +92,21 @@ Game_Map.prototype.setupEvents = function() {
                 
         }
     }
-   
-    this.refreshTileEvents();
+    $gameMap.refreshTileEvents();
+}
+
+MATTIE.eventAPI.ReserveTrasnferOrg = Game_Player.prototype.reserveTransfer;
+Game_Player.prototype.reserveTransfer = function(mapId, x, y, d, fadeType){
+    MATTIE.eventAPI.ReserveTrasnferOrg.call(this,mapId, x, y, d, fadeType)
+    MATTIE.eventAPI.updatePosOfRunTimeEvents();
+}
+
+MATTIE.eventAPI.orgSetEventup = Game_Map.prototype.setupEvents;
+Game_Map.prototype.setupEvents = function() {
+    MATTIE.eventAPI.orgSetEventup.call(this);
+    
+    MATTIE.eventAPI.updateRunTimeEvents();
+    
 };
 
 

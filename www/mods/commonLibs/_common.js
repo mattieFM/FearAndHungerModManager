@@ -146,7 +146,6 @@ MATTIE.Prev_Input_Update = Input.update;
                 let pressed = (()=>{
                     for (let index = 0; index < combinedKeys.length-1; index++) {
                         const element = combinedKeys[index];
-                        console.log("'"+element+"'");
                         if(!Input.isPressed(element)) return false;
                     }
                     return Input.isRepeated(combinedKeys[combinedKeys.length-1]);
@@ -168,19 +167,35 @@ MATTIE.Prev_Input_Update = Input.update;
 
     this.forceModdedSaves = MATTIE.DataManager.global.get("forceModded");
     this.forceVanillaSaves = MATTIE.DataManager.global.get("forceVanilla");
-    console.log(MATTIE);
     MATTIE.menus.mainMenu.addBtnToMainMenu(TextManager.Mods,TextManager.Mods,
     MATTIE.menus.toModMenu.bind(this));
 
 // --ENGINE OVERRIDES--
 
-MATTIE_RPG.Game_Map_Setup = Game_Map.prototype.setup;
-Game_Map.prototype.setup = function(mapId) {
-    /** @description the last map that the player was on */
-    this._lastMapId = mapId;
-    console.log(this._lastMapId);
-    MATTIE_RPG.Game_Map_Setup.call(this, mapId)
-};
+// MATTIE_RPG.Game_Map_Setup = Game_Map.prototype.setup;
+// Game_Map.prototype.setup = function(mapId) {
+//     /** @description the last map that the player was on */
+//     this._lastMapId = mapId;
+//     console.log(this._lastMapId);
+//     MATTIE_RPG.Game_Map_Setup.call(this, mapId)
+// };
+
+MATTIE_RPG.Game_Player_PerformTransfer = Game_Player.prototype.performTransfer;
+Game_Player.prototype.performTransfer = function (){
+    $gameMap._lastMapId = $gameMap.mapId();
+    MATTIE_RPG.Game_Player_PerformTransfer.call(this);
+}
+
+/** @description check if the spot is passible in any direction */
+/** @param {Game_Event} event */
+MATTIE.isPassableAnyDir = function(event){
+    let dirs = [2,4,6,8]; //dir 4 dirsections
+    for (let index = 0; index < dirs.length; index++) {
+        const dir = dirs[index];
+        if(event.canPass(event.x,event.y,dir)) return true;
+        
+    }
+}
 
 /**
  * @description get the last map id
@@ -200,3 +215,5 @@ Game_SelfSwitches.prototype.formatKey = function(mapId, eventId, letter){
     var key = [mapId, eventId, letter];
     return key;
 }
+
+
