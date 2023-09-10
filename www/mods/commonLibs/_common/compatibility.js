@@ -51,6 +51,24 @@ ImageManager.loadBitmap = function(folder, filename, hue, smooth, forceNoDecrypt
 };
 
 
+/**
+ * @description we override this such that it will not return an undefined result ever. Even if another mod fucks up
+ * @todo I don't like this way of fixing this bug but does work.
+ * @param unsafe, if true does not add anything 
+ * @returns the datamap event obj
+ */
+MATTIE_RPG.Game_Event_Event = Game_Event.prototype.event;
+Game_Event.prototype.event = function() {
+    let val = MATTIE_RPG.Game_Event_Event.call(this);
+    if(!val) val = $dataMap.events[1];
+    if(!val) val = new MapEvent().data;
+    return val;
+};
+
+
+
+
+
 
 
 //for some reason cheshire doesn't check if TY exists, so we will define it here.

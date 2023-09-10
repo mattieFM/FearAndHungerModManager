@@ -31,3 +31,22 @@ MATTIE.scenes.modLoader = function () {
 
 MATTIE.scenes.modLoader.prototype = Object.create(MATTIE.scenes.base.prototype);
 MATTIE.scenes.modLoader.prototype.constructor = MATTIE.scenes.modLoader;
+
+
+
+
+//-----------------------------------
+// Window Item List Overrides @override
+//-----------------------------------
+//forces all items to be enabled for menu use
+Window_ItemList.prototype.forceEnableAll = function(){
+    this.forceEnable = true;
+}
+
+Window_ItemList.prototype.isCurrentItemEnabled = function() {
+    return this.forceEnable || this.isEnabled(this.item());
+};
+
+Window_ItemList.prototype.isEnabled = function(item) {
+    return this.forceEnable || $gameParty.canUse(item);
+};

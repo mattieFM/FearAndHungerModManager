@@ -15,7 +15,16 @@
         "_common/static",
         "_common/items",
         "_common/optimisations",
-        "_common/menus/devMenu"
+        "_common/menus/devMenu",
+        "_common/clipboard",
+        "_common/actorAPI",
+        "_common/eventAPI",
+        "_common/eventWrapper",
+        "_common/msgAPI",
+        "_common/supporters",
+        "_common/util",
+        "_common/dataManager",
+        "_common/betterCrowMauler"
     
     ],
     "danger": false
