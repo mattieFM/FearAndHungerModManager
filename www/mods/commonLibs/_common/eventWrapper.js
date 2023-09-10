@@ -326,7 +326,7 @@ class MapEvent {
     }
 
     removeThisEvent () {
-        MATTIE.eventAPI.dataEvents[this.data.id] = null;
+        MATTIE.eventAPI.dataEvents[this.data.id] = undefined;
         delete MATTIE.eventAPI.dataEvents[this.data.id];
     }
 
