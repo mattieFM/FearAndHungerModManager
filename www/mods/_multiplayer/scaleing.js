@@ -140,6 +140,33 @@ MATTIE.multiplayer.scaling.hpScaling = ()=>{
 };
 
 
+
+/**
+ * @description whether body blocking is enabled or not
+ * @default false
+ */
+MATTIE.multiplayer.scaling.bodyBlocking = false;
+
+MATTIE.multiplayer.scaling.checkPassage = Game_Map.prototype.checkPassage;
+Game_Map.prototype.checkPassage = function(x, y, bit) {
+    
+    let val = MATTIE.multiplayer.scaling.checkPassage.call(this,x,y,bit);
+    if(MATTIE.multiplayer.scaling.bodyBlocking){
+        let netCont = MATTIE.multiplayer.getCurrentNetController();
+        let playerIds =Object.keys(netCont.netPlayers);
+        for (let index = 0; index < playerIds.length; index++) {
+            console.log("here")
+            /** @type {PlayerModel} */
+            const netPlayer = netCont.netPlayers[playerIds[index]];
+            if(netPlayer.$gamePlayer.x === x && netPlayer.$gamePlayer.y === y) return false
+        }
+    }
+    
+    return val;
+};
+
+
+
 /**
  * @description override the game enemy setup function to mutliply the hp and mp by the scaler
  */

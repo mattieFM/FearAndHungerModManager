@@ -17,3 +17,17 @@ MATTIE.util.randBetween = function(min, max) {
 MATTIE.util.getName = function(){
     return MATTIE.DataManager.global.get("name") ? MATTIE.DataManager.global.get("name") : MATTIE.supporters.getRandomSupporter()
 }
+
+/** @returns the dist between two points */
+MATTIE.util.getDist = function(x1,x2,y1,y2){
+    return Math.sqrt((x1-x2)**2+(y1-y2)**2);
+}
+
+/**
+ * @description roll a chance
+ * @param {*} chance 0-1, 0 being 0%, 1 being 100%
+ * @returns {boolean} whether the 
+ */
+MATTIE.util.randChance = function(chance){
+    return (Math.random() <= chance)
+}

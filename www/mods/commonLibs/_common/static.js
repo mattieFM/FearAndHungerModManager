@@ -10,10 +10,18 @@ MATTIE.static.rpg = MATTIE.static.rpg || {};
 MATTIE.static.commonEvents = MATTIE.static.commonEvents || {};
 MATTIE.static.variable = MATTIE.static.variable || {};
 MATTIE.static.switch = MATTIE.static.switch || {};
+MATTIE.static.commands = MATTIE.static.commands || {};
+
 
 MATTIE.static.maps = MATTIE.static.maps || {};
 MATTIE.static.events = MATTIE.static.events || {};
 MATTIE.static.events.images = MATTIE.static.events.images || {};
+
+//commandIds
+MATTIE.static.commands.transferId = 201;
+MATTIE.static.commands.ifWin = 601;
+MATTIE.static.commands.selfSwitch = 123;
+
 //maps
 
 MATTIE.static.maps.menuMaps = [];
@@ -42,6 +50,10 @@ MATTIE.static.variable.godAffinityAndPrayerVars = [];
 MATTIE.static.switch.ignoredSwitches = [];
 MATTIE.static.switch.syncedSwitches = [];
 MATTIE.static.switch.godAffinitySwitches = [];
+/** @description true if the player has been to the mines or thicket */
+MATTIE.static.switch.crowMaulerCanSpawn = 0;
+/** @description true if the crow mauler is dead */
+MATTIE.static.switch.crowMaulerDead = 0;
 //selfSwitch ids
 MATTIE.static.switch.syncedSelfSwitches = [];
 MATTIE.static.switch.ignoredSelfSwitches = [];
@@ -65,7 +77,7 @@ MATTIE.static.actors.emptyActorSlotId = 0;
 
 
 //events
-
+MATTIE.static.events.crowMauler = null;
 //images
 MATTIE.static.events.images.shiny = {};
 MATTIE.static.events.images.coin = MATTIE.static.events.images.shiny;
@@ -76,6 +88,10 @@ MATTIE.static.update = function(){
 
     if(MATTIE.global.version === 1){
         //static values specific to funger 1
+
+
+        MATTIE.static.switch.crowMaulerCanSpawn = 786;
+        MATTIE.static.switch.crowMaulerDead = 771;
 
         //actors
         MATTIE.static.actors.bloodGolemId = 10;
@@ -142,6 +158,12 @@ MATTIE.static.update = function(){
         //common events
         MATTIE.static.commonEvents.bloodportal = $dataCommonEvents[152];
 
+
+        MATTIE.eventAPI.getEventOnMap(287,11).then((result) => {
+            MATTIE.static.events.crowMauler = result
+        }).catch((err) => {
+            
+        });;
 
         //states
         MATTIE.static.states.knockout = 0;

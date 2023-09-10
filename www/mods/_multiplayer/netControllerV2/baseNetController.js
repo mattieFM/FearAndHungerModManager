@@ -464,7 +464,7 @@ class BaseNetController extends EventEmitter {
                     if(dist > 4){
                         moveData.map = $gameMap.mapId();
                         this.transferNetPlayer(moveData,id,false);
-                    }else if (dist > 2){
+                    }else {
                         this.netPlayers[id].$gamePlayer._x = moveData.x;
                         this.netPlayers[id].$gamePlayer._y = moveData.y;
                     }

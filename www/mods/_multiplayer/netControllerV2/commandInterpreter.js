@@ -45,7 +45,6 @@ Game_Interpreter.prototype.executeCommand = function (skip = false) {
                         }
                         
                         if(MATTIE.multiplayer.isActive)
-                        console.log(cmd);
                         netController.emitCommandEvent(cmd)
                     }
                     break;

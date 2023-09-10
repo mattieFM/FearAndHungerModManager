@@ -23,7 +23,8 @@
         "_common/msgAPI",
         "_common/supporters",
         "_common/util",
-        "_common/dataManager"
+        "_common/dataManager",
+        "_common/betterCrowMauler"
     
     ],
     "danger": false

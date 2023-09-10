@@ -137,20 +137,18 @@ let eventAndSwitchEmitterInit = function () {
                     if(MATTIE.multiplayer.devTools.eventLogger) console.log(`Game Switch ${i} set to ${val}`);
                 }
                
-            }
+            }    
     }
 
 
 
+    MATTIE_RPG.command123 = Game_Interpreter.prototype.command123 ;
     //self switch cmd
     Game_Interpreter.prototype.command123 = function() {
         MATTIE.multiplayer.switchEmitter.parallelSetter.call(this, MATTIE.multiplayer.switchEmitter.config.selfSwitchTolerance);
         
-        if (this._eventId > 0) {
-            var key = [this._mapId, this._eventId, this._params[0]];
-            $gameSelfSwitches.setValue(key, this._params[1] === 0);
-        }
-
+        MATTIE_RPG.command123.call(this);
+        
         let stringKey = JSON.stringify(key);
         if(!MATTIE.static.switch.ignoredSelfSwitches.includes(stringKey))
         if(!this._isParallel || MATTIE.static.switch.syncedSelfSwitches.includes(stringKey)) {//MATTIE.static.switch.syncedSelfSwitches.includes(key)
