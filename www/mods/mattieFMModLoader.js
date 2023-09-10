@@ -451,7 +451,7 @@ function () {
             
         }).then(()=>{
             setTimeout(() => {
-                MATTIE.static.update();
+                
                 PluginManager._path = path;
                 const mods = modManager.parseMods(path); //fs is in a different root dir so it needs this.
                 console.info(mods)
@@ -462,7 +462,7 @@ function () {
                 }); 
                 
                 
-            }, 500);
+            }, 1000);
             
                 
             

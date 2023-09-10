@@ -73,3 +73,16 @@ Game_Event.prototype.event = function() {
 
 //for some reason cheshire doesn't check if TY exists, so we will define it here.
 var TY = {};
+
+
+
+
+
+
+
+
+//------------------------------
+//Termina Compatibility 
+//------------------------------
+if(Olivia)if(Olivia.AntiPlayerStress)
+Olivia.AntiPlayerStress.ProperErrorDisplay = false; //termina should use my error menu to
