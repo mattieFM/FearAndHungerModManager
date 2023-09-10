@@ -177,7 +177,7 @@ MATTIE.betterCrowMauler.crowController.prototype.follow = function(){
     setTimeout(() => 
     {
         this.spawn();
-    }, 10000);
+    }, 6000);
     
 }
 
@@ -213,6 +213,7 @@ MATTIE.betterCrowMauler.crowController.prototype.onEnterRoom = function(){
     if($gameMap.mapId() != this.mapId) this.onScreen = false;
     if(!this.isDead() && !this.onScreen){
         if(this.canFollow()){
+            this.despawn();
             this.follow();
         } else if(this.shouldDespawn()){
             this.despawn();
