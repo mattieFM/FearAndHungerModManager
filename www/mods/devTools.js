@@ -5,7 +5,7 @@ var MATTIE = MATTIE || {};
 MATTIE.devTools = MATTIE.devTools || {};
 //
 (()=>{
-    Input.addKeyBind('-', ()=>{
+    Input.addKeyBind('p', ()=>{
         SceneManager.push(MATTIE.scenes.Scene_Dev);
     }, "CHEAT", 1)
 
