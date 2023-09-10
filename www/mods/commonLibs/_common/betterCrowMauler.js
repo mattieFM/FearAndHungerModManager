@@ -26,6 +26,8 @@ MATTIE.betterCrowMauler.followChance = .15;
 MATTIE.betterCrowMauler.despawnChance = .15;
 
 MATTIE.betterCrowMauler.crowController = function () {
+    this.disableBaseCrowMauler();
+
     /** @description whether this instance of the controller has spawned a crow mauler on this level */
     this.hasSpawned = false;
 
@@ -54,6 +56,14 @@ MATTIE.betterCrowMauler.crowController.prototype.isDead = function(){
     let bool = this.self.checkSelfSwitch("A");
     console.log("isdead: "+bool);
     return bool;
+}
+
+/**
+ * @description disable crow mauler
+ * @todo make sure this works properly
+ */
+MATTIE.betterCrowMauler.crowController.prototype.disableBaseCrowMauler = function(){
+    $gameSwitches.setValue(MATTIE.static.switch.crowMaulerDisabled,true);
 }
 
 /**
@@ -100,19 +110,22 @@ MATTIE.betterCrowMauler.crowController.prototype.getAllTransferPointsOnMap = fun
 MATTIE.betterCrowMauler.crowController.prototype.findClosestSpawnPoint = function(x,y){
     let spawnPoints = this.getAllTransferPointsOnMap();
     let closest = spawnPoints[0];
-    let dist = MATTIE.util.getDist(x,closest.x,y,closest.y);
-    for (let index = 1; index < spawnPoints.length; index++) {
-        /** @type {Game_Event} */
-        const element = spawnPoints[index];
-        let thisDist = MATTIE.util.getDist(x,element.x,y,element.y);
-        if(thisDist < dist) {
-            if(MATTIE.isPassableAnyDir(element)){
-                dist = thisDist;
-            closest = element
+    if(closest){
+        let dist = MATTIE.util.getDist(x,closest.x,y,closest.y);
+        for (let index = 1; index < spawnPoints.length; index++) {
+            /** @type {Game_Event} */
+            const element = spawnPoints[index];
+            let thisDist = MATTIE.util.getDist(x,element.x,y,element.y);
+            if(thisDist < dist) {
+                if(MATTIE.isPassableAnyDir(element)){
+                    dist = thisDist;
+                closest = element
+                }
+                
             }
-            
         }
     }
+    
 
 
 
@@ -141,11 +154,14 @@ MATTIE.betterCrowMauler.crowController.prototype.spawn = function(){
             this.onScreen = true;
             console.log("spawned in if");
             let spot = this.findClosestSpawnPoint($gamePlayer.x, $gamePlayer.y);
-            this.self = this.createCrowObj();
-            this.self.spawn(spot.x,spot.y);
-        
-            this.mapId = $gameMap.mapId();
-            this.hasSpawned = true;
+            if(spot){
+                this.self = this.createCrowObj();
+                this.self.spawn(spot.x,spot.y);
+            
+                this.mapId = $gameMap.mapId();
+                this.hasSpawned = true;
+            }
+           
         }
     
 }

@@ -6,6 +6,7 @@
 //
 var MATTIE = MATTIE || {};
 MATTIE.multiplayer = MATTIE.multiplayer || {}
+MATTIE.multiplayer.crowController = null;
 MATTIE.menus.multiplayer = MATTIE.menus.multiplayer || {};
 MATTIE.scenes.multiplayer = MATTIE.scenes.multiplayer || {};
 MATTIE.windows.multiplayer = MATTIE.windows.multiplayer || {};
@@ -137,8 +138,9 @@ MATTIE.multiplayer.getCurrentNetController = ()=>{
     if(MATTIE.multiplayer.isHost) return MATTIE.multiplayer.hostController;
 }
 
-
+let crowController;
 (()=>{
+    
     MATTIE.menus.mainMenu.addBtnToMainMenu("Multiplayer","multiplayer", MATTIE.menus.multiplayer.openMultiplayer.bind(this))
     MATTIE.menus.mainMenu.addBtnToMainMenu("Rejoin","Rejoin", MATTIE.menus.multiplayer.openGame, MATTIE.multiplayer.getCurrentNetController()?MATTIE.multiplayer.getCurrentNetController().isClient:false)
     MATTIE.menus.mainMenu.addBtnToMainMenu("Disable Multiplayer","Disable_Multiplayer", (()=>{
@@ -152,14 +154,13 @@ MATTIE.multiplayer.getCurrentNetController = ()=>{
     MATTIE.menus.mainMenu.removeBtnFromMainMenu("Continue Suspended Run","suspend");
     console.log("Multiplayer Init")
 
-
+    
 
     setTimeout(async () => {
         //create ghost char
         MATTIE.static.actors.ghost = new MATTIE.actorAPI.Data_Actor_Wrapper();
         MATTIE.static.actors.ghost.buildDataActorFromEventAndTroop(await MATTIE.eventAPI.getEventOnMap(185,20), $dataTroops[174], 7) //add miner ghost as actor
-        MATTIE.static.actors.ghost.create();  
-
+        MATTIE.static.actors.ghost.create();     
     }, 1000);
     
 

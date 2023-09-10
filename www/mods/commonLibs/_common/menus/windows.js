@@ -352,7 +352,9 @@ MATTIE.windows.modListWin.prototype.reloadModsIfNeeded = function(){
         MATTIE_ModManager.modManager.reloadGame();
     }else{
         SceneManager.pop()
-        alert("No Changes to mods were made, no reload is needed.")
+        setTimeout(() => {
+            MATTIE.msgAPI.footerMsg("No Changes to mods were made, no reload is needed.")
+        }, 200);
     }
 }
 

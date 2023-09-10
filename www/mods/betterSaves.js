@@ -64,26 +64,30 @@ MATTIE.saves.suspendedRunId = 9998;
     };
 
     function updateOldSaves() {
-        MATTIE.saves.savedLatest = DataManager.latestSavefileId(); 
-        const globalInfo = DataManager.loadGlobalInfo();
-        const maxSaves = DataManager.maxSavefiles();
-        for (var index = 1; index < maxSaves; index++) {
-            if(globalInfo[index])
-            if(!globalInfo[index].name){
-                console.info("BETTERSAVES: Migrated save: " + index)
-                var saveData = MATTIE.DataManager.loadAndReturnSave(index)
-                if(saveData){
-                    var diff = MATTIE.GameInfo.getDifficulty(saveData.$gameSwitches);
-                    var name = JSON.stringify(saveData.$gameActors._data[saveData.$gameParty._actors[0]]._name);
+        if(MATTIE.DataManager.global.get("migratedSaves")){
+            MATTIE.saves.savedLatest = DataManager.latestSavefileId(); 
+            const globalInfo = DataManager.loadGlobalInfo();
+            const maxSaves = DataManager.maxSavefiles();
+            for (var index = 1; index < maxSaves; index++) {
+                if(globalInfo[index])
+                if(!globalInfo[index].name){
+                    console.info("BETTERSAVES: Migrated save: " + index)
+                    var saveData = MATTIE.DataManager.loadAndReturnSave(index)
+                    if(saveData){
+                        var diff = MATTIE.GameInfo.getDifficulty(saveData.$gameSwitches);
+                        var name = JSON.stringify(saveData.$gameActors._data[saveData.$gameParty._actors[0]]._name);
+                        
+                        globalInfo[index].difficulty=diff;
+                        globalInfo[index].name=name.replace("\"","").replace("\"","");
+                    }
                     
-                    globalInfo[index].difficulty=diff;
-                    globalInfo[index].name=name.replace("\"","").replace("\"","");
                 }
-                
-            }
-            DataManager.saveGlobalInfo(globalInfo);
-            MATTIE.DataManager.loadAndReturnSave(MATTIE.saves.savedLatest);
-        } 
+                DataManager.saveGlobalInfo(globalInfo);
+                MATTIE.DataManager.loadAndReturnSave(MATTIE.saves.savedLatest);
+            } 
+            MATTIE.DataManager.global.set("migratedSaves", true)
+        }
+        
     }
 
     MATTIE.Scene_Save_prototype_init = Scene_Save.prototype.initialize

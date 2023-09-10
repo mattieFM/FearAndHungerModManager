@@ -50,10 +50,13 @@ MATTIE.static.variable.godAffinityAndPrayerVars = [];
 MATTIE.static.switch.ignoredSwitches = [];
 MATTIE.static.switch.syncedSwitches = [];
 MATTIE.static.switch.godAffinitySwitches = [];
+
 /** @description true if the player has been to the mines or thicket */
 MATTIE.static.switch.crowMaulerCanSpawn = 0;
 /** @description true if the crow mauler is dead */
 MATTIE.static.switch.crowMaulerDead = 0;
+/** @description true if crow mauler is disabled */
+MATTIE.static.switch.crowMaulerDisabled = 0;
 //selfSwitch ids
 MATTIE.static.switch.syncedSelfSwitches = [];
 MATTIE.static.switch.ignoredSelfSwitches = [];
@@ -92,6 +95,8 @@ MATTIE.static.update = function(){
 
         MATTIE.static.switch.crowMaulerCanSpawn = 786;
         MATTIE.static.switch.crowMaulerDead = 771;
+
+        MATTIE.static.switch.crowMaulerDisabled = 2953;
 
         //actors
         MATTIE.static.actors.bloodGolemId = 10;
