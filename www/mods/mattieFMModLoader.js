@@ -23,6 +23,9 @@
 
 var MATTIE_ModManager = MATTIE_ModManager || {};
 var MATTIE = MATTIE || {};
+var MATTIE_RPG = MATTIE_RPG || {};
+MATTIE.ignoredPlugins = ["HIME_PreTitleEvents"];
+MATTIE.isDev = false;
 
 MATTIE.global = MATTIE.global || {};
 MATTIE.menus = MATTIE.menus || {};
@@ -38,14 +41,59 @@ MATTIE.global.checkGameVersion = function(){
     return version;
 }
 
+/**
+ * 
+ * @param {*} plugins 
+ * @returns {Promise}
+ */
+PluginManager.loadScript = function(name) {
+    return new Promise(res =>{
+        var url = this._path + name;
+        var script = document.createElement('script');
+        script.type = 'text/javascript';
+        script.src = url;
+        script.async = false;
+        script.onerror = this.onError.bind(this);
+        script._url = url;
+        script.addEventListener("load", (ev) => {
+            res();
+        })
+        document.body.appendChild(script);
+    })
+    
+};
+/**
+ * 
+ * @param {*} plugins 
+ * @returns {Promise}
+ */
+PluginManager.setup = function(plugins) {
+    let promises = [];
+    plugins.forEach(function(plugin) {
+        console.log(plugin.name)
+        if (plugin.status && !this._scripts.contains(plugin.name)) {
+            if(!MATTIE.ignoredPlugins.includes(plugin.name)){ //this does not work as we load after the plugins, easy enough to implment later when we want to optimze tarrax lighting, but for not im going to leave it
+                this.setParameters(plugin.name, plugin.parameters);
+                promises.push(this.loadScript(plugin.name + '.js'));
+                this._scripts.push(plugin.name);
+            }
+        }
+    }, this);
+    return Promise.all(promises);
+
+}
 MATTIE.DataManagerLoaddatabase =DataManager.loadDatabase;
 DataManager.loadDatabase = function() {
     MATTIE.DataManagerLoaddatabase.call(this);
     let int = setInterval(() => {
         if(DataManager.isDatabaseLoaded()){
-            MATTIE.global.checkGameVersion();
-            MATTIE.static.update();
-            clearInterval(int);
+            if(MATTIE.global)
+            if(MATTIE.static){
+                MATTIE.global.checkGameVersion();
+                MATTIE.static.update();
+                clearInterval(int);
+            }
+            
         }
     }, 50);
     
@@ -58,7 +106,19 @@ class ModManager {
         this._path = path
         this._realMods = [];
         this._mods = []
+        this.forceModdedSaves = false;
+        this.forceVanillaSaves = false;
     }
+
+    checkMod (name){
+        let allMods = this.getAllMods();
+        for (let index = 0; index < allMods.length; index++) {
+            const element = allMods[index];
+            if(element.name == name) return true;
+        }
+        return false;
+    }
+
     getModInfo(path,modName){
         const fs = require('fs');
         const modInfoPath =  path + modName;
@@ -180,6 +240,27 @@ class ModManager {
         return this.getActiveRealDangerMods().length > 0;
     }
 
+    switchForceModdedSaves(){
+        this.forceModdedSaves = !MATTIE.DataManager.global.get("forceModded");
+        MATTIE.DataManager.global.set("forceModded", this.forceModdedSaves);
+        this.forceVanillaSaves = false
+    }
+
+    switchForceVanillaSaves(){
+        this.forceModdedSaves = false;
+        
+        this.forceVanillaSaves = !MATTIE.DataManager.global.get("forceVanilla");
+        MATTIE.DataManager.global.set("forceVanilla", this.forceVanillaSaves);
+    }
+
+    checkForceModdedSaves(){
+        return MATTIE.DataManager.global.get("forceModded");
+    }
+
+    checkForceVanillaSaves(){
+        return  MATTIE.DataManager.global.get("forceVanilla");
+    }
+
     checkVanilla(){
         return this.getActiveRealMods().length === 0;
     }
@@ -202,6 +283,7 @@ class ModManager {
                 this.switchStatusOfMod(mod.name);
             }
         });
+        if(this.forceModdedSaves) this.switchForceModdedSaves();
     }
 
     checkModsChanged(){
@@ -333,18 +415,23 @@ class ModManager {
      * @param {*} mods a list of mods to load
      */
     setup(mods) {
+        let promises = [];
         mods.forEach((mod) => {
             if (mod.status && !this._mods.contains(mod.name)) {
                 this.setParameters(mod.name, mod.parameters);
-                this.loadScript(mod.name);
+                promises.push(this.loadScript(mod.name));
                 this._mods.push(mod.name);
             };
         });
+        return Promise.all(promises);
+        
     };
 }
 
 MATTIE_ModManager.init =
 function () {
+    
+    
     const defaultPath = PluginManager._path;
         const path = "mods/";
         const commonLibsPath = path+"commonLibs/";
@@ -353,28 +440,35 @@ function () {
         modManager.generateDefaultJsonForModsWithoutJsons();
         const commonModManager = new ModManager(commonLibsPath);
         const commonMods = modManager.parseMods(commonLibsPath)
-        setTimeout(() => {
-            new Promise(res=>{
-                
-                PluginManager._path = commonLibsPath;
-                commonModManager.setup(commonMods);
-                window.alert("mod loader successfully initialized")
-    
+            
+        new Promise(res=>{
+            PluginManager._path = commonLibsPath;
+            commonModManager.setup(commonMods).then(()=>{
+                //common mods loaded
                 PluginManager._path = defaultPath
                 res();
-            }).then(()=>{
-                setTimeout(() => {
-                    PluginManager._path = path;
-                    const mods = modManager.parseMods(path); //fs is in a different root dir so it needs this.
-                    console.info(mods)
-                    modManager.setup(mods); //all mods load after plugins
-                    
+            });
+            
+        }).then(()=>{
+            setTimeout(() => {
+                MATTIE.static.update();
+                PluginManager._path = path;
+                const mods = modManager.parseMods(path); //fs is in a different root dir so it needs this.
+                console.info(mods)
+                modManager.setup(mods).then(()=>{ //all mods loaded after plugins
+                    SceneManager.goto(Scene_Title);
+                    MATTIE.msgAPI.footerMsg("Mod loader successfully initialized") 
                     PluginManager._path = defaultPath;
-                }, 2000);
+                }); 
                 
                 
-            })
-        }, 10);
+            }, 500);
+            
+                
+            
+            
+            
+        })
         
 
 }
@@ -392,27 +486,35 @@ Graphics.hideError = function() {
     this.clearCanvasFilter();
 };
 
-
+MATTIE.suppressingAllErrors = false;
 MATTIE.onError = function(e) {
+    if(!MATTIE.suppressingAllErrors){
+        console.error(e);
     console.error(e.message);
     console.error(e.filename, e.lineno);
     try {
         this.stop();
-        Graphics.printError('Error', e.message+"<br>Press 'Y' To Reboot without mods. <br> Press 'R' to try to continue despite this error. <br> Press 'N' to reboot with mods. <br><br> If you are reporting a bug, <br> include this screen with the error and what mod/mods you were using and when you were doing when the bug occurred. <br> Thanks <br> -Mattie");
+        Graphics.printError('Error', e.message+"<br>Press 'F7' or 'escape' to try to continue despite this error. <br><br>Press 'F9' to suppress all future errors. (be carful using this)<br><br>Press 'F6' To Reboot without mods. <br> Press 'F5' to reboot with mods. <br><br> If you are reporting a bug, <br> include this screen with the error and what mod/mods you were using and when you were doing when the bug occurred. <br> Thanks <br> -Mattie");
         AudioManager.stopAll();
         let cb = ((key)=>{
             console.log(key.key);
-            if(key.key === 'y'){
+            if(key.key === 'F6'){
                 MATTIE_ModManager.modManager.disableAndReload();
                 MATTIE_ModManager.modManager.reloadGame();
-            } else if(key.key === 'r'){
+            } else if(key.key === 'F7' || key.key === 'Escape'){
                 document.removeEventListener('keydown', cb, false)
                 Graphics.hideError();
                 this.resume()
             }
             
-            else if (key.key === 'n'){
+            else if (key.key === 'F5'){
                 MATTIE_ModManager.modManager.reloadGame();
+            }
+
+            else if (key.key === 'F9'){
+                MATTIE.suppressingAllErrors = true;
+                Graphics.hideError();
+                this.resume()
             }
             
         })
@@ -421,6 +523,8 @@ MATTIE.onError = function(e) {
     } catch (e2) {
         Graphics.printError('Error', e.message+"\nFUBAR");
     }
+    }
+    
 }
 
 //error handling woooooo
@@ -433,4 +537,5 @@ SceneManager.catchException = function(e) {
     MATTIE.onError.call(this,e);
 };
 
-MATTIE_ModManager.init();
+
+MATTIE_ModManager.init();  

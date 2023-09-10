@@ -174,7 +174,6 @@ MATTIE.windows.emptyScrollHelpWindow.prototype.setText = function(text) {
             if(index >= wantedText.length-1) doneTyping = true;
             index++;
         }
-        console.log("done typing");
 
         index = 0;
         this.interval = setInterval(() => {
@@ -317,6 +316,8 @@ Window_SkillList.prototype.isEnabled = function(item) {
 };
 
 
+
+
 /**
  * Scene_DevActors
  * @description a scene to spawn in or remove actors
@@ -355,8 +356,6 @@ MATTIE.scenes.Scene_DevActors.prototype.onActorOk = function(){
     if($gameParty.allMembers().includes(actor)){
         $gameParty.removeActor(actor._actorId)
     }else{
-        console.log(actor);
-        console.log($gameActors.actor(actor._actorId));
         if(actor.hp <= 0){//resurrect actor if dead
             actor.setHp(1);
             actor.revive();
@@ -367,6 +366,28 @@ MATTIE.scenes.Scene_DevActors.prototype.onActorOk = function(){
     this._actorWindow.refresh();
 }
 
+/**
+ * Scene_ForceActors
+ * @description a scene to change what actor you are
+ * @extends Scene_DevActors
+ */
+MATTIE.scenes.Scene_ForceActors = function () {
+    this.initialize.apply(this, arguments);
+}
+
+MATTIE.scenes.Scene_ForceActors.prototype = Object.create(MATTIE.scenes.Scene_DevActors.prototype);
+MATTIE.scenes.Scene_ForceActors.prototype.constructor = MATTIE.scenes.Scene_ForceActors;
+
+MATTIE.scenes.Scene_ForceActors.prototype.initialize = function() {
+    MATTIE.scenes.Scene_DevActors.prototype.initialize.call(this);
+};
+
+MATTIE.scenes.Scene_ForceActors.prototype.onActorOk = function(){
+    let actor = $gameActors.actor(this._actorWindow.index());
+    if(actor) MATTIE.actorAPI.changeMainChar(actor._actorId);
+    this._actorWindow.activate();
+    this._actorWindow.refresh();
+}
 
 /**
  * Window_AllStatus
@@ -427,7 +448,6 @@ MATTIE.windows.Window_AllStatus.prototype.selectLast = function() {
 };
 
 MATTIE.windows.Window_AllStatus.prototype.loadImages = function() {
-    console.log($gameActors)
     $gameActors._data.forEach(function(actor) {
         if(actor)
         ImageManager.reserveFace(actor.faceName());

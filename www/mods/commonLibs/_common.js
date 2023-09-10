@@ -8,7 +8,6 @@ MATTIE.modLoader = MATTIE.modLoader || {};
 MATTIE.menus.mainMenu = MATTIE.menus.mainMenu || {};
 MATTIE.global = MATTIE.global || {};
 MATTIE.global.version = 1;
-MATTIE.isDev = false;
 MATTIE.GameInfo = {};
 MATTIE.GameInfo.getDifficulty = (data=$gameSwitches)=>{
     var difficulty = "Fear & Hunger"
@@ -24,88 +23,6 @@ MATTIE.GameInfo.getCharName = (data=$gameParty)=>{ return data.menuActor()._name
 MATTIE.GameInfo.isHardMode = (data=$gameSwitches)=>data._data[2190] === true;
 MATTIE.GameInfo.isTerrorAndStarvation = (data=$gameSwitches)=>(!data._data[2190] && data._data[3153] === true);
 
-MATTIE.DataManager = {};
-/**
- * @description load a save as an object to acsess information from it but not load it 
- * @param {JSON} contents a parsed json of the save you are loading
- * @returns an object of the save's game data
- */
-MATTIE.DataManager.extractAndReturnSaveContents = function(contents) {
-    var data={};
-    data.$gameSystem        = contents.system;
-    data.$gameScreen        = contents.screen;
-    data.$gameTimer         = contents.timer;
-    data.$gameSwitches      = contents.switches;
-    data.$gameVariables     = contents.variables;
-    data.$gameSelfSwitches  = contents.selfSwitches;
-    data.$gameActors        = contents.actors;
-    data.$gameParty         = contents.party;
-    data.$gameMap           = contents.map;
-    data.$gamePlayer        = contents.player;
-    return data;
-};
-/**
- * @description turn an object of save data into the format used to save the game
- * @param {Object} data save data for a game parsed as an object
- */
-MATTIE.DataManager.makeSaveContentsFromParam = function(data){
-        // A save data does not contain $gameTemp, $gameMessage, and $gameTroop.
-        var contents = {};
-        contents.system       = data.$gameSystem;
-        contents.screen       = data.$gameScreen;
-        contents.timer        = data.$gameTimer;
-        contents.switches     = data.$gameSwitches;
-        contents.variables    = data.$gameVariables;
-        contents.selfSwitches = data.$gameSelfSwitches;
-        contents.actors       = data.$gameActors;
-        contents.party        = data.$gameParty;
-        contents.map          = data.$gameMap;
-        contents.player       = data.$gamePlayer;
-        return contents;
-}
-/**
- * @description get full game data of a save as an object.
- * @param {integer} index the index of the save slot you want to load
- * @returns full game data of that save
- */
-MATTIE.DataManager.loadAndReturnSave = function(index){
-    try {
-        var saveJson = StorageManager.load(index)
-        var saveData = MATTIE.DataManager.extractAndReturnSaveContents(JsonEx.parse(saveJson)); 
-        return saveData;
-    } catch (error) {
-        return null
-    }
-    
-    
-}
-/**
- * @description make save file info from param
- * @returns save file info
- */
-MATTIE.DataManager.makeSavefileInfo = function(data) {
-    var info = {};
-    info.globalId   = DataManager._globalId;
-    info.title      = $gameSystem.gameTitle;
-    info.characters = data.$gameParty.charactersForSavefile();
-    info.faces      = data.$gameParty.facesForSavefile();
-    info.playtime   = data.$gameSystem.playtimeText();
-    info.timestamp  = Date.now();
-    return info;
-};
-
-MATTIE.DataManager.saveGameFromObj = function (savefileId,obj) {
-        var json = JsonEx.stringify(MATTIE.DataManager.makeSaveContentsFromParam(obj));
-        if (json.length >= 200000) {
-            console.warn('Save data too big!');
-        }
-        StorageManager.save(savefileId, json);
-        DataManager._lastAccessedId = savefileId;
-        var globalInfo = DataManager.loadGlobalInfo() || [];
-        globalInfo[savefileId] = MATTIE.DataManager.makeSavefileInfo(obj);
-        DataManager.saveGlobalInfo(globalInfo);
-        return true;
-}
 
 class CommonMod {
     constructor() {
@@ -149,7 +66,15 @@ function updateKeys(keys,name="") {
 };
 
 function updateKey(key,name="") {
-    Input.keyMapper[key.toUpperCase().charCodeAt(0)] = key; //add our key to the list of watched keys
+    if(key.includes("&")){  
+        let keys = key.split("&");
+        keys.forEach(element=>{
+            Input.keyMapper[element.toUpperCase().charCodeAt(0)] = element; //add our key to the list of watched keys
+        })
+    }else{
+        Input.keyMapper[key.toUpperCase().charCodeAt(0)] = key; //add our key to the list of watched keys
+    }
+    
 };
 
 /**
@@ -214,15 +139,81 @@ MATTIE.Prev_Input_Update = Input.update;
             let obj = keys[name]
             let key = obj.key;
             let cb = obj.cb;
-            if(Input.isRepeated(key)){
-                cb();
+            if(key.contains("&")){
+                /**@type {[]} */
+                let combinedKeys = key.split("&");
+                
+                let pressed = (()=>{
+                    for (let index = 0; index < combinedKeys.length-1; index++) {
+                        const element = combinedKeys[index];
+                        if(!Input.isPressed(element)) return false;
+                    }
+                    return Input.isRepeated(combinedKeys[combinedKeys.length-1]);
+                })();
+                if(pressed){
+                    cb();
+                }
+            }else{
+                if(Input.isRepeated(key)){
+                    cb();
+                }
             }
+            
+            
         }
             
     }
 
-    console.log(MATTIE);
+
+    this.forceModdedSaves = MATTIE.DataManager.global.get("forceModded");
+    this.forceVanillaSaves = MATTIE.DataManager.global.get("forceVanilla");
     MATTIE.menus.mainMenu.addBtnToMainMenu(TextManager.Mods,TextManager.Mods,
     MATTIE.menus.toModMenu.bind(this));
 
 // --ENGINE OVERRIDES--
+
+// MATTIE_RPG.Game_Map_Setup = Game_Map.prototype.setup;
+// Game_Map.prototype.setup = function(mapId) {
+//     /** @description the last map that the player was on */
+//     this._lastMapId = mapId;
+//     console.log(this._lastMapId);
+//     MATTIE_RPG.Game_Map_Setup.call(this, mapId)
+// };
+
+MATTIE_RPG.Game_Player_PerformTransfer = Game_Player.prototype.performTransfer;
+Game_Player.prototype.performTransfer = function (){
+    $gameMap._lastMapId = $gameMap.mapId();
+    MATTIE_RPG.Game_Player_PerformTransfer.call(this);
+}
+
+/** @description check if the spot is passible in any direction */
+/** @param {Game_Event} event */
+MATTIE.isPassableAnyDir = function(event){
+    let dirs = [2,4,6,8]; //dir 4 dirsections
+    for (let index = 0; index < dirs.length; index++) {
+        const dir = dirs[index];
+        if(event.canPass(event.x,event.y,dir)) return true;
+        
+    }
+}
+
+/**
+ * @description get the last map id
+ * @returns the id of the last map 
+ */
+Game_Map.prototype.lastMapId = function(){
+    return this._lastMapId;
+}
+/**
+ * @description format the key of a self swtich id
+ * @param {*} mapId the map id that this event is on
+ * @param {*} eventId the event id of this event
+ * @param {*} letter the letter of this switch
+ * @returns {[]}
+ */
+Game_SelfSwitches.prototype.formatKey = function(mapId, eventId, letter){
+    var key = [mapId, eventId, letter];
+    return key;
+}
+
+

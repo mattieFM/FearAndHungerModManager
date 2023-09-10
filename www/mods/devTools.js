@@ -1,12 +1,12 @@
 
 
 var MATTIE = MATTIE || {};
+
 MATTIE.devTools = MATTIE.devTools || {};
-MATTIE.isDev = true;
 //
 (()=>{
-    Input.addKeyBind('-', ()=>{
-        MATTIE.devTools.switchCheatScene();
+    Input.addKeyBind('p', ()=>{
+        SceneManager.push(MATTIE.scenes.Scene_Dev);
     }, "CHEAT", 1)
 
     Input.addKeyBind(';', ()=>{
@@ -17,6 +17,9 @@ MATTIE.isDev = true;
         SceneManager.push(MATTIE.scenes.Scene_Dev);
     }, "DEV MENU", -2)
 
+
+
+    
 
     Input.addKeyBind('2', ()=>{
         SceneManager.onError(new Error("hiya im an error"))
