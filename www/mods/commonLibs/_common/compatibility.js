@@ -81,5 +81,8 @@ var TY = {};
 //------------------------------
 //Termina Compatibility 
 //------------------------------
-if(Olivia)if(Olivia.AntiPlayerStress)
-Olivia.AntiPlayerStress.ProperErrorDisplay = false; //termina should use my error menu to
+if(Olivia)if(Olivia.AntiPlayerStress){
+    setTimeout(() => {
+        Olivia.AntiPlayerStress.ProperErrorDisplay = false; //termina should use my error menu to
+    }, 5000);
+}

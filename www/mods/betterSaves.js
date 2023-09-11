@@ -8,10 +8,22 @@
 var MATTIE = MATTIE || {};
 MATTIE.saves = MATTIE.saves || {};
 MATTIE.saves.suspendedRunId = 9998;
-
+MATTIE.betterSaves = {};
 
 
 (()=>{
+    let betterSavesName = 'betterSaves'
+    
+
+
+    MATTIE.betterSaves.offload = function(){
+        MATTIE.DataManager.global.set("migratedSaves", false);
+        console.log("offload")
+    }
+
+    MATTIE_ModManager.modManager.addOffloadScriptToMod(betterSavesName,MATTIE.betterSaves.offload)
+
+
     MATTIE.saves.createCommandWindow = Scene_GameEnd.prototype.createCommandWindow;
     Scene_GameEnd.prototype.createCommandWindow = function() {
         MATTIE.saves.createCommandWindow.call(this);
@@ -57,7 +69,7 @@ MATTIE.saves.suspendedRunId = 9998;
     updateOldSaves(); //update old saves on init
     MATTIE.menus.mainMenu.addBtnToMainMenu("Continue Suspended Run","suspendedRunContinue", MATTIE.saves.continueFromSuspendedRun.bind(this), ()=>MATTIE.saves.suspendedRunExists())
 
-    const params = PluginManager.parameters('betterSaves');
+    const params = PluginManager.parameters(betterSavesName);
     
     DataManager.maxSavefiles = function() {
         return params.maxSaves;

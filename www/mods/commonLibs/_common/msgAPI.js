@@ -27,14 +27,27 @@ MATTIE.msgAPI.showChoices = function(choices, defaultChoice, cancelChoice, cb, m
         }else{
             choices.forEach(()=>helpsArr.push(helps))
         }
-        $gameMessage.setChoiceHelps(helpsArr);
-        $gameMessage.setChoiceMessages([]);
-        $gameMessage.setChoiceFaces([]);
+
+        MATTIE.msgAPI._dreamXCompat();
+        
         $gameMessage.add(msg);
         $gameMessage.setChoices(choices, defaultChoice, cancelChoice);
         $gameMessage.setChoiceCallback(function(n) {
             cb(n);
         }.bind(this));
+}
+
+/**
+ * @description add compatibility for dreamX choice help plugin
+ */
+MATTIE.msgAPI._dreamXCompat = function(){
+    var DreamX = DreamX || false;
+    if(DreamX)
+        if(DreamX.ChoiceHelp){
+            $gameMessage.setChoiceHelps(helpsArr);
+            $gameMessage.setChoiceMessages([]);
+            $gameMessage.setChoiceFaces([]);
+        }
 }
 
 
