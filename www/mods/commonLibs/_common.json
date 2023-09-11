@@ -3,6 +3,7 @@
     "status":true,
     "parameters":{},
     "dependencies": [
+        "_common/optimizedTarraxLighting",
         "_common/systemEvents",
         "_common/menus/menu",
         "_common/menus/mainMenu",
@@ -19,6 +20,7 @@
         "_common/clipboard",
         "_common/actorAPI",
         "_common/eventAPI",
+        "_common/troopAPI",
         "_common/eventWrapper",
         "_common/msgAPI",
         "_common/supporters",

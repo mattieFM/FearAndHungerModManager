@@ -216,4 +216,3 @@ Game_SelfSwitches.prototype.formatKey = function(mapId, eventId, letter){
     return key;
 }
 
-
