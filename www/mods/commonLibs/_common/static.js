@@ -28,6 +28,7 @@ MATTIE.static.maps.menuMaps = [];
 //items
 MATTIE.static.items.emptyScroll = null;
 
+MATTIE.static.troops = MATTIE.static.troops || {};
 
 //skills
 MATTIE.static.skills.bloodportal = null;
@@ -63,6 +64,9 @@ MATTIE.static.switch.ignoredSelfSwitches = [];
 //states
 /** this is the state that governs "death" in combat */
 MATTIE.static.states.knockout = 0;
+
+//troopids
+MATTIE.static.troops.crowMauler = 51;
 
 //actors
 MATTIE.static.actors.bloodGolemId = 0;
