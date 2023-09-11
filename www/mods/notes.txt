@@ -1,0 +1,52 @@
+char creation (done), fixed by supressing self switches until player loads onto real game map
+drop weapons/armor X, fixed by changein _itemId to .id --just correcting params.
+
+make saves glboal X, done, easy enough.
+fix death /spectate / revive
+self switches on other maps X, might be fixed?
+crowmauler, appears to be working, might need some tweaking later
+added scaling for healing whispers.
+
+Bugs:
+legard ending should be shared
+disable forwarding talk
+cannot read isAnimationPlaying of undefined.... I still dont know where this comes from.
+level var not flipping sometimes, elevator invis
+hexen one player closes menu, partially closes for other
+overriteing keybind on launch
+affinity not working properly
+ismoverouteforcing of undefined //cannot reproduce but is probably still not fixed
+
+
+werid delay bug, should be fixed by fixing tthe self switch issue.
+temple of tormet, transfer when sacrifice
+
+
+girl extra attack?!??!?!??!?!?!? apparently girl just randomly has an extra attack out of no where? //never has been reproduced on prod.
+skin granny/ dream memories should be shared
+
+
+
+fixed bugs:
+
+invis page not found issue
+
+rope, x fixed.
+Fix item drop dupe bug. X, fixed by making the event wrapper not remove the self switch when it thinks its gone.
+Fix cannot unready. X, fixed, I forgot that you have to activate and deactivate the thing that has the handler for cancel/unready.
+Fixed first turn ready issue. X, fixed.
+fix blood golem, Fixed, battlers are updated when blood golem is summoned
+
+
+
+
+
+//Visual/Cosmetic Bugs
+Too many blood golems appear on ppls screens, doesn't do anything, but if you have 4 parties using blood golem there are like 8 blood golems
+fix the issue where one player has dash and the other doesn't. //this is cosmetic only tho
+dupilcate followers
+cion flip rendering
+
+//qudio bugs
+menu theme overlapp
+remove allys when they die incombat

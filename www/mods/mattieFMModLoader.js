@@ -41,8 +41,13 @@ MATTIE.global.checkGameVersion = function(){
     return version;
 }
 
+
+//----------------------------------------------------------------
+// Plugin Manager
+//----------------------------------------------------------------
+
 /**
- * 
+ * @description the plugin manager loadscript function, this will load a script into the DOM
  * @param {*} plugins 
  * @returns {Promise}
  */
@@ -63,9 +68,9 @@ PluginManager.loadScript = function(name) {
     
 };
 /**
- * 
+ * @description the setup function for plugins, this does not matter right now. But later when we want to optimize and override plugins that did things privately Cough Cough TarraxLighting, we can use this
  * @param {*} plugins 
- * @returns {Promise}
+ * @returns {Promise} all promises
  */
 PluginManager.setup = function(plugins) {
     let promises = [];
@@ -80,9 +85,11 @@ PluginManager.setup = function(plugins) {
         }
     }, this);
     return Promise.all(promises);
-
 }
-MATTIE.DataManagerLoaddatabase =DataManager.loadDatabase;
+/**
+ * @description we override the load database function to update our game version dependant variables
+ */
+MATTIE.DataManagerLoaddatabase = DataManager.loadDatabase;
 DataManager.loadDatabase = function() {
     MATTIE.DataManagerLoaddatabase.call(this);
     let int = setInterval(() => {
@@ -93,23 +100,33 @@ DataManager.loadDatabase = function() {
                 MATTIE.static.update();
                 clearInterval(int);
             }
-            
         }
     }, 50);
-    
-    
 };
 
+
+//----------------------------------------------------------------
+// Mod Manager
+//----------------------------------------------------------------
+/**
+ * @description the main mod manager that handles loading and unloading all mods
+ */
 class ModManager {
     constructor(path) {
         Object.assign(this,PluginManager);
         this._path = path
         this._realMods = [];
         this._mods = []
+        this._modsDict = {};
         this.forceModdedSaves = false;
         this.forceVanillaSaves = false;
     }
 
+    /**
+     * 
+     * @param {*} name the name of the mod
+     * @returns {boolean} is the mod enabled
+     */
     checkMod (name){
         let allMods = this.getAllMods();
         for (let index = 0; index < allMods.length; index++) {
@@ -119,14 +136,25 @@ class ModManager {
         return false;
     }
 
+    /**
+     * @description get mod info about a mod
+     * @param {*} path path to the file
+     * @param {*} modName the name of the file
+     * @returns a modinfo obj
+     */
     getModInfo(path,modName){
         const fs = require('fs');
+        if(!modName.endsWith(".json")) modName+=".json";
         const modInfoPath =  path + modName;
         const modInfoData = fs.readFileSync(modInfoPath)
         const modInfo = JSON.parse(modInfoData);
         return modInfo;
     }
 
+    /** 
+     * @description get the path of the mods folder, checking if we are in dev or prod mode and adding the appropriate prefix 
+     * @returns {string} proper path
+     * */
     getPath(){
         const fs = require('fs');
         let path;
@@ -145,6 +173,10 @@ class ModManager {
         return path
     }
 
+    /**
+     * @description get a list of all files in the mods dir
+     * @returns {String[]} an array of all file names in the mods folder
+     */
     getModsFolder(){
         let arr = [];
         const fs = require('fs');
@@ -157,6 +189,10 @@ class ModManager {
         return arr;
     }
 
+    /**
+     * @description write a default json file for the mod name
+     * @param {string} modName the file name to write not including .json 
+     */
     generateDefaultJSONForMod(modName){
         const fs = require('fs');
         let path = this.getPath();
@@ -169,6 +205,7 @@ class ModManager {
 
     }
 
+    /** @description generate the default json file for all mods without jsons */
     generateDefaultJsonForModsWithoutJsons(){
         let modsWithoutJson = this.getModsWithoutJson();
         modsWithoutJson.forEach(modName=>{
@@ -176,6 +213,7 @@ class ModManager {
         })
     }
 
+    /** @description find all files in the mods folder that do not have a json file attached to them */
     getModsWithoutJson(){
         let modsWithJson = this.getAllMods().map(mod=>mod.name);
         console.log(modsWithJson);
@@ -218,6 +256,10 @@ class ModManager {
         
     }
 
+    /**
+     * @description get a list of all active real mods (not dependencies) that are marked as dangerous.
+     * @returns a list of all real danger mods
+     */
     getActiveRealDangerMods(){
         let arr = [];
         let currentModsData = this.getAllMods();
@@ -227,6 +269,10 @@ class ModManager {
         return arr;
     }
 
+    /** 
+     * @description get a list of all mods, not including preReqs
+     * @returns {array} mod info array
+    */
     getActiveRealMods(){
         let arr = [];
         let currentModsData = this.getAllMods();
@@ -236,16 +282,19 @@ class ModManager {
         return arr;
     }
 
+    /** @description check if any dangerous mods are enabled */
     checkSaveDanger(){
         return this.getActiveRealDangerMods().length > 0;
     }
 
+    /** @description switch the value of the force modded saves option */
     switchForceModdedSaves(){
         this.forceModdedSaves = !MATTIE.DataManager.global.get("forceModded");
         MATTIE.DataManager.global.set("forceModded", this.forceModdedSaves);
         this.forceVanillaSaves = false
     }
 
+    /** @description switch the value of the force vanilla saves option */
     switchForceVanillaSaves(){
         this.forceModdedSaves = false;
         
@@ -253,22 +302,29 @@ class ModManager {
         MATTIE.DataManager.global.set("forceVanilla", this.forceVanillaSaves);
     }
 
+    /** @description check if the force modded saves option is set to true */
     checkForceModdedSaves(){
         return MATTIE.DataManager.global.get("forceModded");
     }
 
+    /** @description check if the force vanilla saves option is set to true */
     checkForceVanillaSaves(){
         return  MATTIE.DataManager.global.get("forceVanilla");
     }
 
+    /** @description check if no mods are enabled */
     checkVanilla(){
         return this.getActiveRealMods().length === 0;
     }
 
+    /** @description check if any mods are enabled */
     checkModded(){
         return this.getActiveRealMods().length > 0;
     }
 
+    /**
+     * @description toggle off all mods
+     */
     setVanilla(){
         let currentModsData = this.getAllMods();
         currentModsData.forEach(mod => {
@@ -276,6 +332,9 @@ class ModManager {
         });
     }
 
+    /**
+     * @description toggle off all mods that are dangerous 
+     */
     setNonDanger(){
         let currentModsData = this.getAllMods();
         currentModsData.forEach(mod => {
@@ -286,6 +345,10 @@ class ModManager {
         if(this.forceModdedSaves) this.switchForceModdedSaves();
     }
 
+    /** 
+     * @description check if any mods have changed their status 
+     * @returns {boolean}
+     * */
     checkModsChanged(){
         let currentModsData = this.getAllMods();
         for (let index = 0; index < this._mods.length; index++) {
@@ -302,49 +365,70 @@ class ModManager {
         return false;
     }
 
+    /**
+     * @description reload the game if changes were made to the mod jsons
+     */
     reloadIfChangedGame(){
         if(this.checkModsChanged())  this.reloadGame();
     }
 
+    /**
+     * @description reload the window
+     */
     reloadGame(){
         location.reload()
     }
 
-    switchStatusOfMod(modName){
+    /**
+     * @description disable the s
+     * @param {String} modName the mod name to change
+     * @param {boolean} bool whether to set the mod as enabled or disabled
+     */
+    setEnabled(modName, bool){
         if(!modName.includes(".json")) modName+=".json";
         const fs = require('fs');
-        let arr = [];
-        let mode;
-        let path;
-        try {
-            fs.readdirSync("www/"+this._path); //dist mode
-            mode = "dist"
-        } catch (error){
-            mode = "dev";
-        }
-        if(mode === "dist"){
-            path="www/"+this._path;
+        let path = this.getPath();
+        let dataInfo = this.getModInfo(path,modName);
+        dataInfo.status = bool;
+
+        if(!bool){ //if a mod is being disabled call its offload script
+            this.callOnOffloadModScript(modName.replace(".json",""));
         }
 
-        let dataInfo = this.getModInfo(path,modName);
-        dataInfo.status = !dataInfo.status;
         fs.writeFileSync(path+modName,JSON.stringify(dataInfo));
+    }
+
+    switchStatusOfMod(modName){
+        let path = this.getPath();
+        let dataInfo = this.getModInfo(path,modName);
+        this.setEnabled(modName, !dataInfo.status)
+    }
+
+    /**
+     * @description this will check the _modsDict and see if this mod has an offload script
+     * @param {string} modName the name of the mod to call the off load script of
+     */
+    callOnOffloadModScript(modName){
+        console.log(this._modsDict)
+        console.log(this._modsDict[modName])
+        if(this._modsDict[modName]){
+            let onOffloadScriptExists = !!this._modsDict[modName].offloadScript;
+            if(onOffloadScriptExists) this._modsDict[modName].offloadScript();
+        }
+    }
+
+    /**
+     * @description this will call the mod's on load script when the mod is loaded if it has one
+     * @param {String} modName the name of the mod to call the on load script of
+     */
+    callOnLoadModScript(modName){
+
     }
 
     getAllMods(){
         const fs = require('fs');
         let arr = [];
-        let mode;
-        let path;
-        try {
-            fs.readdirSync("www/"+this._path); //dist mode
-            mode = "dist"
-        } catch (error){
-            mode = "dev";
-        }
-        if(mode === "dist"){
-            path="www/"+this._path;
-        }
+        let path = this.getPath();
         let readMods = fs.readdirSync(path);
         
         readMods.forEach(modName => { //load _mods first
@@ -360,6 +444,13 @@ class ModManager {
 
     }
 
+    /**
+     * @description add a mod entry to the list of mods
+     * @param {*} name the name of the mod
+     * @param {*} status whether the mod is enabled
+     * @param {*} danger is the mod dangerous 
+     * @param {*} params any params of the mod
+     */
     addModEntry(name,status=true,danger=false, params={}){
         var mod = {};
         mod.status = status;
@@ -367,27 +458,45 @@ class ModManager {
         mod.parameters = params;
         mod.danger = danger;
         this._mods.push(mod);
+        this._modsDict[mod.name] = mod;
     }
 
-    
+    findModIndexByName(name){
+        let index = -1;
+        for (let index = 0; index < this._mods.length; index++) {
+            const mod = this._mods[index];
+            if(mod.name === name) return index;
+        }
+        return index;
+    }
+
+    /**
+     * @description add a offload script that will be called when a mod is deactivated to a mod
+     * @param {*} name 
+     * @param {*} cb 
+     */
+    addOffloadScriptToMod(name,cb){
+        this._modsDict[name].offloadScript=cb;
+    }
+
+    /**
+     * @description disable all mods and reload the game as vanilla
+     */
     disableAndReload(){
         this.setVanilla();
         this.reloadGame();
     }
 
-    parseMods(path){
+    /**
+     * @description finds all mod in a folder
+     * @param {String} path the path of the folder inside www/ to load mods from
+     * @returns a list of mods
+     */
+    parseMods(path=this._path){
         const fs = require('fs');
         var readMods;
-        var mode;
-        try {
-            fs.readdirSync("www/"+path); //dist mode
-            mode = "dist"
-        } catch (error){
-            mode = "dev";
-        }
-        if(mode === "dist"){
-            path="www/"+path;
-        }
+        this._path = path
+        path = this.getPath();
         readMods = fs.readdirSync(path);
         
         readMods.forEach(modName => { //load _mods first
@@ -412,7 +521,9 @@ class ModManager {
 
     /**
      * @description load all mods from a list that are not already loaded
+     * @extends PluginManager.prototype.loadScript
      * @param {*} mods a list of mods to load
+     * @returns a promise that will resolve once all scripts are loaded
      */
     setup(mods) {
         let promises = [];
@@ -427,7 +538,9 @@ class ModManager {
         
     };
 }
-
+/**
+ * @description load the mod manager 
+ */
 MATTIE_ModManager.init =
 function () {
     PluginManager.setup($plugins);
@@ -451,7 +564,6 @@ function () {
             
         }).then(()=>{
             setTimeout(() => {
-                
                 PluginManager._path = path;
                 const mods = modManager.parseMods(path); //fs is in a different root dir so it needs this.
                 console.info(mods)
@@ -459,18 +571,35 @@ function () {
                     SceneManager.goto(Scene_Title);
                     MATTIE.msgAPI.footerMsg("Mod loader successfully initialized") 
                     PluginManager._path = defaultPath;
+                    MATTIE_ModManager.overrideErrorLoggers();
+                    
+
+                    
+
                 }); 
-                
-                
-            }, 1000);
             
-                
-            
-            
-            
-        })
+        },1500);
+    });
         
 
+}
+
+
+//----------------------------------------------------------------
+//Error Handling
+//----------------------------------------------------------------
+
+/**
+ * @description override the scene manager error functions with our own error screen instead
+ */
+MATTIE_ModManager.overrideErrorLoggers = function(){
+    SceneManager.onError = function(e) {
+        MATTIE.onError.call(this,e);
+    };
+    
+    SceneManager.catchException = function(e) {
+        MATTIE.onError.call(this,e);
+    };
 }
 
 Graphics.clearCanvasFilter = function() {
@@ -513,6 +642,7 @@ MATTIE.onError = function(e) {
 
             else if (key.key === 'F9'){
                 MATTIE.suppressingAllErrors = true;
+                document.removeEventListener('keydown', cb, false)
                 Graphics.hideError();
                 this.resume()
             }
@@ -526,16 +656,6 @@ MATTIE.onError = function(e) {
     }
     
 }
-
-//error handling woooooo
-
-SceneManager.onError = function(e) {
-    MATTIE.onError.call(this,e);
-};
-
-SceneManager.catchException = function(e) {
-    MATTIE.onError.call(this,e);
-};
 
 
 MATTIE_ModManager.init();  
