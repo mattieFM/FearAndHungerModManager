@@ -227,13 +227,8 @@ MATTIE.multiplayer.Secondary_Player.prototype.constructor = MATTIE.multiplayer.S
 
 MATTIE.multiplayer.Secondary_Player.prototype.initialize = function (netActors) {
     this.ctrlDir4 = 0; //start standing still
-    Game_Player.prototype.initialize.call(this);
     this.$netActors = netActors;
-
-
-    //TODO: followers
-    //this._followers = $gamePlayer.followers();
-    //this._followers = $gamePlayer.followers();
+    Game_Player.prototype.initialize.call(this);
 }
 
 //override init members to use netfollowers instead of followers

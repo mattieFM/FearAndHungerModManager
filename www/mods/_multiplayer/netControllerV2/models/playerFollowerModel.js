@@ -12,10 +12,10 @@ MATTIE.multiplayer.NetFollower.prototype = Object.create(Game_Follower.prototype
 MATTIE.multiplayer.NetFollower.prototype.constructor = MATTIE.multiplayer.NetFollower;
 
 MATTIE.multiplayer.NetFollower.prototype.initialize = function(memberIndex, netPlayer, actorId = undefined) {
-    Game_Follower.prototype.initialize.call(this, memberIndex);
     this.actorId = actorId;
     this.netPlayer = netPlayer;
     this.$netActors = netPlayer.$netActors;
+    Game_Follower.prototype.initialize.call(this, memberIndex);
 };
 
 MATTIE.multiplayer.NetFollower.prototype.setActor = function(actorId) {
