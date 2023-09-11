@@ -216,8 +216,3 @@ Game_SelfSwitches.prototype.formatKey = function(mapId, eventId, letter){
     return key;
 }
 
-
-Input.addKeyBind("r",()=>{
-    let additionalTroop = new MATTIE.troopAPI.runtimeTroop(1)
-    additionalTroop.spawn();
-},"Add Enemy To Troop",0)
