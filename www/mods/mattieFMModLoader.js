@@ -543,7 +543,7 @@ class ModManager {
  */
 MATTIE_ModManager.init =
 function () {
-    
+    PluginManager.setup($plugins);
     
     const defaultPath = PluginManager._path;
         const path = "mods/";
