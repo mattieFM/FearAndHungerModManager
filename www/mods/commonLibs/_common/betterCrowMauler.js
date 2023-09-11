@@ -91,7 +91,8 @@ MATTIE.betterCrowMauler.crowController.prototype.battleSpawnTick = function(){
         setTimeout(() => {
             MATTIE.msgAPI.footerMsg("A terrifying presence is behind you");
             setTimeout(() => {
-                $gameTroop.addAdditionalTroop(MATTIE.static.troops.crowMauler,100,0)
+                let additionalTroop = new MATTIE.troopAPI.runtimeTroop(MATTIE.static.troops.crowMauler, 100, 0)
+                additionalTroop.spawn();
             }, 3000);
             
         }, 5000);
@@ -230,7 +231,7 @@ MATTIE.betterCrowMauler.crowController.prototype.shouldDespawn = function(){
  * 
  * */
 MATTIE.betterCrowMauler.crowController.prototype.shouldEnterCombat = function(){
-    return !this.isDead() && MATTIE.util.randChance(MATTIE.betterCrowMauler.combatEnterChance);
+    return !this.isDead() && !this.onScreen && MATTIE.util.randChance(MATTIE.betterCrowMauler.combatEnterChance);
 }
 
 

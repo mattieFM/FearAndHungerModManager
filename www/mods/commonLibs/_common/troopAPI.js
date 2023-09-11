@@ -8,18 +8,33 @@ MATTIE.troopAPI.config = MATTIE.troopAPI.config || {};
 //--------------------------------------
 
 
-//override initialization and setup methods
+/** @description the base initalize method for a game troop */
 MATTIE_RPG.TroopApi_Game_Troop_Initialize = Game_Troop.prototype.initialize;
+/** @description the extended method for inializing a game troop, this also inializeds the .additionalTroops thing that we use later */
 Game_Troop.prototype.initialize = function() {
     MATTIE_RPG.TroopApi_Game_Troop_Initialize.call(this);
     /** @type {MATTIE.troopAPI.runtimeTroop[]} an array of all additional troops */
     this._additionalTroops = [];
 };
+
+/** @description the base function to setup a game troop */
 MATTIE_RPG.TroopApi_Game_Troop_Setup = Game_Troop.prototype.setup;
-Game_Troop.prototype.setup = function(troopId){
+/**
+ * @description the setup function for a game troop, extended to also support offset and additional troops
+ * @param {int} troopId the troop id 
+ * @param {int} xOffset default 0, offset the entire troop by this amount
+ * @param {int} yOffset default 0, offset the entire troop by this amount
+ */
+Game_Troop.prototype.setup = function(troopId, xOffset =0, yOffset =0){
     MATTIE_RPG.TroopApi_Game_Troop_Setup.call(this,troopId)
     /** @type {MATTIE.troopAPI.runtimeTroop[]} an array of all additional troops */
     this._additionalTroops = [];
+    this._enemies.forEach(enemy=>{
+        enemy.x+=xOffset;
+        enemy.y+=yOffset;
+        enemy._screenY+=yOffset;
+        enemy._screenX+=xOffset;
+    })
 }
 
 /** 
@@ -45,6 +60,7 @@ Game_Troop.prototype.members = function(){
     return members;
 }
 
+
 /** 
  * @description add a troop to this object's additional troops array  
  * @param {MATTIE.troopAPI.runtimeTroop} troop the troop to add 
@@ -54,10 +70,12 @@ Game_Troop.prototype.addRunTimeTroop = function(troop){
     this._additionalTroops.push(troop);
 }
 
-/**
+
+/** @description the base function to setup the battle event of a game troop */
+MATTIE_RPG.TroopApi_Game_Troop_Setup_Battle_Event = Game_Troop.prototype.setupBattleEvent;
+/** 
  * @description override the setup battle event to also setup battle events of all additional troops
  */
-MATTIE_RPG.TroopApi_Game_Troop_Setup_Battle_Event = Game_Troop.prototype.setupBattleEvent;
 Game_Troop.prototype.setupBattleEvent = function() {
     MATTIE_RPG.TroopApi_Game_Troop_Setup_Battle_Event.call(this);
     for (let index = 0; index < this._additionalTroops.length; index++) {
@@ -67,10 +85,12 @@ Game_Troop.prototype.setupBattleEvent = function() {
 }
 
 
-/**
- * @description override the setup battle event to also setup battle events of all additional troops
- */
+
+/** @description the base function to update the interpreter of a game troop */
 MATTIE_RPG.TroopApi_Game_Troop_UpdateInterpreter = Game_Troop.prototype.updateInterpreter;
+/**
+ * @description override the update interpreter to also update battle events of all additional troops
+ */
 Game_Troop.prototype.updateInterpreter = function() {
     MATTIE_RPG.TroopApi_Game_Troop_UpdateInterpreter.call(this);
     for (let index = 0; index < this._additionalTroops.length; index++) {
@@ -81,7 +101,10 @@ Game_Troop.prototype.updateInterpreter = function() {
 
 /** @description  the game troops function to check conditionals */
 MATTIE_RPG.TroopApi_Game_Troop_Meets_Conditions = Game_Troop.prototype.meetsConditions;
-/** @description the game troops function to check conditionals, override the c.enemy valid to use proper troop */
+/** 
+ * @description the game troops function to check conditionals, override the c.enemy valid to use proper troop 
+ * @param {} page the page of the game troop, not the id
+ */
 Game_Troop.prototype.meetsConditions = function(page) {
     
     var c = page.conditions;
@@ -104,6 +127,13 @@ Game_Troop.prototype.meetsConditions = function(page) {
 //Run Time Troop Class
 //--------------------------------------
 
+/** 
+ * @description a class that handles adding troops to the current combat at runtime 
+ * @param {int} troopId, the id of the troop this class represents
+ * @param {int} xOffset, screen x offset for entire troop
+ * @param {int} yOffset, screen y offset for entire troop
+ * @returns {MATTIE.troopAPI.runtimeTroop}
+ * */
 MATTIE.troopAPI.runtimeTroop = function() {
     this.initialize.apply(this, arguments);
 }
@@ -111,10 +141,17 @@ MATTIE.troopAPI.runtimeTroop = function() {
 MATTIE.troopAPI.runtimeTroop.prototype = Object.create(Game_Troop.prototype);
 MATTIE.troopAPI.runtimeTroop.prototype.constructor = MATTIE.troopAPI.runtimeTroop;
 
-MATTIE.troopAPI.runtimeTroop.prototype.initialize = function(troopId){
+/** 
+ * @description the initialize method for a runtime troop. This sets up all values we might need.
+ * @param {int} troopId, the id of the troop this class represents
+ * @param {int} xOffset, screen x offset for entire troop
+ * @param {int} yOffset, screen y offset for entire troop
+ * @returns {MATTIE.troopAPI.runtimeTroop}
+ * */
+MATTIE.troopAPI.runtimeTroop.prototype.initialize = function(troopId, xOffset=0, yOffset=0){
     Game_Troop.prototype.initialize.call(this);
     
-    this.setup(troopId);
+    this.setup(troopId, xOffset, yOffset);
     this._interpreter.setTroop(this);
     /** @description an array of the sprites of the enemies in this troop */
     this._sprites = [];
@@ -127,10 +164,17 @@ MATTIE.troopAPI.runtimeTroop.prototype.initialize = function(troopId){
     this.spriteSet = SceneManager._scene._spriteset;
 }
 
+/**
+ * @description get all sprites associated with this troop
+ * @returns {PIXI.Sprite[]} a list of the enemy sprites
+ */
 MATTIE.troopAPI.runtimeTroop.prototype.sprites = function(){
     return this._sprites;
 }
 
+/**
+ * @description add the sprites of this troop to the current battle sprite sheet
+ */
 MATTIE.troopAPI.runtimeTroop.prototype.addSpritesToCurrentBattleSet = function(){
     let members = this.baseMembers()
     console.log(members)
@@ -146,11 +190,10 @@ MATTIE.troopAPI.runtimeTroop.prototype.addSpritesToCurrentBattleSet = function()
     }
 }
 
-MATTIE.troopAPI.runtimeTroop.prototype.setupBattleEvent = function() {
-    Game_Troop.prototype.setupBattleEvent.call(this);
-    //this._interpreter.setTroop(this);
-};
-
+/**
+ * @description spawn the event into the actual game. Until this is called the event is meaningless
+ * @returns {MATTIE.troopAPI.runtimeTroop} returns itself so that you can initialize and spawn in one line if you would like.
+ */
 MATTIE.troopAPI.runtimeTroop.prototype.spawn = function(){
     if($gameParty.inBattle()){ //check if the game party is in battler
         if($gameTroop){ //check if there is a current troop
@@ -161,6 +204,7 @@ MATTIE.troopAPI.runtimeTroop.prototype.spawn = function(){
         }
 
     }
+    return this;
 }
 
 //--------------------------------------
@@ -188,7 +232,8 @@ Game_Interpreter.prototype.getTroop = function(){
 
 /**
  *  @description iterate enemy index of local troop only 
- * 
+ *  @param {int} param apears to be enemy id
+ *  @param {Function} callback, the call back to execute
  * */
 Game_Interpreter.prototype.iterateEnemyIndex = function(param, callback) {
     console.log(this);
@@ -262,6 +307,14 @@ Game_Interpreter.prototype.command336 = function() {
 };
 
 
+
+
+
+//--------------------------------------
+// Spriteset_Battle
+//--------------------------------------
+
+//The code below needs some work --we need to allow auto placement and arrangement of battlers
 
 /** 
  * @description controls the padding on the left and right of the screen
