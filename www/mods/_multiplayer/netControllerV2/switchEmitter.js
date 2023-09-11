@@ -148,7 +148,7 @@ let eventAndSwitchEmitterInit = function () {
         MATTIE.multiplayer.switchEmitter.parallelSetter.call(this, MATTIE.multiplayer.switchEmitter.config.selfSwitchTolerance);
         
         MATTIE_RPG.command123.call(this);
-        
+        let key = $gameSelfSwitches.formatKey(this._mapId, this._eventId, this._params[0])
         let stringKey = JSON.stringify(key);
         if(!MATTIE.static.switch.ignoredSelfSwitches.includes(stringKey))
         if(!this._isParallel || MATTIE.static.switch.syncedSelfSwitches.includes(stringKey)) {//MATTIE.static.switch.syncedSelfSwitches.includes(key)
