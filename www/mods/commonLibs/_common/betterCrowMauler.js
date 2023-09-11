@@ -25,11 +25,20 @@ MATTIE.betterCrowMauler.followChance = .15;
  * */
 MATTIE.betterCrowMauler.despawnChance = .15;
 
+/**
+ * @description the chance of crow mauler entering someones battle
+ * @default .01
+ */
+MATTIE.betterCrowMauler.combatEnterChance = .01;
+
 MATTIE.betterCrowMauler.crowController = function () {
     this.disableBaseCrowMauler();
 
     /** @description whether this instance of the controller has spawned a crow mauler on this level */
     this.hasSpawned = false;
+
+    /**@description whether a crow mauler has forced its way into this combat */
+    this.inBattle = false;
 
     /** @description whether this instance of the controller's crow mauler is on screen or not  */
     this.onScreen = false;
@@ -44,10 +53,12 @@ MATTIE.betterCrowMauler.crowController = function () {
     Game_Player.prototype.performTransfer = function() {
         prevFunc.call(this);
         that.onEnterRoom();
+        this.inBattle = false;
     }
 
     setInterval(() => {
         this.spawnTick();
+        this.battleSpawnTick();
     }, MATTIE.betterCrowMauler.spawnInterval);
 }
 
@@ -71,6 +82,22 @@ MATTIE.betterCrowMauler.crowController.prototype.disableBaseCrowMauler = functio
  */
 MATTIE.betterCrowMauler.crowController.prototype.spawnTick = function(){
     if(!this.onScreen && !this.hasSpawned && !this.isDead() && !$gameParty.inBattle() && SceneManager._scene instanceof Scene_Map) this.update();
+}
+
+MATTIE.betterCrowMauler.crowController.prototype.battleSpawnTick = function(){
+    if(!this.isDead() && $gameParty.inBattle() && this.shouldEnterCombat() && !this.inBattle){
+        this.inBattle = true;
+        MATTIE.msgAPI.footerMsg("A terrifying presence has entered the room...")
+        setTimeout(() => {
+            MATTIE.msgAPI.footerMsg("A terrifying presence is behind you");
+            setTimeout(() => {
+                $gameTroop.addAdditionalTroop(MATTIE.static.troops.crowMauler,100,0)
+            }, 3000);
+            
+        }, 5000);
+       
+    }
+    
 }
 
 
@@ -198,6 +225,13 @@ MATTIE.betterCrowMauler.crowController.prototype.shouldDespawn = function(){
     return !this.isDead() && MATTIE.util.randChance(MATTIE.betterCrowMauler.despawnChance);
 }
 
+/** 
+ * @description checks a random chance to see if the crow should appear in combat
+ * 
+ * */
+MATTIE.betterCrowMauler.crowController.prototype.shouldEnterCombat = function(){
+    return !this.isDead() && MATTIE.util.randChance(MATTIE.betterCrowMauler.combatEnterChance);
+}
 
 
 MATTIE.betterCrowMauler.crowController.prototype.despawn = function(){

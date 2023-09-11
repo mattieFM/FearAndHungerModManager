@@ -81,6 +81,7 @@ MATTIE.eventAPI.setupRunTimeDataEvents = function(){
         /** @type {rm.types.Event} */
         const dataEvent = MATTIE.eventAPI.dataEvents[keys[index]];
         if(dataEvent.mapId === $gameMap.mapId() && dataEvent.persist){
+                console.log(dataEvent)
                 $dataMap.events[dataEvent.id] = dataEvent;
                 let mapEvent = new MapEvent();
                 mapEvent.data = dataEvent;
@@ -96,6 +97,7 @@ MATTIE.eventAPI.setupRunTimeGameEvents = function(){
         const dataEvent = MATTIE.eventAPI.dataEvents[keys[index]];
         if(dataEvent.mapId === $gameMap.mapId() && dataEvent.persist){
             if(!$dataMap.events[dataEvent.id]) {
+                console.log(dataEvent);
                 $dataMap.events[dataEvent.id] = dataEvent;
                 let mapEvent = new MapEvent();
                 mapEvent.data = dataEvent;

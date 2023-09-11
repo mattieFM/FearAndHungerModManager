@@ -232,6 +232,7 @@ class MapEvent {
      * Create a new Game_Event object and store it in $gameMap.
      */
     createGameEvent() {
+        console.log(MATTIE.eventAPI.dataEvents[this.data.id])
         $dataMap.events[this.data.id] = MATTIE.eventAPI.dataEvents[this.data.id];
         $gameMap._events[this.data.id] = (new Game_Event($gameMap.mapId(), this.data.id));
         if(!$dataMap.events[this.data.id]) $dataMap.events[this.data.id] = undefined; //if data is null set it to undefined instead
