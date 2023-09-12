@@ -116,6 +116,12 @@ MATTIE.multiplayer.scaling.resurrectionCost = () =>{
     return true
 }
 
+/**
+ * @description whether enemy hp should be scaled
+ * @default true
+ */
+MATTIE.multiplayer.scaling.scaleHp = true;
+
 
 /**
  * @description this is multiplied by the max hp of all enemies
@@ -133,6 +139,7 @@ MATTIE.multiplayer.scaling.hpPlayerDivisor = 1.2;
  * @description the function to scale hp
  */
 MATTIE.multiplayer.scaling.hpScaling = ()=>{
+    if(!MATTIE.multiplayer.scaling.scaleHp) return MATTIE.multiplayer.scaling.hpScaler;
     let totalCombatants = $gameTroop.totalCombatants();
     let playerScaler = totalCombatants > 1 ? totalCombatants / MATTIE.multiplayer.scaling.hpPlayerDivisor : 1
     return (playerScaler * MATTIE.multiplayer.scaling.hpScaler)
