@@ -127,7 +127,7 @@ MATTIE.multiplayer.scaling.hpScaler = 1;
  * @description when there are more than one player in combat with an enemy, the number of players is divided by this number then the health is multiplied by this.
  * @default 1
  */
-MATTIE.multiplayer.scaling.hpPlayerDivisor = 1.5;
+MATTIE.multiplayer.scaling.hpPlayerDivisor = 1.2;
 
 /**
  * @description the function to scale hp
@@ -174,6 +174,5 @@ MATTIE_RPG.Game_Enemy_Setup = Game_Enemy.prototype.setup;
 Game_Enemy.prototype.setup = function(enemyId, x, y) {
     MATTIE_RPG.Game_Enemy_Setup.call(this,enemyId, x, y);
     this.mhp = this.mhp * MATTIE.multiplayer.scaling.hpScaling();
-    this.mmp = this.mmp * MATTIE.multiplayer.scaling.hpScaling();
     this.recoverAll();
 };
