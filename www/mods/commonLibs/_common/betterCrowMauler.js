@@ -230,8 +230,10 @@ MATTIE.betterCrowMauler.crowController.prototype.shouldDespawn = function(){
  * @description checks a random chance to see if the crow should appear in combat
  * 
  * */
+
 MATTIE.betterCrowMauler.crowController.prototype.shouldEnterCombat = function(){
-    return !this.isDead() && !this.onScreen && MATTIE.util.randChance(MATTIE.betterCrowMauler.combatEnterChance);
+    if(MATTIE.multiplayer) return false;
+    return !MATTIE.multiplayer && !this.isDead() && !this.onScreen && MATTIE.util.randChance(MATTIE.betterCrowMauler.combatEnterChance);
 }
 
 
