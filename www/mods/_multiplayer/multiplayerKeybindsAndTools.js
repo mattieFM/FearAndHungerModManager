@@ -59,6 +59,10 @@ Input.addKeyBind('z', async ()=>{
 }, "die",-2)
 
 Input.addKeyBind("r",()=>{
-    let additionalTroop = new MATTIE.troopAPI.runtimeTroop(MATTIE.static.troops.crowMauler, 0, 0)
+    let additionalTroop = new MATTIE.troopAPI.runtimeTroop(109, 0, 0)
     additionalTroop.spawn();
+    let additionalTroop2 = new MATTIE.troopAPI.runtimeTroop(110, 0, 0)
+    additionalTroop2.spawn();
+    let additionalTroop3 = new MATTIE.troopAPI.runtimeTroop(115, 0, 0)
+    additionalTroop3.spawn();
 },"spawn crow in battler",-2);
