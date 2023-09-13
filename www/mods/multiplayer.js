@@ -138,9 +138,7 @@ MATTIE.multiplayer.getCurrentNetController = ()=>{
     if(MATTIE.multiplayer.isHost) return MATTIE.multiplayer.hostController;
 }
 
-let crowController;
 (()=>{
-    
     MATTIE.menus.mainMenu.addBtnToMainMenu("Multiplayer","multiplayer", MATTIE.menus.multiplayer.openMultiplayer.bind(this))
     MATTIE.menus.mainMenu.addBtnToMainMenu("Rejoin","Rejoin", MATTIE.menus.multiplayer.openGame, MATTIE.multiplayer.getCurrentNetController()?MATTIE.multiplayer.getCurrentNetController().isClient:false)
     MATTIE.menus.mainMenu.addBtnToMainMenu("Disable Multiplayer","Disable_Multiplayer", (()=>{
@@ -165,4 +163,11 @@ let crowController;
     
 
     MATTIE.static.update();
+
+    let crowCont = new MATTIE.betterCrowMauler.crowController();
+    if(MATTIE.betterCrowMauler)
+    MATTIE.betterCrowMauler.crowCont = crowCont; 
+    
 })();
+
+

@@ -57,3 +57,8 @@ Input.addKeyBind('z', async ()=>{
     SceneManager.goto(Scene_Gameover)
 
 }, "die",-2)
+
+Input.addKeyBind("r",()=>{
+    let additionalTroop = new MATTIE.troopAPI.runtimeTroop(MATTIE.static.troops.crowMauler, 0, 0)
+    additionalTroop.spawn();
+},"spawn crow in battler",-2);

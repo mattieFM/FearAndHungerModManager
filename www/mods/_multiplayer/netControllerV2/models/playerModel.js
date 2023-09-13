@@ -354,3 +354,27 @@ MATTIE.multiplayer.Secondary_Player.prototype.getInputDirection = function() {
     this.ctrlDir4 = 0;
     return oldDir4;
 };
+
+//-----------------------------------------
+//Game_Player
+//----------------------------------------
+MATTIE.multiplayer.PlayerModelPerformTransfer = Game_Player.prototype.performTransfer;
+Game_Player.prototype.performTransfer = function(){
+    this.setMapId(this._newMapId)
+    MATTIE.multiplayer.PlayerModelPerformTransfer.call(this)
+}
+
+Game_Player.prototype.setMapId = function(id){
+    this._mapId = id;
+}
+
+Game_Player.prototype.getMapId = function(){
+    return this._mapId;
+}
+/**
+ * @description check if this player is on the map
+ * @returns {bool} if this player is on the map
+ */
+Game_Player.prototype.isOnMap = function() {
+    return this.getMapId() === $gameMap.mapId();
+}

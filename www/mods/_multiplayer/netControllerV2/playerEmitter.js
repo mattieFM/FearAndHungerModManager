@@ -176,7 +176,9 @@ MATTIE.multiplayer.gamePlayer.override = function() {
     MATTIE.multiplayer.playerEmitter.checkPlayerActionBtnEvent = function(x, y, triggers){
         let netCont =MATTIE.multiplayer.getCurrentNetController()
         Object.keys(netCont.netPlayers).forEach(key=>{
+            /** @type {PlayerModel} */
             let netPlayer = netCont.netPlayers[key];
+            if(netPlayer.map === $gameMap.mapId())
             if(netPlayer.$gamePlayer.x === x && netPlayer.$gamePlayer.y ===y){
                 if(triggers.contains(0)){ //if this is an action button trigger
                     netPlayer.onInteract();
