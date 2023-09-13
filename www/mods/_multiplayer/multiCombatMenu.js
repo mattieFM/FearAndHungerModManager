@@ -92,7 +92,6 @@ Spriteset_Battle.prototype.addNetBattler = function(actor) {
 }
 
 Scene_Battle.prototype.refreshNetBattlers = function(){
-    console.log("refresh battlers")
     MATTIE.multiplayer.multiCombat.netPlayerOffset = $gameParty.battleMembers().length;
     let playersIds = $gameTroop.getIdsInCombatWith();
     let netCont = MATTIE.multiplayer.getCurrentNetController();

@@ -82,15 +82,80 @@ BattleManager.getAllPlayerActions = function () {
     this.makeActionOrders();
     this._actionBattlers.forEach(battler => {
         if (battler.battlerInParty() && battler.isAlive()){
+            /** @type {Game_Action} */
             let action = battler.currentAction();
             if(action){ //only do stuff if the action exists
                 action.setNetTarget(MATTIE.multiplayer.getCurrentNetController().peerId)
+                action.preloadRng(action.makeTargets());
                 arr.push(action);
             }
         }
     });
     return(arr);
 }
+
+
+Game_Action.prototype.forceHit = function(bool){
+    this.forcedHit = bool;
+}
+/**
+ * 
+ * @param {Game_Battler[]} targets 
+ */
+Game_Action.prototype.preloadRng = function(targets){
+    BattleManager.targetResults = {};
+    targets.forEach(target => {
+        let rand = Math.random();
+        let rand2 = Math.random();
+        let missed = (rand >= this.itemHit(target));
+        let evaded = (!missed && rand2 < this.itemEva(target));
+        BattleManager.targetResults[target.name()] = (!missed && !evaded);
+    });    
+    this.targetResults = BattleManager.targetResults;
+}
+
+Game_Action.prototype.loadRng = function(results){
+    BattleManager.targetResults = Object.assign({}, BattleManager.targetResults||{}, results)
+    console.log(BattleManager.targetResults);
+}
+
+Game_Action.prototype.getTargetResults = function(){
+    return BattleManager.targetResults;
+}
+
+MATTIE.multiplayer.Game_Action_Apply = Game_Action.prototype.apply;
+Game_Action.prototype.apply = function(target) {
+    MATTIE.multiplayer.Game_Action_Apply.call(this, target);
+}
+MATTIE.multiplayer.Game_Action_testApply = Game_Action.prototype.testApply;
+Game_Action.prototype.testApply = function(target) {
+    let targets = this.getTargetResults();
+    if(Object.keys(targets).includes(target.name())){
+        console.log("hit is forcing on" + target.name());
+        target.result().forceHit(targets[target.name()])
+    } else {
+        target.result().forceHit(undefined)
+    }
+    return MATTIE.multiplayer.Game_Action_testApply.call(this,target)
+};
+
+/** @description extend the is hit function to include if it is being forced to hit */
+MATTIE.multiplayer.Game_ActionResultisHit = Game_ActionResult.prototype.isHit
+Game_ActionResult.prototype.isHit = function() {
+    if(typeof this.forceHit != 'undefined'){
+        return this.forceHit;
+    }
+    return (MATTIE.multiplayer.Game_ActionResultisHit.call(this))
+};
+/** @description set a action result as forced hit */
+Game_ActionResult.prototype.forceHit = function(bool=undefined) {
+    this.forceHit = bool;
+};
+
+
+
+
+
 Game_Action.prototype.setNetTarget = function(peerId){
     this._netTarget = peerId;
 }
@@ -202,8 +267,17 @@ BattleManager.startTurn = function() {
         }
 
         if(val === 0 ){ //finnally sort by luck cus its funny
+            val = b.mp - a.mp;
+        }
+
+        if(val === 0 ){ //finnally sort by luck cus its funny
             val = b.luk - a.luk;
         }
+
+        if(val === 0 ){ //finnally sort by luck cus its funny
+            val = b.name() - a.name();
+        }
+
         return val;
     });
     this._actionBattlers = battlers;
@@ -212,8 +286,10 @@ BattleManager.startTurn = function() {
   Game_Battler.prototype.setCurrentAction = function(action) {
     this.forceAction(action._item._itemId,action._targetIndex, action.forcedTargets);
     this._actions[this._actions.length-1]._netTarget = action._netTarget;
+    this._actions[this._actions.length-1].loadRng(action.targetResults);
+    
+    console.log(action.forcedTargets)
     if(action._item._dataClass==="item") this._actions[this._actions.length-1].setItem(action._item._itemId)
-
 };
 MATTIE.forceAction = Game_Battler.prototype.forceAction;
 Game_Battler.prototype.forceAction = function(skillId, targetIndex, forcedTargets = []) {
@@ -226,12 +302,10 @@ MATTIE.maketargets = Game_Action.prototype.makeTargets
 /** override make targets to return forced target if we need */
 Game_Action.prototype.makeTargets = function() {
     if(this.forcedTargets) { //net player targeting someone
-        console.log("net target")
         return this.forcedTargets;
     }
 
     if(this.netPartyId !== MATTIE.multiplayer.getCurrentNetController().peerId) {//host targeting net player
-        console.log("host targetted nett")
         let net = MATTIE.multiplayer.getCurrentNetController().netPlayers[this.netPartyId];
         let netParty = []
         if(net){
@@ -241,7 +315,6 @@ Game_Action.prototype.makeTargets = function() {
         
     }
 
-    console.log("base target")
     return MATTIE.maketargets.call(this);
 };
 
@@ -299,7 +372,6 @@ Game_Action.prototype.setNetPartyId = function(id){
                     }
                 }
                 else if(this.checkAllPlayersReady()){ //otherwise normal check all ready
-                    console.log("turn started no some")
                     this.startAfterReady();
                     setTimeout(() => {
                         MATTIE.multiplayer.BattleController.emitUnreadyEvent(); //unready once the round is well and started

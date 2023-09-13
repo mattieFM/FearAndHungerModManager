@@ -120,7 +120,7 @@ MATTIE.multiplayer.scaling.resurrectionCost = () =>{
  * @description whether enemy hp should be scaled
  * @default true
  */
-MATTIE.multiplayer.scaling.scaleHp = true;
+MATTIE.multiplayer.scaling.scaleHp = false;
 
 
 /**

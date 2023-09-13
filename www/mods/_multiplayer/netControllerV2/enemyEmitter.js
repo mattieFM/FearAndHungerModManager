@@ -181,6 +181,7 @@ Game_Troop.prototype.allExTurn = function () {
 }
 
 Game_Troop.prototype.getIdsInCombatWith = function () {
+    if(!this._combatants)this._combatants = {};
     return Object.keys(this._combatants);
 }
 

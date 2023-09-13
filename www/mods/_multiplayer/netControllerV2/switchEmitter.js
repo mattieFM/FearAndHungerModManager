@@ -132,6 +132,7 @@ let eventAndSwitchEmitterInit = function () {
                     obj.b = val;
                     obj.s = 0;
                     let netController = MATTIE.multiplayer.getCurrentNetController();
+                    if(netController)
                     if(MATTIE.multiplayer.isActive) 
                     netController.emitSwitchEvent(obj);
                     if(MATTIE.multiplayer.devTools.eventLogger) console.log(`Game Switch ${i} set to ${val}`);
@@ -157,6 +158,7 @@ let eventAndSwitchEmitterInit = function () {
                 obj.b = val;
                 obj.s = 1;
                 let netController = MATTIE.multiplayer.getCurrentNetController();
+                if(netController)
                 if(MATTIE.multiplayer.isActive) 
                 netController.emitSwitchEvent(obj);
                 if(MATTIE.multiplayer.devTools.eventLogger)
@@ -220,6 +222,7 @@ Game_Interpreter.prototype.operateVariable = function(variableId, operationType,
                         obj.b = val;
                         obj.s = 2;
                         let netController = MATTIE.multiplayer.getCurrentNetController();
+                        if(netController)
                         if(MATTIE.multiplayer.isActive) 
                         netController.emitSwitchEvent(obj);
                         // if(MATTIE.multiplayer.devTools.varLogger)

@@ -157,6 +157,8 @@ class BattleController extends EventEmitter {
                 break;
         }
     }
+
+    
 }
 
 

@@ -28,7 +28,7 @@ MATTIE.multiplayer.renderer._renderNetPlayers = function(target) {
 
                 
                 p2.name = netPlayer.name;
-                let p2Sprite = new Sprite_Character(p2);
+                let p2Sprite = new MATTIE.multiplayer.netSpriteChar(p2);
                 if(MATTIE.multiplayer.devTools.shouldTint) {
                     if(!MATTIE.multiplayer.devTools.consistentTint){
                         MATTIE.multiplayer.devTools.consistentTint = MATTIE.multiplayer.devTools.getTint()
@@ -55,3 +55,23 @@ MATTIE.multiplayer.renderer._renderNetPlayers = function(target) {
 
 
 }
+
+
+//-----------------------------------------------------------------------------
+// netSpriteChar
+//
+// The sprite for displaying a character.
+
+MATTIE.multiplayer.netSpriteChar = function () {
+    this.initialize.apply(this, arguments);
+}
+
+MATTIE.multiplayer.netSpriteChar.prototype = Object.create(Sprite_Character.prototype);
+MATTIE.multiplayer.netSpriteChar.prototype.constructor = MATTIE.multiplayer.netSpriteChar;
+
+MATTIE.multiplayer.netSpriteChar.prototype.updateVisibility = function() {
+    Sprite_Character.prototype.updateVisibility.call(this);
+    if(!this._character.isOnMap()){
+        this.visible = false;
+    }
+};

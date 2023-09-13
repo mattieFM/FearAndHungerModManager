@@ -6,7 +6,6 @@ MATTIE.quickSaves = MATTIE.quickSaves || {};
 MATTIE.quickSaves.quickSaveId = 9998;
 function initQuickSave (){
     Input.addKeyBind('l', ()=>{
-        console.log("here")
         $gameSystem.onBeforeSave();
         DataManager.saveGame(MATTIE.quickSaves.quickSaveId,true);
     }, "Quick Save", 1)

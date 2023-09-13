@@ -11,7 +11,7 @@ MATTIE.betterCrowMauler.spawnInterval = 10000;
  *  @description the chance that crow mauler will spawn every interval 
  *  @default .05
  * */
-MATTIE.betterCrowMauler.spawnChance = .05;
+MATTIE.betterCrowMauler.spawnChance = .01;
 
 /**
  *  @description the chance that crow mauler will follow you into the next room
@@ -29,7 +29,7 @@ MATTIE.betterCrowMauler.despawnChance = .15;
  * @description the chance of crow mauler entering someones battle
  * @default .01
  */
-MATTIE.betterCrowMauler.combatEnterChance = .01;
+MATTIE.betterCrowMauler.combatEnterChance = .005;
 
 MATTIE.betterCrowMauler.crowController = function () {
     this.disableBaseCrowMauler();
@@ -86,17 +86,28 @@ MATTIE.betterCrowMauler.crowController.prototype.spawnTick = function(){
 
 MATTIE.betterCrowMauler.crowController.prototype.battleSpawnTick = function(){
     if(!this.isDead() && $gameParty.inBattle() && this.shouldEnterCombat() && !this.inBattle){
-        this.inBattle = true;
         MATTIE.msgAPI.footerMsg("A terrifying presence has entered the room...")
+        MATTIE.msgAPI.footerMsg("A terrifying presence is getting closer");
+        
         setTimeout(() => {
             MATTIE.msgAPI.footerMsg("A terrifying presence is behind you");
+            
             setTimeout(() => {
-                let additionalTroop = new MATTIE.troopAPI.runtimeTroop(MATTIE.static.troops.crowMauler, 100, 0)
-                additionalTroop.spawn();
-            }, 3000);
+                this.invadeBattle();
+            }, 35000);
             
         }, 5000);
        
+    }
+    
+}
+
+/** @description spawns crow mauler into the current battle */
+MATTIE.betterCrowMauler.crowController.prototype.invadeBattle = function(net=false){
+    if($gameParty.inBattle()){
+        this.inBattle = true;
+        let additionalTroop = new MATTIE.troopAPI.runtimeTroop(MATTIE.static.troops.crowMauler, 500, 0)
+        additionalTroop.spawn(net);
     }
     
 }
@@ -147,16 +158,12 @@ MATTIE.betterCrowMauler.crowController.prototype.findClosestSpawnPoint = functio
             if(thisDist < dist) {
                 if(MATTIE.isPassableAnyDir(element)){
                     dist = thisDist;
-                closest = element
+                    closest = element
                 }
                 
             }
         }
     }
-    
-
-
-
     return closest;
 }
 
@@ -177,10 +184,8 @@ MATTIE.betterCrowMauler.crowController.prototype.enter = function(){
  * @description spawn the crow mauler event removing the previous one if it exists
  */
 MATTIE.betterCrowMauler.crowController.prototype.spawn = function(){
-    console.log("spawned")
         if(!this.hasSpawned && !this.isDead() && !$gameParty.inBattle()){
             this.onScreen = true;
-            console.log("spawned in if");
             let spot = this.findClosestSpawnPoint($gamePlayer.x, $gamePlayer.y);
             if(spot){
                 this.self = this.createCrowObj();
@@ -232,8 +237,7 @@ MATTIE.betterCrowMauler.crowController.prototype.shouldDespawn = function(){
  * */
 
 MATTIE.betterCrowMauler.crowController.prototype.shouldEnterCombat = function(){
-    if(MATTIE.multiplayer) return false;
-    return !MATTIE.multiplayer && !this.isDead() && !this.onScreen && MATTIE.util.randChance(MATTIE.betterCrowMauler.combatEnterChance);
+    return !this.isDead() && !this.onScreen && MATTIE.util.randChance(MATTIE.betterCrowMauler.combatEnterChance);
 }
 
 

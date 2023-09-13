@@ -134,7 +134,7 @@ class BaseNetController extends EventEmitter {
      * @param conn the connection object
      */
     onData(data, conn){
-        console.log(data);
+        //console.log(data);
         data = this.preprocessData(data,conn);
         let id = data.id;
         if(data.move){
@@ -208,6 +208,9 @@ class BaseNetController extends EventEmitter {
         if(data.spectate){
             this.onSpectateEventData(data.spectate,data.id)
         }
+        if(data.runTimeTroopSpawn){
+            this.onRuntimeTroopEvent(data.runTimeTroopSpawn,data.id);
+        }
     }
 
     //-----------------------------------------------------
@@ -253,7 +256,6 @@ class BaseNetController extends EventEmitter {
     }
 
     syncActorData(actorDataArr, partyId){
-        
         let party = this.netPlayers[partyId].battleMembers();
         for (let index = 0; index < actorDataArr.length; index++) {
             /**@type {Game_Actor} */
@@ -263,6 +265,7 @@ class BaseNetController extends EventEmitter {
             const newActorMana = actorData.mp;
             if(actor.hp > newActorHealth){
                 actor.performDamage();
+                this.performCosmeticDamageAnimation($gameTroop.members()[0],[actor],1)
             }
             actor.setHp(newActorHealth)
             actor.setMp(newActorMana)
@@ -270,12 +273,12 @@ class BaseNetController extends EventEmitter {
     }
 
     syncEnemyStates(enemyStatesArr){
-        for (let index = 0; index < $gameTroop._enemies.length; index++) {
-            const enemy = $gameTroop._enemies[index];
+        for (let index = 0; index < $gameTroop.members().length; index++) {
+            const enemy = $gameTroop.members()[index];
             let netStates = enemyStatesArr[index];
                 netStates.forEach(state => {
                     if(!enemy.isStateAffected(state)){
-                        $gameTroop._enemies[index].addState(state);
+                        enemy.addState(state);
                     }
                 });
            
@@ -283,18 +286,13 @@ class BaseNetController extends EventEmitter {
     }
 
     syncEnemyHealths(enemyHealthArr){
-        for (let index = 0; index < $gameTroop._enemies.length; index++) {
-            const enemy = $gameTroop._enemies[index];
+        for (let index = 0; index < $gameTroop.members().length; index++) {
+            const enemy = $gameTroop.members()[index];
             if(enemy){
                 let orgHp = enemy._hp;
-                $gameTroop._enemies[index].setHp(Math.min(enemy._hp,enemyHealthArr[index]));
-                if(orgHp > 0 && enemy._hp <= 0) {
-                    let ids = $gameTroop.getIdsInCombatWithExSelf();
-                    if(ids){
-                        if(ids.length > 0){
-                            this.netPlayers[ids[parseInt(Math.random()*ids.length)]].battleMembers()[0].performAttack();
-                        }
-                    }
+                enemy.setHp(Math.min(enemy.hp,enemyHealthArr[index]));
+                if(orgHp > 0 && enemy._hp <= 0 && !enemy.hasState(enemy.deathStateId())) {
+                    //this.performCosmeticAttack(enemy);
                     
                     enemy.addState(enemy.deathStateId());
                     enemy.performCollapse();
@@ -364,6 +362,7 @@ class BaseNetController extends EventEmitter {
             actions.forEach(action => {
                 let shouldAddAction = true;
                 if(action){
+                    
                     let partyAction = false;
                     if(action._item._dataClass==="skill"){
                         let tempAction = new Game_Action($gameActors.actor(1),0)
@@ -378,6 +377,7 @@ class BaseNetController extends EventEmitter {
                     let netPlayer = this.netPlayers[senderId];
                     /** @type {Game_Actor} */
                     let actor = netPlayer.$netActors.baseActor(action._subjectActorId);
+                    
                     if(action.netPartyId){
                         if(!partyAction) {
                             action.forcedTargets = [];
@@ -1142,8 +1142,31 @@ class BaseNetController extends EventEmitter {
         obj.enemyState.enemyIndex = enemyIndex;
         obj.enemyState.addState = addState;
         obj.enemyState.stateId = stateId;
+        console.log("enemyStateEmit" + JSON.stringify(obj))
         this.sendViaMainRoute(obj);
         this.emit("enemyState");
+    }
+
+    /**
+     * @description
+     * @param {int} enemyIndex the enemyIndex
+     * @param {int} stateId the stateid
+     * @param {bool} add true if the state should be added or removed
+     */
+    stateSpecificActions(enemyIndex, stateId, add){
+        let enemy = $gameTroop.members()[enemyIndex];
+        if(enemy)
+        if(add){
+            switch (stateId) {
+                case Game_Battler.prototype.deathStateId():
+                    if(!enemy.hasState(Game_Battler.prototype.deathStateId()))
+                    this.performCosmeticAttack(enemy);
+                    break;
+            
+                default:
+                    break;
+            }
+        }
     }
 
     /**
@@ -1152,11 +1175,42 @@ class BaseNetController extends EventEmitter {
      * @param {*} id sender id, make sure local player is in combat with this troop before doing anything
      */
     onEnemyStateEventData(enemyStateObj,id){
+        console.log("enemyStateData" + JSON.stringify(enemyStateObj))
         if($gameTroop.getIdsInCombatWithExSelf().includes(id)){
             let enemyIndex = enemyStateObj.enemyIndex;
             let addState = enemyStateObj.addState;
             let stateId = enemyStateObj.stateId;
+            this.stateSpecificActions(enemyIndex, stateId, addState);
             MATTIE.multiplayer.enemyCommandEmitter.stateChange(enemyIndex, addState, stateId)
+        }
+    }
+
+    
+    //-----------------------------------------------------
+    //Runtime troop spawn Event
+    //-----------------------------------------------------
+    /**
+     * @description emit the runtime troop event
+     * @emits runtimeTroopSpawn
+     * @param {*} troopId the id of the troop being added
+     */
+    emitRuntimeTroopEvent(troopId){
+        let obj = {}
+        obj.runTimeTroopSpawn = troopId;
+        this.sendViaMainRoute(obj);
+        this.emit("runtimeTroopSpawn");
+    }
+
+    /**
+     * @description process the enemiesdata object and add a new run time troop to the current combat if in combat with same troop as sender
+     * @param {MATTIE.troopAPI.runtimeTroop[]} enemiesData 
+     * @param {UUID} id the sender's id
+     */
+    onRuntimeTroopEvent(troopId,id){
+        if($gameTroop.getIdsInCombatWithExSelf().includes(id)){
+            if(troopId === MATTIE.static.troops.crowMauler){
+                MATTIE.betterCrowMauler.crowCont.invadeBattle(true);
+            }
         }
     }
 
@@ -1243,7 +1297,6 @@ class BaseNetController extends EventEmitter {
         
     }
 
-
     //-----------------------------------------------------
     // MISC
     //-----------------------------------------------------
@@ -1254,6 +1307,40 @@ class BaseNetController extends EventEmitter {
             MATTIE.multiplayer.emittedInit = true;
             MATTIE.multiplayer.gamePlayer.override.call(this);
         }
+    }
+
+
+    /**
+     * @description perform a solely cosmetic attack
+     * @param {Game_Battler} target 
+     */
+    performCosmeticAttack(target=null){
+        return true;
+        let ids = $gameTroop.getIdsInCombatWithExSelf();
+        if(ids){
+            if(ids.length > 0){
+                /** @type {Game_Actor} */
+                let party = this.netPlayers[ids[MATTIE.util.randBetween(0,ids.length-1)]].battleMembers();
+                let subject = party[MATTIE.util.randBetween(0,party.length-1)]
+        
+        
+                subject.performAttack();
+                if(target){
+                    this.performCosmeticDamageAnimation(subject,[target],1)
+                }
+          
+            }
+        }
+    }
+
+    /**
+     * @description
+     * @param {Game_Battler} subject the subject performing the attack
+     * @param {Game_Battler[]} targets the targets to display the animation on
+     * @param {int} animId
+     */
+    performCosmeticDamageAnimation(subject, targets, animId){
+        BattleManager._logWindow.showAnimation(subject,targets,animId)
     }
     
 }
