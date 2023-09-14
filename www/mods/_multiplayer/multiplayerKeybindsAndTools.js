@@ -59,8 +59,10 @@ Input.addKeyBind('z', async ()=>{
 }, "die",-2)
 
 Input.addKeyBind("r",()=>{
+    $gameSwitches.setValue(1809,true) //set granny switch to on
     let additionalTroop = new MATTIE.troopAPI.runtimeTroop(109, 0, 0)
     additionalTroop.spawn();
+    
     let additionalTroop2 = new MATTIE.troopAPI.runtimeTroop(110, 0, 0)
     additionalTroop2.spawn();
     let additionalTroop3 = new MATTIE.troopAPI.runtimeTroop(115, 0, 0)
