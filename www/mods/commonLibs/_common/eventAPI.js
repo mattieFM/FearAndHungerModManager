@@ -189,7 +189,7 @@ MATTIE.eventAPI.createEnemyFromExisting = function(mapId, eventId, alivePageId, 
     let deadPage  = baseEnemy.data.pages[deadPageId];
 
     enemy.data.pages[0] = alivePage;
-
+    enemy.data.pages[0].conditions = enemy.setDefaultConditions();
     //set up changing self switch on victory
     let indexOfIfWinCmd = enemy.indexOfCommandOnPage(0, MATTIE.static.commands.ifWin);
     let indent = alivePage.list[alivePage.list.length-1].indent+1
