@@ -14,7 +14,7 @@ MATTIE_RPG.TroopApi_Game_Troop_Initialize = Game_Troop.prototype.initialize;
 Game_Troop.prototype.initialize = function() {
     MATTIE_RPG.TroopApi_Game_Troop_Initialize.call(this);
     /** @type {MATTIE.troopAPI.runtimeTroop[]} an array of all additional troops */
-    this._additionalTroops = {};
+    if(!this._additionalTroops)this._additionalTroops = {};
 };
 
 /** @description the base function to setup a game troop */
@@ -29,7 +29,7 @@ Game_Troop.prototype.setup = function(troopId, xOffset =0, yOffset =0){
     MATTIE_RPG.TroopApi_Game_Troop_Setup.call(this,troopId)
     this._interpreter.setTroop(this);
     /** @type {MATTIE.troopAPI.runtimeTroop[]} an array of all additional troops */
-    this._additionalTroops = {};
+    if(!this._additionalTroops)this._additionalTroops = {};
 }
 
 /** 
@@ -69,9 +69,10 @@ Game_Troop.prototype.forEachAdditionalTroop = function(cb){
  * 
 */
 Game_Troop.prototype.addRunTimeTroop = function(troop){
-    console.log(troop)
     this._additionalTroops[troop.getMId()] = troop;
     this.makeUniqueNames();
+    console.log(troop.getMId())
+    console.log(this._additionalTroops)
 }
 
 /** 
@@ -82,7 +83,7 @@ Game_Troop.prototype.addRunTimeTroop = function(troop){
  * 
 */
 Game_Troop.prototype.getMId = function(){
-    return this._MTroopId || !(this instanceof MATTIE.troopAPI.runtimeTroop) ? -1 : -2; 
+    return this._MTroopId ? this._MTroopId : !(this instanceof MATTIE.troopAPI.runtimeTroop) ? -1 : -2; 
 }
 
 /**
@@ -116,9 +117,9 @@ MATTIE_RPG.TroopApi_Game_Troop_UpdateInterpreter = Game_Troop.prototype.updateIn
  */
 Game_Troop.prototype.updateInterpreter = function() {
     MATTIE_RPG.TroopApi_Game_Troop_UpdateInterpreter.call(this);
-    for (let index = 0; index < this._additionalTroops.length; index++) {
+    this.forEachAdditionalTroop((additionalTroop) =>{
         additionalTroop.updateInterpreter();
-    }
+    });
 }
 
 /** @description  the game troops function to check conditionals */
@@ -224,6 +225,8 @@ MATTIE.troopAPI.runtimeTroop.prototype.addSpritesToCurrentBattleSet = function()
 MATTIE.troopAPI.runtimeTroop.prototype.spawn = function(){
     if($gameParty.inBattle()){ //check if the game party is in battler
         if($gameTroop){ //check if there is a current troop
+            this.setupTroopId();
+            console.log(this.getMId())
             this.setupBattleEvent(); //setup battle event 
             $gameTroop.addRunTimeTroop(this); //pass this runtime troop to the active troop
             this.addSpritesToCurrentBattleSet();
