@@ -40,6 +40,11 @@ MATTIE.menus.mainMenu = MATTIE.menus.mainMenu || {};
 // Plugin Manager
 //----------------------------------------------------------------
 
+
+//----------------------------------------------------------------
+// Plugin Manager
+//----------------------------------------------------------------
+
 /**
  * @description the plugin manager loadscript function, this will load a script into the DOM
  * @param {*} plugins 
@@ -99,7 +104,6 @@ DataManager.loadDatabase = function() {
             }
         }, 50);
     })
-    
 };
 
 
@@ -573,6 +577,7 @@ async function () {
             
 
         }); 
+
     });
         
 
