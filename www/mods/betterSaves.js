@@ -87,7 +87,7 @@ MATTIE.betterSaves = {};
                     var saveData = MATTIE.DataManager.loadAndReturnSave(index)
                     if(saveData){
                         var diff = MATTIE.GameInfo.getDifficulty(saveData.$gameSwitches);
-                        var name = JSON.stringify(saveData.$gameActors._data[saveData.$gameParty._actors[0]]._name);
+                        var name = JSON.stringify($gameParty.leader().name);
                         
                         globalInfo[index].difficulty=diff;
                         globalInfo[index].name=name.replace("\"","").replace("\"","");
@@ -125,7 +125,7 @@ MATTIE.betterSaves = {};
         var bottom = rect.y + rect.height;
         if (rect.width >= 420) {
             if (valid) {
-                this.drawPartyCharacters(info, rect.x + 220, rect.y);
+                this.drawPartyCharacters(info, rect.x + 220, MATTIE.global.isTermina() ? rect.y: bottom-4);
             }
             this.drawGameTitle(info, rect.x + 192, rect.y, rect.width - 192, rect);
         }
