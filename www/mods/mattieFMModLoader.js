@@ -24,7 +24,7 @@
 var MATTIE_ModManager = MATTIE_ModManager || {};
 var MATTIE = MATTIE || {};
 var MATTIE_RPG = MATTIE_RPG || {};
-MATTIE.ignoredPlugins = ["HIME_PreTitleEvents"];
+
 MATTIE.isDev = false;
 
 MATTIE.global = MATTIE.global || {};
@@ -72,7 +72,7 @@ PluginManager.setup = function(plugins) {
     plugins.forEach(function(plugin) {
         console.log(plugin.name)
         if (plugin.status && !this._scripts.contains(plugin.name)) {
-            if(!MATTIE.ignoredPlugins.includes(plugin.name)){ //this does not work as we load after the plugins, easy enough to implment later when we want to optimze tarrax lighting, but for not im going to leave it
+            if(!MATTIE.ignoredPlugins().includes(plugin.name)){ //this does not work as we load after the plugins, easy enough to implment later when we want to optimze tarrax lighting, but for not im going to leave it
                 this.setParameters(plugin.name, plugin.parameters);
                 promises.push(this.loadScript(plugin.name + '.js'));
                 this._scripts.push(plugin.name);
