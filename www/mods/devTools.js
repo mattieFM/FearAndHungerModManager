@@ -8,15 +8,15 @@ MATTIE.devTools = MATTIE.devTools || {};
 
     Input.addKeyBind('p', ()=>{
         SceneManager.push(MATTIE.scenes.Scene_Dev);
-    }, "CHEAT", 1)
+    }, "CHEAT (DEV)", 1)
 
     Input.addKeyBind(';', ()=>{
         SceneManager.push(Scene_Debug);
-    }, "DEBUG", -2)
+    }, "DEBUG (DEV)", -2)
 
     Input.addKeyBind('m', ()=>{
         SceneManager.push(MATTIE.scenes.Scene_Dev);
-    }, "DEV MENU", -2)
+    }, "DEV MENU (DEV)", -2)
 
 
 
@@ -24,7 +24,7 @@ MATTIE.devTools = MATTIE.devTools || {};
 
     Input.addKeyBind('2', ()=>{
         SceneManager.onError(new Error("hiya im an error"))
-    }, "THROW ERROR", -2)
+    }, "THROW ERROR (DEV)", -2)
     
     Input.addKeyBind('v', ()=>{
         let amount = 1;

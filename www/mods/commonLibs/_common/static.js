@@ -58,9 +58,14 @@ MATTIE.static.switch.crowMaulerCanSpawn = 0;
 MATTIE.static.switch.crowMaulerDead = 0;
 /** @description true if crow mauler is disabled */
 MATTIE.static.switch.crowMaulerDisabled = 0;
+
+/** @description the switch that handles most coin flip instant kill / grab attack */
+MATTIE.static.switch.neckBreak = 0
+
 //selfSwitch ids
 MATTIE.static.switch.syncedSelfSwitches = [];
 MATTIE.static.switch.ignoredSelfSwitches = [];
+
 //states
 /** this is the state that governs "death" in combat */
 MATTIE.static.states.knockout = 0;
@@ -90,16 +95,17 @@ MATTIE.static.events.images.shiny = {};
 MATTIE.static.events.images.coin = MATTIE.static.events.images.shiny;
 
 MATTIE.static.update = function(){
+    MATTIE.global.checkGameVersion(); // make sure version is valid
     //common events
     MATTIE.static.commonEvents.bloodportal = null;
 
-    if(MATTIE.global.version === 1){
+    if(MATTIE.global.isFunger()){
         //static values specific to funger 1
 
 
         MATTIE.static.switch.crowMaulerCanSpawn = 786;
         MATTIE.static.switch.crowMaulerDead = 771;
-
+        MATTIE.static.switch.neckBreak = 16;
         MATTIE.static.switch.crowMaulerDisabled = 2953;
 
         //actors
@@ -167,12 +173,8 @@ MATTIE.static.update = function(){
         //common events
         MATTIE.static.commonEvents.bloodportal = $dataCommonEvents[152];
 
-
-        MATTIE.eventAPI.getEventOnMap(287,11).then((result) => {
-            MATTIE.static.events.crowMauler = result
-        }).catch((err) => {
+        MATTIE.static.events.crowMauler = (()=>MATTIE.eventAPI.getEventOnMap(287,11))
             
-        });;
 
         //states
         MATTIE.static.states.knockout = 0;
@@ -940,8 +942,21 @@ MATTIE.static.update = function(){
         MATTIE.static.events.images.shiny = MapEvent.generateImage(0,"!Flame",6,0,0); //the shiny coin incon
         MATTIE.static.events.images.coin =  MATTIE.static.events.images.shiny;
 
-    }else if (MATTIE.global.version === 2){
+    }else if (MATTIE.global.isTermina()){
+        console.log("termina")
         //static values specific to funger 2
+
+        //skills
+        MATTIE.static.skills.bloodportal = $dataSkills[148];
+        MATTIE.static.skills.hurting = $dataSkills[12];    
+
+        //items
+        MATTIE.static.items.emptyScroll = $dataItems[88];
+
+        //common events 
+        MATTIE.static.commonEvents.bloodportal = $dataCommonEvents[152];
+
+    
     }   
     //static values shared between both games
 

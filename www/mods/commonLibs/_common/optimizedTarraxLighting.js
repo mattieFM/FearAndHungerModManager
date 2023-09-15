@@ -181,481 +181,573 @@ Imported.TerraxLighting = true;
 	
 
 (function() {
-	var lightarray_id = [];
-	var tilearray = [];
-	var lightarray_state = [];
-	var lightgrow_value;
-	var lightgrow_target;
-	var lightgrow_speed;
-	var oldmap = 0;
-	var oldseconds = 0;
-    var playercolor = '#FFFFFF';  
-    var playerflicker = false; 
-    var playerbrightness = 0.0;
-    var flickerradiusshift = 7;
-    var flickercolorshift = 10;
-    var playerflashlight = false;
-    var flashlightlength = 8;
-    var flashlightwidth = 12; 
-    var flashlightdensity = 3;
-    var scriptactive = true;
-    var daynightspeed = 10;
-    var daynightcycle = 17;
-    var daynighttimer = 0;
-    var daynightstop = false;
-    var daynightcolors = [  '#000000', '#000000', '#000000', '#000000',
-      						'#000000', '#000000', '#666666', '#AAAAAA',
-      						'#FFFFFF', '#FFFFFF', '#FFFFFF', '#FFFFFF',
-      						'#FFFFFF', '#FFFFFF', '#FFFFFF', '#FFFFFF',
-      						'#FFFFFF', '#FFFFFF', '#AAAAAA', '#666666',
-      						'#000000', '#000000', '#000000', '#000000' ];       						
-	var daynightHoursInDay = 24;
-	var parameters = PluginManager.parameters('TerraxLighting');
-    var player_radius = Number(parameters['Player radius'] || 300);	
-	var reset_each_map = parameters['Reset Lights'] || No;  
-	var daynightsave = Number(parameters['Save DaynightHours'] || 10);	
-	var daynightsavemin = Number(parameters['Save DaynightMinutes'] || 11);
-	var daynightsavesec = Number(parameters['Save DaynightSeconds'] || 12);
-	var flashlightoffset = Number(parameters['Flashlight offset'] || 0);
-	var killswitch = parameters['Kill Switch'] || No;
-	
-	var maxX = Number(parameters['Screensize X'] || 866);
-	var maxY = Number(parameters['Screensize Y'] || 630);
-	
-	var daynightdebug = false;
-	
-	var tint_value = '#000000';
-	var tint_timer = 0;
-	//var tint_speed = 60;
-	//var tint_target = '#000000';
-	var tint_oldseconds = 0;
-	
-	var move_event_x = [];
-	var move_event_y = [];
-	var move_event_id = [];
-	var move_event_dir = [];
-	
-	var tiletest = false;
-	var moghunter = false;
-	var moghunter_phase = 0;
-	var mogtint = [ '#555555', '#FFEFD5', '#FFFFFF', '#EEE8AA', '#555555', '#111111' ];    
-	
-    var _Game_Interpreter_pluginCommand = Game_Interpreter.prototype.pluginCommand;
-    Game_Interpreter.prototype.pluginCommand = function(command, args) {
-        _Game_Interpreter_pluginCommand.call(this, command, args);
-        command = command.toLowerCase();
-              
 
-        // ************* TILE TAGS ***************
-
-        if (command === 'tileblock' || command === 'regionblock' || command === 'tilelight' || command === 'regionlight' || command === 'tilefire' || command === 'regionfire') {
-	        var tiletype = 0;
-	        if (command === 'tileblock') { tiletype = 1; }
-	        if (command === 'regionblock') { tiletype = 2; }
-	  	    if (command === 'tilelight') { tiletype = 3; }
-	  	    if (command === 'regionlight') { tiletype = 4; }	
-	  	    if (command === 'tilefire') { tiletype = 5; }
-	  	    if (command === 'regionfire') { tiletype = 6; }	  	            
-	 		var tilenumber = Number(args[0]);
- 			var tile_on = 0;
- 			if (args[1] === 'on' || args[1] === 'ON') {
- 				var tile_on = 1;
-		 	} 
-	 		var tilecolor = args[2];
-	 		var isValidColor  = /(^#[0-9A-F]{6}$)|(^#[0-9A-F]{3}$)/i.test(tilecolor); 	
-	 		if (!isValidColor) {
-		 		if ( tiletype === 1 || tiletype === 2) {
-	 				tilecolor = '#000000';
- 				} else {
-	 				tilecolor = '#FFFFFF';
- 				}
-			}
-			
-			var tileradius = 100;
-			var tilebrightness = 0.0;
-			var shape = 0;
-			var x1 = 0;
-			var y1 = 0;
-			var x2 = 0;
-			var y2 = 0;
-			if ( tiletype === 1 || tiletype === 2) {
-					if (args.length > 3) { shape = args[3]; }
-					if (args.length > 4) { x1 = args[4]; }
-					if (args.length > 5) { y1 = args[5]; }
-					if (args.length > 6) { x2 = args[6]; }
-					if (args.length > 7) { y2 = args[7]; }
-			} else {
-					if (args.length > 3) { tileradius = args[3]; }
-					if (args.length > 4) { tilebrightness = args[4]; }
-			} 
-			
-			var tilefound = false;
-			
-			for (var i = 0; i < tilearray.length; i++) {
-				tilestr = tilearray[i];
-				var tileargs = tilestr.split(";");
-				if (tileargs[0] == tiletype && tileargs[1] == tilenumber ) {
-					tilefound = true;
-					if ( tiletype === 1 || tiletype === 2) {
-						tilearray[i] = tiletype + ";" + tilenumber + ";" + tile_on + ";" + tilecolor + ";" + shape + ";" + x1 + ";" + y1 + ";" + x2 + ";" + y2;
-					} else {
-						tilearray[i] = tiletype + ";" + tilenumber + ";" + tile_on + ";" + tilecolor + ";" + tileradius + ";" + tilebrightness;
-					}	
-						//Graphics.Debug('Set',tilearray[i]);
-				}
-			}
-			
-			if (tilefound === false) {
-				if ( tiletype === 1 || tiletype === 2) {
-					tiletag = tiletype + ";" + tilenumber + ";" + tile_on + ";" + tilecolor + ";" + shape + ";" + x1 + ";" + y1 + ";" + x2 + ";" + y2;
-				} else {
-					tiletag = tiletype + ";" + tilenumber + ";" + tile_on + ";" + tilecolor + ";" + tileradius + ";" + tilebrightness;
-				}
-				tilearray.push(tiletag);	
-				//Graphics.Debug('Push',tiletag);			
-			}	 
-			$gameVariables.setTileArray(tilearray);   
-	          
-    	}
-    	
-   
-	    // ************* TINT  *******************        
-        if (command === 'tint') {
-	     
-        	if (args[0] === 'set') { 
-	        	tint_value = args[1];
-	        	Terrax_tint_target = tint_value;
-	        	$gameVariables.setTintValue(tint_value);
-        	}  
-        	if (args[0] === 'fade') { 
-	        	Terrax_tint_target = args[1];
-	        	Terrax_tint_speed = args[2];
-	        	$gameVariables.setTintValue(Terrax_tint_target);
-        	}	      
-        	
-            //Graphics.Debug('TINT',tint_value+' '+tint_target+' '+tint_speed);	
-    	}
-    	
- 	    // ************* MOGHUNTER TIMESYSTEM COMPATIBLE  *******************        
-        if (command === 'tls_moghunter') {
-        	if (args[0] === 'on') { 
-	        	moghunter = true;
-        		$gameVariables.setMog(true);
-        	}  
-        	if (args[0] === 'off') {
-	        	moghunter = false; 
-	        	Terrax_tint_target = '#000000';
-	        	Terrax_tint_speed = 5;
-	        	$gameVariables.setTintValue(Terrax_tint_target);
-				$gameVariables.setMog(false);
-        	}	      
-        	if (args[0] === 'tint') { 
-	        		
-	        	if (args.length = 7) {
-					for (var i = 0; i <= 5; i++) {
-						var tintcolor = args[i];
-	    			 	var isValidColor  = /(^#[0-9A-F]{6}$)|(^#[0-9A-F]{3}$)/i.test(tintcolor); 	    
-						if (isValidColor == true) {
-							//Graphics.Debug('TINT',tintcolor);
-							mogtint[i] = tintcolor;
-							$gameVariables.setmogtintarray(mogtint); 
-						}
-					}
-	    		}
-        	} 
-    	}
-    	
-	
-        // ************* DAYNIGHT *******************
-        if (command === 'daynight') {
-			
-	   		if (args[0] === 'speed') {   
-		   		daynightspeed = Number(args[1]);  
-	        	if (daynightspeed == 0) {
-		       		daynightspeed = 1000;
-		       		daynightstop = true;
-	        	} else {
-	        		daynightstop = false;
-		        }	
-		        $gameVariables.setSpeedDayNightSave(daynightspeed);
-	   		}
-	   		
-	   		if (args[0] === 'add') {   
-		   		var houradd = Number(args[1]); 
-		   		var minuteadd = 0;
-		   		if (args.length > 2) {
-		   			minuteadd = Number(args[2]); 
-	   			}
-	   			
-	   			var daynightminutes = Math.floor(daynighttimer/daynightspeed);
-	   			daynightminutes = daynightminutes + minuteadd;
-	   			if (daynightminutes > 60) {
-		   			daynightminutes = daynightminutes - 60;
-		   			daynightcycle = daynightcycle + 1; 
-	   			}					   			
-	   			daynightcycle = daynightcycle + houradd;
-		   		daynighttimer = daynightminutes * daynightspeed;
-		   		$gameVariables.setDayNightSaveMin(daynightminutes);
-		   		if (daynightsavemin > 0) {
-					$gameVariables.setValue(daynightsavemin, daynightminutes);			
-				}
-	        	if (daynightcycle < 0) {
-		       		daynightcycle = 0;
-				}
-	        	if (daynightcycle >= daynightHoursInDay) {
-		       		daynightcycle = daynightcycle - daynightHoursInDay;
-				}
-				if (daynightsave > 0) {
-					$gameVariables.setValue(daynightsave, daynightcycle);			
-				}
-				$gameVariables.setDayNightSave(daynightcycle);
-	   		}
-	   		
-	   		
-	   		if (args[0] === 'hour') {   
-		   		daynightcycle = Number(args[1]);  
-		   		if (args.length > 2) {
-		   			daynightminutes = Number(args[2]); 
-	   			} else {
-		   			daynightminutes = 0;
-	   			}
-		   		daynighttimer = daynightminutes * daynightspeed;
-		   		$gameVariables.setDayNightSaveMin(daynightminutes);
-		   		if (daynightsavemin > 0) {
-					$gameVariables.setValue(daynightsavemin, daynightminutes);			
-				}
-	        	if (daynightcycle < 0) {
-		       		daynightcycle = 0;
-				}
-	        	if (daynightcycle >= daynightHoursInDay) {
-		       		daynightcycle = (daynightHoursInDay-1);
-				}
-				if (daynightsave > 0) {
-					$gameVariables.setValue(daynightsave, daynightcycle);			
-				}
-				$gameVariables.setDayNightSave(daynightcycle);
-
-			}
-			
-			if (args[0] === 'hoursinday') { 
-				var old_value = daynightHoursInDay ; 
-		   		daynightHoursInDay = Number(args[1]);  
-	        	if (daynightHoursInDay < 0) {
-		       		daynightHoursInDay = 0;
-				}
-	        	if (daynightHoursInDay > old_value) {
-		       		for (var i = old_value; i < daynightHoursInDay; i++) {
-			       		daynightcolors.push('#FFFFFF');	
-		       		}	
-				}
-				$gameVariables.setDayNightColorArray(daynightcolors);
-				$gameVariables.setDayNightHoursInDay(daynightHoursInDay);
-			}
-			
-			if (args[0] === 'debug') {   
-					daynightdebug = true;
-			}
-			
-	   			   		
-	   		if (args[0] === 'color') {   
-		   		var hour = Number(args[1]);  
-	        	if (hour < 0) {
-		       		hour = 0;
-				}
-	        	if (hour >= daynightHoursInDay) {
-		       		hour = (daynightHoursInDay-1);
-				}
-				hourcolor = args[2];
-				var isValidColor  = /(^#[0-9A-F]{6}$)|(^#[0-9A-F]{3}$)/i.test(hourcolor); 	    
-				if (isValidColor) {
-					daynightcolors[hour] = hourcolor;
-   				}
-   				$gameVariables.setDayNightColorArray(daynightcolors);
-			}
-	   		
-	        
-		}
-       
-        // ************* FLASHLIGHT *******************
-        if (command === 'flashlight') {
-	        if (args[0] == 'on') {
-    			playerflashlight = true;
-    			if (args.length >= 1) { flashlightlength = args[1]; }
-    			if (args.length >= 2) { flashlightwidth = args[2]; }
-    			if (args.length >= 3) {
-	    			 playercolor = args[3];
-	    			 var isValidPlayerColor  = /(^#[0-9A-F]{6}$)|(^#[0-9A-F]{3}$)/i.test(playercolor); 	    
-					if (!isValidPlayerColor) {
-						playercolor = '#FFFFFF' 
-					}
-	    		}
-    			if (args.length >= 4) {
-	    			 flashlightdensity = args[4]; // density
-	    		}
-
-    			if (flashlightlength == 0 || isNaN(flashlightlength)) { flashlightlength = 8 }
-    			if (flashlightwidth == 0 || isNaN(flashlightwidth)) { flashlightwidth = 12 }
-    			if (flashlightdensity == 0 || isNaN(flashlightdensity)) { flashlightdensity = 3 }
-
-    			$gameVariables.setPlayerColor(playercolor);  
-    			$gameVariables.setFlashlightWidth(flashlightwidth); 
-    			$gameVariables.setFlashlightLength(flashlightlength); 
-    			$gameVariables.setFlashlightDensity(flashlightdensity); 
-			}
-	        if (args[0] === 'off') {
-    			playerflashlight = false;
-			}
-			$gameVariables.setFlashLight(playerflashlight);
-		} 
+	function init() {
+		let No = false;
+		var lightarray_id = [];
+		var tilearray = [];
+		var lightarray_state = [];
+		var lightgrow_value;
+		var lightgrow_target;
+		var lightgrow_speed;
+		var oldmap = 0;
+		var oldseconds = 0;
+		var playercolor = '#FFFFFF';  
+		var playerflicker = false; 
+		var playerbrightness = 0.0;
+		var flickerradiusshift = 7;
+		var flickercolorshift = 10;
+		var playerflashlight = false;
+		var flashlightlength = 8;
+		var flashlightwidth = 12; 
+		var flashlightdensity = 3;
+		var scriptactive = true;
+		var daynightspeed = 10;
+		var daynightcycle = 17;
+		var daynighttimer = 0;
+		var daynightstop = false;
+		var daynightcolors = [  '#000000', '#000000', '#000000', '#000000',
+								'#000000', '#000000', '#666666', '#AAAAAA',
+								'#FFFFFF', '#FFFFFF', '#FFFFFF', '#FFFFFF',
+								'#FFFFFF', '#FFFFFF', '#FFFFFF', '#FFFFFF',
+								'#FFFFFF', '#FFFFFF', '#AAAAAA', '#666666',
+								'#000000', '#000000', '#000000', '#000000' ];       						
+		var daynightHoursInDay = 24;
+		var parameters = PluginManager.parameters('TerraxLighting');
+		var player_radius = Number(parameters['Player radius'] || 300);	
+		var reset_each_map = parameters['Reset Lights'] || No;  
+		var daynightsave = Number(parameters['Save DaynightHours'] || 10);	
+		var daynightsavemin = Number(parameters['Save DaynightMinutes'] || 11);
+		var daynightsavesec = Number(parameters['Save DaynightSeconds'] || 12);
+		var flashlightoffset = Number(parameters['Flashlight offset'] || 0);
+		var killswitch = parameters['Kill Switch'] || No;
 		
-        // ******************* SET FIRE *******************
-        if (command === 'setfire') {
-	       
-			flickerradiusshift = args[0];
-			flickercolorshift = args[1];
-			$gameVariables.setFireRadius(flickerradiusshift);
-			$gameVariables.setFireColorshift(flickercolorshift);
-		}			
+		var maxX = Number(parameters['Screensize X'] || 866);
+		var maxY = Number(parameters['Screensize Y'] || 630);
 		
-
-		// ******************* FIRE *******************
-        if (command === 'fire') {
-    		playerflicker = true;
-    		$gameVariables.setFire(playerflicker);
-    		$gameVariables.setFireRadius(flickerradiusshift);
-			$gameVariables.setFireColorshift(flickercolorshift);
-	    } else {
-			playerflicker = false;   
-			$gameVariables.setFire(playerflicker);
-			$gameVariables.setFireRadius(flickerradiusshift);
-			$gameVariables.setFireColorshift(flickercolorshift);
-		}			
+		var daynightdebug = false;
 		
-        //var evid = this._eventId;
-        if (command === 'light' || command === 'fire') {
-	        
-	        //******************* Light radius 100 #FFFFFF ************************  	    
-	        if (args[0] == 'radius') {
-    			var newradius = Number(args[1]);
-    			if (newradius >= 0) {
-    				player_radius = newradius;
-    				lightgrow_value = newradius;
-    				lightgrow_target = newradius;		
-					$gameVariables.setRadiusSave(player_radius);
-				}
-				if (args.length > 2) {
-					playercolor = args[2];
-					var isValidPlayerColor  = /(^#[0-9A-F]{6}$)|(^#[0-9A-F]{3}$)/i.test(playercolor); 	    
-					if (!isValidPlayerColor) {
-						playercolor = '#FFFFFF'    
-					}
-					$gameVariables.setPlayerColor(playercolor);  
-				}
-			    // player brightness
-				if (args.length > 3) {
-					var brightness = 0.0;
-					var b_arg = args[3];
-					if (typeof b_arg != 'undefined') {
-					    var key = b_arg.substring(0,1);
-						if (key == 'b' || key == 'B') {
-							playerbrightness = Number(b_arg.substring(1))/100;
-							$gameVariables.setPlayerBrightness(playerbrightness);	
-						}	
-		    		}
-    			}
-			} 
-			
-			//******************* Light radiusgrow 100 #FFFFFF ************************  	    
-	        if (args[0] === 'radiusgrow') {
-		        var evid = this._eventId;
-		        //Graphics.printError('test',evid);
-    			var newradius = Number(args[1]);
-    			if (newradius >= 0) {
-    				//player_radius = newradius;
-	 				lightgrow_value = player_radius;
-					lightgrow_target = newradius;
-					if (args.length >= 4) {
-						if(player_radius > newradius) {
-							//shrinking
-							lightgrow_speed = (player_radius * 0.012) / Number(args[4]);
-						} else {
-							//growing
-							lightgrow_speed = (newradius * 0.012) / Number(args[4]);
-						}
-					}else {
-						lightgrow_speed = (Math.abs(newradius-player_radius))/500;	
-					}
-					//lightgrow_speed = (Math.abs(newradius-player_radius))/500;
-
-				}
-				// player color
-				if (args.length > 2) {
-					playercolor = args[2];
-					var isValidPlayerColor  = /(^#[0-9A-F]{6}$)|(^#[0-9A-F]{3}$)/i.test(playercolor); 	    
-					if (!isValidPlayerColor) {
-						playercolor = '#FFFFFF'    
-					}
-					$gameVariables.setPlayerColor(playercolor);  
-				}
-				// player brightness
-				if (args.length > 3) {
-					var brightness = 0.0;
-					var b_arg = args[3];
-					if (typeof b_arg != 'undefined') {
-					    var key = b_arg.substring(0,1);
-						if (key == 'b' || key == 'B') {
-							playerbrightness = Number(b_arg.substring(1))/100;
-							$gameVariables.setPlayerBrightness(playerbrightness);	
-						}	
-		    		}
-    			}
+		var tint_value = '#000000';
+		var tint_timer = 0;
+		//var tint_speed = 60;
+		//var tint_target = '#000000';
+		var tint_oldseconds = 0;
+		
+		var move_event_x = [];
+		var move_event_y = [];
+		var move_event_id = [];
+		var move_event_dir = [];
+		
+		var tiletest = false;
+		var moghunter = false;
+		var moghunter_phase = 0;
+		var mogtint = [ '#555555', '#FFEFD5', '#FFFFFF', '#EEE8AA', '#555555', '#111111' ];    
+		
+		var _Game_Interpreter_pluginCommand = Game_Interpreter.prototype.pluginCommand;
+		Game_Interpreter.prototype.pluginCommand = function(command, args) {
+			_Game_Interpreter_pluginCommand.call(this, command, args);
+			command = command.toLowerCase();
 				
-			} 
-			
-			// *********************** TURN SPECIFIC LIGHT ON *********************
- 			if (args[0] === 'on') {
-    	 		var lightid = Number(args[1]);
-    			var idfound = false;
-				for (var i = 0; i < lightarray_id.length; i++) {
-					if (lightarray_id[i] == lightid) {
-						idfound = true;
-						lightarray_state[i] = true;
+
+			// ************* TILE TAGS ***************
+
+			if (command === 'tileblock' || command === 'regionblock' || command === 'tilelight' || command === 'regionlight' || command === 'tilefire' || command === 'regionfire') {
+				var tiletype = 0;
+				if (command === 'tileblock') { tiletype = 1; }
+				if (command === 'regionblock') { tiletype = 2; }
+				if (command === 'tilelight') { tiletype = 3; }
+				if (command === 'regionlight') { tiletype = 4; }	
+				if (command === 'tilefire') { tiletype = 5; }
+				if (command === 'regionfire') { tiletype = 6; }	  	            
+				var tilenumber = Number(args[0]);
+				var tile_on = 0;
+				if (args[1] === 'on' || args[1] === 'ON') {
+					var tile_on = 1;
+				} 
+				var tilecolor = args[2];
+				var isValidColor  = /(^#[0-9A-F]{6}$)|(^#[0-9A-F]{3}$)/i.test(tilecolor); 	
+				if (!isValidColor) {
+					if ( tiletype === 1 || tiletype === 2) {
+						tilecolor = '#000000';
+					} else {
+						tilecolor = '#FFFFFF';
 					}
 				}
-				if (idfound == false) {
-					lightarray_id.push(lightid);
-					lightarray_state.push(true);					
-				}
-				//Graphics.printError('test',lightarray_id.length+' '+lightarray_state.length);
-				$gameVariables.setLightArrayId(lightarray_id);
-				$gameVariables.setLightArrayState(lightarray_state);				
-			}	
-			
-			// *********************** TURN SPECIFIC LIGHT OFF *********************
- 			if (args[0] === 'off') {
-    			var lightid = Number(args[1]);
-    			var idfound = false;
-				for (var i = 0; i < lightarray_id.length; i++) {
-					if (lightarray_id[i] == lightid) {
-						idfound = true;
-						lightarray_state[i] = false;
+				
+				var tileradius = 100;
+				var tilebrightness = 0.0;
+				var shape = 0;
+				var x1 = 0;
+				var y1 = 0;
+				var x2 = 0;
+				var y2 = 0;
+				if ( tiletype === 1 || tiletype === 2) {
+						if (args.length > 3) { shape = args[3]; }
+						if (args.length > 4) { x1 = args[4]; }
+						if (args.length > 5) { y1 = args[5]; }
+						if (args.length > 6) { x2 = args[6]; }
+						if (args.length > 7) { y2 = args[7]; }
+				} else {
+						if (args.length > 3) { tileradius = args[3]; }
+						if (args.length > 4) { tilebrightness = args[4]; }
+				} 
+				
+				var tilefound = false;
+				
+				for (var i = 0; i < tilearray.length; i++) {
+					tilestr = tilearray[i];
+					var tileargs = tilestr.split(";");
+					if (tileargs[0] == tiletype && tileargs[1] == tilenumber ) {
+						tilefound = true;
+						if ( tiletype === 1 || tiletype === 2) {
+							tilearray[i] = tiletype + ";" + tilenumber + ";" + tile_on + ";" + tilecolor + ";" + shape + ";" + x1 + ";" + y1 + ";" + x2 + ";" + y2;
+						} else {
+							tilearray[i] = tiletype + ";" + tilenumber + ";" + tile_on + ";" + tilecolor + ";" + tileradius + ";" + tilebrightness;
+						}	
+							//Graphics.Debug('Set',tilearray[i]);
 					}
 				}
-				if (idfound == false) {
-					lightarray_id.push(lightid);
-					lightarray_state.push(false);
-				}
-				$gameVariables.setLightArrayId(lightarray_id);
-				$gameVariables.setLightArrayState(lightarray_state); 
-				//Graphics.Debug('RESET3','RESET3');	
-				 
+				
+				if (tilefound === false) {
+					if ( tiletype === 1 || tiletype === 2) {
+						tiletag = tiletype + ";" + tilenumber + ";" + tile_on + ";" + tilecolor + ";" + shape + ";" + x1 + ";" + y1 + ";" + x2 + ";" + y2;
+					} else {
+						tiletag = tiletype + ";" + tilenumber + ";" + tile_on + ";" + tilecolor + ";" + tileradius + ";" + tilebrightness;
+					}
+					tilearray.push(tiletag);	
+					//Graphics.Debug('Push',tiletag);			
+				}	 
+				$gameVariables.setTileArray(tilearray);   
+				
 			}
 			
-			// **************************** RESET ALL SWITCHES ***********************
-			if (args[0] === 'switch' && args[1] === 'reset') {
-				// reset switches to false					
+	
+			// ************* TINT  *******************        
+			if (command === 'tint') {
+			
+				if (args[0] === 'set') { 
+					tint_value = args[1];
+					Terrax_tint_target = tint_value;
+					$gameVariables.setTintValue(tint_value);
+				}  
+				if (args[0] === 'fade') { 
+					Terrax_tint_target = args[1];
+					Terrax_tint_speed = args[2];
+					$gameVariables.setTintValue(Terrax_tint_target);
+				}	      
+				
+				//Graphics.Debug('TINT',tint_value+' '+tint_target+' '+tint_speed);	
+			}
+			
+			// ************* MOGHUNTER TIMESYSTEM COMPATIBLE  *******************        
+			if (command === 'tls_moghunter') {
+				if (args[0] === 'on') { 
+					moghunter = true;
+					$gameVariables.setMog(true);
+				}  
+				if (args[0] === 'off') {
+					moghunter = false; 
+					Terrax_tint_target = '#000000';
+					Terrax_tint_speed = 5;
+					$gameVariables.setTintValue(Terrax_tint_target);
+					$gameVariables.setMog(false);
+				}	      
+				if (args[0] === 'tint') { 
+						
+					if (args.length = 7) {
+						for (var i = 0; i <= 5; i++) {
+							var tintcolor = args[i];
+							var isValidColor  = /(^#[0-9A-F]{6}$)|(^#[0-9A-F]{3}$)/i.test(tintcolor); 	    
+							if (isValidColor == true) {
+								//Graphics.Debug('TINT',tintcolor);
+								mogtint[i] = tintcolor;
+								$gameVariables.setmogtintarray(mogtint); 
+							}
+						}
+					}
+				} 
+			}
+			
+		
+			// ************* DAYNIGHT *******************
+			if (command === 'daynight') {
+				
+				if (args[0] === 'speed') {   
+					daynightspeed = Number(args[1]);  
+					if (daynightspeed == 0) {
+						daynightspeed = 1000;
+						daynightstop = true;
+					} else {
+						daynightstop = false;
+					}	
+					$gameVariables.setSpeedDayNightSave(daynightspeed);
+				}
+				
+				if (args[0] === 'add') {   
+					var houradd = Number(args[1]); 
+					var minuteadd = 0;
+					if (args.length > 2) {
+						minuteadd = Number(args[2]); 
+					}
+					
+					var daynightminutes = Math.floor(daynighttimer/daynightspeed);
+					daynightminutes = daynightminutes + minuteadd;
+					if (daynightminutes > 60) {
+						daynightminutes = daynightminutes - 60;
+						daynightcycle = daynightcycle + 1; 
+					}					   			
+					daynightcycle = daynightcycle + houradd;
+					daynighttimer = daynightminutes * daynightspeed;
+					$gameVariables.setDayNightSaveMin(daynightminutes);
+					if (daynightsavemin > 0) {
+						$gameVariables.setValue(daynightsavemin, daynightminutes);			
+					}
+					if (daynightcycle < 0) {
+						daynightcycle = 0;
+					}
+					if (daynightcycle >= daynightHoursInDay) {
+						daynightcycle = daynightcycle - daynightHoursInDay;
+					}
+					if (daynightsave > 0) {
+						$gameVariables.setValue(daynightsave, daynightcycle);			
+					}
+					$gameVariables.setDayNightSave(daynightcycle);
+				}
+				
+				
+				if (args[0] === 'hour') {   
+					daynightcycle = Number(args[1]);  
+					if (args.length > 2) {
+						daynightminutes = Number(args[2]); 
+					} else {
+						daynightminutes = 0;
+					}
+					daynighttimer = daynightminutes * daynightspeed;
+					$gameVariables.setDayNightSaveMin(daynightminutes);
+					if (daynightsavemin > 0) {
+						$gameVariables.setValue(daynightsavemin, daynightminutes);			
+					}
+					if (daynightcycle < 0) {
+						daynightcycle = 0;
+					}
+					if (daynightcycle >= daynightHoursInDay) {
+						daynightcycle = (daynightHoursInDay-1);
+					}
+					if (daynightsave > 0) {
+						$gameVariables.setValue(daynightsave, daynightcycle);			
+					}
+					$gameVariables.setDayNightSave(daynightcycle);
+
+				}
+				
+				if (args[0] === 'hoursinday') { 
+					var old_value = daynightHoursInDay ; 
+					daynightHoursInDay = Number(args[1]);  
+					if (daynightHoursInDay < 0) {
+						daynightHoursInDay = 0;
+					}
+					if (daynightHoursInDay > old_value) {
+						for (var i = old_value; i < daynightHoursInDay; i++) {
+							daynightcolors.push('#FFFFFF');	
+						}	
+					}
+					$gameVariables.setDayNightColorArray(daynightcolors);
+					$gameVariables.setDayNightHoursInDay(daynightHoursInDay);
+				}
+				
+				if (args[0] === 'debug') {   
+						daynightdebug = true;
+				}
+				
+							
+				if (args[0] === 'color') {   
+					var hour = Number(args[1]);  
+					if (hour < 0) {
+						hour = 0;
+					}
+					if (hour >= daynightHoursInDay) {
+						hour = (daynightHoursInDay-1);
+					}
+					hourcolor = args[2];
+					var isValidColor  = /(^#[0-9A-F]{6}$)|(^#[0-9A-F]{3}$)/i.test(hourcolor); 	    
+					if (isValidColor) {
+						daynightcolors[hour] = hourcolor;
+					}
+					$gameVariables.setDayNightColorArray(daynightcolors);
+				}
+				
+				
+			}
+		
+			// ************* FLASHLIGHT *******************
+			if (command === 'flashlight') {
+				if (args[0] == 'on') {
+					playerflashlight = true;
+					if (args.length >= 1) { flashlightlength = args[1]; }
+					if (args.length >= 2) { flashlightwidth = args[2]; }
+					if (args.length >= 3) {
+						playercolor = args[3];
+						var isValidPlayerColor  = /(^#[0-9A-F]{6}$)|(^#[0-9A-F]{3}$)/i.test(playercolor); 	    
+						if (!isValidPlayerColor) {
+							playercolor = '#FFFFFF' 
+						}
+					}
+					if (args.length >= 4) {
+						flashlightdensity = args[4]; // density
+					}
+
+					if (flashlightlength == 0 || isNaN(flashlightlength)) { flashlightlength = 8 }
+					if (flashlightwidth == 0 || isNaN(flashlightwidth)) { flashlightwidth = 12 }
+					if (flashlightdensity == 0 || isNaN(flashlightdensity)) { flashlightdensity = 3 }
+
+					$gameVariables.setPlayerColor(playercolor);  
+					$gameVariables.setFlashlightWidth(flashlightwidth); 
+					$gameVariables.setFlashlightLength(flashlightlength); 
+					$gameVariables.setFlashlightDensity(flashlightdensity); 
+				}
+				if (args[0] === 'off') {
+					playerflashlight = false;
+				}
+				$gameVariables.setFlashLight(playerflashlight);
+			} 
+			
+			// ******************* SET FIRE *******************
+			if (command === 'setfire') {
+			
+				flickerradiusshift = args[0];
+				flickercolorshift = args[1];
+				$gameVariables.setFireRadius(flickerradiusshift);
+				$gameVariables.setFireColorshift(flickercolorshift);
+			}			
+			
+
+			// ******************* FIRE *******************
+			if (command === 'fire') {
+				playerflicker = true;
+				$gameVariables.setFire(playerflicker);
+				$gameVariables.setFireRadius(flickerradiusshift);
+				$gameVariables.setFireColorshift(flickercolorshift);
+			} else {
+				playerflicker = false;   
+				$gameVariables.setFire(playerflicker);
+				$gameVariables.setFireRadius(flickerradiusshift);
+				$gameVariables.setFireColorshift(flickercolorshift);
+			}			
+			
+			//var evid = this._eventId;
+			if (command === 'light' || command === 'fire') {
+				
+				//******************* Light radius 100 #FFFFFF ************************  	    
+				if (args[0] == 'radius') {
+					var newradius = Number(args[1]);
+					if (newradius >= 0) {
+						player_radius = newradius;
+						lightgrow_value = newradius;
+						lightgrow_target = newradius;		
+						$gameVariables.setRadiusSave(player_radius);
+					}
+					if (args.length > 2) {
+						playercolor = args[2];
+						var isValidPlayerColor  = /(^#[0-9A-F]{6}$)|(^#[0-9A-F]{3}$)/i.test(playercolor); 	    
+						if (!isValidPlayerColor) {
+							playercolor = '#FFFFFF'    
+						}
+						$gameVariables.setPlayerColor(playercolor);  
+					}
+					// player brightness
+					if (args.length > 3) {
+						var brightness = 0.0;
+						var b_arg = args[3];
+						if (typeof b_arg != 'undefined') {
+							var key = b_arg.substring(0,1);
+							if (key == 'b' || key == 'B') {
+								playerbrightness = Number(b_arg.substring(1))/100;
+								$gameVariables.setPlayerBrightness(playerbrightness);	
+							}	
+						}
+					}
+				} 
+				
+				//******************* Light radiusgrow 100 #FFFFFF ************************  	    
+				if (args[0] === 'radiusgrow') {
+					var evid = this._eventId;
+					//Graphics.printError('test',evid);
+					var newradius = Number(args[1]);
+					if (newradius >= 0) {
+						//player_radius = newradius;
+						lightgrow_value = player_radius;
+						lightgrow_target = newradius;
+						if (args.length >= 4) {
+							if(player_radius > newradius) {
+								//shrinking
+								lightgrow_speed = (player_radius * 0.012) / Number(args[4]);
+							} else {
+								//growing
+								lightgrow_speed = (newradius * 0.012) / Number(args[4]);
+							}
+						}else {
+							lightgrow_speed = (Math.abs(newradius-player_radius))/500;	
+						}
+						//lightgrow_speed = (Math.abs(newradius-player_radius))/500;
+
+					}
+					// player color
+					if (args.length > 2) {
+						playercolor = args[2];
+						var isValidPlayerColor  = /(^#[0-9A-F]{6}$)|(^#[0-9A-F]{3}$)/i.test(playercolor); 	    
+						if (!isValidPlayerColor) {
+							playercolor = '#FFFFFF'    
+						}
+						$gameVariables.setPlayerColor(playercolor);  
+					}
+					// player brightness
+					if (args.length > 3) {
+						var brightness = 0.0;
+						var b_arg = args[3];
+						if (typeof b_arg != 'undefined') {
+							var key = b_arg.substring(0,1);
+							if (key == 'b' || key == 'B') {
+								playerbrightness = Number(b_arg.substring(1))/100;
+								$gameVariables.setPlayerBrightness(playerbrightness);	
+							}	
+						}
+					}
+					
+				} 
+				
+				// *********************** TURN SPECIFIC LIGHT ON *********************
+				if (args[0] === 'on') {
+					var lightid = Number(args[1]);
+					var idfound = false;
+					for (var i = 0; i < lightarray_id.length; i++) {
+						if (lightarray_id[i] == lightid) {
+							idfound = true;
+							lightarray_state[i] = true;
+						}
+					}
+					if (idfound == false) {
+						lightarray_id.push(lightid);
+						lightarray_state.push(true);					
+					}
+					//Graphics.printError('test',lightarray_id.length+' '+lightarray_state.length);
+					$gameVariables.setLightArrayId(lightarray_id);
+					$gameVariables.setLightArrayState(lightarray_state);				
+				}	
+				
+				// *********************** TURN SPECIFIC LIGHT OFF *********************
+				if (args[0] === 'off') {
+					var lightid = Number(args[1]);
+					var idfound = false;
+					for (var i = 0; i < lightarray_id.length; i++) {
+						if (lightarray_id[i] == lightid) {
+							idfound = true;
+							lightarray_state[i] = false;
+						}
+					}
+					if (idfound == false) {
+						lightarray_id.push(lightid);
+						lightarray_state.push(false);
+					}
+					$gameVariables.setLightArrayId(lightarray_id);
+					$gameVariables.setLightArrayState(lightarray_state); 
+					//Graphics.Debug('RESET3','RESET3');	
+					
+				}
+				
+				// **************************** RESET ALL SWITCHES ***********************
+				if (args[0] === 'switch' && args[1] === 'reset') {
+					// reset switches to false					
+					for (var i = 0; i < $dataMap.events.length; i++) {
+						if ($dataMap.events[i]) {
+							for (var j = 0; j < lightarray_id.length; j++) {
+								if (lightarray_id[j] == lightid) {
+									var mapid = $gameMap.mapId();
+									var eventid = $dataMap.events[i].id;
+									var key = [mapid,eventid,'D'];
+									$gameSelfSwitches.setValue(key, false);
+								}
+							}
+						}
+					}
+					lightarray_id = [];
+					lightarray_state = [];
+					$gameVariables.setLightArrayId(lightarray_id);
+					$gameVariables.setLightArrayState(lightarray_state); 
+				}
+			}
+			// *********************** TURN SCRIPT ON/OFF *********************
+				if (command === 'light' && args[0] == 'deactivate') {
+				scriptactive = false;	
+				$gameVariables.setScriptActive(false);
+			}
+				if (command === 'light' && args[0] == 'activate') {
+				scriptactive = true;
+				$gameVariables.setScriptActive(true);
+			}	
+							
+
+		}
+
+		Spriteset_Map.prototype.createLightmask = function() {
+			this._lightmask = new Lightmask();
+			this.addChild(this._lightmask);
+		};
+		
+		function Lightmask() {
+			this.initialize.apply(this, arguments);
+		}
+		
+		Lightmask.prototype = Object.create(PIXI.DisplayObjectContainer.prototype);
+		Lightmask.prototype.constructor = Lightmask;
+		
+		Lightmask.prototype.initialize = function() {
+			PIXI.DisplayObjectContainer.call(this);
+			this._width = Graphics.width;
+			this._height = Graphics.height;
+			this._sprites = [];
+			this._createBitmap();
+		};
+		
+		//Updates the Lightmask for each frame.
+		
+		Lightmask.prototype.update = function() {
+				this._updateMask();
+		};
+		
+		//@method _createBitmaps
+		
+		Lightmask.prototype._createBitmap = function() {
+			this._maskBitmap = new Bitmap(maxX,maxY);   // one big bitmap to fill the intire screen with black
+			var canvas = this._maskBitmap.canvas;             // a bit larger then setting to take care of screenshakes
+		};
+
+		let mogtime = 0;
+		let daynight = 0;
+		
+		/**
+		 * @method _updateAllSprites
+		 * @private
+		 */
+		Lightmask.prototype._updateMask = function() {
+			
+		
+			// ****** DETECT MAP CHANGES ********
+			var map_id = $gameMap.mapId();
+			if (map_id != oldmap) {
+				oldmap = map_id;
+					
+				// moving lightsources
 				for (var i = 0; i < $dataMap.events.length; i++) {
-	        		if ($dataMap.events[i]) {
+					if ($dataMap.events[i]) {
+						for (var j = 0; j < move_event_id.length; j++) {
+							if (move_event_id[j] == i) {
+								move_event_x[j] = $dataMap.events[i].x;
+								move_event_y[j] = $dataMap.events[i].y;
+								move_event_dir[j] = 2;
+							}
+						}
+						// reset switches to false
+						if (reset_each_map == 'Yes' || reset_each_map == 'yes')
 						for (var j = 0; j < lightarray_id.length; j++) {
 							if (lightarray_id[j] == lightid) {
 								var mapid = $gameMap.mapId();
@@ -665,1132 +757,1071 @@ Imported.TerraxLighting = true;
 							}
 						}
 					}
+					//finish up reseting switches
+					Lightarray_id = [];
+					lightarray_state = [];
+					$gameVariables.setLightArrayId(lightarray_id);
+					$gameVariables.setLightArrayState(lightarray_state); 
+
+
 				}
-    			lightarray_id = [];
-				lightarray_state = [];
-				$gameVariables.setLightArrayId(lightarray_id);
-				$gameVariables.setLightArrayState(lightarray_state); 
-			}
-		}
-		// *********************** TURN SCRIPT ON/OFF *********************
-			if (command === 'light' && args[0] == 'deactivate') {
-			scriptactive = false;	
-			$gameVariables.setScriptActive(false);
-		}
-			if (command === 'light' && args[0] == 'activate') {
-			scriptactive = true;
-			$gameVariables.setScriptActive(true);
-		}	
-						
 
-	}
-
-	Spriteset_Map.prototype.createLightmask = function() {
-	    this._lightmask = new Lightmask();
-	    this.addChild(this._lightmask);
-	};
-	
-	function Lightmask() {
-	    this.initialize.apply(this, arguments);
-	}
-	
-	Lightmask.prototype = Object.create(PIXI.DisplayObjectContainer.prototype);
-	Lightmask.prototype.constructor = Lightmask;
-	
-	Lightmask.prototype.initialize = function() {
-	    PIXI.DisplayObjectContainer.call(this);
-	    this._width = Graphics.width;
-	    this._height = Graphics.height;
-	    this._sprites = [];
-	    this._createBitmap();
-	};
-	
-	//Updates the Lightmask for each frame.
-	
-	Lightmask.prototype.update = function() {
-		  	this._updateMask();
-	};
-	
-	//@method _createBitmaps
-	
-	Lightmask.prototype._createBitmap = function() {
-	    this._maskBitmap = new Bitmap(maxX,maxY);   // one big bitmap to fill the intire screen with black
-	    var canvas = this._maskBitmap.canvas;             // a bit larger then setting to take care of screenshakes
-	};
-
-	let mogtime = 0;
-	let daynight = 0;
-	
-	/**
-	 * @method _updateAllSprites
-	 * @private
-	 */
-	Lightmask.prototype._updateMask = function() {
-		
-	
-		// ****** DETECT MAP CHANGES ********
-		var map_id = $gameMap.mapId();
-		if (map_id != oldmap) {
-			oldmap = map_id;
-				
-			// moving lightsources
-			for (var i = 0; i < $dataMap.events.length; i++) {
-	        	if ($dataMap.events[i]) {
-					for (var j = 0; j < move_event_id.length; j++) {
-						if (move_event_id[j] == i) {
-							move_event_x[j] = $dataMap.events[i].x;
-							move_event_y[j] = $dataMap.events[i].y;
-							move_event_dir[j] = 2;
-						}
-					}
-					// reset switches to false
-					if (reset_each_map == 'Yes' || reset_each_map == 'yes')
-					for (var j = 0; j < lightarray_id.length; j++) {
-						if (lightarray_id[j] == lightid) {
-							var mapid = $gameMap.mapId();
-							var eventid = $dataMap.events[i].id;
-							var key = [mapid,eventid,'D'];
-							$gameSelfSwitches.setValue(key, false);
-						}
-					}
-				}
-				//finish up reseting switches
-				Lightarray_id = [];
-				lightarray_state = [];
-				$gameVariables.setLightArrayId(lightarray_id);
-				$gameVariables.setLightArrayState(lightarray_state); 
-
-
-			}
-
-			if (scriptactive == true){
-				var searchdaynight = $dataMap.note.toLowerCase();
-				mogtime = searchdaynight.search('mogtime');
-				daynight = searchdaynight.search('daynight');
-			}
-		}
-	
-				
-		// remove old sprites
-		for (var i = 0; i < this._sprites.length; i++) {	  // remove all old sprites
-			this._removeSprite();
-		}
-		
-		
-		if (scriptactive == true) {	
-			// moghunter timesystem compatibility
-			if (moghunter == true) {
-				
-				if (mogtime >= 0) {
-				
-					var new_phase = 0;
-					if ($gameSwitches.value(21)) { new_phase = 0; } //Dawn
-					if ($gameSwitches.value(22)) { new_phase = 1; } //Rise
-					if ($gameSwitches.value(23)) { new_phase = 2; } //Day
-					if ($gameSwitches.value(24)) { new_phase = 3; } //Set
-					if ($gameSwitches.value(25)) { new_phase = 4; } //Dusk
-					if ($gameSwitches.value(26)) { new_phase = 5; } //Night
-					if (new_phase != moghunter_phase) {
-						moghunter_phase = new_phase;
-						var newtint = '#000000';
-						if (new_phase == 0) { newtint = mogtint[0]; }
-						if (new_phase == 1) { newtint = mogtint[1]; }
-						if (new_phase == 2) { newtint = mogtint[2]; }
-						if (new_phase == 3) { newtint = mogtint[3]; }
-						if (new_phase == 4) { newtint = mogtint[4]; }	
-						if (new_phase == 5) { newtint = mogtint[5]; }
-						
-						Terrax_tint_target = newtint;
-		        		Terrax_tint_speed = 10;
-		        		$gameVariables.setTintValue(Terrax_tint_target);	
-					}
-				}
-			}
-			
-			// are there lightsources on this map?
-			
-			if (daynight >= 0) {	
-				this._addSprite(0,0,this._maskBitmap); // daynight tag? yes.. then turn off the lights
-			} else {
-				for (var i = 0; i < $dataMap.events.length; i++) {
-			        if ($dataMap.events[i]) {
-			            var note = $dataMap.events[i].note
-			            var note_args = note.split(" ");
-			    		var note_command = note_args.shift().toLowerCase();    		
-			            if (note_command == "light" || note_command == "fire" || note_command == "daynight" || note_command == "flashlight" ) {			
-							this._addSprite(0,0,this._maskBitmap); // light event? yes.. then turn off the lights		
-							break;
-						}
-					}
+				if (scriptactive == true){
+					var searchdaynight = $dataMap.note.toLowerCase();
+					mogtime = searchdaynight.search('mogtime');
+					daynight = searchdaynight.search('daynight');
 				}
 			}
 		
-			// ******** GROW OR SHRINK GLOBE *********
-			
-			if (lightgrow_value < lightgrow_target) {			
-				lightgrow_value = lightgrow_value + lightgrow_speed;
-				if(lightgrow_value > lightgrow_target) {
-					//other wise it can keep fliping back and forth between > and <
-					lightgrow_value = lightgrow_target;
-				}
-				player_radius = Math.floor(lightgrow_value)
-				$gameVariables.setRadiusSave(player_radius);
-			}
-			if (lightgrow_value > lightgrow_target) {				
-				lightgrow_value = lightgrow_value - lightgrow_speed;
-				if(lightgrow_value < lightgrow_target) {
-					//other wise it can keep fliping back and forth between > and <
-					lightgrow_value = lightgrow_target;
-				}
-				player_radius = Math.floor(lightgrow_value)
-				$gameVariables.setRadiusSave(player_radius);
-			}
-			
-			
-		    // ****** PLAYER LIGHTGLOBE ********
-		
-		    var canvas = this._maskBitmap.canvas;
-		   	var ctx = canvas.getContext("2d");
-		    this._maskBitmap.fillRect(0, 0, maxX, maxY, 'black');
-		  
-			//ctx.globalCompositeOperation = 'lighten';
-			ctx.globalCompositeOperation = 'lighter';
-			
-			var pw = $gameMap.tileWidth()
-		    var ph = $gameMap.tileHeight();
-			var dx = $gameMap.displayX();
-			var dy = $gameMap.displayY();
-			var px = $gamePlayer._realX;
-			var py = $gamePlayer._realY;
-			var pd = $gamePlayer._direction;	
-			
-			var x1 = (pw/2)+( (px-dx)*pw);
-			var y1 = (ph/2)+( (py-dy)*ph);
-		    var paralax = false;
-			// paralax does something weird with coordinates.. recalc needed
-			if (dx>$gamePlayer.x) {
-				var xjump = $gameMap.width() - Math.floor(dx-px);  
-				x1 = (pw/2)+(xjump*pw);
-			} 
-			if (dy>$gamePlayer.y) {
-				var yjump = $gameMap.height() - Math.floor(dy-py);
-				y1 = (ph/2)+(yjump*ph);
-			}
 					
-			if (player_radius > 0) {
-				if (playerflashlight == true) {
-					this._maskBitmap.radialgradientFillRect2(x1,y1, 20, player_radius, playercolor, 'black', pd, flashlightlength, flashlightwidth);
-				}
-				if (player_radius < 100){
-					// dim the light a bit at lower lightradius for a less focused effect.
-					var r = hexToRgb(playercolor).r;
-		    		var g = hexToRgb(playercolor).g;
-		    		var b = hexToRgb(playercolor).b;
-		    		g = g - 60;
-		    		r = r - 60;
-		    		b = b - 60;
-					if (g<0) { g = 0; }
-					if (r<0) { r = 0; }
-					if (b<0) { b = 0; }						
-		  			var newcolor = "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
-		  				
-					this._maskBitmap.radialgradientFillRect(x1,y1, 0, player_radius, newcolor, 'black', playerflicker,playerbrightness); 
-				} else { 	
-					this._maskBitmap.radialgradientFillRect(x1,y1, 20, player_radius, playercolor, 'black', playerflicker,playerbrightness); 
-				}
-				
+			// remove old sprites
+			for (var i = 0; i < this._sprites.length; i++) {	  // remove all old sprites
+				this._removeSprite();
 			}
 			
-
-			// *********************************** DAY NIGHT CYCLE TIMER **************************
-		            
-		    if (daynightspeed > 0) {
-				if (daynightstop == false) {
-					var seconds;
-					var datenow = new Date();
-					var seconds = Math.floor(datenow.getTime()/10); 
-					if (seconds > oldseconds) {
-						oldseconds = seconds;
-						daynighttimer = daynighttimer + 1;
-						var daynightminutes = Math.floor(daynighttimer/daynightspeed)
-					    var daynighttimeover = daynighttimer-(daynightspeed*daynightminutes)
-					    var daynightseconds = Math.floor(daynighttimeover/daynightspeed*60)
-					    if (daynightdebug == true) {
-						    var daynightseconds2 = daynightseconds;
-						    if (daynightseconds < 10) {
-							    daynightseconds2 = '0' + daynightseconds;
-							}
-							Graphics.Debug('Debug Daynight system',daynightcycle+' '+daynightminutes+' '+daynightseconds2);	
-						}
-		 				if (daynightsavemin > 0) {
-							$gameVariables.setValue(daynightsavemin, daynightminutes);			
-						}
-						if (daynightsavesec > 0) {
-							$gameVariables.setValue(daynightsavesec, daynightseconds);			
-						}
-						$gameVariables.setDayNightSaveMin(daynightminutes);
-						if (daynighttimer >= (daynightspeed * 60)) {
-
-							daynightcycle = daynightcycle + 1;
-							if (daynightcycle >= daynightHoursInDay ) {
-								daynightcycle = 0;
-							}	
-							if (daynightsave > 0) {
-								$gameVariables.setValue(daynightsave, daynightcycle);
-		 					}
-		 					$gameVariables.setDayNightSave(daynightcycle);
-							daynighttimer = 0;
-						}
-					}
-			    }
-	        }
 			
-			// ********** OTHER LIGHTSOURCES **************
-			var daynightset = false;
-			for (var i = 0; i < $dataMap.events.length; i++) {
-		        if ($dataMap.events[i]) {
-		            var note = $dataMap.events[i].note;
-		            var evid = $dataMap.events[i].id;
-		            var note_args = note.split(" ");
-		    		var note_command = note_args.shift().toLowerCase();
-		            if (note_command == "light" || note_command == "fire" || note_command == "flashlight") {
-			            
-			            var objectflicker = false;
-			            if (note_command == "fire") {
-			        		objectflicker = true;
-				        }
-				        
-			            var light_radius = 1;
-				        var flashlength = 8;
-				        var flashwidth = 12;
-				        if (note_command == "flashlight") {
-					        flashlength = Number(note_args.shift());
-					        flashwidth = Number(note_args.shift());
-					        if (flashlength == 0) { flashlightlenth = 8 }
-	    					if (flashwidth == 0) { flashlightlenth = 12 }
-				    	} else {				    	
-			        		light_radius = note_args.shift();
-		        		}        	
-			        	// light radius
-			        	if (light_radius >= 0) {
-				        	
-				        	// light color
-				        	var colorvalue = note_args.shift();
-				        	var isValidColor  = /(^#[0-9A-F]{6}$)|(^#[0-9A-F]{3}$)/i.test(colorvalue) 	    
-				            if (!isValidColor) {
-					        	colorvalue = '#FFFFFF'    
-				            }   	
-				            
-				            // brightness and direction 
-				            
-				            var brightness = 0.0;
-					    	var direction = 0;
-					    	var next_arg = note_args.shift();
-					       
-						    if (typeof next_arg != 'undefined') {
-						    	var key = next_arg.substring(0,1);
-						    	if (key == 'b' || key == 'B') {
-							    	brightness = Number(next_arg.substring(1))/100;
-							    	next_arg = note_args.shift();
-							    	if (typeof next_arg != 'undefined') {
-						    			key = next_arg.substring(0,1);
-					    			}
-						    	}
-						    	if (key == 'd' || key == 'D') {
-							    	direction = next_arg.substring(1);
-							    	next_arg = note_args.shift();
-							    }			            
-		            		}	
-		            			  		
-				            // conditional lighting
-				            if (typeof next_arg != 'undefined') {
-			           			var lightid = next_arg;
-					        }else {
-					        	var lightid = 0;
-			           		}
-						    //var lightid = note_args.shift();
-						    
-						    var state = true;
-				        	if (lightid > 0) {
-					        	var state = false;
-						    	for (var j = 0; j < lightarray_id.length; j++) {
-									if (lightarray_id[j] == lightid) {
-										idfound = true;
-										state = lightarray_state[j]; 
-										var mapid = $gameMap.mapId();
-										var eventid = $dataMap.events[i].id;
-										
-										//Graphics.printError('test',mapid+' '+eventid);
-										key = [mapid,eventid,'D'];
-										if (state == true) {
-											$gameSelfSwitches.setValue(key, true);
-										} else {
-											$gameSelfSwitches.setValue(key, false);
-										}
-									}
-								}
-							}  
+			if (scriptactive == true) {	
+				// moghunter timesystem compatibility
+				if (moghunter == true) {
+					
+					if (mogtime >= 0) {
+					
+						var new_phase = 0;
+						if ($gameSwitches.value(21)) { new_phase = 0; } //Dawn
+						if ($gameSwitches.value(22)) { new_phase = 1; } //Rise
+						if ($gameSwitches.value(23)) { new_phase = 2; } //Day
+						if ($gameSwitches.value(24)) { new_phase = 3; } //Set
+						if ($gameSwitches.value(25)) { new_phase = 4; } //Dusk
+						if ($gameSwitches.value(26)) { new_phase = 5; } //Night
+						if (new_phase != moghunter_phase) {
+							moghunter_phase = new_phase;
+							var newtint = '#000000';
+							if (new_phase == 0) { newtint = mogtint[0]; }
+							if (new_phase == 1) { newtint = mogtint[1]; }
+							if (new_phase == 2) { newtint = mogtint[2]; }
+							if (new_phase == 3) { newtint = mogtint[3]; }
+							if (new_phase == 4) { newtint = mogtint[4]; }	
+							if (new_phase == 5) { newtint = mogtint[5]; }
 							
-							// kill switch 
-		            		if (killswitch == 'A' || killswitch == 'B' || killswitch == 'C' || killswitch == 'D') {
-								key = [$gameMap.mapId(),$dataMap.events[i].id,killswitch];
-								if ($gameSelfSwitches.value(key) == true) {	
-									state = false;
-									//Graphics.Debug('Deathswitch',killswitch);	
-								}
-	            			}
-							      	
-				        	// show light
-				            if (state == true) {
-				        				        	
-					            var lpx = $dataMap.events[i].x;
-					            var lpy = $dataMap.events[i].y;
-					            ldir = 4
-					            // moving lightsources
-					            var flashlight = false;
-								for (var j = 0; j < move_event_id.length; j++) {
-									if (move_event_id[j] == evid) {
-										lpx = move_event_x[j];
-										lpy = move_event_y[j];
-										ldir = move_event_dir[j];
-										if (note_command === "flashlight") {
-						            		flashlight = true;
-					            		}
-									}
-								}
-					            if (note_command == "flashlight" && flashlight === false ) {
-						            flashlight = true;
-						        	// flashlight direction
-				            		var tldir = Number(note_args.shift());
-				            		if (!isNaN(tldir)) {
-					            		if (tldir < 0 || ldir >= 5) {ldir = 4}    
-					            		if (tldir == 1) {ldir = 8}
-					            		if (tldir == 2) {ldir = 6}
-					            		if (tldir == 3) {ldir = 2}
-					            		if (tldir == 4) {ldir = 4}	
-				            		}     
+							Terrax_tint_target = newtint;
+							Terrax_tint_speed = 10;
+							$gameVariables.setTintValue(Terrax_tint_target);	
+						}
+					}
+				}
+				
+				// are there lightsources on this map?
+				
+				if (daynight >= 0) {	
+					this._addSprite(0,0,this._maskBitmap); // daynight tag? yes.. then turn off the lights
+				} else {
+					for (var i = 0; i < $dataMap.events.length; i++) {
+						if ($dataMap.events[i]) {
+							var note = $dataMap.events[i].note
+							var note_args = note.split(" ");
+							var note_command = note_args.shift().toLowerCase();    		
+							if (note_command == "light" || note_command == "fire" || note_command == "daynight" || note_command == "flashlight" ) {			
+								this._addSprite(0,0,this._maskBitmap); // light event? yes.. then turn off the lights		
+								break;
+							}
+						}
+					}
+				}
+			
+				// ******** GROW OR SHRINK GLOBE *********
+				
+				if (lightgrow_value < lightgrow_target) {			
+					lightgrow_value = lightgrow_value + lightgrow_speed;
+					if(lightgrow_value > lightgrow_target) {
+						//other wise it can keep fliping back and forth between > and <
+						lightgrow_value = lightgrow_target;
+					}
+					player_radius = Math.floor(lightgrow_value)
+					$gameVariables.setRadiusSave(player_radius);
+				}
+				if (lightgrow_value > lightgrow_target) {				
+					lightgrow_value = lightgrow_value - lightgrow_speed;
+					if(lightgrow_value < lightgrow_target) {
+						//other wise it can keep fliping back and forth between > and <
+						lightgrow_value = lightgrow_target;
+					}
+					player_radius = Math.floor(lightgrow_value)
+					$gameVariables.setRadiusSave(player_radius);
+				}
+				
+				
+				// ****** PLAYER LIGHTGLOBE ********
+			
+				var canvas = this._maskBitmap.canvas;
+				var ctx = canvas.getContext("2d");
+				this._maskBitmap.fillRect(0, 0, maxX, maxY, 'black');
+			
+				//ctx.globalCompositeOperation = 'lighten';
+				ctx.globalCompositeOperation = 'lighter';
+				
+				var pw = $gameMap.tileWidth()
+				var ph = $gameMap.tileHeight();
+				var dx = $gameMap.displayX();
+				var dy = $gameMap.displayY();
+				var px = $gamePlayer._realX;
+				var py = $gamePlayer._realY;
+				var pd = $gamePlayer._direction;	
+				
+				var x1 = (pw/2)+( (px-dx)*pw);
+				var y1 = (ph/2)+( (py-dy)*ph);
+				var paralax = false;
+				// paralax does something weird with coordinates.. recalc needed
+				if (dx>$gamePlayer.x) {
+					var xjump = $gameMap.width() - Math.floor(dx-px);  
+					x1 = (pw/2)+(xjump*pw);
+				} 
+				if (dy>$gamePlayer.y) {
+					var yjump = $gameMap.height() - Math.floor(dy-py);
+					y1 = (ph/2)+(yjump*ph);
+				}
+						
+				if (player_radius > 0) {
+					if (playerflashlight == true) {
+						this._maskBitmap.radialgradientFillRect2(x1,y1, 20, player_radius, playercolor, 'black', pd, flashlightlength, flashlightwidth);
+					}
+					if (player_radius < 100){
+						// dim the light a bit at lower lightradius for a less focused effect.
+						var r = hexToRgb(playercolor).r;
+						var g = hexToRgb(playercolor).g;
+						var b = hexToRgb(playercolor).b;
+						g = g - 60;
+						r = r - 60;
+						b = b - 60;
+						if (g<0) { g = 0; }
+						if (r<0) { r = 0; }
+						if (b<0) { b = 0; }						
+						var newcolor = "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+							
+						this._maskBitmap.radialgradientFillRect(x1,y1, 0, player_radius, newcolor, 'black', playerflicker,playerbrightness); 
+					} else { 	
+						this._maskBitmap.radialgradientFillRect(x1,y1, 20, player_radius, playercolor, 'black', playerflicker,playerbrightness); 
+					}
+					
+				}
+				
 
+				// *********************************** DAY NIGHT CYCLE TIMER **************************
+						
+				if (daynightspeed > 0) {
+					if (daynightstop == false) {
+						var seconds;
+						var datenow = new Date();
+						var seconds = Math.floor(datenow.getTime()/10); 
+						if (seconds > oldseconds) {
+							oldseconds = seconds;
+							daynighttimer = daynighttimer + 1;
+							var daynightminutes = Math.floor(daynighttimer/daynightspeed)
+							var daynighttimeover = daynighttimer-(daynightspeed*daynightminutes)
+							var daynightseconds = Math.floor(daynighttimeover/daynightspeed*60)
+							if (daynightdebug == true) {
+								var daynightseconds2 = daynightseconds;
+								if (daynightseconds < 10) {
+									daynightseconds2 = '0' + daynightseconds;
 								}
-								//Graphics.Debug('ldir',ldir);	
-								
-					            var lx1 = (pw/2)+( (lpx-dx)*pw);
-								var ly1 = (ph/2)+( (lpy-dy)*ph);
-								// paralaxloop does something weird with coordinates.. recalc needed
-								
-								if ($dataMap.scrollType === 2 || $dataMap.scrollType === 3) {	
-									if (dx-10>lpx) {
-										var lxjump = $gameMap.width() - (dx-lpx);
-										lx1 = (pw/2)+(lxjump*pw);
-									} 
+								Graphics.Debug('Debug Daynight system',daynightcycle+' '+daynightminutes+' '+daynightseconds2);	
+							}
+							if (daynightsavemin > 0) {
+								$gameVariables.setValue(daynightsavemin, daynightminutes);			
+							}
+							if (daynightsavesec > 0) {
+								$gameVariables.setValue(daynightsavesec, daynightseconds);			
+							}
+							$gameVariables.setDayNightSaveMin(daynightminutes);
+							if (daynighttimer >= (daynightspeed * 60)) {
+
+								daynightcycle = daynightcycle + 1;
+								if (daynightcycle >= daynightHoursInDay ) {
+									daynightcycle = 0;
+								}	
+								if (daynightsave > 0) {
+									$gameVariables.setValue(daynightsave, daynightcycle);
 								}
-								if ($dataMap.scrollType === 1 || $dataMap.scrollType === 3) {
-									if (dy-10>lpy) {
-										var lyjump = $gameMap.height() -(dy-lpy);
-										ly1 = (ph/2)+(lyjump*ph);
+								$gameVariables.setDayNightSave(daynightcycle);
+								daynighttimer = 0;
+							}
+						}
+					}
+				}
+				
+				// ********** OTHER LIGHTSOURCES **************
+				var daynightset = false;
+				for (var i = 0; i < $dataMap.events.length; i++) {
+					if ($dataMap.events[i]) {
+						var note = $dataMap.events[i].note;
+						var evid = $dataMap.events[i].id;
+						var note_args = note.split(" ");
+						var note_command = note_args.shift().toLowerCase();
+						if (note_command == "light" || note_command == "fire" || note_command == "flashlight") {
+							
+							var objectflicker = false;
+							if (note_command == "fire") {
+								objectflicker = true;
+							}
+							
+							var light_radius = 1;
+							var flashlength = 8;
+							var flashwidth = 12;
+							if (note_command == "flashlight") {
+								flashlength = Number(note_args.shift());
+								flashwidth = Number(note_args.shift());
+								if (flashlength == 0) { flashlightlenth = 8 }
+								if (flashwidth == 0) { flashlightlenth = 12 }
+							} else {				    	
+								light_radius = note_args.shift();
+							}        	
+							// light radius
+							if (light_radius >= 0) {
+								
+								// light color
+								var colorvalue = note_args.shift();
+								var isValidColor  = /(^#[0-9A-F]{6}$)|(^#[0-9A-F]{3}$)/i.test(colorvalue) 	    
+								if (!isValidColor) {
+									colorvalue = '#FFFFFF'    
+								}   	
+								
+								// brightness and direction 
+								
+								var brightness = 0.0;
+								var direction = 0;
+								var next_arg = note_args.shift();
+							
+								if (typeof next_arg != 'undefined') {
+									var key = next_arg.substring(0,1);
+									if (key == 'b' || key == 'B') {
+										brightness = Number(next_arg.substring(1))/100;
+										next_arg = note_args.shift();
+										if (typeof next_arg != 'undefined') {
+											key = next_arg.substring(0,1);
+										}
+									}
+									if (key == 'd' || key == 'D') {
+										direction = next_arg.substring(1);
+										next_arg = note_args.shift();
+									}			            
+								}	
+											
+								// conditional lighting
+								if (typeof next_arg != 'undefined') {
+									var lightid = next_arg;
+								}else {
+									var lightid = 0;
+								}
+								//var lightid = note_args.shift();
+								
+								var state = true;
+								if (lightid > 0) {
+									var state = false;
+									for (var j = 0; j < lightarray_id.length; j++) {
+										if (lightarray_id[j] == lightid) {
+											idfound = true;
+											state = lightarray_state[j]; 
+											var mapid = $gameMap.mapId();
+											var eventid = $dataMap.events[i].id;
+											
+											//Graphics.printError('test',mapid+' '+eventid);
+											key = [mapid,eventid,'D'];
+											if (state == true) {
+												$gameSelfSwitches.setValue(key, true);
+											} else {
+												$gameSelfSwitches.setValue(key, false);
+											}
+										}
+									}
+								}  
+								
+								// kill switch 
+								if (killswitch == 'A' || killswitch == 'B' || killswitch == 'C' || killswitch == 'D') {
+									key = [$gameMap.mapId(),$dataMap.events[i].id,killswitch];
+									if ($gameSelfSwitches.value(key) == true) {	
+										state = false;
+										//Graphics.Debug('Deathswitch',killswitch);	
 									}
 								}
-								if (flashlight == true) {
-									this._maskBitmap.radialgradientFillRect2(lx1,ly1, 0, light_radius , colorvalue, 'black', ldir, flashlength, flashwidth);
-								} else {
-					            	this._maskBitmap.radialgradientFillRect(lx1,ly1, 0, light_radius , colorvalue, 'black', objectflicker, brightness, direction); 
+										
+								// show light
+								if (state == true) {
+														
+									var lpx = $dataMap.events[i].x;
+									var lpy = $dataMap.events[i].y;
+									ldir = 4
+									// moving lightsources
+									var flashlight = false;
+									for (var j = 0; j < move_event_id.length; j++) {
+										if (move_event_id[j] == evid) {
+											lpx = move_event_x[j];
+											lpy = move_event_y[j];
+											ldir = move_event_dir[j];
+											if (note_command === "flashlight") {
+												flashlight = true;
+											}
+										}
+									}
+									if (note_command == "flashlight" && flashlight === false ) {
+										flashlight = true;
+										// flashlight direction
+										var tldir = Number(note_args.shift());
+										if (!isNaN(tldir)) {
+											if (tldir < 0 || ldir >= 5) {ldir = 4}    
+											if (tldir == 1) {ldir = 8}
+											if (tldir == 2) {ldir = 6}
+											if (tldir == 3) {ldir = 2}
+											if (tldir == 4) {ldir = 4}	
+										}     
+
+									}
+									//Graphics.Debug('ldir',ldir);	
+									
+									var lx1 = (pw/2)+( (lpx-dx)*pw);
+									var ly1 = (ph/2)+( (lpy-dy)*ph);
+									// paralaxloop does something weird with coordinates.. recalc needed
+									
+									if ($dataMap.scrollType === 2 || $dataMap.scrollType === 3) {	
+										if (dx-10>lpx) {
+											var lxjump = $gameMap.width() - (dx-lpx);
+											lx1 = (pw/2)+(lxjump*pw);
+										} 
+									}
+									if ($dataMap.scrollType === 1 || $dataMap.scrollType === 3) {
+										if (dy-10>lpy) {
+											var lyjump = $gameMap.height() -(dy-lpy);
+											ly1 = (ph/2)+(lyjump*ph);
+										}
+									}
+									if (flashlight == true) {
+										this._maskBitmap.radialgradientFillRect2(lx1,ly1, 0, light_radius , colorvalue, 'black', ldir, flashlength, flashwidth);
+									} else {
+										this._maskBitmap.radialgradientFillRect(lx1,ly1, 0, light_radius , colorvalue, 'black', objectflicker, brightness, direction); 
+									}
 								}
-					        }
-		            	}
-		            }
-	       	
-		            
-					// *********************************** DAY NIGHT CYCLE FILTER **************************
-					if (daynightset == false) {
-					    if (daynight >= 0 || note_command == "daynight" ) {
-						    daynightset = true;
-						    $gameVariables.setDayNightColorArray(daynightcolors);
-			            }
-		        	}
-	            }
-		    }
-		    		   
-			 // *************************** TILE TAG ********************* 
-			 
-    			 
-			 
-			for (var i = 0; i < tilearray.length; i++) {
-				tilestr = tilearray[i];
-				var tileargs = tilestr.split(";");
-			    var tile_type = tileargs[0];
-			    var tile_number = tileargs[1];
-			    var tile_on = tileargs[2];
-			    var tile_color = tileargs[3];
-			    var tile_radius = 0;
-			    var brightness = 0.0;
-			    var shape = 0;
-			    var xo1 = 0.0;
-			    var yo1 = 0.0;
-			    var xo2 = 0.0;
-			    var yo2 = 0.0;
-			   
-			    if ( tile_type == 1 || tile_type == 2) {
-				    
-				    var b_arg = tileargs[4];
-					if (typeof b_arg != 'undefined') { shape = b_arg; }
-				    b_arg = tileargs[5];
-					if (typeof b_arg != 'undefined') { xo1 = b_arg; }
-					b_arg = tileargs[6];
-					if (typeof b_arg != 'undefined') { yo1 = b_arg; }
-					b_arg = tileargs[7];
-					if (typeof b_arg != 'undefined') { xo2 = b_arg; }
-					b_arg = tileargs[8];
-					if (typeof b_arg != 'undefined') { yo2 = b_arg; }					
+							}
+						}
+				
+						
+						// *********************************** DAY NIGHT CYCLE FILTER **************************
+						if (daynightset == false) {
+							if (daynight >= 0 || note_command == "daynight" ) {
+								daynightset = true;
+								$gameVariables.setDayNightColorArray(daynightcolors);
+							}
+						}
+					}
+				}
+						
+				// *************************** TILE TAG ********************* 
+				
+					
+				
+				for (var i = 0; i < tilearray.length; i++) {
+					tilestr = tilearray[i];
+					var tileargs = tilestr.split(";");
+					var tile_type = tileargs[0];
+					var tile_number = tileargs[1];
+					var tile_on = tileargs[2];
+					var tile_color = tileargs[3];
+					var tile_radius = 0;
+					var brightness = 0.0;
+					var shape = 0;
+					var xo1 = 0.0;
+					var yo1 = 0.0;
+					var xo2 = 0.0;
+					var yo2 = 0.0;
+				
+					if ( tile_type == 1 || tile_type == 2) {
+						
+						var b_arg = tileargs[4];
+						if (typeof b_arg != 'undefined') { shape = b_arg; }
+						b_arg = tileargs[5];
+						if (typeof b_arg != 'undefined') { xo1 = b_arg; }
+						b_arg = tileargs[6];
+						if (typeof b_arg != 'undefined') { yo1 = b_arg; }
+						b_arg = tileargs[7];
+						if (typeof b_arg != 'undefined') { xo2 = b_arg; }
+						b_arg = tileargs[8];
+						if (typeof b_arg != 'undefined') { yo2 = b_arg; }					
+						
+							
+					} else {
+						tile_radius = tileargs[4];
+						var b_arg = tileargs[5];
+						if (typeof b_arg != 'undefined') {
+							var key = b_arg.substring(0,1);
+							if (key == 'b' || key == 'B') {
+								brightness = Number(b_arg.substring(1))/100;	
+							}	
+						}
+					}
+					
+					if (tile_on == 1 ) {
+				
+						if (tile_type >= 3 ) { 
+							// *************************** TILE TAG LIGHTSOURCES *********
+							for (var y = 0; y < $dataMap.height; y++) {	
+								for (var x = 0; x < $dataMap.width; x++) {
+									var tag = 0;
+									if (tile_type == 3 || tile_type == 5) { tag = $gameMap.terrainTag(x,y); }          // tile light
+									if (tile_type == 4 || tile_type == 6) { tag = $dataMap.data[(5 * $dataMap.height + y) * $dataMap.width + x]; }  // region light
+									if (tag == tile_number) {			    	    
+										var x1 =(pw/2)+(x-dx)*pw;
+										var y1 =(ph/2)+(y-dy)*ph;
+										
+										if ($dataMap.scrollType === 2 || $dataMap.scrollType === 3) {	
+											if (dx-5>x) {
+												var lxjump = $gameMap.width() - (dx-x);
+												x1 = (pw/2)+(lxjump*pw);
+											} 
+										}
+										if ($dataMap.scrollType === 1 || $dataMap.scrollType === 3) {
+											if (dy-5>y) {
+												var lyjump = $gameMap.height() -(dy-y);
+												y1 = (ph/2)+(lyjump*ph);
+											}
+										}									
+										
+										if (tile_type == 3 || tile_type == 4) {
+											this._maskBitmap.radialgradientFillRect(x1,y1, 0, tile_radius , tile_color, 'black', false, brightness); // Light
+										} else {
+											
+											this._maskBitmap.radialgradientFillRect(x1,y1, 0, tile_radius , tile_color, 'black', true, brightness);  // Fire
+										}
+									}
+								}
+							}
+						}
 					
 						
-			    } else {
-			    	tile_radius = tileargs[4];
-					var b_arg = tileargs[5];
-					if (typeof b_arg != 'undefined') {
-					    var key = b_arg.substring(0,1);
-						if (key == 'b' || key == 'B') {
-							brightness = Number(b_arg.substring(1))/100;	
-						}	
-		    		}
-	    		}
-			    
-			    if (tile_on == 1 ) {
-			 
-					if (tile_type >= 3 ) { 
-					    // *************************** TILE TAG LIGHTSOURCES *********
-					    for (var y = 0; y < $dataMap.height; y++) {	
-							for (var x = 0; x < $dataMap.width; x++) {
-								var tag = 0;
-								if (tile_type == 3 || tile_type == 5) { tag = $gameMap.terrainTag(x,y); }          // tile light
-						    	if (tile_type == 4 || tile_type == 6) { tag = $dataMap.data[(5 * $dataMap.height + y) * $dataMap.width + x]; }  // region light
-								if (tag == tile_number) {			    	    
-									var x1 =(pw/2)+(x-dx)*pw;
-									var y1 =(ph/2)+(y-dy)*ph;
-									
-									if ($dataMap.scrollType === 2 || $dataMap.scrollType === 3) {	
-										if (dx-5>x) {
-											var lxjump = $gameMap.width() - (dx-x);
-											x1 = (pw/2)+(lxjump*pw);
-										} 
-									}
-									if ($dataMap.scrollType === 1 || $dataMap.scrollType === 3) {
-										if (dy-5>y) {
-											var lyjump = $gameMap.height() -(dy-y);
-											y1 = (ph/2)+(lyjump*ph);
-										}
-									}									
-									
-									if (tile_type == 3 || tile_type == 4) {
-										this._maskBitmap.radialgradientFillRect(x1,y1, 0, tile_radius , tile_color, 'black', false, brightness); // Light
-									} else {
+						// *************************** REDRAW MAPTILES FOR ROOFS ETC *********
+						if (tile_type == 1 || tile_type == 2) { 
+							for (var y = 0; y < $dataMap.height; y++) {	
+								for (var x = 0; x < $dataMap.width; x++) {
+									//var tag = $gameMap.terrainTag(x,y);
+									var tag = 0;
+									if (tile_type == 1) { tag = $gameMap.terrainTag(x,y); }                  // tile block
+									if (tile_type == 2) { tag = $dataMap.data[(5 * $dataMap.height + y) * $dataMap.width + x]; }  // region block
+									if (tag == tile_number ) {
+										ctx.globalCompositeOperation =  'darker';
+										var x1 =  (x-dx)*pw;
+										var y1 =  (y-dy)*ph;
 										
-										this._maskBitmap.radialgradientFillRect(x1,y1, 0, tile_radius , tile_color, 'black', true, brightness);  // Fire
-									}
-					    		}
-				        	}
-			        	}
-		        	}
-				
-		        	
-		    		// *************************** REDRAW MAPTILES FOR ROOFS ETC *********
-					if (tile_type == 1 || tile_type == 2) { 
-					    for (var y = 0; y < $dataMap.height; y++) {	
-							for (var x = 0; x < $dataMap.width; x++) {
-						    	//var tag = $gameMap.terrainTag(x,y);
-						    	var tag = 0;
-						    	if (tile_type == 1) { tag = $gameMap.terrainTag(x,y); }                  // tile block
-						    	if (tile_type == 2) { tag = $dataMap.data[(5 * $dataMap.height + y) * $dataMap.width + x]; }  // region block
-								if (tag == tile_number ) {
-									ctx.globalCompositeOperation =  'darker';
-									var x1 =  (x-dx)*pw;
-									var y1 =  (y-dy)*ph;
-									
-									if ($dataMap.scrollType === 2 || $dataMap.scrollType === 3) {	
-										if (dx-5>x) {
-											var lxjump = $gameMap.width() - (dx-x);
-											x1 = (lxjump*pw);
-										} 
-									}
-									if ($dataMap.scrollType === 1 || $dataMap.scrollType === 3) {
-										if (dy-5>y) {
-											var lyjump = $gameMap.height() -(dy-y);
-											y1 = (lyjump*ph);
+										if ($dataMap.scrollType === 2 || $dataMap.scrollType === 3) {	
+											if (dx-5>x) {
+												var lxjump = $gameMap.width() - (dx-x);
+												x1 = (lxjump*pw);
+											} 
 										}
-									}										
-									if (shape == 0) {
-										this._maskBitmap.FillRect(x1,y1,pw,ph,tile_color);
-									} 
-									if (shape == 1) { 
-										x1 = x1 + Number(xo1);
-										y1 = y1 + Number(yo1);
-										this._maskBitmap.FillRect(x1,y1,Number(xo2),Number(yo2),tile_color);
-									}	
-									if (shape == 2) {
-										x1 = x1 + Number(xo1);
-										y1 = y1 + Number(yo1);
-										//this._maskBitmap.FillRect(x1,y1,pw,ph,tile_color);
-										this._maskBitmap.FillCircle(x1,y1,Number(xo2),Number(yo2),tile_color);
-									}	
-									ctx.globalCompositeOperation = 'lighter';
-					    		}
-				        	}
-			        	}
+										if ($dataMap.scrollType === 1 || $dataMap.scrollType === 3) {
+											if (dy-5>y) {
+												var lyjump = $gameMap.height() -(dy-y);
+												y1 = (lyjump*ph);
+											}
+										}										
+										if (shape == 0) {
+											this._maskBitmap.FillRect(x1,y1,pw,ph,tile_color);
+										} 
+										if (shape == 1) { 
+											x1 = x1 + Number(xo1);
+											y1 = y1 + Number(yo1);
+											this._maskBitmap.FillRect(x1,y1,Number(xo2),Number(yo2),tile_color);
+										}	
+										if (shape == 2) {
+											x1 = x1 + Number(xo1);
+											y1 = y1 + Number(yo1);
+											//this._maskBitmap.FillRect(x1,y1,pw,ph,tile_color);
+											this._maskBitmap.FillCircle(x1,y1,Number(xo2),Number(yo2),tile_color);
+										}	
+										ctx.globalCompositeOperation = 'lighter';
+									}
+								}
+							}
+						}
 					}
 				}
-			}
 
-        	// *********************************** DAY NIGHT CYCLE FILTER **************************
+				// *********************************** DAY NIGHT CYCLE FILTER **************************
 
-			if (daynightset == true) {
+				if (daynightset == true) {
 
-		        var color1 = daynightcolors[daynightcycle];
+					var color1 = daynightcolors[daynightcycle];
+						
+					if (daynightspeed > 0) {
+						var nextcolor = daynightcycle+1;
+						if (nextcolor >= daynightHoursInDay ) {
+							nextcolor = 0;	
+						}
+						var color2 = daynightcolors[nextcolor];
+
+						var r = hexToRgb(color1).r;
+						var g = hexToRgb(color1).g;
+						var b = hexToRgb(color1).b;
+							
+						var r2 = hexToRgb(color2).r;
+						var g2 = hexToRgb(color2).g;
+						var b2 = hexToRgb(color2).b;		    			
+							
+						var stepR = (r2-r)/(60*daynightspeed);
+						var stepG = (g2-g)/(60*daynightspeed);
+						var stepB = (b2-b)/(60*daynightspeed);
+																				
+						r = Math.floor(r + (stepR * daynighttimer));
+						g = Math.floor(g + (stepG * daynighttimer));
+						b = Math.floor(b + (stepB * daynighttimer));
+														
+					}		    					    			
+					color1 = "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+						
+					this._maskBitmap.FillRect(0,0,maxX,maxY,color1);
+				}
+
+				// *********************************** TINT **************************
+
+				if (daynightset == false) {
+							
+					color1 = tint_value;
+					if (tint_value != Terrax_tint_target) {
+		
+						var tintdatenow = new Date();
+						var tintseconds = Math.floor(tintdatenow.getTime()/10); 
+						if (tintseconds > tint_oldseconds) {
+							tint_oldseconds = tintseconds; 
+							tint_timer ++;
+						}
+													
+						var r = hexToRgb(tint_value).r;
+						var g = hexToRgb(tint_value).g;
+						var b = hexToRgb(tint_value).b;
+											
+						var r2 = hexToRgb(Terrax_tint_target).r;
+						var g2 = hexToRgb(Terrax_tint_target).g;
+						var b2 = hexToRgb(Terrax_tint_target).b;		    			
+											
+						var stepR = (r2-r)/(60*Terrax_tint_speed);
+						var stepG = (g2-g)/(60*Terrax_tint_speed);
+						var stepB = (b2-b)/(60*Terrax_tint_speed);
+																								
+						r3 = Math.floor(r + (stepR * tint_timer));
+						g3 = Math.floor(g + (stepG * tint_timer));
+						b3 = Math.floor(b + (stepB * tint_timer));
+						if (r3<0) { r3 = 0 }
+						if (g3<0) { g3 = 0 }
+						if (b3<0) { b3 = 0 }
+						if (r3>255) { r3 = 255 }
+						if (g3>255) { g3 = 255 }
+						if (b3>255) { b3 = 255 }								
+						var reddone = false;
+						var greendone = false;
+						var bluedone = false;
+						if (stepR >=0 && r3>=r2) {
+							reddone = true;	
+						}
+						if (stepR <=0 && r3<=r2) {
+							reddone = true;	
+						}
+						if (stepG >=0 && g3>=g2) {
+							greendone = true;	
+						}
+						if (stepG <=0 && g3<=g2) {
+							greendone = true;	
+						}	
+						if (stepB >=0 && b3>=b2) {
+							bluedone = true;	
+						}
+						if (stepB <=0 && b3<=b2) {
+							bluedone = true;	
+						}					
+						if (reddone == true && bluedone == true && greendone == true) {
+							tint_value = Terrax_tint_target;
+						}
+						color1 = "#" + ((1 << 24) + (r3 << 16) + (g3 << 8) + b3).toString(16).slice(1);	    						    			
+					} else {
+						tint_timer = 0;
+					}		    					    			
 					
-				if (daynightspeed > 0) {
-    				var nextcolor = daynightcycle+1;
-    				if (nextcolor >= daynightHoursInDay ) {
-	    				nextcolor = 0;	
-    				}
-    				var color2 = daynightcolors[nextcolor];
-
-    				var r = hexToRgb(color1).r;
-		    		var g = hexToRgb(color1).g;
-		    		var b = hexToRgb(color1).b;
-		    			
-		    		var r2 = hexToRgb(color2).r;
-		    		var g2 = hexToRgb(color2).g;
-		    		var b2 = hexToRgb(color2).b;		    			
-		    			
-		    		var stepR = (r2-r)/(60*daynightspeed);
-		    		var stepG = (g2-g)/(60*daynightspeed);
-		    		var stepB = (b2-b)/(60*daynightspeed);
-		    						    					    			
-		    		r = Math.floor(r + (stepR * daynighttimer));
-		    		g = Math.floor(g + (stepG * daynighttimer));
-		    		b = Math.floor(b + (stepB * daynighttimer));
-		    						    			
-    			}		    					    			
-	  			color1 = "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
-					
-				this._maskBitmap.FillRect(0,0,maxX,maxY,color1);
-            }
-
-		    // *********************************** TINT **************************
-
-		    if (daynightset == false) {
-		    			
-				color1 = tint_value;
-			    if (tint_value != Terrax_tint_target) {
-	
-					var tintdatenow = new Date();
-					var tintseconds = Math.floor(tintdatenow.getTime()/10); 
-					if (tintseconds > tint_oldseconds) {
-						tint_oldseconds = tintseconds; 
-						tint_timer ++;
-					}
-				    							
-				    var r = hexToRgb(tint_value).r;
-					var g = hexToRgb(tint_value).g;
-					var b = hexToRgb(tint_value).b;
-						    			
-					var r2 = hexToRgb(Terrax_tint_target).r;
-					var g2 = hexToRgb(Terrax_tint_target).g;
-					var b2 = hexToRgb(Terrax_tint_target).b;		    			
-						    			
-					var stepR = (r2-r)/(60*Terrax_tint_speed);
-					var stepG = (g2-g)/(60*Terrax_tint_speed);
-					var stepB = (b2-b)/(60*Terrax_tint_speed);
-						    						    					    			
-					r3 = Math.floor(r + (stepR * tint_timer));
-					g3 = Math.floor(g + (stepG * tint_timer));
-					b3 = Math.floor(b + (stepB * tint_timer));
-					if (r3<0) { r3 = 0 }
-					if (g3<0) { g3 = 0 }
-					if (b3<0) { b3 = 0 }
-					if (r3>255) { r3 = 255 }
-					if (g3>255) { g3 = 255 }
-					if (b3>255) { b3 = 255 }								
-					var reddone = false;
-					var greendone = false;
-					var bluedone = false;
-					if (stepR >=0 && r3>=r2) {
-						reddone = true;	
-					}
-					if (stepR <=0 && r3<=r2) {
-						reddone = true;	
-					}
-					if (stepG >=0 && g3>=g2) {
-						greendone = true;	
-					}
-					if (stepG <=0 && g3<=g2) {
-						greendone = true;	
-					}	
-					if (stepB >=0 && b3>=b2) {
-						bluedone = true;	
-					}
-					if (stepB <=0 && b3<=b2) {
-						bluedone = true;	
-					}					
-					if (reddone == true && bluedone == true && greendone == true) {
-						tint_value = Terrax_tint_target;
-					}
-					color1 = "#" + ((1 << 24) + (r3 << 16) + (g3 << 8) + b3).toString(16).slice(1);	    						    			
-				} else {
-					tint_timer = 0;
-				}		    					    			
+									
+					this._maskBitmap.FillRect(0,0,maxX,maxY,color1);
+				}
 				
-			    				
-				this._maskBitmap.FillRect(0,0,maxX,maxY,color1);
-	    	}
-	    	
-			// reset drawmode to normal
-		    ctx.globalCompositeOperation =  'source-over';	    
-		}
-	};
-	
-
-	
-	
-	
-	/**
-	 * @method _addSprite
-	 * @private
-	 */
-	Lightmask.prototype._addSprite = function(x1,y1,selectedbitmap) {
-		
-	    var sprite = new Sprite(this.viewport);
-	    sprite.bitmap = selectedbitmap;
-	    sprite.opacity = 255;
-	    sprite.blendMode = 2;
-	    sprite.x = x1;
-	 	sprite.y = y1;
-	    this._sprites.push(sprite);
-	    this.addChild(sprite);
-	    sprite.rotation = 0;
-	    sprite.ax = 0
-	    sprite.ay = 0
-	 	sprite.opacity = 255;
-	};
-	
-	/**
-	 * @method _removeSprite
-	 * @private
-	 */
-	Lightmask.prototype._removeSprite = function() {
-	    this.removeChild(this._sprites.pop());
-	};
-	
-	
-		
-	// *******************  NORMAL BOX SHAPE ***********************************
-	
-	Bitmap.prototype.FillRect = function(x1, y1, x2, y2, color1) {
-	    var context = this._context;
-	    context.save();
-	    context.fillStyle = color1;
-	    context.fillRect(x1, y1, x2, y2);
-	    context.restore();
-	    this._setDirty();
-	};
-	
-	// *******************  CIRCLE/OVAL SHAPE ***********************************
-	// from http://scienceprimer.com/draw-oval-html5-canvas
-	Bitmap.prototype.FillCircle = function(centerX, centerY, xradius, yradius, color1) {
-	    var context = this._context;
-	    context.save();
-	    context.fillStyle = color1;
-	   	context.beginPath();
-	   	var rotation = 0;
-	   	var start_angle = 0;
-	   	var end_angle = 2 * Math.PI;
-		for (var i = start_angle * Math.PI; i < end_angle * Math.PI; i += 0.01 ) {
-    		xPos = centerX - (yradius * Math.sin(i)) * Math.sin(rotation * Math.PI) + (xradius * Math.cos(i)) * Math.cos(rotation * Math.PI);
-    		yPos = centerY + (xradius * Math.cos(i)) * Math.sin(rotation * Math.PI) + (yradius * Math.sin(i)) * Math.cos(rotation * Math.PI);
-
-    		if (i == 0) {
-        		context.moveTo(xPos, yPos);
-    		} else {
-        		context.lineTo(xPos, yPos);
-    		}
-		}
-		context.fill();
-		context.closePath();
-	    context.restore();
-	    this._setDirty();
-	};
-	
-	
-	// *******************  NORMAL LIGHT SHAPE ***********************************
-	// Fill gradient circle
-	
-	Bitmap.prototype.radialgradientFillRect = function(x1, y1, r1, r2, color1, color2, flicker, brightness, direction) {
-		if (!brightness) { brightness = 0.0; }
-		if (!direction) {direction = 0; }
-	    var context = this._context;
-	    var grad;	  
-	    var wait = Math.floor((Math.random()*8)+1); 
-	   	if (flicker == true && wait == 1) {
-		   	//var flickerradiusshift = 7;
-    		//var flickercolorshift = 10;
-		    var gradrnd = Math.floor((Math.random()*flickerradiusshift)+1); 
-		  	var colorrnd = Math.floor((Math.random()*flickercolorshift)-(flickercolorshift/2)); 
-		  	
-		    var r = hexToRgb(color1).r;
-		    var g = hexToRgb(color1).g;
-		    var b = hexToRgb(color1).b;
-		    g = g + colorrnd;
-		    if (g<0) { g = 0; }
-			if (g>255) { g = 255; }
-		  	color1 = "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
-		    r2 = r2 - gradrnd;  
-		    if (r2 < 0) r2=0;
-  		}
-  		
-	  	grad = context.createRadialGradient(x1, y1, r1, x1, y1, r2);
-	    grad.addColorStop(0, '#FFFFFF');
-	    grad.addColorStop(brightness, color1);
-	   	grad.addColorStop(1, color2);
-
-	    context.save();
-	    context.fillStyle = grad;
-	    direction = Number(direction);
-	    var pw = $gameMap.tileWidth()/2;
-	    var ph = $gameMap.tileHeight()/2;
-	    switch(direction) {
-	    	case 0:
-	    		context.fillRect(x1-r2, y1-r2, r2*2, r2*2);
-	       	    break;
-	   		case 1:
-	   			context.fillRect(x1-r2, y1-ph, r2*2, r2*2);
-	       	    break;
-	   		case 2:
-	   			context.fillRect(x1-r2, y1-r2, r2*1+pw, r2*2);
-	       	    break;
-	        case 3:
-	            context.fillRect(x1-r2, y1-r2, r2*2, r2*1+ph);
-	       	    break;
-	        case 4:
-	            context.fillRect(x1-pw, y1-r2, r2*2, r2*2);
-	       	    break;	       	    
-		} 
-	    
-	    
-	    // context.fillRect(x1-r2, y1-r2, r2*2, r2*2);
-	    context.restore();
-	    this._setDirty();
-	};
-	
-	// ********************************** FLASHLIGHT *************************************
-	// Fill gradient Cone
-	
-	Bitmap.prototype.radialgradientFillRect2 = function(x1, y1, r1, r2, color1, color2, direction, flashlength, flashwidth) {
-	    var context = this._context;
-	    var grad;	
-	    
-	    // smal dim glove around player
-	   	context.save();
-	    y1 = y1 - flashlightoffset;
-	     
-	    r1 = 1;
-	  	r2 = 40;
-		grad = context.createRadialGradient(x1, y1, r1, x1, y1, r2);
-		grad.addColorStop(0, '#999999');
-		grad.addColorStop(1, color2);
-	
-		context.fillStyle = grad;
-		context.fillRect(x1-r2, y1-r2, r2*2, r2*2);
-	    
-	    // flashlight
-	    
-		for (var cone = 0; cone < flashlength; cone++) {
-		   	r1 = cone * flashlightdensity;
-	  		r2 = cone * flashwidth;
-	  		
-	  		switch(direction) {
-	    		case 6:
-	    			x1 = x1 + cone*6;
-	       	    	break;
-	   			case 4:
-	   				x1 = x1 - cone*6;
-	       	    	break;
-	   			case 2:
-	   				y1 = y1 + cone*6;
-	       	    	break;
-	            case 8:
-	            	y1 = y1 - cone*6;
-	       	    	break;
-			} 
-	  		  		
-
-		  	grad = context.createRadialGradient(x1, y1, r1, x1, y1, r2);
-		    grad.addColorStop(0, color1);
-		    grad.addColorStop(1, color2);
-	
-		    context.fillStyle = grad;
-		    context.fillRect(x1-r2, y1-r2, r2*2, r2*2);
-    	}
-	    context.fillStyle = grad;
-		context.fillRect(x1-r2, y1-r2, r2*2, r2*2);
-		
-	    context.restore();	    
-	    this._setDirty();
-	};
-	
-	
-	function hexToRgb(hex) {
-    	var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    	return result ? {
-        	r: parseInt(result[1], 16),
-        	g: parseInt(result[2], 16),
-        	b: parseInt(result[3], 16)
-    	} : null;
-	}
-	
-	// Saving Variables in Game_Variables 
-	// Big thanks to Schlangan for the code.
-	
-	Game_Variables.prototype.valueRadiusSave = function() {
-		return this._Terrax_Lighting_Radius || 0;
-	};
-	Game_Variables.prototype.valueDayNightSave = function() {
-		return this._Terrax_Lighting_DayNight || 0;
-	};
-	Game_Variables.prototype.valueDayNightSaveMin = function() {
-		return this._Terrax_Lighting_DayNightMin || 0;
-	};
-	Game_Variables.prototype.valueSpeedDayNightSave = function() {
-		return this._Terrax_Lighting_SpeedDayNight || 0;
-	};
-	Game_Variables.prototype.valueFlashLightSave = function() {
-		return this._Terrax_Lighting_FlashLight || false;
-	};
-	Game_Variables.prototype.valueFireSave = function() {
-		return this._Terrax_Lighting_Fire || false;
-	};
-	Game_Variables.prototype.setDayNightSave = function(value) {
-		this._Terrax_Lighting_DayNight = value;
-	};
-	Game_Variables.prototype.setDayNightSaveMin = function(value) {
-		this._Terrax_Lighting_DayNightMin = value;
-	};
-	Game_Variables.prototype.setRadiusSave = function(value) {
-		this._Terrax_Lighting_Radius = value;
-	};
-	Game_Variables.prototype.setSpeedDayNightSave = function(value) {
-		this._Terrax_Lighting_SpeedDayNight = value;
-	};
-	Game_Variables.prototype.setFlashLight = function(value) {
-		this._Terrax_Lighting_FlashLight = value;
-	};
-	Game_Variables.prototype.setFire = function(value) {
-		this._Terrax_Lighting_Fire = value;
-	};
-	Game_Variables.prototype.setFireRadius = function(value) {
-		this._Terrax_Lighting_FireRadius = value;
-	};
-	Game_Variables.prototype.valueFireRadiusSave = function() {
-		return this._Terrax_Lighting_FireRadius || false;
-	};	
-	Game_Variables.prototype.setFireColorshift = function(value) {
-		this._Terrax_Lighting_FireColorshift = value;
-	};
-	Game_Variables.prototype.valueFireColorshiftSave = function() {
-		return this._Terrax_Lighting_FireColorshift || false;
-	};	
-	Game_Variables.prototype.setMog = function(value) {
-		this._Terrax_Lighting_Mog = value;
-	};
-	Game_Variables.prototype.valueMog = function() {
-		return this._Terrax_Lighting_Mog || false;
-	};	
-	Game_Variables.prototype.setPlayerColor = function(value) {
-		this._Terrax_Lighting_PlayerColor = value;
-	};
-	Game_Variables.prototype.valuePlayerColorSave = function() {
-		return this._Terrax_Lighting_PlayerColor || '#FFFFFF';
-	};
-	Game_Variables.prototype.setPlayerBrightness = function(value) {
-		this._Terrax_Lighting_PlayerBrightness = value;
-	};
-	Game_Variables.prototype.valuePlayerBrightnessSave = function() {
-		return this._Terrax_Lighting_PlayerBrightness || 0.0;
-	};
-	Game_Variables.prototype.setTintValue = function(value) {
-		this._Terrax_Tint_Value = value;
-	};
-	Game_Variables.prototype.valueTintValueSave = function() {
-		return this._Terrax_Tint_Value || '#000000';
-	};
-	
-	Game_Variables.prototype.setFlashlightDensity = function(value) {
-		this._Terrax_Lighting_FlashlightDensity = value;
-	};
-	Game_Variables.prototype.valueFlashlightDensity = function() {
-		return this._Terrax_Lighting_FlashlightDensity || 3;
-	};	
-	Game_Variables.prototype.setFlashlightLength = function(value) {
-		this._Terrax_Lighting_FlashlightLength = value;
-	};
-	Game_Variables.prototype.valueFlashlightLength = function() {
-		return this._Terrax_Lighting_FlashlightLength || 8;
-	};
-	Game_Variables.prototype.setFlashlightWidth = function(value) {
-		this._Terrax_Lighting_FlashlightWidth = value;
-	};
-	Game_Variables.prototype.valueFlashlightWidth = function() {
-		return this._Terrax_Lighting_FlashlightWidth || 12;
-	};
-
-	Game_Variables.prototype.valueDayNightColor = function() {
-	    var default_color = [ '#FF0000', '#FF0000', '#FF0000', '#FF0000',
-	                          '#FF0000', '#FF0000', '#FF0000', '#FF0000',
-	                          '#FF0000', '#FF0000', '#FF0000', '#FF0000',
-	                          '#FF0000', '#FF0000', '#FF0000', '#FF0000',
-	                          '#FF0000', '#FF0000', '#FF0000', '#FF0000',
-	                          '#FF0000', '#FF0000', '#FF0000', '#FF0000' ];
-    	return this._Terrax_Lighting_DayNightColor || default_color;
-	};
-
-	Game_Variables.prototype.setDayNightColorArray = function(value) {
-    	this._Terrax_Lighting_DayNightColor = value;
-	};
-
-	Game_Variables.prototype.valueLightArrayId = function() {
-	    var default_LAI = [];
-    	return this._Terrax_Lighting_LightArrayId || default_LAI;
-	};
-
-	Game_Variables.prototype.setLightArrayId = function(value) {
-    	this._Terrax_Lighting_LightArrayId = value;
-	};	
-	
-	Game_Variables.prototype.valueLightArrayState = function() {
-	   	var default_LAS = [];
-    	return this._Terrax_Lighting_LightArrayState || default_LAS;
-	};
-
-	Game_Variables.prototype.setLightArrayState = function(value) {
-    	this._Terrax_Lighting_LightArrayState = value;
-	};	
-	
-	Game_Variables.prototype.valueTileArray = function() {
-	   	var default_TA = [];
-    	return this._Terrax_Lighting_TileArray || default_TA;
-	};
-
-	Game_Variables.prototype.setTileArray = function(value) {
-    	this._Terrax_Lighting_TileArray = value;
-	};
-	
-	Game_Variables.prototype.setmogtintarray = function(value) {
-    	this._Terrax_Lighting_MogTintArray = value;
-	};
-	
-	Game_Variables.prototype.valuemogtintarray = function() {
-	   	var default_MT = [];
-    	return this._Terrax_Lighting_MogTintArray || default_MT;
-	};		
-	
-	Game_Variables.prototype.valueScriptActive = function() {
-		if (typeof this._Terrax_Lighting_ScriptActive == 'undefined') {
-			this._Terrax_Lighting_ScriptActive = true;
-		}
-		return this._Terrax_Lighting_ScriptActive || false;
-	};
-	
-	Game_Variables.prototype.setScriptActive = function(value) {
-		this._Terrax_Lighting_ScriptActive = value;
-	};
-	
-	
-	function SaveLightingVariables() {
-
-			var storeddata = $gameVariables.valueRadiusSave();
-			if (storeddata > 0) {
-				player_radius = storeddata;
+				// reset drawmode to normal
+				ctx.globalCompositeOperation =  'source-over';	    
 			}
+		};
+		
 
-			var storeddata = $gameVariables.valueDayNightSave();
-			if (storeddata > 0) {
-				daynightcycle = storeddata;
-				if (daynightsave > 0) {
-					$gameVariables.setValue(daynightsave, daynightcycle);
-				}
-			}
-			daynightminutes = $gameVariables.valueDayNightSaveMin();
-			daynighttimer = daynightminutes * daynightspeed; 		
-
-			var storeddata = $gameVariables.valueSpeedDayNightSave();
-			if (storeddata > 0) {
-				daynightspeed = storeddata;
+		
+		
+		
+		/**
+		 * @method _addSprite
+		 * @private
+		 */
+		Lightmask.prototype._addSprite = function(x1,y1,selectedbitmap) {
 			
-				if (daynightspeed == 0) {
-				   daynightspeed = 1000;
-				   daynightstop = true;
-			    } else {
-			       daynightstop = false;
+			var sprite = new Sprite(this.viewport);
+			sprite.bitmap = selectedbitmap;
+			sprite.opacity = 255;
+			sprite.blendMode = 2;
+			sprite.x = x1;
+			sprite.y = y1;
+			this._sprites.push(sprite);
+			this.addChild(sprite);
+			sprite.rotation = 0;
+			sprite.ax = 0
+			sprite.ay = 0
+			sprite.opacity = 255;
+		};
+		
+		/**
+		 * @method _removeSprite
+		 * @private
+		 */
+		Lightmask.prototype._removeSprite = function() {
+			this.removeChild(this._sprites.pop());
+		};
+		
+		
+			
+		// *******************  NORMAL BOX SHAPE ***********************************
+		
+		Bitmap.prototype.FillRect = function(x1, y1, x2, y2, color1) {
+			var context = this._context;
+			context.save();
+			context.fillStyle = color1;
+			context.fillRect(x1, y1, x2, y2);
+			context.restore();
+			this._setDirty();
+		};
+		
+		// *******************  CIRCLE/OVAL SHAPE ***********************************
+		// from http://scienceprimer.com/draw-oval-html5-canvas
+		Bitmap.prototype.FillCircle = function(centerX, centerY, xradius, yradius, color1) {
+			var context = this._context;
+			context.save();
+			context.fillStyle = color1;
+			context.beginPath();
+			var rotation = 0;
+			var start_angle = 0;
+			var end_angle = 2 * Math.PI;
+			for (var i = start_angle * Math.PI; i < end_angle * Math.PI; i += 0.01 ) {
+				xPos = centerX - (yradius * Math.sin(i)) * Math.sin(rotation * Math.PI) + (xradius * Math.cos(i)) * Math.cos(rotation * Math.PI);
+				yPos = centerY + (xradius * Math.cos(i)) * Math.sin(rotation * Math.PI) + (yradius * Math.sin(i)) * Math.cos(rotation * Math.PI);
+
+				if (i == 0) {
+					context.moveTo(xPos, yPos);
+				} else {
+					context.lineTo(xPos, yPos);
 				}
 			}
-			scriptactive = $gameVariables.valueScriptActive();
-			playercolor = $gameVariables.valuePlayerColorSave();
-			playerflicker = $gameVariables.valueFireSave();
-			playerflashlight = $gameVariables.valueFlashLightSave();
-    		flashlightwidth = $gameVariables.valueFlashlightWidth(); 
-    		flashlightlength = $gameVariables.valueFlashlightLength(); 
-    		flashlightdensity = $gameVariables.valueFlashlightDensity(); 
- 
-			daynightcolors =  $gameVariables.valueDayNightColor();
-			lightarray_id = $gameVariables.valueLightArrayId();
-			lightarray_state = $gameVariables.valueLightArrayState();
-			flickerradiusshift = $gameVariables.valueFireRadiusSave();
-			flickercolorshift = $gameVariables.valueFireColorshiftSave();
-			tint_value = $gameVariables.valueTintValueSave();
-			Terrax_tint_target = $gameVariables.valueTintValueSave();
-			tilearray = $gameVariables.valueTileArray();
-			mogtint = $gameVariables.valuemogtintarray();
-			playerbrightness = $gameVariables.valuePlayerBrightnessSave();
-			moghunter = $gameVariables.valueMog();		
-	};
-	
-
-	
-	//****
-	// Debug
-	//****
-
-	Graphics.Debug = function(name, message) {
-    	if (this._errorPrinter) {
-        	this._errorPrinter.innerHTML = this._makeErrorHtml(name, message);
-    	}
-	}
-	
-	//****
-	// This function is overwritten from rpg_sprites.js
-	//****
-
-	Spriteset_Map.prototype.createLowerLayer = function() {
-	    Spriteset_Base.prototype.createLowerLayer.call(this);
-	    this.createParallax();
-	    this.createTilemap();
-	    this.createCharacters();
-	    this.createShadow();
-	    this.createDestination();
-	    this.createLightmask();
-	    this.createWeather();
-	
-	}
-
+			context.fill();
+			context.closePath();
+			context.restore();
+			this._setDirty();
+		};
 		
-	//****
-	// These functions are overwritten from objects/sprites/scenes.
-	//****
-	
-	
-	Game_CharacterBase.prototype.setDirection = function(d) {
+		
+		// *******************  NORMAL LIGHT SHAPE ***********************************
+		// Fill gradient circle
+		
+		Bitmap.prototype.radialgradientFillRect = function(x1, y1, r1, r2, color1, color2, flicker, brightness, direction) {
+			if (!brightness) { brightness = 0.0; }
+			if (!direction) {direction = 0; }
+			var context = this._context;
+			var grad;	  
+			var wait = Math.floor((Math.random()*8)+1); 
+			if (flicker == true && wait == 1) {
+				//var flickerradiusshift = 7;
+				//var flickercolorshift = 10;
+				var gradrnd = Math.floor((Math.random()*flickerradiusshift)+1); 
+				var colorrnd = Math.floor((Math.random()*flickercolorshift)-(flickercolorshift/2)); 
 				
-	    if (!this.isDirectionFixed() && d) {
-	        this._direction = d;
+				var r = hexToRgb(color1).r;
+				var g = hexToRgb(color1).g;
+				var b = hexToRgb(color1).b;
+				g = g + colorrnd;
+				if (g<0) { g = 0; }
+				if (g>255) { g = 255; }
+				color1 = "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+				r2 = r2 - gradrnd;  
+				if (r2 < 0) r2=0;
+			}
+			
+			grad = context.createRadialGradient(x1, y1, r1, x1, y1, r2);
+			grad.addColorStop(0, '#FFFFFF');
+			grad.addColorStop(brightness, color1);
+			grad.addColorStop(1, color2);
+
+			context.save();
+			context.fillStyle = grad;
+			direction = Number(direction);
+			var pw = $gameMap.tileWidth()/2;
+			var ph = $gameMap.tileHeight()/2;
+			switch(direction) {
+				case 0:
+					context.fillRect(x1-r2, y1-r2, r2*2, r2*2);
+					break;
+				case 1:
+					context.fillRect(x1-r2, y1-ph, r2*2, r2*2);
+					break;
+				case 2:
+					context.fillRect(x1-r2, y1-r2, r2*1+pw, r2*2);
+					break;
+				case 3:
+					context.fillRect(x1-r2, y1-r2, r2*2, r2*1+ph);
+					break;
+				case 4:
+					context.fillRect(x1-pw, y1-r2, r2*2, r2*2);
+					break;	       	    
+			} 
+			
+			
+			// context.fillRect(x1-r2, y1-r2, r2*2, r2*2);
+			context.restore();
+			this._setDirty();
+		};
+		
+		// ********************************** FLASHLIGHT *************************************
+		// Fill gradient Cone
+		
+		Bitmap.prototype.radialgradientFillRect2 = function(x1, y1, r1, r2, color1, color2, direction, flashlength, flashwidth) {
+			var context = this._context;
+			var grad;	
+			
+			// smal dim glove around player
+			context.save();
+			y1 = y1 - flashlightoffset;
+			
+			r1 = 1;
+			r2 = 40;
+			grad = context.createRadialGradient(x1, y1, r1, x1, y1, r2);
+			grad.addColorStop(0, '#999999');
+			grad.addColorStop(1, color2);
+		
+			context.fillStyle = grad;
+			context.fillRect(x1-r2, y1-r2, r2*2, r2*2);
+			
+			// flashlight
+			
+			for (var cone = 0; cone < flashlength; cone++) {
+				r1 = cone * flashlightdensity;
+				r2 = cone * flashwidth;
+				
+				switch(direction) {
+					case 6:
+						x1 = x1 + cone*6;
+						break;
+					case 4:
+						x1 = x1 - cone*6;
+						break;
+					case 2:
+						y1 = y1 + cone*6;
+						break;
+					case 8:
+						y1 = y1 - cone*6;
+						break;
+				} 
+						
+
+				grad = context.createRadialGradient(x1, y1, r1, x1, y1, r2);
+				grad.addColorStop(0, color1);
+				grad.addColorStop(1, color2);
+		
+				context.fillStyle = grad;
+				context.fillRect(x1-r2, y1-r2, r2*2, r2*2);
+			}
+			context.fillStyle = grad;
+			context.fillRect(x1-r2, y1-r2, r2*2, r2*2);
+			
+			context.restore();	    
+			this._setDirty();
+		};
+		
+		
+		function hexToRgb(hex) {
+			var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+			return result ? {
+				r: parseInt(result[1], 16),
+				g: parseInt(result[2], 16),
+				b: parseInt(result[3], 16)
+			} : null;
 		}
 		
-		if (!this.isDirectionFixed() ) {
+		// Saving Variables in Game_Variables 
+		// Big thanks to Schlangan for the code.
+		
+		Game_Variables.prototype.valueRadiusSave = function() {
+			return this._Terrax_Lighting_Radius || 0;
+		};
+		Game_Variables.prototype.valueDayNightSave = function() {
+			return this._Terrax_Lighting_DayNight || 0;
+		};
+		Game_Variables.prototype.valueDayNightSaveMin = function() {
+			return this._Terrax_Lighting_DayNightMin || 0;
+		};
+		Game_Variables.prototype.valueSpeedDayNightSave = function() {
+			return this._Terrax_Lighting_SpeedDayNight || 0;
+		};
+		Game_Variables.prototype.valueFlashLightSave = function() {
+			return this._Terrax_Lighting_FlashLight || false;
+		};
+		Game_Variables.prototype.valueFireSave = function() {
+			return this._Terrax_Lighting_Fire || false;
+		};
+		Game_Variables.prototype.setDayNightSave = function(value) {
+			this._Terrax_Lighting_DayNight = value;
+		};
+		Game_Variables.prototype.setDayNightSaveMin = function(value) {
+			this._Terrax_Lighting_DayNightMin = value;
+		};
+		Game_Variables.prototype.setRadiusSave = function(value) {
+			this._Terrax_Lighting_Radius = value;
+		};
+		Game_Variables.prototype.setSpeedDayNightSave = function(value) {
+			this._Terrax_Lighting_SpeedDayNight = value;
+		};
+		Game_Variables.prototype.setFlashLight = function(value) {
+			this._Terrax_Lighting_FlashLight = value;
+		};
+		Game_Variables.prototype.setFire = function(value) {
+			this._Terrax_Lighting_Fire = value;
+		};
+		Game_Variables.prototype.setFireRadius = function(value) {
+			this._Terrax_Lighting_FireRadius = value;
+		};
+		Game_Variables.prototype.valueFireRadiusSave = function() {
+			return this._Terrax_Lighting_FireRadius || false;
+		};	
+		Game_Variables.prototype.setFireColorshift = function(value) {
+			this._Terrax_Lighting_FireColorshift = value;
+		};
+		Game_Variables.prototype.valueFireColorshiftSave = function() {
+			return this._Terrax_Lighting_FireColorshift || false;
+		};	
+		Game_Variables.prototype.setMog = function(value) {
+			this._Terrax_Lighting_Mog = value;
+		};
+		Game_Variables.prototype.valueMog = function() {
+			return this._Terrax_Lighting_Mog || false;
+		};	
+		Game_Variables.prototype.setPlayerColor = function(value) {
+			this._Terrax_Lighting_PlayerColor = value;
+		};
+		Game_Variables.prototype.valuePlayerColorSave = function() {
+			return this._Terrax_Lighting_PlayerColor || '#FFFFFF';
+		};
+		Game_Variables.prototype.setPlayerBrightness = function(value) {
+			this._Terrax_Lighting_PlayerBrightness = value;
+		};
+		Game_Variables.prototype.valuePlayerBrightnessSave = function() {
+			return this._Terrax_Lighting_PlayerBrightness || 0.0;
+		};
+		Game_Variables.prototype.setTintValue = function(value) {
+			this._Terrax_Tint_Value = value;
+		};
+		Game_Variables.prototype.valueTintValueSave = function() {
+			return this._Terrax_Tint_Value || '#000000';
+		};
+		
+		Game_Variables.prototype.setFlashlightDensity = function(value) {
+			this._Terrax_Lighting_FlashlightDensity = value;
+		};
+		Game_Variables.prototype.valueFlashlightDensity = function() {
+			return this._Terrax_Lighting_FlashlightDensity || 3;
+		};	
+		Game_Variables.prototype.setFlashlightLength = function(value) {
+			this._Terrax_Lighting_FlashlightLength = value;
+		};
+		Game_Variables.prototype.valueFlashlightLength = function() {
+			return this._Terrax_Lighting_FlashlightLength || 8;
+		};
+		Game_Variables.prototype.setFlashlightWidth = function(value) {
+			this._Terrax_Lighting_FlashlightWidth = value;
+		};
+		Game_Variables.prototype.valueFlashlightWidth = function() {
+			return this._Terrax_Lighting_FlashlightWidth || 12;
+		};
+
+		Game_Variables.prototype.valueDayNightColor = function() {
+			var default_color = [ '#FF0000', '#FF0000', '#FF0000', '#FF0000',
+								'#FF0000', '#FF0000', '#FF0000', '#FF0000',
+								'#FF0000', '#FF0000', '#FF0000', '#FF0000',
+								'#FF0000', '#FF0000', '#FF0000', '#FF0000',
+								'#FF0000', '#FF0000', '#FF0000', '#FF0000',
+								'#FF0000', '#FF0000', '#FF0000', '#FF0000' ];
+			return this._Terrax_Lighting_DayNightColor || default_color;
+		};
+
+		Game_Variables.prototype.setDayNightColorArray = function(value) {
+			this._Terrax_Lighting_DayNightColor = value;
+		};
+
+		Game_Variables.prototype.valueLightArrayId = function() {
+			var default_LAI = [];
+			return this._Terrax_Lighting_LightArrayId || default_LAI;
+		};
+
+		Game_Variables.prototype.setLightArrayId = function(value) {
+			this._Terrax_Lighting_LightArrayId = value;
+		};	
+		
+		Game_Variables.prototype.valueLightArrayState = function() {
+			var default_LAS = [];
+			return this._Terrax_Lighting_LightArrayState || default_LAS;
+		};
+
+		Game_Variables.prototype.setLightArrayState = function(value) {
+			this._Terrax_Lighting_LightArrayState = value;
+		};	
+		
+		Game_Variables.prototype.valueTileArray = function() {
+			var default_TA = [];
+			return this._Terrax_Lighting_TileArray || default_TA;
+		};
+
+		Game_Variables.prototype.setTileArray = function(value) {
+			this._Terrax_Lighting_TileArray = value;
+		};
+		
+		Game_Variables.prototype.setmogtintarray = function(value) {
+			this._Terrax_Lighting_MogTintArray = value;
+		};
+		
+		Game_Variables.prototype.valuemogtintarray = function() {
+			var default_MT = [];
+			return this._Terrax_Lighting_MogTintArray || default_MT;
+		};		
+		
+		Game_Variables.prototype.valueScriptActive = function() {
+			if (typeof this._Terrax_Lighting_ScriptActive == 'undefined') {
+				this._Terrax_Lighting_ScriptActive = true;
+			}
+			return this._Terrax_Lighting_ScriptActive || false;
+		};
+		
+		Game_Variables.prototype.setScriptActive = function(value) {
+			this._Terrax_Lighting_ScriptActive = value;
+		};
+		
+		
+		function SaveLightingVariables() {
+
+				var storeddata = $gameVariables.valueRadiusSave();
+				if (storeddata > 0) {
+					player_radius = storeddata;
+				}
+
+				var storeddata = $gameVariables.valueDayNightSave();
+				if (storeddata > 0) {
+					daynightcycle = storeddata;
+					if (daynightsave > 0) {
+						$gameVariables.setValue(daynightsave, daynightcycle);
+					}
+				}
+				daynightminutes = $gameVariables.valueDayNightSaveMin();
+				daynighttimer = daynightminutes * daynightspeed; 		
+
+				var storeddata = $gameVariables.valueSpeedDayNightSave();
+				if (storeddata > 0) {
+					daynightspeed = storeddata;
+				
+					if (daynightspeed == 0) {
+					daynightspeed = 1000;
+					daynightstop = true;
+					} else {
+					daynightstop = false;
+					}
+				}
+				scriptactive = $gameVariables.valueScriptActive();
+				playercolor = $gameVariables.valuePlayerColorSave();
+				playerflicker = $gameVariables.valueFireSave();
+				playerflashlight = $gameVariables.valueFlashLightSave();
+				flashlightwidth = $gameVariables.valueFlashlightWidth(); 
+				flashlightlength = $gameVariables.valueFlashlightLength(); 
+				flashlightdensity = $gameVariables.valueFlashlightDensity(); 
+	
+				daynightcolors =  $gameVariables.valueDayNightColor();
+				lightarray_id = $gameVariables.valueLightArrayId();
+				lightarray_state = $gameVariables.valueLightArrayState();
+				flickerradiusshift = $gameVariables.valueFireRadiusSave();
+				flickercolorshift = $gameVariables.valueFireColorshiftSave();
+				tint_value = $gameVariables.valueTintValueSave();
+				Terrax_tint_target = $gameVariables.valueTintValueSave();
+				tilearray = $gameVariables.valueTileArray();
+				mogtint = $gameVariables.valuemogtintarray();
+				playerbrightness = $gameVariables.valuePlayerBrightnessSave();
+				moghunter = $gameVariables.valueMog();		
+		};
+		
+
+		
+		//****
+		// Debug
+		//****
+
+		Graphics.Debug = function(name, message) {
+			if (this._errorPrinter) {
+				this._errorPrinter.innerHTML = this._makeErrorHtml(name, message);
+			}
+		}
+		
+		//****
+		// This function is overwritten from rpg_sprites.js
+		//****
+
+		Spriteset_Map.prototype.createLowerLayer = function() {
+			Spriteset_Base.prototype.createLowerLayer.call(this);
+			this.createParallax();
+			this.createTilemap();
+			this.createCharacters();
+			this.createShadow();
+			this.createDestination();
+			this.createLightmask();
+			this.createWeather();
+		
+		}
+
+			
+		//****
+		// These functions are overwritten from objects/sprites/scenes.
+		//****
+		
+		
+		Game_CharacterBase.prototype.setDirection = function(d) {
+					
+			if (!this.isDirectionFixed() && d) {
+				this._direction = d;
+			}
+			
+			if (!this.isDirectionFixed() ) {
+				
+				var evid = this._eventId;    // Capture the realX and realY of moving events.
+				if (evid) {
+					if ($dataMap.events[evid]) {
+						var note = $dataMap.events[evid].note;  
+						var note_args = note.split(" ");
+						var note_command = note_args.shift().toLowerCase();
+						if (note_command == "light" || note_command == "fire" || note_command == "flashlight") {
+							//Graphics.printError('test',evid + ' ' + this._realX + ' '+ this._pattern);
+							var idfound = false;
+							for (var i = 0; i < move_event_id.length; i++) {
+								if (move_event_id[i] == evid) {
+									idfound = true;
+									move_event_x[i] = this._realX;
+									move_event_y[i] = this._realY;
+									move_event_dir[i] = this._direction;
+								}
+							}
+		
+						}
+					}
+				}
+			}
+			this.resetStopCount();
+		}
+		
+
+		Game_CharacterBase.prototype.updateMove = function() {
 			
 			var evid = this._eventId;    // Capture the realX and realY of moving events.
 			if (evid) {
@@ -1799,7 +1830,7 @@ Imported.TerraxLighting = true;
 					var note_args = note.split(" ");
 					var note_command = note_args.shift().toLowerCase();
 					if (note_command == "light" || note_command == "fire" || note_command == "flashlight") {
-						//Graphics.printError('test',evid + ' ' + this._realX + ' '+ this._pattern);
+						//Graphics.printError('test',evid + ' ' + this._realX + ' '+ this._realY);
 						var idfound = false;
 						for (var i = 0; i < move_event_id.length; i++) {
 							if (move_event_id[i] == evid) {
@@ -1809,79 +1840,59 @@ Imported.TerraxLighting = true;
 								move_event_dir[i] = this._direction;
 							}
 						}
-	
-					}
-				}
-			}
-		}
-	    this.resetStopCount();
-	}
-	
-
-	Game_CharacterBase.prototype.updateMove = function() {
-		
-		var evid = this._eventId;    // Capture the realX and realY of moving events.
-		if (evid) {
-			if ($dataMap.events[evid]) {
-				var note = $dataMap.events[evid].note;  
-				var note_args = note.split(" ");
-				var note_command = note_args.shift().toLowerCase();
-				if (note_command == "light" || note_command == "fire" || note_command == "flashlight") {
-					//Graphics.printError('test',evid + ' ' + this._realX + ' '+ this._realY);
-					var idfound = false;
-					for (var i = 0; i < move_event_id.length; i++) {
-						if (move_event_id[i] == evid) {
-							idfound = true;
-							move_event_x[i] = this._realX;
-							move_event_y[i] = this._realY;
-							move_event_dir[i] = this._direction;
+						if (idfound == false) {
+							move_event_id.push(evid);
+							move_event_x.push(this._realX);
+							move_event_y.push(this._realY);	
+							move_event_dir.push(this._direction);
 						}
 					}
-					if (idfound == false) {
-						move_event_id.push(evid);
-						move_event_x.push(this._realX);
-						move_event_y.push(this._realY);	
-						move_event_dir.push(this._direction);
-					}
 				}
 			}
+			//Graphics.printError('test',evid + ' ' + this._realX + ' '+ this._realY);
+			
+			if (this._x < this._realX) {
+				this._realX = Math.max(this._realX - this.distancePerFrame(), this._x);
+			}
+			if (this._x > this._realX) {
+				this._realX = Math.min(this._realX + this.distancePerFrame(), this._x);
+			}
+			if (this._y < this._realY) {
+				this._realY = Math.max(this._realY - this.distancePerFrame(), this._y);
+			}
+			if (this._y > this._realY) {
+				this._realY = Math.min(this._realY + this.distancePerFrame(), this._y);
+			}
+			if (!this.isMoving()) {
+				this.refreshBushDepth();
+			}
 		}
-		//Graphics.printError('test',evid + ' ' + this._realX + ' '+ this._realY);
 		
-	    if (this._x < this._realX) {
-	        this._realX = Math.max(this._realX - this.distancePerFrame(), this._x);
-	    }
-	    if (this._x > this._realX) {
-	        this._realX = Math.min(this._realX + this.distancePerFrame(), this._x);
-	    }
-	    if (this._y < this._realY) {
-	        this._realY = Math.max(this._realY - this.distancePerFrame(), this._y);
-	    }
-	    if (this._y > this._realY) {
-	        this._realY = Math.min(this._realY + this.distancePerFrame(), this._y);
-	    }
-	    if (!this.isMoving()) {
-	        this.refreshBushDepth();
-	    }
+		
+		Scene_Load.prototype.onSavefileOk = function() {
+			Scene_File.prototype.onSavefileOk.call(this);
+			if (DataManager.loadGame(this.savefileId())) {
+				this.onLoadSuccess();
+				
+				if (Imported.TerraxLighting) {	        
+					SaveLightingVariables();
+				}
+				if (Imported.TerraxPuzzle) {
+					SavePuzzleVariables();
+				}
+							
+			} else {
+				this.onLoadFailure();
+			}
+		}
 	}
 	
-	
-	Scene_Load.prototype.onSavefileOk = function() {
-	    Scene_File.prototype.onSavefileOk.call(this);
-	    if (DataManager.loadGame(this.savefileId())) {
-	        this.onLoadSuccess();
-	        
-	        if (Imported.TerraxLighting) {	        
-	        	SaveLightingVariables();
-        	}
-	        if (Imported.TerraxPuzzle) {
-				SavePuzzleVariables();
-		    }
-	        	        
-	    } else {
-	        this.onLoadFailure();
-	    }
+	if(MATTIE.global.hasLoadedOnce){
+		if(!MATTIE.global.isTermina()){
+			init();
+		}
 	}
+	
 
 })();
 
