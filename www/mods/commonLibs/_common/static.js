@@ -822,6 +822,8 @@ MATTIE.static.update = function(){
         MATTIE.static.switch.godAffinitySwitches = MATTIE.static.rangeParser(MATTIE.static.switch.godAffinitySwitches);
         MATTIE.static.variable.godAffinityAndPrayerVars = MATTIE.static.rangeParser(MATTIE.static.variable.godAffinityAndPrayerVars);
         MATTIE.static.variable.ignoredVars = [ //ignored vars
+            12,
+            11,
             4,
             30, //player_mp
             "22-23", //arrow var

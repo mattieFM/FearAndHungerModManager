@@ -11,7 +11,7 @@ MATTIE.betterCrowMauler.spawnInterval = 10000;
  *  @description the chance that crow mauler will spawn every interval 
  *  @default .05
  * */
-MATTIE.betterCrowMauler.spawnChance = .01;
+MATTIE.betterCrowMauler.spawnChance = .003;
 
 /**
  *  @description the chance that crow mauler will follow you into the next room
@@ -81,7 +81,7 @@ MATTIE.betterCrowMauler.crowController.prototype.disableBaseCrowMauler = functio
  * @description the function called every x ms to check if crow mauler should spawn
  */
 MATTIE.betterCrowMauler.crowController.prototype.spawnTick = function(){
-    if(!this.onScreen && !this.hasSpawned && !this.isDead() && !$gameParty.inBattle() && SceneManager._scene instanceof Scene_Map) this.update();
+    if(!this.onScreen && !this.hasSpawned && !this.isDead() && !$gameParty.inBattle() && SceneManager._scene instanceof Scene_Map && ($gameSwitches.value(MATTIE.static.switch.crowMaulerCanSpawn)))  this.update();
 }
 
 MATTIE.betterCrowMauler.crowController.prototype.battleSpawnTick = function(){
