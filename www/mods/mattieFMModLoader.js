@@ -70,7 +70,6 @@ PluginManager.loadScript = function(name) {
 PluginManager.setup = function(plugins) {
     let promises = [];
     plugins.forEach(function(plugin) {
-        console.log(plugin.name)
         if (plugin.status && !this._scripts.contains(plugin.name)) {
             if(!MATTIE.ignoredPlugins().includes(plugin.name)){ //this does not work as we load after the plugins, easy enough to implment later when we want to optimze tarrax lighting, but for not im going to leave it
                 this.setParameters(plugin.name, plugin.parameters);
@@ -215,7 +214,6 @@ class ModManager {
     /** @description find all files in the mods folder that do not have a json file attached to them */
     getModsWithoutJson(){
         let modsWithJson = this.getAllMods().map(mod=>mod.name);
-        console.log(modsWithJson);
         let modsWithoutJson = [];
         this.getModsFolder().forEach(modName =>{
             if(modName.endsWith(".js") && !modName.includes("mattieFMModLoader")){
@@ -408,8 +406,6 @@ class ModManager {
      * @param {string} modName the name of the mod to call the off load script of
      */
     callOnOffloadModScript(modName){
-        console.log(this._modsDict)
-        console.log(this._modsDict[modName])
         if(this._modsDict[modName]){
             let onOffloadScriptExists = !!this._modsDict[modName].offloadScript;
             if(onOffloadScriptExists) this._modsDict[modName].offloadScript();
@@ -652,7 +648,6 @@ MATTIE.onError = function(e) {
         Graphics.printError('',errorText);
         AudioManager.stopAll();
         let cb = ((key)=>{
-            console.log(key.key);
             if(key.key === 'F6'){
                 MATTIE_ModManager.modManager.disableAndReload();
                 MATTIE_ModManager.modManager.reloadGame();

@@ -173,12 +173,8 @@ MATTIE.static.update = function(){
         //common events
         MATTIE.static.commonEvents.bloodportal = $dataCommonEvents[152];
 
-
-        MATTIE.eventAPI.getEventOnMap(287,11).then((result) => {
-            MATTIE.static.events.crowMauler = result
-        }).catch((err) => {
+        MATTIE.static.events.crowMauler = (()=>MATTIE.eventAPI.getEventOnMap(287,11))
             
-        });;
 
         //states
         MATTIE.static.states.knockout = 0;
