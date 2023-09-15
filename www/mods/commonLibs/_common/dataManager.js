@@ -32,10 +32,7 @@ MATTIE.global.requestedDataBaseLoad = false;
 MATTIE.global.checkGameVersion = function(){
     return new Promise(res=>{
         if(!$dataSystem){
-            console.log("!data system")
-            console.log(MATTIE.global.version)
             if(MATTIE.DataManager){
-                console.log("data manager")
                 let dataVersion = MATTIE.DataManager.global.get('version');
                 if(typeof dataVersion != 'undefined'){
                     MATTIE.global.version = dataVersion
@@ -43,7 +40,6 @@ MATTIE.global.checkGameVersion = function(){
                     res(dataVersion);
                 } else {
                     MATTIE.DataManager.loadFileXML("System.json",(data=>{
-                        console.log(data);
                         let version = data.gameTitle.toUpperCase().includes("TERMINA")? 2 : 1;
                         MATTIE.global.version = version
                         MATTIE.global.hasLoadedOnce = true;
@@ -135,7 +131,6 @@ MATTIE.DataManager.global.set = function(key,val){
     let fs = require('fs');
     let path = MATTIE.DataManager.localFileDirectoryPath();
     let name = path+MATTIE.DataManager.global.fileName;
-    console.log(name);
     MATTIE.DataManager.global.data[key] = val;
     fs.writeFileSync(name, JSON.stringify(MATTIE.DataManager.global.data));
 }

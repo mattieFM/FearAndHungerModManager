@@ -182,7 +182,8 @@ Imported.TerraxLighting = true;
 
 (function() {
 
-	let init = (()=>{
+	function init() {
+		let No = false;
 		var lightarray_id = [];
 		var tilearray = [];
 		var lightarray_state = [];
@@ -1884,7 +1885,7 @@ Imported.TerraxLighting = true;
 				this.onLoadFailure();
 			}
 		}
-	})
+	}
 	
 	if(MATTIE.global.hasLoadedOnce){
 		if(!MATTIE.global.isTermina()){
