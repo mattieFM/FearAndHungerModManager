@@ -32,7 +32,10 @@ MATTIE.betterCrowMauler.despawnChance = .15;
 MATTIE.betterCrowMauler.combatEnterChance = .005;
 
 MATTIE.betterCrowMauler.crowController = function () {
-    this.disableBaseCrowMauler();
+    setTimeout(() => {
+        this.disableBaseCrowMauler();  
+    }, 5000);
+    
 
     /** @description whether this instance of the controller has spawned a crow mauler on this level */
     this.hasSpawned = false;

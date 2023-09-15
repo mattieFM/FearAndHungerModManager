@@ -164,9 +164,9 @@ MATTIE.multiplayer.getCurrentNetController = ()=>{
 
     MATTIE.static.update();
 
-    let crowCont = new MATTIE.betterCrowMauler.crowController();
-    if(MATTIE.betterCrowMauler)
-    MATTIE.betterCrowMauler.crowCont = crowCont; 
+    // let crowCont = new MATTIE.betterCrowMauler.crowController();
+    // if(MATTIE.betterCrowMauler)
+    // MATTIE.betterCrowMauler.crowCont = crowCont; 
     
 })();
 
