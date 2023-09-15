@@ -54,6 +54,25 @@ Game_Troop.prototype.members = function() {
     return members;
 }
 
+/**
+ * @description take a member index and find the troop it exists in
+ * @param {int} memberIndex the index of the member within this.members(); 
+ * @returns the MId of the member's troop, -1 if main troop, -2 if out of range
+ */
+Game_Troop.prototype.mapMemberIndexToTroopId = function(memberIndex) {
+    let members = this._enemies;
+    let maxVal = members.length-1;
+    if(memberIndex <= maxVal) return -1;
+    let keys = Object.keys(this._additionalTroops)
+    for (let index = 0; index < keys.length; index++) {
+        const additionalTroop = this._additionalTroops[keys[index]];
+        members = members.concat(additionalTroop.baseMembers());
+        maxVal = members.length-1;
+        if(memberIndex <= maxVal) return additionalTroop.getMId();
+    }
+    return -2;
+}
+
 /** @description proform a callback on all additional troops */
 Game_Troop.prototype.forEachAdditionalTroop = function(cb){
     let keys = Object.keys(this._additionalTroops)
@@ -108,6 +127,18 @@ Game_Troop.prototype.setupBattleEvent = function() {
     });
 }
 
+/** @description the base method to increase turn of a game troop*/
+MATTIE_RPG.TroopApi_Game_Troop_IncreaseTurn = Game_Troop.prototype.increaseTurn;
+/** 
+ * @description override the increase turn method to also increase turn of all additional troops
+ */
+Game_Troop.prototype.increaseTurn  = function(){
+    MATTIE_RPG.TroopApi_Game_Troop_IncreaseTurn.call(this);
+    this.forEachAdditionalTroop((additionalTroop)=>{
+        additionalTroop.increaseTurn();
+    });
+}
+
 
 
 /** @description the base function to update the interpreter of a game troop */
@@ -131,14 +162,32 @@ MATTIE_RPG.TroopApi_Game_Troop_Meets_Conditions = Game_Troop.prototype.meetsCond
 Game_Troop.prototype.meetsConditions = function(page) {
     
     var c = page.conditions;
+    if (!c.turnEnding && !c.turnValid && !c.enemyValid &&
+        !c.actorValid && !c.switchValid) {
+        return false;  // Conditions not set
+    }
+    let prevEnemyValid = c.enemyValid
     if (c.enemyValid) {
         var enemy = this.baseMembers()[c.enemyIndex];
         if (!enemy || enemy.hpRate() * 100 > c.enemyHp) {
             return false;
         }
     }
+
+    let prevSwitchValid = c.switchValid
+    if(this != $gameTroop){ //if this is a runtime troop check if a local switch exists
+        if (c.switchValid) {
+            if(!this.getSwitchValue(c.switchId)) return false;
+        }
+        c.switchValid = false;
+    }
     
-    let returnVal = MATTIE_RPG.TroopApi_Game_Troop_Meets_Conditions.call(this,page);
+
+    c.enemyValid = false;
+    let anyConditionsLeft = (c.turnEnding || c.turnValid || c.enemyValid || c.actorValid || c.switchValid);
+    let returnVal = anyConditionsLeft ? MATTIE_RPG.TroopApi_Game_Troop_Meets_Conditions.call(this,page) : true;
+    c.switchValid = prevSwitchValid;
+    c.enemyValid = prevEnemyValid;
     return returnVal;
 };
 
@@ -161,6 +210,36 @@ MATTIE.troopAPI.runtimeTroop = function() {
 MATTIE.troopAPI.runtimeTroop.prototype = Object.create(Game_Troop.prototype);
 MATTIE.troopAPI.runtimeTroop.prototype.constructor = MATTIE.troopAPI.runtimeTroop;
 
+MATTIE.troopAPI.runtimeTroop.prototype.getSwitchValue = function(id){
+    if(typeof this.localSwitches[id] != 'undefined'){
+        return this.localSwitches[id];
+    }
+    else {
+        return $gameSwitches.value(id);
+    }
+}
+
+MATTIE.troopAPI.runtimeTroop.prototype.setSwitchValue = function(id, bool){
+    return this.localSwitches[id] = bool
+}
+
+MATTIE.troopAPI.runtimeTroop.prototype.getVariableValue = function(id){
+    if(typeof this.localVars[id] != 'undefined'){
+        return this.localVars[id];
+    }
+    else {
+        return $gameVariables.value(id);
+    }
+}
+
+MATTIE.troopAPI.runtimeTroop.prototype.setVariableValue = function(id, bool){
+    return this.localVars[id] = bool;
+}
+
+
+MATTIE.troopAPI.runtimeTroop.prototype.getLocalSwitches = function(){
+    return this.localSwitches;
+}
 /** 
  * @description the initialize method for a runtime troop. This sets up all values we might need.
  * @param {int} troopId, the id of the troop this class represents
@@ -175,7 +254,13 @@ MATTIE.troopAPI.runtimeTroop.prototype.initialize = function(troopId, xOffset=0,
     this._interpreter.setTroop(this);
     /** @description an array of the sprites of the enemies in this troop */
     this._sprites = [];
-    
+
+    /** @description any local switches that exist */
+    this.localSwitches = {};
+
+    /** @description any local vars that are set */
+    this.localVars = {};
+
     /** 
      * @description the current battle spriteset
      * @type {Spriteset_Battle} 
@@ -274,6 +359,70 @@ Game_Interpreter.prototype.iterateEnemyIndex = function(param, callback) {
     }
 };
 
+Game_Interpreter.prototype.setupReservedCommonEvent = function() {
+    if ($gameTemp.isCommonEventReserved(this.getTroop().getMId())) {
+        this.setup($gameTemp.reservedCommonEvent().list);
+        $gameTemp.clearCommonEvent();
+        return true;
+    } else {
+        return false;
+    }
+};
+
+// Control Switches
+MATTIE_RPG.TroopApi_Game_Interpreter_Command121 = Game_Interpreter.prototype.command121;
+Game_Interpreter.prototype.command121 = function() {
+    if(this.getTroop() !== $gameTroop){ //if the interpreter is targeting a runtime troop
+        for (var i = this._params[0]; i <= this._params[1]; i++) {
+            let bool = this._params[2] === 0;
+            this.getTroop().setSwitchValue(i, bool);
+            console.log(`set local switch ${i} to ${bool}`)
+        }
+        return true;
+
+    }else{ //if the interpreter is not targeting a runtimetroop
+        let returnVal = MATTIE_RPG.TroopApi_Game_Interpreter_Command121.call(this);
+        return returnVal;
+    }
+    
+};
+
+/** @description the default operatevariable method of the game interpreter */
+MATTIE_RPG.TroopApi_Game_Interpreter_OperateVariable = Game_Interpreter.prototype.operateVariable;
+/** @description the opperate variable method overriden such that it will set local variables if on a local troop */
+Game_Interpreter.prototype.operateVariable = function(variableId, operationType, value) {
+    if(this.getTroop() !== $gameTroop){ //if the interpreter is targeting a runtime troop
+        try {
+            var oldValue = $gameVariables.value(variableId);
+            switch (operationType) {
+            case 0:  // Set
+                this.getTroop().setVariableValue(variableId, oldValue = value);
+                break;
+            case 1:  // Add
+                this.getTroop().setVariableValue(variableId, oldValue + value);
+                break;
+            case 2:  // Sub
+                this.getTroop().setVariableValue(variableId, oldValue - value);
+                break;
+            case 3:  // Mul
+                this.getTroop().setVariableValue(variableId, oldValue * value);
+                break;
+            case 4:  // Div
+                this.getTroop().setVariableValue(variableId, oldValue / value);
+                break;
+            case 5:  // Mod
+                this.getTroop().setVariableValue(variableId, oldValue % value);
+                break;
+            }
+        } catch (e) {
+            this.getTroop().setVariableValue(variableId, 0);
+        }
+
+    }else{ //if the interpreter is not targeting a runtimetroop
+        return MATTIE_RPG.TroopApi_Game_Interpreter_OperateVariable.call(this, variableId, operationType, value);
+    }
+};
+
 /*** @description the game interpreter's conditional branch*/
 MATTIE_RPG.TroopApi_Game_Interpreter_Command111 = Game_Interpreter.prototype.command111;
 /**
@@ -281,8 +430,101 @@ MATTIE_RPG.TroopApi_Game_Interpreter_Command111 = Game_Interpreter.prototype.com
  * we are overriding the enemy case to use the proper troop and leaving the rest the same
  * @returns {boolean} sucsess
  */
-Game_Interpreter.prototype.command111 = function (){
-    switch(this._params[0]){
+Game_Interpreter.prototype.command111 = function() {
+    var result = false;
+    switch (this._params[0]) {
+        case 0:  // Switch
+            if(this.getTroop() !== $gameTroop){
+                result = (this.getTroop().getSwitchValue(this._params[1]) === (this._params[2] === 0));
+            }else{
+                result = ($gameSwitches.value(this._params[1]) === (this._params[2] === 0));
+            }
+            break;
+        case 1:  // Variable
+            var value1
+            var value2
+            if(this.getTroop() !== $gameTroop){ //if additional troop
+                value1 = this.getTroop().getVariableValue(this._params[1]);
+                if (this._params[2] === 0) {
+                    value2 = this._params[3];
+                } else {
+                    value2 = this.getTroop().getVariableValue(this._params[3]);
+                }
+            }else{ // if normal troop
+                value1 = $gameVariables.value(this._params[1]);
+                if (this._params[2] === 0) {
+                    value2 = this._params[3];
+                } else {
+                    value2 = $gameVariables.value(this._params[3]);
+                }
+            }
+            switch (this._params[4]) {
+                case 0:  // Equal to
+                    result = (value1 === value2);
+                    break;
+                case 1:  // Greater than or Equal to
+                    result = (value1 >= value2);
+                    break;
+                case 2:  // Less than or Equal to
+                    result = (value1 <= value2);
+                    break;
+                case 3:  // Greater than
+                    result = (value1 > value2);
+                    break;
+                case 4:  // Less than
+                    result = (value1 < value2);
+                    break;
+                case 5:  // Not Equal to
+                    result = (value1 !== value2);
+                    break;
+                
+            }
+            
+            break;
+        case 2:  // Self Switch
+            if (this._eventId > 0) {
+                var key = [this._mapId, this._eventId, this._params[1]];
+                result = ($gameSelfSwitches.value(key) === (this._params[2] === 0));
+            }
+            break;
+        case 3:  // Timer
+            if ($gameTimer.isWorking()) {
+                if (this._params[2] === 0) {
+                    result = ($gameTimer.seconds() >= this._params[1]);
+                } else {
+                    result = ($gameTimer.seconds() <= this._params[1]);
+                }
+            }
+            break;
+        case 4:  // Actor
+            var actor = $gameActors.actor(this._params[1]);
+            if (actor) {
+                var n = this._params[3];
+                switch (this._params[2]) {
+                    case 0:  // In the Party
+                        result = $gameParty.members().contains(actor);
+                        break;
+                    case 1:  // Name
+                        result = (actor.name() === n);
+                        break;
+                    case 2:  // Class
+                        result = actor.isClass($dataClasses[n]);
+                        break;
+                    case 3:  // Skill
+                        result = actor.hasSkill(n);
+                        break;
+                    case 4:  // Weapon
+                        result = actor.hasWeapon($dataWeapons[n]);
+                        break;
+                    case 5:  // Armor
+                        result = actor.hasArmor($dataArmors[n]);
+                        break;
+                    case 6:  // State
+                        result = actor.isStateAffected(n);
+                        break;
+                }
+            }
+            break;
         case 5:  // Enemy
             var enemy = this.getTroop().baseMembers()[this._params[1]];
             if (enemy) {
@@ -295,19 +537,59 @@ Game_Interpreter.prototype.command111 = function (){
                         break;
                 }
             }
-            this._branch[this._indent] = result;
-            if (this._branch[this._indent] === false) {
-                this.skipBranch();
-            }
-            return true;
             break;
-        default:
-            return MATTIE_RPG.TroopApi_Game_Interpreter_Command111.call(this);
+        case 6:  // Character
+            var character = this.character(this._params[1]);
+            if (character) {
+                result = (character.direction() === this._params[2]);
+            }
+            break;
+        case 7:  // Gold
+            switch (this._params[2]) {
+                case 0:  // Greater than or equal to
+                    result = ($gameParty.gold() >= this._params[1]);
+                    break;
+                case 1:  // Less than or equal to
+                    result = ($gameParty.gold() <= this._params[1]);
+                    break;
+                case 2:  // Less than
+                    result = ($gameParty.gold() < this._params[1]);
+                    break;
+            }
+            break;
+        case 8:  // Item
+            result = $gameParty.hasItem($dataItems[this._params[1]]);
+            break;
+        case 9:  // Weapon
+            result = $gameParty.hasItem($dataWeapons[this._params[1]], this._params[2]);
+            break;
+        case 10:  // Armor
+            result = $gameParty.hasItem($dataArmors[this._params[1]], this._params[2]);
+            break;
+        case 11:  // Button
+            result = Input.isPressed(this._params[1]);
+            break;
+        case 12:  // Script
+            result = !!eval(this._params[1]);
+            break;
+        case 13:  // Vehicle
+            result = ($gamePlayer.vehicle() === $gameMap.vehicle(this._params[1]));
             break;
     }
-    return MATTIE_RPG.TroopApi_Game_Interpreter_Command111.call(this);
-    
-}
+    this._branch[this._indent] = result;
+    if (this._branch[this._indent] === false) {
+        this.skipBranch();
+    }
+    return true;
+};
+
+/*** @description the game interpreter's tint screen command*/
+MATTIE_RPG.TroopApi_Game_Interpreter_Command223 = Game_Interpreter.prototype.command223;
+/** @description only the main troop controller is allowed to tint the screen*/
+Game_Interpreter.prototype.command223 = function() {
+    if(this.getTroop() === $gameTroop) return MATTIE_RPG.TroopApi_Game_Interpreter_Command223.call(this)
+    return true;
+};
 
 /**
  * @description the enemy appear command, overridden to use correct troop
@@ -424,4 +706,37 @@ Spriteset_Battle.prototype.visualSort = function() {
         this._battleField.addChild(sprite);
         
     }
+}
+
+
+//------------------------------
+//Game_Temp
+//-------------------------------
+/* @description override the reserve common event function to also take a troopName */
+MATTIE_RPG.TroopApi_Game_Temp_reserveCommonEvent = Game_Temp.prototype.reserveCommonEvent;
+Game_Temp.prototype.reserveCommonEvent = function(commonEventId) {
+    MATTIE_RPG.TroopApi_Game_Temp_reserveCommonEvent.call(this,commonEventId)
+    this._troopId = BattleManager.getCurrentTroopMId();
+};
+
+/** @description the base is common event reserved method */
+MATTIE_RPG.TroopApi_Game_Temp_isCommonEventReserved = Game_Temp.prototype.isCommonEventReserved;
+/** @description override the method to check if a troopId has been specified and only return true if the id matches the troop that assigned it */
+Game_Temp.prototype.isCommonEventReserved = function(id = undefined) {
+    if(this._troopId  && id){
+        return MATTIE_RPG.TroopApi_Game_Temp_isCommonEventReserved.call(this) && id == this._troopId;
+    }else{
+        return MATTIE_RPG.TroopApi_Game_Temp_isCommonEventReserved.call(this)
+    }
+    return this._commonEventId > 0;
+};
+
+
+
+BattleManager.getCurrentTroopMId = function(){
+    let allMembers = $gameTroop.members();
+    let indexOfCurrentSubject = allMembers.indexOf(this._subject);
+    let mId = $gameTroop.mapMemberIndexToTroopId(indexOfCurrentSubject);
+    return mId;
+    
 }

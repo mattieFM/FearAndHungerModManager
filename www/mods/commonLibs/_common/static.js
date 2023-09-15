@@ -58,9 +58,14 @@ MATTIE.static.switch.crowMaulerCanSpawn = 0;
 MATTIE.static.switch.crowMaulerDead = 0;
 /** @description true if crow mauler is disabled */
 MATTIE.static.switch.crowMaulerDisabled = 0;
+
+/** @description the switch that handles most coin flip instant kill / grab attack */
+MATTIE.static.switch.neckBreak = 0
+
 //selfSwitch ids
 MATTIE.static.switch.syncedSelfSwitches = [];
 MATTIE.static.switch.ignoredSelfSwitches = [];
+
 //states
 /** this is the state that governs "death" in combat */
 MATTIE.static.states.knockout = 0;
@@ -99,7 +104,7 @@ MATTIE.static.update = function(){
 
         MATTIE.static.switch.crowMaulerCanSpawn = 786;
         MATTIE.static.switch.crowMaulerDead = 771;
-
+        MATTIE.static.switch.neckBreak = 16;
         MATTIE.static.switch.crowMaulerDisabled = 2953;
 
         //actors

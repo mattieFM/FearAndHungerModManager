@@ -615,6 +615,20 @@ Graphics.hideError = function() {
     this.clearCanvasFilter();
 };
 
+/**
+ * @description for the purpose of matching our error style to that of termina I have used Olivia's formatting below
+ * variables names were changed to match coding convention of my modloader not to appear as though this is my code. That said this is like
+ * borrowing a color. 
+ * @credit Olivia AntiPlayerStress
+ */
+MATTIE_RPG.Graphics_updateErrorPrinter = Graphics._updateErrorPrinter;
+Graphics._updateErrorPrinter = function() {
+    MATTIE_RPG.Graphics_updateErrorPrinter.call(this);
+    this._errorPrinter.height = this._height * 0.5;
+    this._errorPrinter.style.textAlign = 'left';
+    this._centerElement(this._errorPrinter);
+};
+
 MATTIE.suppressingAllErrors = false;
 MATTIE.onError = function(e) {
     if(!MATTIE.suppressingAllErrors){
@@ -623,7 +637,21 @@ MATTIE.onError = function(e) {
     console.error(e.filename, e.lineno);
     try {
         this.stop();
-        Graphics.printError('Error', e.message+"<br>Press 'F7' or 'escape' to try to continue despite this error. <br><br>Press 'F9' to suppress all future errors. (be carful using this)<br><br>Press 'F6' To Reboot without mods. <br> Press 'F5' to reboot with mods. <br><br> If you are reporting a bug, <br> include this screen with the error and what mod/mods you were using and when you were doing when the bug occurred. <br> Thanks <br> -Mattie");
+        let color = "#f5f3b0";
+        let errorText = "";
+        errorText += `<font color="Yellow" size=5>The game has encountered an error, please report this.<br></font>`
+        errorText += `<br> If you are reporting a bug, include this screen with the error and what mod/mods you were using and when you were doing when the bug occurred. <br> Thanks <br> -Mattie<br>`
+        
+       
+        errorText += `<br><font color="Yellow" size=5>Error<br></font>`
+        errorText += e.stack.split("\n").join("<br>");
+
+        errorText += `<font color=${color}><br><br>Press 'F7' or 'escape' to try to continue despite this error. <br></font>`
+        errorText += `<font color=${color}>Press 'F9' to suppress all future errors. (be carful using this)<br></font>`
+        errorText += `<font color=${color}>Press 'F6' To reboot without mods.<br></font>`
+        errorText += `<font color=${color}>Press 'F5' to reboot with mods. <br></font>`
+        
+        Graphics.printError('',errorText);
         AudioManager.stopAll();
         let cb = ((key)=>{
             console.log(key.key);
