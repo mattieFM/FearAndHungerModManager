@@ -3,7 +3,18 @@ MATTIE.DataManager = MATTIE.DataManager || {};
 MATTIE.DataManager.dataPath = "/modData/";
 MATTIE.multiplayer = MATTIE.multiplayer || {};
 MATTIE.global = MATTIE.global || {};
+let funger1IgnoredPlugins = ["TerraxLighting"];
+let terminaIgnoredPlugins = [];
+let ignoredPlugins = ["HIME_PreTitleEvents"];
 
+MATTIE.ignoredPlugins = (()=>{
+    if(MATTIE.global.isTermina()){
+        return terminaIgnoredPlugins.concat(ignoredPlugins);
+    } else if (MATTIE.global.isFunger()){
+        return funger1IgnoredPlugins.concat(ignoredPlugins);
+    }
+    return [];
+})
 
 //----------------------------------------------
 // Global Data
