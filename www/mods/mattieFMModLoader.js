@@ -564,14 +564,17 @@ async function () {
             });
             
         }).then(()=>{
-        PluginManager._path = path;
-        const mods = modManager.parseMods(path); //fs is in a different root dir so it needs this.
-        console.info(mods)
-        modManager.setup(mods).then(()=>{ //all mods loaded after plugins
-            SceneManager.goto(Scene_Title);
-            MATTIE.msgAPI.footerMsg("Mod loader successfully initialized") 
-            PluginManager._path = defaultPath;
-            MATTIE_ModManager.overrideErrorLoggers();
+            setTimeout(() => {
+                PluginManager._path = path;
+                const mods = modManager.parseMods(path); //fs is in a different root dir so it needs this.
+                console.info(mods)
+                modManager.setup(mods).then(()=>{ //all mods loaded after plugins
+                SceneManager.goto(Scene_Title);
+                MATTIE.msgAPI.footerMsg("Mod loader successfully initialized") 
+                PluginManager._path = defaultPath;
+                MATTIE_ModManager.overrideErrorLoggers();
+            }, 1000);
+        
             
 
             
