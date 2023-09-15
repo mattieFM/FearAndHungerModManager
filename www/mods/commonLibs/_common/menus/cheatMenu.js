@@ -294,6 +294,8 @@ MATTIE.windows.Window_DevSkillList.prototype.constructor = MATTIE.windows.Window
 
 MATTIE.windows.Window_DevSkillList.prototype.initialize = function(x, y, width, height) {
     Window_SkillList.prototype.initialize.call(this, x, y, width, height);
+    this.setActor($gameParty.leader());
+    this.refresh()
 };
 //override to return all skills. We return the skills with icons first
 MATTIE.windows.Window_DevSkillList.prototype.makeItemList = function() {
