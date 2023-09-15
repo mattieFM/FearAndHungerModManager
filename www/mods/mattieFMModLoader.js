@@ -35,12 +35,6 @@ MATTIE.TextManager = MATTIE.TextManager || {};
 MATTIE.CmdManager = MATTIE.CmdManager || {};
 MATTIE.menus.mainMenu = MATTIE.menus.mainMenu || {};
 
-MATTIE.global.checkGameVersion = function(){
-    let version = $dataSystem.gameTitle.includes("termina")? 2 : 1;
-    MATTIE.global.version = version
-    return version;
-}
-
 
 //----------------------------------------------------------------
 // Plugin Manager
@@ -52,7 +46,8 @@ MATTIE.global.checkGameVersion = function(){
  * @returns {Promise}
  */
 PluginManager.loadScript = function(name) {
-    return new Promise(res =>{
+    return new Promise(async res =>{
+        await MATTIE.global.checkGameVersion();
         var url = this._path + name;
         var script = document.createElement('script');
         script.type = 'text/javascript';
@@ -91,17 +86,21 @@ PluginManager.setup = function(plugins) {
  */
 MATTIE.DataManagerLoaddatabase = DataManager.loadDatabase;
 DataManager.loadDatabase = function() {
-    MATTIE.DataManagerLoaddatabase.call(this);
-    let int = setInterval(() => {
-        if(DataManager.isDatabaseLoaded()){
-            if(MATTIE.global)
-            if(MATTIE.static){
-                MATTIE.global.checkGameVersion();
-                MATTIE.static.update();
-                clearInterval(int);
+    return new Promise(res=>{
+        MATTIE.DataManagerLoaddatabase.call(this);
+        let int = setInterval(() => {
+            if(DataManager.isDatabaseLoaded()){
+                if(MATTIE.global)
+                if(MATTIE.static){
+                    MATTIE.global.checkGameVersion();
+                    MATTIE.static.update();
+                    clearInterval(int);
+                }
+                res()
             }
-        }
-    }, 50);
+        }, 50);
+    })
+    
 };
 
 
@@ -542,8 +541,9 @@ class ModManager {
  * @description load the mod manager 
  */
 MATTIE_ModManager.init =
-function () {
-    PluginManager.setup($plugins);
+async function () {
+    await DataManager.loadDatabase();
+    await PluginManager.setup($plugins);
     
     const defaultPath = PluginManager._path;
         const path = "mods/";
@@ -559,26 +559,24 @@ function () {
             commonModManager.setup(commonMods).then(()=>{
                 //common mods loaded
                 PluginManager._path = defaultPath
+                MATTIE.static.update();
                 res();
             });
             
         }).then(()=>{
-            setTimeout(() => {
-                PluginManager._path = path;
-                const mods = modManager.parseMods(path); //fs is in a different root dir so it needs this.
-                console.info(mods)
-                modManager.setup(mods).then(()=>{ //all mods loaded after plugins
-                    SceneManager.goto(Scene_Title);
-                    MATTIE.msgAPI.footerMsg("Mod loader successfully initialized") 
-                    PluginManager._path = defaultPath;
-                    MATTIE_ModManager.overrideErrorLoggers();
-                    
-
-                    
-
-                }); 
+        PluginManager._path = path;
+        const mods = modManager.parseMods(path); //fs is in a different root dir so it needs this.
+        console.info(mods)
+        modManager.setup(mods).then(()=>{ //all mods loaded after plugins
+            SceneManager.goto(Scene_Title);
+            MATTIE.msgAPI.footerMsg("Mod loader successfully initialized") 
+            PluginManager._path = defaultPath;
+            MATTIE_ModManager.overrideErrorLoggers();
             
-        },1500);
+
+            
+
+        }); 
     });
         
 

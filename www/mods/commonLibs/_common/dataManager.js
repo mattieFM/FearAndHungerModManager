@@ -1,8 +1,61 @@
 var MATTIE = MATTIE || {};
 MATTIE.DataManager = MATTIE.DataManager || {};
 MATTIE.DataManager.dataPath = "/modData/";
+MATTIE.multiplayer = MATTIE.multiplayer || {};
+MATTIE.global = MATTIE.global || {};
 
 
+//----------------------------------------------
+// Global Data
+//----------------------------------------------
+/** @description whether the version has been loaded and is valid */
+MATTIE.global.hasLoadedOnce = false
+
+/** @description returns if this is termina or not */
+MATTIE.global.isTermina = ()=>(MATTIE.global.version===2);
+
+/** @description returns if this is funger or not */
+MATTIE.global.isFunger = ()=>(MATTIE.global.version===1);
+MATTIE.global.requestedDataBaseLoad = false;
+/** @description check the version of the game */
+MATTIE.global.checkGameVersion = function(){
+    return new Promise(res=>{
+        if(!$dataSystem){
+            console.log("!data system")
+            console.log(MATTIE.global.version)
+            if(MATTIE.DataManager){
+                console.log("data manager")
+                let dataVersion = MATTIE.DataManager.global.get('version');
+                if(typeof dataVersion != 'undefined'){
+                    MATTIE.global.version = dataVersion
+                    MATTIE.global.hasLoadedOnce = true;
+                    res(dataVersion);
+                } else {
+                    MATTIE.DataManager.loadFileXML("System.json",(data=>{
+                        console.log(data);
+                        let version = data.gameTitle.toUpperCase().includes("TERMINA")? 2 : 1;
+                        MATTIE.global.version = version
+                        MATTIE.global.hasLoadedOnce = true;
+                        MATTIE.DataManager.global.set('version',version)
+                        res(version);
+                    }));
+                    
+                }
+                
+            } else {
+                //this should never occur,
+                //but if it does we will just resolve with 1
+                res(1);
+            }
+        }else{
+            let version = $dataSystem.gameTitle.toUpperCase().includes("TERMINA")? 2 : 1;
+            MATTIE.global.version = version
+            MATTIE.global.hasLoadedOnce = true;
+            res(version);
+        }
+    })
+    
+}
 
 //--------------------------------------------------------------
 //Mod data
@@ -31,10 +84,15 @@ MATTIE.DataManager.localFileDirectoryPath = function() {
     return path.join(base, MATTIE.DataManager.dataPath);
 };
 
-/** @description creates a modData folder if one does not exist */
-MATTIE.DataManager.createDir = function(){
+/** 
+ * @description creates a modData folder if one does not exist 
+ * or if a parm is passes it will create a specfic dir inside of the moddata folder
+ * 
+*/
+MATTIE.DataManager.createDir = function(path=null){
     let fs = require('fs');
-    let path = MATTIE.DataManager.localFileDirectoryPath();
+    if(!path) path = MATTIE.DataManager.localFileDirectoryPath();
+    if(path) path = MATTIE.DataManager.localFileDirectoryPath() + path;
     if(!fs.existsSync(path)){
         fs.mkdir(path);
     }
@@ -95,6 +153,27 @@ MATTIE.DataManager.addToOnLoad = function(cb){
         prevFunc.call(this);
         cb();
     }
+}
+/**
+ * @description load a data file using an xml request, then call the callback provided with the data
+ * @param {*} src the file name IE: System.json
+ * @param {*} cb the callback
+ */
+MATTIE.DataManager.loadFileXML = function(src, cb){
+    var xhr = new XMLHttpRequest();
+    var url = 'data/' + src;
+    xhr.open('GET', url);
+    xhr.overrideMimeType('application/json');
+    xhr.onload = function() {
+        if (xhr.status < 400) {
+            let data = JSON.parse(xhr.responseText);
+            cb(data);
+        }
+    };
+    xhr.onerror = this._mapLoader || function() {
+        DataManager._errorUrl = DataManager._errorUrl || url;
+    };
+    xhr.send();
 }
 
 

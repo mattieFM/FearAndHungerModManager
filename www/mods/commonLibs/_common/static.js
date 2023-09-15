@@ -95,10 +95,11 @@ MATTIE.static.events.images.shiny = {};
 MATTIE.static.events.images.coin = MATTIE.static.events.images.shiny;
 
 MATTIE.static.update = function(){
+    MATTIE.global.checkGameVersion(); // make sure version is valid
     //common events
     MATTIE.static.commonEvents.bloodportal = null;
 
-    if(MATTIE.global.version === 1){
+    if(MATTIE.global.isFunger()){
         //static values specific to funger 1
 
 
@@ -945,8 +946,21 @@ MATTIE.static.update = function(){
         MATTIE.static.events.images.shiny = MapEvent.generateImage(0,"!Flame",6,0,0); //the shiny coin incon
         MATTIE.static.events.images.coin =  MATTIE.static.events.images.shiny;
 
-    }else if (MATTIE.global.version === 2){
+    }else if (MATTIE.global.isTermina()){
+        console.log("termina")
         //static values specific to funger 2
+
+        //skills
+        MATTIE.static.skills.bloodportal = $dataSkills[148];
+        MATTIE.static.skills.hurting = $dataSkills[12];    
+
+        //items
+        MATTIE.static.items.emptyScroll = $dataItems[88];
+
+        //common events 
+        MATTIE.static.commonEvents.bloodportal = $dataCommonEvents[152];
+
+    
     }   
     //static values shared between both games
 

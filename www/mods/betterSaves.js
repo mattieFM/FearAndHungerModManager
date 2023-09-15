@@ -125,7 +125,7 @@ MATTIE.betterSaves = {};
         var bottom = rect.y + rect.height;
         if (rect.width >= 420) {
             if (valid) {
-                this.drawPartyCharacters(info, rect.x + 220, bottom - 4);
+                this.drawPartyCharacters(info, rect.x + 220, rect.y);
             }
             this.drawGameTitle(info, rect.x + 192, rect.y, rect.width - 192, rect);
         }
