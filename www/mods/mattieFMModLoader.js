@@ -24,7 +24,7 @@
 var MATTIE_ModManager = MATTIE_ModManager || {};
 var MATTIE = MATTIE || {};
 var MATTIE_RPG = MATTIE_RPG || {};
-MATTIE.ignoredPlugins = ["HIME_PreTitleEvents"];
+
 MATTIE.isDev = false;
 
 MATTIE.global = MATTIE.global || {};
@@ -35,11 +35,10 @@ MATTIE.TextManager = MATTIE.TextManager || {};
 MATTIE.CmdManager = MATTIE.CmdManager || {};
 MATTIE.menus.mainMenu = MATTIE.menus.mainMenu || {};
 
-MATTIE.global.checkGameVersion = function(){
-    let version = $dataSystem.gameTitle.includes("termina")? 2 : 1;
-    MATTIE.global.version = version
-    return version;
-}
+
+//----------------------------------------------------------------
+// Plugin Manager
+//----------------------------------------------------------------
 
 
 //----------------------------------------------------------------
@@ -52,7 +51,8 @@ MATTIE.global.checkGameVersion = function(){
  * @returns {Promise}
  */
 PluginManager.loadScript = function(name) {
-    return new Promise(res =>{
+    return new Promise(async res =>{
+        await MATTIE.global.checkGameVersion();
         var url = this._path + name;
         var script = document.createElement('script');
         script.type = 'text/javascript';
@@ -75,9 +75,8 @@ PluginManager.loadScript = function(name) {
 PluginManager.setup = function(plugins) {
     let promises = [];
     plugins.forEach(function(plugin) {
-        console.log(plugin.name)
         if (plugin.status && !this._scripts.contains(plugin.name)) {
-            if(!MATTIE.ignoredPlugins.includes(plugin.name)){ //this does not work as we load after the plugins, easy enough to implment later when we want to optimze tarrax lighting, but for not im going to leave it
+            if(!MATTIE.ignoredPlugins().includes(plugin.name)){ //this does not work as we load after the plugins, easy enough to implment later when we want to optimze tarrax lighting, but for not im going to leave it
                 this.setParameters(plugin.name, plugin.parameters);
                 promises.push(this.loadScript(plugin.name + '.js'));
                 this._scripts.push(plugin.name);
@@ -91,17 +90,20 @@ PluginManager.setup = function(plugins) {
  */
 MATTIE.DataManagerLoaddatabase = DataManager.loadDatabase;
 DataManager.loadDatabase = function() {
-    MATTIE.DataManagerLoaddatabase.call(this);
-    let int = setInterval(() => {
-        if(DataManager.isDatabaseLoaded()){
-            if(MATTIE.global)
-            if(MATTIE.static){
-                MATTIE.global.checkGameVersion();
-                MATTIE.static.update();
-                clearInterval(int);
+    return new Promise(res=>{
+        MATTIE.DataManagerLoaddatabase.call(this);
+        let int = setInterval(() => {
+            if(DataManager.isDatabaseLoaded()){
+                if(MATTIE.global)
+                if(MATTIE.static){
+                    MATTIE.global.checkGameVersion();
+                    MATTIE.static.update();
+                    clearInterval(int);
+                }
+                res()
             }
-        }
-    }, 50);
+        }, 50);
+    })
 };
 
 
@@ -216,7 +218,6 @@ class ModManager {
     /** @description find all files in the mods folder that do not have a json file attached to them */
     getModsWithoutJson(){
         let modsWithJson = this.getAllMods().map(mod=>mod.name);
-        console.log(modsWithJson);
         let modsWithoutJson = [];
         this.getModsFolder().forEach(modName =>{
             if(modName.endsWith(".js") && !modName.includes("mattieFMModLoader")){
@@ -409,8 +410,6 @@ class ModManager {
      * @param {string} modName the name of the mod to call the off load script of
      */
     callOnOffloadModScript(modName){
-        console.log(this._modsDict)
-        console.log(this._modsDict[modName])
         if(this._modsDict[modName]){
             let onOffloadScriptExists = !!this._modsDict[modName].offloadScript;
             if(onOffloadScriptExists) this._modsDict[modName].offloadScript();
@@ -542,8 +541,9 @@ class ModManager {
  * @description load the mod manager 
  */
 MATTIE_ModManager.init =
-function () {
-    PluginManager.setup($plugins);
+async function () {
+    await DataManager.loadDatabase();
+    await PluginManager.setup($plugins);
     
     const defaultPath = PluginManager._path;
         const path = "mods/";
@@ -559,26 +559,25 @@ function () {
             commonModManager.setup(commonMods).then(()=>{
                 //common mods loaded
                 PluginManager._path = defaultPath
+                MATTIE.static.update();
                 res();
             });
             
         }).then(()=>{
-            setTimeout(() => {
-                PluginManager._path = path;
-                const mods = modManager.parseMods(path); //fs is in a different root dir so it needs this.
-                console.info(mods)
-                modManager.setup(mods).then(()=>{ //all mods loaded after plugins
-                    SceneManager.goto(Scene_Title);
-                    MATTIE.msgAPI.footerMsg("Mod loader successfully initialized") 
-                    PluginManager._path = defaultPath;
-                    MATTIE_ModManager.overrideErrorLoggers();
-                    
-
-                    
-
-                }); 
+        PluginManager._path = path;
+        const mods = modManager.parseMods(path); //fs is in a different root dir so it needs this.
+        console.info(mods)
+        modManager.setup(mods).then(()=>{ //all mods loaded after plugins
+            SceneManager.goto(Scene_Title);
+            MATTIE.msgAPI.footerMsg("Mod loader successfully initialized") 
+            PluginManager._path = defaultPath;
+            MATTIE_ModManager.overrideErrorLoggers();
             
-        },1500);
+
+            
+
+        }); 
+
     });
         
 
@@ -615,6 +614,20 @@ Graphics.hideError = function() {
     this.clearCanvasFilter();
 };
 
+/**
+ * @description for the purpose of matching our error style to that of termina I have used Olivia's formatting below
+ * variables names were changed to match coding convention of my modloader not to appear as though this is my code. That said this is like
+ * borrowing a color. 
+ * @credit Olivia AntiPlayerStress
+ */
+MATTIE_RPG.Graphics_updateErrorPrinter = Graphics._updateErrorPrinter;
+Graphics._updateErrorPrinter = function() {
+    MATTIE_RPG.Graphics_updateErrorPrinter.call(this);
+    this._errorPrinter.height = this._height * 0.5;
+    this._errorPrinter.style.textAlign = 'left';
+    this._centerElement(this._errorPrinter);
+};
+
 MATTIE.suppressingAllErrors = false;
 MATTIE.onError = function(e) {
     if(!MATTIE.suppressingAllErrors){
@@ -623,10 +636,23 @@ MATTIE.onError = function(e) {
     console.error(e.filename, e.lineno);
     try {
         this.stop();
-        Graphics.printError('Error', e.message+"<br>Press 'F7' or 'escape' to try to continue despite this error. <br><br>Press 'F9' to suppress all future errors. (be carful using this)<br><br>Press 'F6' To Reboot without mods. <br> Press 'F5' to reboot with mods. <br><br> If you are reporting a bug, <br> include this screen with the error and what mod/mods you were using and when you were doing when the bug occurred. <br> Thanks <br> -Mattie");
+        let color = "#f5f3b0";
+        let errorText = "";
+        errorText += `<font color="Yellow" size=5>The game has encountered an error, please report this.<br></font>`
+        errorText += `<br> If you are reporting a bug, include this screen with the error and what mod/mods you were using and when you were doing when the bug occurred. <br> Thanks <br> -Mattie<br>`
+        
+       
+        errorText += `<br><font color="Yellow" size=5>Error<br></font>`
+        errorText += e.stack.split("\n").join("<br>");
+
+        errorText += `<font color=${color}><br><br>Press 'F7' or 'escape' to try to continue despite this error. <br></font>`
+        errorText += `<font color=${color}>Press 'F9' to suppress all future errors. (be carful using this)<br></font>`
+        errorText += `<font color=${color}>Press 'F6' To reboot without mods.<br></font>`
+        errorText += `<font color=${color}>Press 'F5' to reboot with mods. <br></font>`
+        
+        Graphics.printError('',errorText);
         AudioManager.stopAll();
         let cb = ((key)=>{
-            console.log(key.key);
             if(key.key === 'F6'){
                 MATTIE_ModManager.modManager.disableAndReload();
                 MATTIE_ModManager.modManager.reloadGame();

@@ -3,7 +3,7 @@
     "status":true,
     "parameters":{},
     "dependencies": [
-        "_common/optimizedTarraxLighting",
+        
         "_common/systemEvents",
         "_common/menus/menu",
         "_common/menus/mainMenu",
@@ -16,6 +16,11 @@
         "_common/static",
         "_common/items",
         "_common/optimisations",
+
+    
+        "_common/optimizedTarraxLighting",
+
+
         "_common/menus/devMenu",
         "_common/clipboard",
         "_common/actorAPI",
@@ -25,7 +30,7 @@
         "_common/msgAPI",
         "_common/supporters",
         "_common/util",
-        "_common/dataManager",
+        
         "_common/betterCrowMauler"
     
     ],

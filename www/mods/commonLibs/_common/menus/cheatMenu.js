@@ -261,6 +261,15 @@ MATTIE.scenes.Scene_DevSkill.prototype.createItemWindow = function() {
     this.addWindow(this._itemWindow);
 };
 
+
+MATTIE.scenes.Scene_DevSkill.prototype.createActorWindow = function() {
+    Scene_Skill.prototype.createActorWindow.call(this);
+    this._actorWindow.select($gameParty.leader())
+    this._actorWindow.refresh();
+    this._actorWindow._formationMode = ()=>true;
+};
+
+
 //override. This is the function that actually uses the skill, cus skills are "items"
 //we want to always select an actor to teach the skill to
 MATTIE.scenes.Scene_DevSkill.prototype.determineItem = function() {
@@ -294,6 +303,9 @@ MATTIE.windows.Window_DevSkillList.prototype.constructor = MATTIE.windows.Window
 
 MATTIE.windows.Window_DevSkillList.prototype.initialize = function(x, y, width, height) {
     Window_SkillList.prototype.initialize.call(this, x, y, width, height);
+    BattleManager.clearActor();
+    this.setActor($gameParty.leader());
+    this.refresh()
 };
 //override to return all skills. We return the skills with icons first
 MATTIE.windows.Window_DevSkillList.prototype.makeItemList = function() {
@@ -315,9 +327,14 @@ MATTIE.windows.Window_DevSkillList.prototype.drawSkillCost = function(skill, x, 
     }
 };
 //we wand all skills to be enabled
-Window_SkillList.prototype.isEnabled = function(item) {
+MATTIE.windows.Window_DevSkillList.prototype.isEnabled = function(item) {
     return true;
 };
+
+MATTIE.windows.Window_DevSkillList.prototype.isCurrentItemEnabled = function() {
+    return true
+};
+
 
 
 
