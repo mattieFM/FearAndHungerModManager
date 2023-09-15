@@ -105,7 +105,6 @@ Game_Troop.prototype.getMId = function(){
     return this._MTroopId ? this._MTroopId : !(this instanceof MATTIE.troopAPI.runtimeTroop) ? -1 : -2; 
 }
 
-
 /**
  * @description takes a local index for baseMembers() and transforms it into an index for members()
  * @param {*} index the local index of the enemy
@@ -216,7 +215,7 @@ MATTIE.troopAPI.runtimeTroop.prototype.getSwitchValue = function(id){
         return this.localSwitches[id];
     }
     else {
-        return $gameSwitches.value(id);
+        return false; //$gameSwitches.value(id);
     }
 }
 

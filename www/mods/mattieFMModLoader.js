@@ -544,7 +544,7 @@ MATTIE_ModManager.init =
 async function () {
     await DataManager.loadDatabase();
     await PluginManager.setup($plugins);
-    
+    MATTIE.DataManager.onLoad();
     const defaultPath = PluginManager._path;
         const path = "mods/";
         const commonLibsPath = path+"commonLibs/";
