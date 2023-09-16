@@ -9,9 +9,9 @@ MATTIE.betterCrowMauler = MATTIE.betterCrowMauler || {};
 MATTIE.betterCrowMauler.spawnInterval = 10000;
 /**
  *  @description the chance that crow mauler will spawn every interval 
- *  @default .05
+ *  @default .03
  * */
-MATTIE.betterCrowMauler.spawnChance = .003;
+MATTIE.betterCrowMauler.spawnChance = .03;
 
 /**
  *  @description the chance that crow mauler will follow you into the next room
@@ -27,9 +27,13 @@ MATTIE.betterCrowMauler.despawnChance = .15;
 
 /**
  * @description the chance of crow mauler entering someones battle
- * @default .01
+ * @default .005
  */
 MATTIE.betterCrowMauler.combatEnterChance = .005;
+
+
+/** @description a scaler to scale the crow's spawn chance by */
+MATTIE.betterCrowMauler.scaler = 1;
 
 MATTIE.betterCrowMauler.crowController = function () {
     setTimeout(() => {
@@ -60,8 +64,12 @@ MATTIE.betterCrowMauler.crowController = function () {
     }
 
     setInterval(() => {
-        this.spawnTick();
-        this.battleSpawnTick();
+        if(this.crowCanSpawn()){
+            if((!MATTIE.static.maps.onMenuMap()))
+            this.spawnTick();
+            this.battleSpawnTick(); 
+        }
+        
     }, MATTIE.betterCrowMauler.spawnInterval);
 }
 
@@ -70,6 +78,11 @@ MATTIE.betterCrowMauler.crowController.prototype.isDead = function(){
     let bool = this.self.checkSelfSwitch("A");
     console.log("isdead: "+bool);
     return bool;
+}
+
+/** @description a function to return the scaler, ment to be overriden if other mods need to change this */
+MATTIE.betterCrowMauler.crowController.prototype.getScaling = function(){
+    return MATTIE.betterCrowMauler.scaler;
 }
 
 /**
@@ -84,7 +97,7 @@ MATTIE.betterCrowMauler.crowController.prototype.disableBaseCrowMauler = functio
  * @description the function called every x ms to check if crow mauler should spawn
  */
 MATTIE.betterCrowMauler.crowController.prototype.spawnTick = function(){
-    if(!this.onScreen && !this.hasSpawned && !this.isDead() && !$gameParty.inBattle() && SceneManager._scene instanceof Scene_Map && ($gameSwitches.value(MATTIE.static.switch.crowMaulerCanSpawn)))  this.update();
+    if(!this.onScreen && !this.hasSpawned && !this.isDead() && !$gameParty.inBattle() && SceneManager._scene instanceof Scene_Map)  this.update();
 }
 
 MATTIE.betterCrowMauler.crowController.prototype.battleSpawnTick = function(){
@@ -222,7 +235,7 @@ MATTIE.betterCrowMauler.crowController.prototype.follow = function(){
  * 
  * */
 MATTIE.betterCrowMauler.crowController.prototype.canFollow = function(){
-    return MATTIE.util.randChance(MATTIE.betterCrowMauler.followChance) && (this.mapId === $gameMap.lastMapId());
+    return MATTIE.util.randChance(MATTIE.betterCrowMauler.followChance*this.getScaling()) && (this.mapId === $gameMap.lastMapId());
 }
 
 
@@ -240,7 +253,7 @@ MATTIE.betterCrowMauler.crowController.prototype.shouldDespawn = function(){
  * */
 
 MATTIE.betterCrowMauler.crowController.prototype.shouldEnterCombat = function(){
-    return !this.isDead() && !this.onScreen && MATTIE.util.randChance(MATTIE.betterCrowMauler.combatEnterChance);
+    return !this.isDead() && !this.onScreen && MATTIE.util.randChance(MATTIE.betterCrowMauler.combatEnterChance*this.getScaling());
 }
 
 
@@ -268,8 +281,41 @@ MATTIE.betterCrowMauler.crowController.prototype.onEnterRoom = function(){
 
 MATTIE.betterCrowMauler.crowController.prototype.update = function(){
     console.log("updated")
-    if(MATTIE.util.randChance(MATTIE.betterCrowMauler.spawnChance)){
+    if(MATTIE.util.randChance(MATTIE.betterCrowMauler.spawnChance*this.getScaling())){
         console.log("entered")
         this.enter();
     }
+}
+/**
+ * @description set up the crow mauler class and assign it to the variable we use
+ */
+MATTIE.betterCrowMauler.betterCrowMaulerInit = function(){
+    let crowCont = new MATTIE.betterCrowMauler.crowController();
+    if(MATTIE.betterCrowMauler)
+    MATTIE.betterCrowMauler.crowCont = crowCont; 
+}
+
+
+
+/** @description cleanup the crow controller if it exists */
+MATTIE.betterCrowMauler.betterCrowMaulerCleanup = function(){
+    if(MATTIE.betterCrowMauler)
+    MATTIE.betterCrowMauler.crowCont = null; 
+}
+
+
+
+//--------------------------------------------------
+// Multiplayer Compatibility
+//--------------------------------------------------
+if(MATTIE.multiplayer){
+    MATTIE.betterCrowMauler.crowController.prototype.getScaling = function(){
+        if(MATTIE.multiplayer.getCurrentNetController){
+            let netCont = MATTIE.multiplayer.getCurrentNetController();
+            return 2 / Object.keys(netCont.netPlayers).length;
+        }else{
+            return MATTIE.betterCrowMauler.scaler;
+        }
+    }
+    
 }

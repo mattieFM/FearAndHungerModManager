@@ -792,12 +792,14 @@ class BaseNetController extends EventEmitter {
                 this.netPlayers[key] = Object.assign(this.netPlayers[key], netPlayer) //replace any files that conflict with new data, otherwise keep old data.
             }
         }
+        this.emit("updateNetPlayers", netPlayers)
     }
 
     updateNetPlayer(playerInfo){
         let obj = {};
         obj[playerInfo.peerId] = playerInfo;
         this.updateNetPlayers(obj)
+        this.emit("updateNetPlayers", [obj])
     }
 
     updateNetPlayerFollowers(playerInfo){

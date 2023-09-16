@@ -2,8 +2,13 @@ var MATTIE = MATTIE || {};
 var MATTIE_RPG = MATTIE_RPG || {};
 MATTIE.betterCrowMauler = MATTIE.betterCrowMauler || {};
 
-if(!MATTIE_ModManager.modManager.checkMod("multiplayer"))
-MATTIE.betterCrowMauler.crowCont = new MATTIE.betterCrowMauler.crowController();
+//the multiplayer mod automatically uses better crow mauler so we don't want to double up if both are used
+if(!MATTIE_ModManager.modManager.checkMod("multiplayer")) MATTIE.betterCrowMauler.betterCrowMaulerInit();
+
+
+//----------------------------------------------------------------------
+// Key Binds
+//----------------------------------------------------------------------
 Input.addKeyBind("x",()=>{
     MATTIE.betterCrowMauler.crowCont.enter();
 },"spawn crow (DEV)",-2);
