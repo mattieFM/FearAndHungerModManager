@@ -11,7 +11,7 @@ MATTIE.eventAPI.addItemDropToCurrentMap = function(item){
     let itemObj = item.object();
     event.addPage();
     event.data.pages[1].conditions.selfSwitchValid=true;
-    event.setImage(0, MATTIE.static.events.images.shiny);
+    event.setImage(0, MATTIE.static.events.images.shiny());
     event.addCommand(0,101,["", 0, 0, 2]);
     event.addCommand(0,401,["There is something shining here...."]);
     event.addCommand(0,101,["", 0, 0, 2]);

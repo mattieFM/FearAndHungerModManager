@@ -567,7 +567,7 @@ async function () {
             SceneManager.goto(Scene_Title);
             MATTIE.msgAPI.footerMsg("Mod loader successfully initialized") 
             PluginManager._path = defaultPath;
-            MATTIE_ModManager.overrideErrorLoggers();
+            
             
 
             
@@ -627,8 +627,8 @@ MATTIE.suppressingAllErrors = false;
 MATTIE.onError = function(e) {
     if(!MATTIE.suppressingAllErrors){
         console.error(e);
-    console.error(e.message);
-    console.error(e.filename, e.lineno);
+        console.error(e.message);
+        console.error(e.filename, e.lineno);
     try {
         this.stop();
         let color = "#f5f3b0";
@@ -638,7 +638,12 @@ MATTIE.onError = function(e) {
         
        
         errorText += `<br><font color="Yellow" size=5>Error<br></font>`
+        if(e.stack)
         errorText += e.stack.split("\n").join("<br>");
+        if(e.message)
+        errorText += e.message
+        if(e.lineno)
+        errorText += e.lineno
 
         errorText += `<font color=${color}><br><br>Press 'F7' or 'escape' to try to continue despite this error. <br></font>`
         errorText += `<font color=${color}>Press 'F9' to suppress all future errors. (be carful using this)<br></font>`
@@ -672,11 +677,11 @@ MATTIE.onError = function(e) {
         document.addEventListener('keydown', cb, false);
         
     } catch (e2) {
-        Graphics.printError('Error', e.message+"\nFUBAR");
+        Graphics.printError('Error',e+ "<br>"+ e2.message + e2.stack+"<br>\nFUBAR");
     }
     }
     
 }
 
-
+MATTIE_ModManager.overrideErrorLoggers();
 MATTIE_ModManager.init();  
