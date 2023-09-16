@@ -98,8 +98,8 @@ DataManager.loadDatabase = function() {
                 if(MATTIE.static){
                     MATTIE.global.checkGameVersion();
                     MATTIE.static.update();
-                    clearInterval(int);
                 }
+                clearInterval(int);
                 res()
             }
         }, 50);
