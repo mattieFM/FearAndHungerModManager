@@ -356,6 +356,7 @@ class BaseNetController extends EventEmitter {
         }
             
 
+        if($gameTroop.getIdsInCombatWithExSelf().includes(id)) //only setup net actions if we are in combat with that troop
         if(readyObj.actions){
             let actions = JSON.parse(readyObj.actions);
            
