@@ -44,9 +44,18 @@ MATTIE.scenes.multiplayer.host.prototype.addPlayerListWindow = function(){
 }
 
 MATTIE.scenes.multiplayer.host.prototype.initListController = function(){
-    MATTIE.multiplayer.hostController.addListener('playerInfo', (player) =>{
-        this._playerWindow.addItem(player.name)
+    MATTIE.multiplayer.hostController.addListener('updateNetPlayers', () =>{
+        let arr = [];
+        arr.push(MATTIE.multiplayer.hostController.player.name);
+        for(key in MATTIE.multiplayer.hostController.netPlayers){
+            let netPlayer = MATTIE.multiplayer.hostController.netPlayers[key];
+            arr.push(netPlayer.name);
+        }
+        
+        this._playerWindow.updateText(arr);
     })
+
+    this._playerWindow.updateText([MATTIE.multiplayer.hostController.player.name])
 }
 
 MATTIE.scenes.multiplayer.host.prototype.showHideCode = function(hidden){
