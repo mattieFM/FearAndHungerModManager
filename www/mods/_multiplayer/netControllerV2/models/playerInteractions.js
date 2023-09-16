@@ -82,10 +82,10 @@ MATTIE.multiplayer.conversations.prototype.nameSpeak = function(name,msg){
 MATTIE.multiplayer.conversations.prototype.talkOptionsCb = function(n){
     switch (n) {
         case 0: //Talk
-           this.nameSpeak("Mattie", "That feature isn't implemented.")
+           this.nameSpeak("Mattie", "Hiya, im the dev, you can't talk yet XD. Eventually there will likely be flavor text for interactions between chars here. Or even a small in game chat functionality.")
             break;
         case 1: //Trade
-            this.nameSpeak("Mattie", "That feature isn't implemented.")
+            this.nameSpeak("Mattie", "That feature isn't implemented. You can drop items to trade.")
             break;
         case 2: //Resurrect
             this.resurrect();
@@ -93,11 +93,10 @@ MATTIE.multiplayer.conversations.prototype.talkOptionsCb = function(n){
         case 3: //Attack
             this.nameSpeak("Mattie", "That feature isn't implemented.")
             break;
-        case 3: //Cancel
-        
+        case 4: //Cancel
             break;
         default:
-            this.nameSpeak("Mattie", "That feature isn't implemented.")
+            break;
     }
 }
 /**
