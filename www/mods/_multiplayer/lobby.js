@@ -22,10 +22,15 @@ MATTIE.scenes.multiplayer.lobby.prototype.create = function(){
     MATTIE.scenes.multiplayer.base.prototype.create.call(this);
     this.createWindowLayer();
     MATTIE.multiplayer.clientController.open();
+    if(!MATTIE.multiplayer.clientController.self)
     MATTIE.multiplayer.clientController.self.on("open", ()=>{
         this.addPlayerListWindow();
         this.initListController();
     });
+    else {
+        this.addPlayerListWindow();
+        this.initListController();
+    }
     let btns = {};
     btns[MATTIE.TextManager.disconnect] = MATTIE.CmdManager.disconnect;
     btns[MATTIE.TextManager.forceStart] = MATTIE.CmdManager.forceStart
@@ -69,7 +74,7 @@ MATTIE.scenes.multiplayer.lobby.prototype.updateList = function(list){
         let netPlayer = list[key];
         arr.push(netPlayer.name);
     }
-    arr.push(clientController.player.name);
+    arr.push(MATTIE.multiplayer.clientController.player.name);
     this._playerWindow.updateText(arr);
 }
 
