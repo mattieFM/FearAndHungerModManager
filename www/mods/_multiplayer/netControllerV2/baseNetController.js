@@ -48,6 +48,7 @@ class BaseNetController extends EventEmitter {
     reconnectAllConns(){
         if(this.self){
             this.self.reconnect();
+            this.self.disconnected = false;
         }
         this.setIsClient();
         // if(this.conn){

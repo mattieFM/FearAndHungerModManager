@@ -45,8 +45,7 @@ class ClientController extends BaseNetController {
     }
 
     connect(hostId=this.hostId){
-        if(this.canTryToReconnect)
-        if(this.lastHostId === hostId) {
+        if(this.lastHostId === hostId && this.canTryToReconnect) {
            
             this.reconnectAllConns();
             this.sendPlayerInfo();
@@ -61,7 +60,7 @@ class ClientController extends BaseNetController {
             })
 
             this.conn.on("data", (data) => {
-                if(!this.self.disconnected)
+                //if(!this.self.disconnected)
                 this.onData(data,this.conn);
             })
         this.lastHostId = hostId;
