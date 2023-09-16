@@ -162,6 +162,17 @@ MATTIE.actorAPI.Data_Actor_Wrapper = class {
         
 
     }
+
+
+    /** @description replace the actor at this index with this actor */
+    replace (i){
+        $dataActors[i] = this._data;
+        console.log($dataActors[i] );
+        $gameActors._data[i] = false;
+        console.log($gameActors._data[i])
+        $gameActors.actor(i);
+
+    }
 }
 
 MATTIE.actorAPI.Data_Class = class {
