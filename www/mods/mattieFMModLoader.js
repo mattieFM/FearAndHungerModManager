@@ -552,6 +552,52 @@ class ModManager {
     };
 }
 
+/**
+ * @description load the mod manager 
+ */
+MATTIE_ModManager.init =
+async function () {
+    await DataManager.loadDatabase();
+    await PluginManager.setup($plugins);
+    
+    const defaultPath = PluginManager._path;
+        const path = "mods/";
+        const commonLibsPath = path+"commonLibs/";
+        const modManager = new ModManager(path);
+        MATTIE_ModManager.modManager = modManager;
+        modManager.generateDefaultJsonForModsWithoutJsons();
+        const commonModManager = new ModManager(commonLibsPath);
+        const commonMods = modManager.parseMods(commonLibsPath)
+            
+        new Promise(res=>{
+            PluginManager._path = commonLibsPath;
+            commonModManager.setup(commonMods).then(()=>{
+                //common mods loaded
+                PluginManager._path = defaultPath
+                MATTIE.static.update();
+                res();
+            });
+            
+        }).then(()=>{
+        PluginManager._path = path;
+        const mods = modManager.parseMods(path); //fs is in a different root dir so it needs this.
+        console.info(mods)
+        modManager.setup(mods).then(()=>{ //all mods loaded after plugins
+            SceneManager.goto(Scene_Title);
+            MATTIE.msgAPI.footerMsg("Mod loader successfully initialized") 
+            PluginManager._path = defaultPath;
+            
+            
+
+            
+
+        }); 
+    });
+        
+
+}
+
+
 //----------------------------------------------------------------
 //Error Handling
 //----------------------------------------------------------------
@@ -600,8 +646,8 @@ MATTIE.suppressingAllErrors = false;
 MATTIE.onError = function(e) {
     if(!MATTIE.suppressingAllErrors){
         console.error(e);
-    console.error(e.message);
-    console.error(e.filename, e.lineno);
+        console.error(e.message);
+        console.error(e.filename, e.lineno);
     try {
         this.stop();
         let color = "#f5f3b0";
@@ -611,7 +657,12 @@ MATTIE.onError = function(e) {
 
 
         errorText += `<br><font color="Yellow" size=5>Error<br></font>`
+        if(e.stack)
         errorText += e.stack.split("\n").join("<br>");
+        if(e.message)
+        errorText += e.message
+        if(e.lineno)
+        errorText += e.lineno
 
         errorText += `<font color=${color}><br><br>Press 'F7' or 'escape' to try to continue despite this error. <br></font>`
         errorText += `<font color=${color}>Press 'F9' to suppress all future errors. (be carful using this)<br></font>`
@@ -645,7 +696,7 @@ MATTIE.onError = function(e) {
         document.addEventListener('keydown', cb, false);
 
     } catch (e2) {
-        Graphics.printError('Error', e.message+"\nFUBAR");
+        Graphics.printError('Error',e+ "<br>"+ e2.message + e2.stack+"<br>\nFUBAR");
     }
     }
 

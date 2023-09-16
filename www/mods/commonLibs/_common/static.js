@@ -950,7 +950,7 @@ MATTIE.static.update = function(){
         //events
 
         //event images
-        MATTIE.static.events.images.shiny = MapEvent.generateImage(0,"!Flame",6,0,0); //the shiny coin incon
+        MATTIE.static.events.images.shiny = ()=>MapEvent.generateImage(0,"!Flame",6,0,0); //the shiny coin incon
         MATTIE.static.events.images.coin =  MATTIE.static.events.images.shiny;
 
     }else if (MATTIE.global.isTermina()){

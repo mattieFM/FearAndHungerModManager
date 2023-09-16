@@ -87,3 +87,36 @@ if(Olivia)if(Olivia.AntiPlayerStress){
     }, 5000);
 }
 
+//---------------------------------
+// Engine Fixes
+//---------------------------------
+
+
+//this fixes the screen freeze
+
+/**
+ * Renders the stage to the game screen.
+ *
+ * @static
+ * @method render
+ * @param {Stage} stage The stage object to be rendered
+ */
+Graphics.render = function(stage) {
+    if (this._skipCount <= 0) {
+        var startTime = Date.now();
+        if (stage) {
+            this._renderer.render(stage);
+            if (this._renderer.gl && this._renderer.gl.flush) {
+                this._renderer.gl.flush();
+            }
+        }
+        var endTime = Date.now();
+        var elapsed = endTime - startTime;
+        this._skipCount = Math.min(Math.floor(elapsed / 15), this._maxSkip);
+        this._rendered = true;
+    } else {
+        this._skipCount--;
+        this._rendered = false;
+    }
+    this.frameCount++;
+};
