@@ -27,6 +27,9 @@ MATTIE.static.commands.selfSwitch = 123;
 MATTIE.static.maps.menuMaps = [];
 //items
 MATTIE.static.items.emptyScroll = null;
+MATTIE.static.items.icons = {};
+MATTIE.static.items.icons.bookIcon = 0;
+
 
 MATTIE.static.troops = MATTIE.static.troops || {};
 
@@ -72,6 +75,42 @@ MATTIE.static.states.knockout = 0;
 
 //troopids
 MATTIE.static.troops.crowMauler = 51;
+MATTIE.static.troops.salmonSnakeId = 50;
+MATTIE.static.troops.blackWitchId = 96;
+MATTIE.static.troops.caveMotherId = 19;
+MATTIE.static.troops.harvestManId = 55;
+MATTIE.static.troops.bodySnatcherId = 160;
+MATTIE.static.troops.redManId = 153;
+MATTIE.static.troops.greaterBlightId = 191
+MATTIE.static.troops.blightId = 185
+MATTIE.static.troops.moldedId = 178;
+MATTIE.static.troops.torturerId = 17;
+MATTIE.static.troops.moonlessGaurdId = 117;
+MATTIE.static.troops.isayahId = 138;
+MATTIE.static.troops.seymor = 205;
+MATTIE.static.troops.ironShakespeareId = 57
+MATTIE.static.troops.knightSpectorId = 22
+MATTIE.static.troops.gauntKnightId = 140;
+MATTIE.static.troops.assassinSpectreId = 56
+MATTIE.static.troops.darceId = 119;
+MATTIE.static.troops.enkiId = 69;
+MATTIE.static.troops.caharaId = 67;
+MATTIE.static.troops.ragnId = 120;
+MATTIE.static.troops.oldKnightId = 21
+MATTIE.static.troops.whiteAngelId = 100;
+MATTIE.static.troops.doubleHeadedCrowId = 135;
+MATTIE.static.troops.secretId = 0; //enki marraige
+MATTIE.static.troops.namelessId =97
+MATTIE.static.troops.oldGuardianId =
+MATTIE.static.troops.lizardMageId = 214;
+MATTIE.static.troops.skinGrannyId = 109;
+MATTIE.static.troops.fancoisId = 115;
+MATTIE.static.troops.chambaraId = 75
+MATTIE.static.troops.valteilId = 110
+MATTIE.static.troops.gorothId = 170
+MATTIE.static.troops.sylvianId = 210;
+MATTIE.static.troops.griffithId = 126;
+MATTIE.static.troops.GOFAHID = 130;
 
 //actors
 MATTIE.static.actors.bloodGolemId = 0;
@@ -141,6 +180,7 @@ MATTIE.static.update = function(){
 
         //items
         MATTIE.static.items.emptyScroll = $dataItems[88]
+        MATTIE.static.items.icons.bookIcon = 121;
 
         //selfSwitch ids
         MATTIE.static.switch.syncedSelfSwitches = [
