@@ -85,7 +85,7 @@ class HostController extends BaseNetController {
     sendAll(data, excluded= []){
         this.connections.forEach(conn=>{
             if(!excluded.includes(conn.peer)) //if the id of the peer is excluded don't send
-            if(this.conn) conn.send(data);
+            if(conn) conn.send(data);
         })
     }
 

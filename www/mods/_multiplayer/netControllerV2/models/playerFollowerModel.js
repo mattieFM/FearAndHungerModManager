@@ -21,8 +21,6 @@ MATTIE.multiplayer.NetFollower.prototype.initialize = function(memberIndex, netP
 MATTIE.multiplayer.NetFollower.prototype.setActor = function(actorId) {
     if(actorId)
     if(!this.netPlayer.$netActors.baseActor(actorId)) this.netPlayer.$netActors.createNewNetActor(actorId);
-    console.log("from" + this.actorId);
-    console.log("set actor id to " + actorId);
     this.actorId = actorId;
    
     this.refresh();
