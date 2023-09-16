@@ -30,24 +30,34 @@ class ClientController extends BaseNetController {
     }
 
     open(){
+        if(!this.lastHostId) this.lastHostId = "";
         this.initEmitterOverrides(); //override stuff for interceptors
         this.setIsClient();
-        if(!this.self){
+        if(!this.lastHostId.includes(this.hostId) || !this.canTryToReconnect){
             this.self = new Peer();
             this.self.on('open', ()=>{
                 this.peerId = this.self.id;
                 this.player.setPeerId(this.peerId)
                 console.info(`Client opened at: ${this.peerId}`)
                 console.info(`Attempting to connect to host at: ${this.hostId}`)
-                MATTIE.multiplayer.clientController.connect();
+                this.connect();
             })
+        }else{
+            this.connect();
         }
+
+        
+        
+
     }
 
     connect(hostId=this.hostId){
-        if(this.lastHostId === hostId && this.canTryToReconnect) {
+        if(!this.lastHostId) this.lastHostId = "";
+        if(this.lastHostId.includes(hostId) && this.canTryToReconnect) {
+            console.log("last")
             this.reconnectAllConns();
             this.sendPlayerInfo();
+            this.lastHostId = hostId;
             return
         }
            
@@ -60,7 +70,8 @@ class ClientController extends BaseNetController {
             this.conn.on("data", (data) => {
                 //if(!this.self.disconnected)
                 this.onData(data,this.conn);
-            })
+            });
+
         this.lastHostId = hostId;
     }
 

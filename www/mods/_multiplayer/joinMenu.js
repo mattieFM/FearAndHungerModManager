@@ -46,7 +46,7 @@ MATTIE.scenes.multiplayer.join.prototype.addOptionsBtns = function(){
 
     this._optionsWindow.setHandler(MATTIE.CmdManager.joinGame, (()=>{
         this._inputWin.close();
-        MATTIE.multiplayer.clientController.hostId = this._inputWin.getInput()
+        MATTIE.multiplayer.clientController.hostId = (this._inputWin.getInput()).trim();
         MATTIE.menus.multiplayer.openLobby();
     }).bind(this));
 
