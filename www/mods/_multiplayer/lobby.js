@@ -36,7 +36,7 @@ MATTIE.scenes.multiplayer.lobby.prototype.create = function(){
     btns[MATTIE.TextManager.forceStart] = MATTIE.CmdManager.forceStart
     this._optionsWindow = new MATTIE.windows.horizontalBtns(175+300+10, btns, 2);
     this._optionsWindow.setHandler(MATTIE.CmdManager.disconnect, (()=>{
-        MATTIE.multiplayer.getCurrentNetController().disconnectAllConns();
+        MATTIE.multiplayer.clientController.disconnectAllConns();
         MATTIE.menus.multiplayer.openMultiplayer();
     }).bind(this))
 

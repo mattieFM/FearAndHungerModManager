@@ -38,7 +38,7 @@ class BaseNetController extends EventEmitter {
     disconnectAllConns(){
         this.canTryToReconnect = true;
         if(this.self){
-            this.self.disconnect();
+            this.self.disconnect()
         }
         // if(this.conn){
         //     this.conn.disconnect();
@@ -47,8 +47,8 @@ class BaseNetController extends EventEmitter {
 
     reconnectAllConns(){
         if(this.self){
+            if(!this.self.disconnected)
             this.self.reconnect();
-            this.self.disconnected = false;
         }
         this.setIsClient();
         // if(this.conn){
@@ -76,6 +76,10 @@ class BaseNetController extends EventEmitter {
     }
 
     clearControlVars(){
+        this.started = false;
+        this.players = {};
+        /** @type {[PlayerModel]} */
+        this.netPlayers = {};
         MATTIE.multiplayer.isClient = false;
         MATTIE.multiplayer.isHost = false;
         MATTIE.multiplayer.isActive = false;

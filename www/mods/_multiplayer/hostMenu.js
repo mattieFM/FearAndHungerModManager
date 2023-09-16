@@ -93,6 +93,7 @@ MATTIE.scenes.multiplayer.host.prototype.addOptionsBtns = function(){
     }).bind(this));
     this._optionsWindow.setHandler(MATTIE.CmdManager.returnToMultiplayer,  (()=>{
         MATTIE.multiplayer.getCurrentNetController().destroyAllConns();
+        MATTIE.multiplayer.getCurrentNetController().resetNet();
         MATTIE.menus.multiplayer.openMultiplayer();
 
     }).bind(this));
