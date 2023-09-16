@@ -94,6 +94,15 @@ MATTIE.static.events.crowMauler = null;
 MATTIE.static.events.images.shiny = {};
 MATTIE.static.events.images.coin = MATTIE.static.events.images.shiny;
 
+
+
+//Functions
+/** @description check if the player is on a menu map */
+MATTIE.static.maps.onMenuMap = () => MATTIE.static.maps.menuMaps.includes($gameMap.mapId())
+
+
+//Update Function
+
 MATTIE.static.update = function(){
     MATTIE.global.checkGameVersion(); // make sure version is valid
     //common events
