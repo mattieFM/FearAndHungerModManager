@@ -133,8 +133,10 @@ Game_Action.prototype.testApply = function(target) {
     if(targets)
     if(Object.keys(targets).includes(target.name())){
         console.log("hit is forcing on" + target.name());
+        if(target.result().forceHit)
         target.result().forceHit(targets[target.name()])
     } else {
+        if(target.result().forceHit)
         target.result().forceHit(undefined)
     }
     return MATTIE.multiplayer.Game_Action_testApply.call(this,target)
