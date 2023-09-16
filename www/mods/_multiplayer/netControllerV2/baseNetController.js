@@ -732,6 +732,38 @@ class BaseNetController extends EventEmitter {
             this.emitChangeInBattlersEvent(this.formatChangeInBattleObj(battleEndObj.eventId,battleEndObj.mapid,id));
     }
 
+    //-----------------------------------------------------
+    // Player Sync Event
+    //-----------------------------------------------------
+
+    //this is an event used to sync players on the same map making sure everyone renders in promptly
+
+    // /**
+    //  * @description used by the client to request a sync from the host
+    //  * @clientOnly
+    //  * @emits requestSyncEvent
+    //  */
+    // emitRequestSyncEvent(){
+    //     let obj = {};
+    //     obj.requestPlayerSync = {};
+    //     obj.requestPlayerSync.mapId = $gameMap.mapId();
+    //     this.emit("requestSyncEvent");
+    // }
+
+    // /**
+    //  * @description when the host recives a request to sync player data do this 
+    //  * @param {Object} syncObj the net obj for requestPlayerSync event
+    //  * @param {UUID} senderId the sender's id
+    //  */
+    // onRequestSyncEventData(syncObj, senderId){
+    //     let senderMapId = syncObj.mapId;
+
+    //     let playersOnMap = this.netPlayers.filter(player=>player.mapId===senderMapId);
+    //     let obj = {};
+    //     obj.playerSyncData = {};
+    //     obj.playerSyncData.playersOnMap
+    // }
+
 
     //-----------------------------------------------------
     //Update Net Players Event
@@ -1301,6 +1333,26 @@ class BaseNetController extends EventEmitter {
     //-----------------------------------------------------
     // MISC
     //-----------------------------------------------------
+
+
+    /**
+     * @description transfers all players on the current map to their locations on the current map
+     */
+    updatePlayersOnCurrentMap(){
+        let keys = Object.keys(this.netPlayers)
+        let idsOfPlayersOnSameMap = keys.filter(playerKey=>this.netPlayers[playerKey].isOnMap())
+        for (let index = 0; index < idsOfPlayersOnSameMap.length; index++) {
+            /** @type {PlayerModel} */
+            const key = idsOfPlayersOnSameMap[index]
+            const player = this.netPlayers[key];
+            let transObj = {};
+            transObj.x = player.$gamePlayer.x;
+            transObj.y = player.$gamePlayer.y;
+            transObj.map = player.map;
+            this.transferNetPlayer(transObj, player.peerId);
+            
+        }
+    }
 
 
     initEmitterOverrides(){

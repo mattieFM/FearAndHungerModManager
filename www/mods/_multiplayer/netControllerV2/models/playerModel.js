@@ -33,6 +33,14 @@ class PlayerModel {
         this.conversationModel = new MATTIE.multiplayer.conversations();
     }
 
+    /**
+     * @description check if this player is on the map
+     * @returns {bool} if this player is on the map
+     */
+    isOnMap () {
+        return this.map === $gameMap.mapId() || this.$gamePlayer.isOnMap();
+    }
+
     onInteract(){
         //called when this player is interacted with by pressing okay.
         this.conversationModel.talk($gameParty.leader().actorId(),this);

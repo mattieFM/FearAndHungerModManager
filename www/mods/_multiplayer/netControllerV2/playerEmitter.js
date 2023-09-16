@@ -122,7 +122,7 @@ MATTIE.multiplayer.gamePlayer.override = function() {
         if(MATTIE.multiplayer.isActive){
             MATTIE.emitTransfer();
             MATTIE.multiplayer.setEnemyHost();
-        
+            MATTIE.multiplayer.getCurrentNetController().updatePlayersOnCurrentMap();
         }
     }
 
