@@ -86,7 +86,7 @@ class ClientController extends BaseNetController {
     // }
 
     sendHost(data){
-        this.conn.send(data);
+        if(this.conn) this.conn.send(data);
     }
 
     /**
