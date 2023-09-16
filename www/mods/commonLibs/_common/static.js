@@ -94,6 +94,15 @@ MATTIE.static.events.crowMauler = null;
 MATTIE.static.events.images.shiny = {};
 MATTIE.static.events.images.coin = MATTIE.static.events.images.shiny;
 
+
+
+//Functions
+/** @description check if the player is on a menu map */
+MATTIE.static.maps.onMenuMap = () => MATTIE.static.maps.menuMaps.includes($gameMap.mapId())
+
+
+//Update Function
+
 MATTIE.static.update = function(){
     MATTIE.global.checkGameVersion(); // make sure version is valid
     //common events
@@ -822,6 +831,8 @@ MATTIE.static.update = function(){
         MATTIE.static.switch.godAffinitySwitches = MATTIE.static.rangeParser(MATTIE.static.switch.godAffinitySwitches);
         MATTIE.static.variable.godAffinityAndPrayerVars = MATTIE.static.rangeParser(MATTIE.static.variable.godAffinityAndPrayerVars);
         MATTIE.static.variable.ignoredVars = [ //ignored vars
+            12,
+            11,
             4,
             30, //player_mp
             "22-23", //arrow var
