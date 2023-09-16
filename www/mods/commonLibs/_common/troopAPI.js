@@ -215,7 +215,7 @@ MATTIE.troopAPI.runtimeTroop.prototype.getSwitchValue = function(id){
         return this.localSwitches[id];
     }
     else {
-        return $gameSwitches.value(id);
+        return false; //$gameSwitches.value(id);
     }
 }
 
