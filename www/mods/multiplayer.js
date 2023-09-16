@@ -84,13 +84,6 @@ MATTIE.multiplayer.devTools.randBetween = function(min, max) {
 }
 
 
-
-Input.addKeyBind('z', ()=>{
-    SceneManager.goto(Scene_Gameover);
-}, "DIE", -2)
-
-
-
 MATTIE.multiplayer.devTools.getTint = function() {
     let min = 180;
     let max = 255;
@@ -158,16 +151,14 @@ MATTIE.multiplayer.getCurrentNetController = ()=>{
         //create ghost char
         MATTIE.static.actors.ghost = new MATTIE.actorAPI.Data_Actor_Wrapper();
         MATTIE.static.actors.ghost.buildDataActorFromEventAndTroop(await MATTIE.eventAPI.getEventOnMap(185,20), $dataTroops[174], 7) //add miner ghost as actor
-        MATTIE.static.actors.ghost.create();     
+        MATTIE.static.actors.ghost.create();  
+
+        
     }, 1000);
     
 
-    MATTIE.static.update();
-
-    // let crowCont = new MATTIE.betterCrowMauler.crowController();
-    // if(MATTIE.betterCrowMauler)
-    // MATTIE.betterCrowMauler.crowCont = crowCont; 
-    
+    MATTIE.static.update();    
+    MATTIE.betterCrowMauler.betterCrowMaulerInit();   //setup crow mauler 
 })();
 
 
