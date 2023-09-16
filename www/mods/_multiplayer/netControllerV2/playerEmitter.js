@@ -179,6 +179,7 @@ MATTIE.multiplayer.gamePlayer.override = function() {
             /** @type {PlayerModel} */
             let netPlayer = netCont.netPlayers[key];
             if(netPlayer.map === $gameMap.mapId())
+            if(!MATTIE.static.maps.onMenuMap())
             if(netPlayer.$gamePlayer.x === x && netPlayer.$gamePlayer.y ===y){
                 if(triggers.contains(0)){ //if this is an action button trigger
                     netPlayer.onInteract();
