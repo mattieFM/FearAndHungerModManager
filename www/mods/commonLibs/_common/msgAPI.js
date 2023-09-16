@@ -1,6 +1,8 @@
 var MATTIE = MATTIE || {};
 MATTIE.msgAPI = MATTIE.msgAPI || {};
 
+//check DreamX exists for compatibility reasons
+var DreamX = DreamX || false;
 
 /**
  * @description display a msg in the way funger handles speech
@@ -28,7 +30,7 @@ MATTIE.msgAPI.showChoices = function(choices, defaultChoice, cancelChoice, cb, m
             choices.forEach(()=>helpsArr.push(helps))
         }
 
-        MATTIE.msgAPI._dreamXCompat();
+        MATTIE.msgAPI._dreamXCompat(helpsArr);
         
         $gameMessage.add(msg);
         $gameMessage.setChoices(choices, defaultChoice, cancelChoice);
@@ -40,14 +42,14 @@ MATTIE.msgAPI.showChoices = function(choices, defaultChoice, cancelChoice, cb, m
 /**
  * @description add compatibility for dreamX choice help plugin
  */
-MATTIE.msgAPI._dreamXCompat = function(){
-    var DreamX = DreamX || false;
-    if(DreamX)
+MATTIE.msgAPI._dreamXCompat = function(helpsArr){
+    if(DreamX){
         if(DreamX.ChoiceHelp){
             $gameMessage.setChoiceHelps(helpsArr);
             $gameMessage.setChoiceMessages([]);
             $gameMessage.setChoiceFaces([]);
         }
+    }
 }
 
 
