@@ -117,6 +117,8 @@ MATTIE.static.update = function(){
         MATTIE.static.switch.neckBreak = 16;
         MATTIE.static.switch.crowMaulerDisabled = 2953;
 
+        MATTIE.static.switch.legardAliveSwitch = 1016;
+
         //actors
         MATTIE.static.actors.bloodGolemId = 10;
         MATTIE.static.actors.emptyActorSlotId = 15;
@@ -484,6 +486,11 @@ MATTIE.static.update = function(){
             413,
 
 
+            1016, //auto run legard reqruit scene
+            2946, //outlander finds legard scene
+            987, //auto run cahara prision scene
+
+
 
 
 
@@ -491,12 +498,6 @@ MATTIE.static.update = function(){
             3540, //sleep event
             //"3541-3548", //surprise events
             
-
-            //--------------------------
-            //switch vars
-            //--------------------------
-            1270, //mahbre door 1
-            117, //elevator lever
 
 
 
@@ -533,6 +534,12 @@ MATTIE.static.update = function(){
             //this will cause some weirdness but also will make sure there is only one copy of them
             "657-658", //merc or outlander in party
 
+
+            //--------------------------
+            //switch vars
+            //--------------------------
+            1270, //mahbre door 1
+            117, //elevator lever
 
             2536, //vines 2
             2930, //elite guard rand2
@@ -588,10 +595,14 @@ MATTIE.static.update = function(){
             //crow mauler
             786, //crow activated
             "767-789", //the rest of crow mauler vars
+            167, //pocket cat girl
+            660, //pocket cat demon kid
 
             "685-686", //darce_scene
             687, //darce in party
             688, //darce dead
+            992, //chara party
+            991, //cahara party2
             "1842-1843",//legard ending
             "1845-1847", //legard ending
             "1848-1849", //gauntlet door2-3
@@ -683,6 +694,7 @@ MATTIE.static.update = function(){
 
 
 
+            1006, //ensure there is only one copy of legard
 
 
 
