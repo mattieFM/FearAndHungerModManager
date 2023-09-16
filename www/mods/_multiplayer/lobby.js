@@ -54,16 +54,23 @@ MATTIE.scenes.multiplayer.lobby.prototype.addPlayerListWindow = function(){
 MATTIE.scenes.multiplayer.lobby.prototype.initListController = function(){
     var clientController = MATTIE.multiplayer.clientController; 
     clientController.addListener('updateNetPlayers', (netPlayers) =>{
-        let arr = [];
-        for(key in netPlayers){
-            let netPlayer = netPlayers[key];
-            arr.push(netPlayer.name);
-        }
-        arr.push(clientController.player.name);
-        this._playerWindow.updateText(arr);
+        this.updateList(netPlayers);
     })
 
     clientController.addListener('startGame', () =>{
         MATTIE.menus.multiplayer.openGame();
     })
+
+    this.updateList(clientController.netPlayers)
 }
+MATTIE.scenes.multiplayer.lobby.prototype.updateList = function(list){
+    let arr = [];
+    for(key in list){
+        let netPlayer = list[key];
+        arr.push(netPlayer.name);
+    }
+    arr.push(clientController.player.name);
+    this._playerWindow.updateText(arr);
+}
+
+
