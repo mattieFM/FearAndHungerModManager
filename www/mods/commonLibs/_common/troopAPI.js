@@ -29,7 +29,7 @@ Game_Troop.prototype.setup = function(troopId, xOffset =0, yOffset =0){
     MATTIE_RPG.TroopApi_Game_Troop_Setup.call(this,troopId)
     this._interpreter.setTroop(this);
     /** @type {MATTIE.troopAPI.runtimeTroop[]} an array of all additional troops */
-    if(!this._additionalTroops)this._additionalTroops = {};
+    this._additionalTroops = {};
 }
 
 /** 
@@ -174,8 +174,6 @@ MATTIE_RPG.TroopApi_Game_Troop_Meets_Conditions = Game_Troop.prototype.meetsCond
  * @param {} page the page of the game troop, not the id
  */
 Game_Troop.prototype.meetsConditions = function(page) {
-    if(this != $gameTroop) console.log("page:" + page)
-    
     var c = page.conditions;
     if (!c.turnEnding && !c.turnValid && !c.enemyValid &&
         !c.actorValid && !c.switchValid) {
@@ -191,7 +189,7 @@ Game_Troop.prototype.meetsConditions = function(page) {
     }
 
     let prevSwitchValid = c.switchValid
-    if(this != $gameTroop){ //if this is a runtime troop check if a local switch exists
+    if(this instanceof MATTIE.troopAPI.runtimeTroop){ //if this is a runtime troop check if a local switch exists
         if (c.switchValid) {
             if(!this.getSwitchValue(c.switchId)) return false;
         }
@@ -233,6 +231,7 @@ MATTIE.troopAPI.runtimeTroop.prototype.constructor = MATTIE.troopAPI.runtimeTroo
 MATTIE.troopAPI.runtimeTroop.prototype.getSwitchValue = function(id){
     switch (id) {
         case MATTIE.static.switch.toughEnemyMode: //is_enemy_tough_mode should always return its global value
+        case MATTIE.static.switch.justGuard: //enemies should be able to all see this
         case MATTIE.static.switch.backstab:  //backstab should apply to all enemies
             return $gameSwitches.value(id)
             break;
@@ -404,7 +403,7 @@ Game_Interpreter.prototype.setupReservedCommonEvent = function() {
 // Control Switches
 MATTIE_RPG.TroopApi_Game_Interpreter_Command121 = Game_Interpreter.prototype.command121;
 Game_Interpreter.prototype.command121 = function() {
-    if(this.getTroop() !== $gameTroop){ //if the interpreter is targeting a runtime troop
+    if(this.getTroop() instanceof MATTIE.troopAPI.runtimeTroop){ //if the interpreter is targeting a runtime troop
         for (var i = this._params[0]; i <= this._params[1]; i++) {
             let bool = this._params[2] === 0;
             this.getTroop().setSwitchValue(i, bool);
@@ -423,7 +422,7 @@ Game_Interpreter.prototype.command121 = function() {
 MATTIE_RPG.TroopApi_Game_Interpreter_OperateVariable = Game_Interpreter.prototype.operateVariable;
 /** @description the opperate variable method overriden such that it will set local variables if on a local troop */
 Game_Interpreter.prototype.operateVariable = function(variableId, operationType, value) {
-    if(this.getTroop() !== $gameTroop){ //if the interpreter is targeting a runtime troop
+    if(this.getTroop() instanceof MATTIE.troopAPI.runtimeTroop){ //if the interpreter is targeting a runtime troop
         try {
             var oldValue = $gameVariables.value(variableId);
             switch (operationType) {
@@ -466,7 +465,7 @@ Game_Interpreter.prototype.command111 = function() {
     var result = false;
     switch (this._params[0]) {
         case 0:  // Switch
-            if(this.getTroop() !== $gameTroop){
+            if(this.getTroop() instanceof MATTIE.troopAPI.runtimeTroop){
                 console.log("getting value for " + this._params[1])
                 result = (this.getTroop().getSwitchValue(this._params[1]) === (this._params[2] === 0));
             }else{
@@ -476,7 +475,7 @@ Game_Interpreter.prototype.command111 = function() {
         case 1:  // Variable
             var value1
             var value2
-            if(this.getTroop() !== $gameTroop){ //if additional troop
+            if(this.getTroop() instanceof MATTIE.troopAPI.runtimeTroop){ //if additional troop
                 value1 = this.getTroop().getVariableValue(this._params[1]);
                 if (this._params[2] === 0) {
                     value2 = this._params[3];
@@ -620,7 +619,7 @@ Game_Interpreter.prototype.command111 = function() {
 MATTIE_RPG.TroopApi_Game_Interpreter_Command223 = Game_Interpreter.prototype.command223;
 /** @description only the main troop controller is allowed to tint the screen*/
 Game_Interpreter.prototype.command223 = function() {
-    if(this.getTroop() === $gameTroop) return MATTIE_RPG.TroopApi_Game_Interpreter_Command223.call(this)
+    if(!(this.getTroop() instanceof MATTIE.troopAPI.runtimeTroop)) return MATTIE_RPG.TroopApi_Game_Interpreter_Command223.call(this)
     return true;
 };
 

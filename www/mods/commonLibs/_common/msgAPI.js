@@ -38,6 +38,7 @@ MATTIE.msgAPI.formatMsgAndTitle = function(title,msg){
     return `\\c[7]${title}\\c[0]\n${msg}`
 }
 
+
 /**
  * @param {*} choices array of string msgs
  * @param {*} defaultChoice what index does the user start on

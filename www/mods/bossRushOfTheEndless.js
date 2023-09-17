@@ -39,7 +39,7 @@ MATTIE.bossRush =  MATTIE.bossRush || {};
         [MATTIE.static.troops.salmonSnakeId, MATTIE.static.troops.blackWitchId],
         [MATTIE.static.troops.caveMotherId, MATTIE.static.troops.harvestManId, MATTIE.static.troops.bodySnatcherId],
         [MATTIE.static.troops.redManId, MATTIE.static.troops.greaterBlightId, MATTIE.static.troops.blightId, MATTIE.static.troops.moldedId],
-        [MATTIE.static.troops.torturerId, MATTIE.static.troops.moonlessGaurdId,MATTIE.static.troops.bodySnatcherId],
+        [MATTIE.static.troops.torturerId, MATTIE.static.troops.moonlessGaurdId],
         [MATTIE.static.troops.isayahId, MATTIE.static.troops.ironShakespeareId]
         [MATTIE.static.troops.knightSpectorId, MATTIE.static.troops.gauntKnightId,MATTIE.static.troops.oldKnightId],
         [MATTIE.static.troops.crowMaulerId, MATTIE.static.troops.doubleHeadedCrowId],
@@ -54,7 +54,9 @@ MATTIE.bossRush =  MATTIE.bossRush || {};
     function rush(){
         if(!$gameParty.leader().isDead() && !(SceneManager._scene instanceof Scene_Gameover)){
             startNextFight(()=>{
+                $gameMessage.clear();
                 SceneManager.goto(Scene_Map);
+                $gameMessage.clear();
                 setTimeout(() => {
                     MATTIE.msgAPI.showChoices(["Continue Reading"],0,0,()=>{
                         rush();  
@@ -67,7 +69,7 @@ MATTIE.bossRush =  MATTIE.bossRush || {};
 
     function startNextFight(cb = ()=>{}){
         if(MATTIE.bossRush.currentFightIndex < MATTIE.bossRush.fights.length){
-            startFight(MATTIE.bossRush.currentFightIndex,cb);
+            startFight(MATTIE.bossRush.currentFightIndex, cb);
             MATTIE.bossRush.currentFightIndex++;
         } else {
             win()
@@ -90,9 +92,7 @@ MATTIE.bossRush =  MATTIE.bossRush || {};
         let roundIds = MATTIE.bossRush.fights[x];
         let first = 142
         BattleManager.setup(first, false, true);
-        BattleManager.setEventCallback(function(n) {
-            cb();
-        }.bind(this));
+        
         $gamePlayer.makeEncounterCount();
         SceneManager.push(Scene_Battle);
 
@@ -125,6 +125,9 @@ MATTIE.bossRush =  MATTIE.bossRush || {};
                 }  
                 setTimeout(() => {
                    BattleManager.setCantStartInputting(false);
+                   BattleManager.setEventCallback(function(n) {
+                    cb();
+                    }.bind(this));
                 }, 500);
                 
                 
@@ -256,7 +259,7 @@ MATTIE.bossRush =  MATTIE.bossRush || {};
                         break;
                     case 1: //read every page
                         rush();
-                    break;
+                        break;
                     default:
                         $gameParty.leader().addState(MATTIE.static.states.blind)
                         MATTIE.msgAPI.footerMsg("You vision fades as you claw out your eyes... It is a dark world now")
