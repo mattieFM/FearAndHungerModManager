@@ -303,8 +303,11 @@ Window_BattleStatus.prototype.drawTitleText = function(text, x, y, width) {
 Window_BattleStatus.prototype.drawItem = function(index) {
     let gameParty = this._gameParty || $gameParty;
     var actor = gameParty.battleMembers()[index];
-    this.drawBasicArea(this.basicAreaRect(index), actor);
-    this.drawGaugeArea(this.gaugeAreaRect(index), actor);
+    if(actor){
+        this.drawBasicArea(this.basicAreaRect(index), actor);
+        this.drawGaugeArea(this.gaugeAreaRect(index), actor);
+    }
+    
 };
 
 Window_BattleStatus.prototype.maxItems = function() { //fix battles length on net parties viewing

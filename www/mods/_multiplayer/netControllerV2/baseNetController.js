@@ -625,23 +625,25 @@ class BaseNetController extends EventEmitter {
      * @param {*} id 
      */
     battleEndRemoveCombatant(troopId,id){
+        if($dataTroops[troopId]){
+            let troopName = $dataTroops[troopId].name;
         
-        let troopName = $dataTroops[troopId].name;
-        
-        $dataTroops.forEach(element => {
-            if(element){
-                if(element.name === troopName){
-                    if(element._combatants){
-                        delete element._combatants[id];
+            $dataTroops.forEach(element => {
+                if(element){
+                    if(element.name === troopName){
+                        if(element._combatants){
+                            delete element._combatants[id];
+                        }
                     }
-                }
+            }
+            });
+            
+            $gameTroop.removeIdFromCombatArr(id);
+            if($dataTroops[troopId]._combatants){
+                delete $dataTroops[troopId]._combatants[id];
+            }
         }
-        });
         
-        $gameTroop.removeIdFromCombatArr(id);
-        if($dataTroops[troopId]._combatants){
-            delete $dataTroops[troopId]._combatants[id];
-        }
     }
 
      /**
@@ -706,7 +708,7 @@ class BaseNetController extends EventEmitter {
         obj.battleEnd.troopId = troopId;
         this.emit("battleEndEvent", obj);
         this.emitChangeInBattlersEvent(this.formatChangeInBattleObj(obj.eventId,obj.mapid,this.peerId));
-        $gameMap.event(obj.battleEnd.eventId).removeIdFromCombatArr(this.peerId);
+        if($gameMap.event(obj.battleEnd.eventId))$gameMap.event(obj.battleEnd.eventId).removeIdFromCombatArr(this.peerId);
         this.battleEndRemoveCombatant(obj.battleEnd.troopId,this.peerId);
         
         this.sendViaMainRoute(obj);
