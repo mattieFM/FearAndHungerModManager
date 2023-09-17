@@ -27,6 +27,9 @@ MATTIE.static.commands.selfSwitch = 123;
 MATTIE.static.maps.menuMaps = [];
 //items
 MATTIE.static.items.emptyScroll = null;
+MATTIE.static.items.icons = {};
+MATTIE.static.items.icons.bookIcon = 0;
+
 
 MATTIE.static.troops = MATTIE.static.troops || {};
 
@@ -37,6 +40,7 @@ MATTIE.static.skills.bloodGolem = null;
 MATTIE.static.skills.greaterBloodGolem = null;
 MATTIE.static.skills.healingWhispers = null;
 MATTIE.static.skills.run = null;
+MATTIE.static.skills.enGarde = null;
 
 //RPGMaker Constants
 MATTIE.static.rpg.battleProcessingId = 301;
@@ -62,6 +66,12 @@ MATTIE.static.switch.crowMaulerDisabled = 0;
 /** @description the switch that handles most coin flip instant kill / grab attack */
 MATTIE.static.switch.neckBreak = 0
 
+/** @description the switch tht handles en garde extra turn */
+MATTIE.static.switch.backstab = 0
+
+/** @description the switch that handles changing enemy health in harder mods */
+MATTIE.static.switch.toughEnemyMode = 0
+
 //selfSwitch ids
 MATTIE.static.switch.syncedSelfSwitches = [];
 MATTIE.static.switch.ignoredSelfSwitches = [];
@@ -72,6 +82,42 @@ MATTIE.static.states.knockout = 0;
 
 //troopids
 MATTIE.static.troops.crowMauler = 51;
+MATTIE.static.troops.salmonSnakeId = 50;
+MATTIE.static.troops.blackWitchId = 96;
+MATTIE.static.troops.caveMotherId = 19;
+MATTIE.static.troops.harvestManId = 55;
+MATTIE.static.troops.bodySnatcherId = 160;
+MATTIE.static.troops.redManId = 74;
+MATTIE.static.troops.greaterBlightId = 191
+MATTIE.static.troops.blightId = 185
+MATTIE.static.troops.moldedId = 178;
+MATTIE.static.troops.torturerId = 17;
+MATTIE.static.troops.moonlessGaurdId = 117;
+MATTIE.static.troops.isayahId = 138;
+MATTIE.static.troops.seymor = 205;
+MATTIE.static.troops.ironShakespeareId = 57
+MATTIE.static.troops.knightSpectorId = 22
+MATTIE.static.troops.gauntKnightId = 140;
+MATTIE.static.troops.assassinSpectreId = 56
+MATTIE.static.troops.darceId = 119;
+MATTIE.static.troops.enkiId = 69;
+MATTIE.static.troops.caharaId = 67;
+MATTIE.static.troops.ragnId = 120;
+MATTIE.static.troops.oldKnightId = 21
+MATTIE.static.troops.whiteAngelId = 100;
+MATTIE.static.troops.doubleHeadedCrowId = 135;
+MATTIE.static.troops.secretId = 0; //enki marraige
+MATTIE.static.troops.namelessId =97
+MATTIE.static.troops.oldGuardianId =
+MATTIE.static.troops.lizardMageId = 214;
+MATTIE.static.troops.skinGrannyId = 109;
+MATTIE.static.troops.fancoisId = 115;
+MATTIE.static.troops.chambaraId = 75
+MATTIE.static.troops.valteilId = 110
+MATTIE.static.troops.gorothId = 170
+MATTIE.static.troops.sylvianId = 210;
+MATTIE.static.troops.griffithId = 126;
+MATTIE.static.troops.GOFAHID = 130;
 
 //actors
 MATTIE.static.actors.bloodGolemId = 0;
@@ -115,6 +161,8 @@ MATTIE.static.update = function(){
         MATTIE.static.switch.crowMaulerCanSpawn = 786;
         MATTIE.static.switch.crowMaulerDead = 771;
         MATTIE.static.switch.neckBreak = 16;
+        MATTIE.static.switch.backstab = 1045;
+        MATTIE.static.switch.toughEnemyMode = 3155; 
         MATTIE.static.switch.crowMaulerDisabled = 2953;
 
         MATTIE.static.switch.legardAliveSwitch = 1016;
@@ -152,6 +200,7 @@ MATTIE.static.update = function(){
 
         //items
         MATTIE.static.items.emptyScroll = $dataItems[88]
+        MATTIE.static.items.icons.bookIcon = 121;
 
         //selfSwitch ids
         MATTIE.static.switch.syncedSelfSwitches = [
@@ -179,7 +228,7 @@ MATTIE.static.update = function(){
         MATTIE.static.skills.greaterBloodGolem = $dataSkills[103];;
         MATTIE.static.skills.healingWhispers = $dataSkills[151];
         MATTIE.static.skills.run = $dataSkills[40];
-
+        MATTIE.static.skills.enGarde = $dataSkills[146];
 
         //common events
         MATTIE.static.commonEvents.bloodportal = $dataCommonEvents[152];
@@ -189,6 +238,7 @@ MATTIE.static.update = function(){
 
         //states
         MATTIE.static.states.knockout = 0;
+        MATTIE.static.states.blind = 49;
 
         //switches
         MATTIE.static.switch.ignoredSwitches = [

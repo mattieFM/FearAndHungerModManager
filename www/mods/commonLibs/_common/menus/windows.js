@@ -332,7 +332,7 @@ MATTIE.windows.modListWin.prototype.makeCommandList = function() {
 
     MATTIE_ModManager.modManager.getAllMods().forEach(mod=>{
         let name = mod.name;
-        let status = mod.status;
+        let status = MATTIE_ModManager.modManager.getModActive(name);
         TextManager["MATTIE_"+name] = name ;
         this.addCommand(TextManager["MATTIE_"+name],  "MATTIE_"+name, status);
         //TextManager["MATTIE_"+name+"_STATUS"] = (status? "active": "not active");

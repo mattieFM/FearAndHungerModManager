@@ -24,6 +24,7 @@
 
         "_common/menus/devMenu",
         "_common/clipboard",
+        "_common/vfxAPI",
         "_common/actorAPI",
         "_common/eventAPI",
         "_common/troopAPI",
