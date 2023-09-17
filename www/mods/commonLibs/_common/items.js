@@ -194,6 +194,11 @@ MATTIE.items.runTimeItem = class {
         
     }
 
+    /** @description 1: normal, 0: weapon, 0: armor?, 2: book */
+    setItemType(type){
+        this._data.itypeId = type;
+    }
+
     setIconIndex(index){
         this._data.iconIndex = index;
     }
