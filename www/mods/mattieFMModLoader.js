@@ -670,6 +670,7 @@ Graphics._updateErrorPrinter = function() {
 
 MATTIE.suppressingAllErrors = false;
 MATTIE.onError = function(e) {
+    if(!e.message.includes("greenworks-win32"))
     if(!MATTIE.suppressingAllErrors){
         console.error(e);
         console.error(e.message);
