@@ -390,6 +390,9 @@ class ModManager {
 
         if(!bool){ //if a mod is being disabled call its offload script
             this.callOnOffloadModScript(modName.replace(".json",""));
+        } 
+        if(bool) {
+            this.callOnLoadModScript(modName.replace(".json",""));
         }
 
         fs.writeFileSync(path+modName,JSON.stringify(dataInfo));
@@ -413,12 +416,16 @@ class ModManager {
     }
 
     /**
-     * @description this will call the mod's on load script when the mod is loaded if it has one
-     * @param {String} modName the name of the mod to call the on load script of
+     * @description this will check the _modsDict and see if this mod has an offload script
+     * @param {string} modName the name of the mod to call the off load script of
      */
     callOnLoadModScript(modName){
-
+        if(this._modsDict[modName]){
+            let onOffloadScriptExists = !!this._modsDict[modName].onloadScript;
+            if(onOffloadScriptExists) this._modsDict[modName].onloadScript();
+        }
     }
+
 
     getAllMods(){
         const fs = require('fs');
@@ -472,6 +479,15 @@ class ModManager {
      */
     addOffloadScriptToMod(name,cb){
         this._modsDict[name].offloadScript=cb;
+    }
+
+    /**
+     * @description add a offload script that will be called when a mod is activated to a mod
+     * @param {*} name 
+     * @param {*} cb 
+     */
+    addOnloadScriptToMod(name,cb){
+        this._modsDict[name].onloadScript=cb;
     }
 
     /**

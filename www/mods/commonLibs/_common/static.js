@@ -40,6 +40,7 @@ MATTIE.static.skills.bloodGolem = null;
 MATTIE.static.skills.greaterBloodGolem = null;
 MATTIE.static.skills.healingWhispers = null;
 MATTIE.static.skills.run = null;
+MATTIE.static.skills.enGarde = null;
 
 //RPGMaker Constants
 MATTIE.static.rpg.battleProcessingId = 301;
@@ -65,6 +66,12 @@ MATTIE.static.switch.crowMaulerDisabled = 0;
 /** @description the switch that handles most coin flip instant kill / grab attack */
 MATTIE.static.switch.neckBreak = 0
 
+/** @description the switch tht handles en garde extra turn */
+MATTIE.static.switch.backstab = 0
+
+/** @description the switch that handles changing enemy health in harder mods */
+MATTIE.static.switch.toughEnemyMode = 0
+
 //selfSwitch ids
 MATTIE.static.switch.syncedSelfSwitches = [];
 MATTIE.static.switch.ignoredSelfSwitches = [];
@@ -80,7 +87,7 @@ MATTIE.static.troops.blackWitchId = 96;
 MATTIE.static.troops.caveMotherId = 19;
 MATTIE.static.troops.harvestManId = 55;
 MATTIE.static.troops.bodySnatcherId = 160;
-MATTIE.static.troops.redManId = 153;
+MATTIE.static.troops.redManId = 74;
 MATTIE.static.troops.greaterBlightId = 191
 MATTIE.static.troops.blightId = 185
 MATTIE.static.troops.moldedId = 178;
@@ -145,6 +152,8 @@ MATTIE.static.update = function(){
         MATTIE.static.switch.crowMaulerCanSpawn = 786;
         MATTIE.static.switch.crowMaulerDead = 771;
         MATTIE.static.switch.neckBreak = 16;
+        MATTIE.static.switch.backstab = 1045;
+        MATTIE.static.switch.toughEnemyMode = 3155; 
         MATTIE.static.switch.crowMaulerDisabled = 2953;
 
         //actors
@@ -208,7 +217,7 @@ MATTIE.static.update = function(){
         MATTIE.static.skills.greaterBloodGolem = $dataSkills[103];;
         MATTIE.static.skills.healingWhispers = $dataSkills[151];
         MATTIE.static.skills.run = $dataSkills[40];
-
+        MATTIE.static.skills.enGarde = $dataSkills[146];
 
         //common events
         MATTIE.static.commonEvents.bloodportal = $dataCommonEvents[152];
@@ -218,6 +227,7 @@ MATTIE.static.update = function(){
 
         //states
         MATTIE.static.states.knockout = 0;
+        MATTIE.static.states.blind = 49;
 
         //switches
         MATTIE.static.switch.ignoredSwitches = [
