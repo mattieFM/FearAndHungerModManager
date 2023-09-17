@@ -28,7 +28,7 @@ MATTIE.scenes.multiplayer.Scene_GameOver .prototype.create = function() {
     MATTIE.multiplayer.BattleController.emitTurnEndEvent();
     MATTIE.multiplayer.getCurrentNetController().emitBattleEndEvent($gameTroop._troopId, MATTIE.multiplayer.currentBattleEnemy);
 
-    
+
     Scene_Base.prototype.create.call(this);
     this.playGameoverMusic();
     

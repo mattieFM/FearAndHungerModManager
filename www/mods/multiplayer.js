@@ -151,6 +151,7 @@ MATTIE.multiplayer.getCurrentNetController = ()=>{
         //create ghost char
         MATTIE.static.actors.ghost = new MATTIE.actorAPI.Data_Actor_Wrapper();
         MATTIE.static.actors.ghost.buildDataActorFromEventAndTroop(await MATTIE.eventAPI.getEventOnMap(185,20), $dataTroops[174], 7) //add miner ghost as actor
+        //MATTIE.static.actors.ghost._data.characterName = "$shadow_people"
         MATTIE.static.actors.ghost.create();  
 
         

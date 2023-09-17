@@ -65,7 +65,15 @@ class PlayerModel {
             } else { //
                 $gameParty.leader().setHp(50);
                 SceneManager.goto(MATTIE.scenes.multiplayer.Scene_Spectate);
+                
                 MATTIE.actorAPI.changePartyLeader(MATTIE.static.actors.ghost._data.id);
+
+                let members = $gameParty.members();
+                for (let index = 1; index < members.length; index++) {
+                    const element = members[index];
+                    $gameParty.removeActor(element.actorId());
+                    
+                }
             }
         }
         this.isSpectating = bool
