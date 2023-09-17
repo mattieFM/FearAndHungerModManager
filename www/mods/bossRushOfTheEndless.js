@@ -40,7 +40,7 @@ MATTIE.bossRush =  MATTIE.bossRush || {};
         [MATTIE.static.troops.caveMotherId, MATTIE.static.troops.harvestManId, MATTIE.static.troops.bodySnatcherId],
         [MATTIE.static.troops.redManId, MATTIE.static.troops.greaterBlightId, MATTIE.static.troops.blightId, MATTIE.static.troops.moldedId],
         [MATTIE.static.troops.torturerId, MATTIE.static.troops.moonlessGaurdId],
-        [MATTIE.static.troops.isayahId, MATTIE.static.troops.ironShakespeareId]
+        [MATTIE.static.troops.isayahId, MATTIE.static.troops.ironShakespeareId],
         [MATTIE.static.troops.knightSpectorId, MATTIE.static.troops.gauntKnightId,MATTIE.static.troops.oldKnightId],
         [MATTIE.static.troops.crowMaulerId, MATTIE.static.troops.doubleHeadedCrowId],
         [MATTIE.static.troops.namelessId,MATTIE.static.troops.oldGuardianId, MATTIE.static.troops.lizardMageId],
