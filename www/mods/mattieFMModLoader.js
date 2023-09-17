@@ -25,7 +25,7 @@ var MATTIE_ModManager = MATTIE_ModManager || {};
 var MATTIE = MATTIE || {};
 var MATTIE_RPG = MATTIE_RPG || {};
 
-MATTIE.isDev = false;
+MATTIE.isDev = MATTIE.isDev || false;
 
 MATTIE.global = MATTIE.global || {};
 MATTIE.menus = MATTIE.menus || {};
@@ -240,13 +240,13 @@ class ModManager {
         const modInfoPath =  path + modName;
         const modInfoData = fs.readFileSync(modInfoPath)
         const modInfo = JSON.parse(modInfoData);
-        if(modInfo.dependencies && modInfo.status){ //load all dependencies before mod
+        if(modInfo.dependencies && this.getModActive(modInfo.name)){ //load all dependencies before mod
             modInfo.dependencies.forEach(dep=>{
                 this.addModEntry(dep);
             });
         }
         if(modInfo.name){
-            this.addModEntry(modInfo.name,modInfo.status,modInfo.danger,modInfo.parameters)
+            this.addModEntry(modInfo.name,this.getModActive(modInfo.name),modInfo.danger,modInfo.parameters)
         }else{
             this.addModEntry(modName)
         }
@@ -261,9 +261,22 @@ class ModManager {
         let arr = [];
         let currentModsData = this.getAllMods();
         currentModsData.forEach(mod => {
-            if(mod.status && mod.name[0] != "_" && mod.danger == true) arr.push(mod);
+            if(this.getModActive(mod.name) && mod.name[0] != "_" && mod.danger == true) arr.push(mod);
         });
         return arr;
+    }
+
+    getModActive(modName){
+        modName = modName.replace(".json","")
+        let userDataMod = MATTIE.DataManager.global.get(modName+"_Active") ;
+        let path = this.getPath();
+        let dataInfo = this.getModInfo(path,modName);
+        return typeof userDataMod != 'undefined' ? userDataMod : dataInfo.status;
+    }
+
+    setModActive(modName, bool){
+        modName = modName.replace(".json","")
+        MATTIE.DataManager.global.set(modName+"_Active", bool)
     }
 
     /** 
@@ -274,7 +287,7 @@ class ModManager {
         let arr = [];
         let currentModsData = this.getAllMods();
         currentModsData.forEach(mod => {
-            if(mod.status && mod.name[0] != "_") arr.push(mod);
+            if(this.getModActive(mod.name) && mod.name[0] != "_") arr.push(mod);
         });
         return arr;
     }
@@ -325,7 +338,7 @@ class ModManager {
     setVanilla(){
         let currentModsData = this.getAllMods();
         currentModsData.forEach(mod => {
-            if(mod.status) this.switchStatusOfMod(mod.name);
+            if(this.getModActive(mod.name)) this.switchStatusOfMod(mod.name);
         });
     }
 
@@ -335,7 +348,7 @@ class ModManager {
     setNonDanger(){
         let currentModsData = this.getAllMods();
         currentModsData.forEach(mod => {
-            if(mod.status == true && mod.danger == true) {
+            if(this.getModActive(mod.name) && mod.danger == true) {
                 this.switchStatusOfMod(mod.name);
             }
         });
@@ -347,17 +360,12 @@ class ModManager {
      * @returns {boolean}
      * */
     checkModsChanged(){
-        let currentModsData = this.getAllMods();
-        for (let index = 0; index < this._mods.length; index++) {
-            const mod = this._mods[index];
-            for (let index = 0; index < currentModsData.length; index++) {
-                const currentMod = currentModsData[index];
-                if(mod.name === currentMod.name && mod.status != currentMod.status) {
+        let keys = Object.keys(this._modsDict)
+        for (let index = 0; index < keys.length; index++) {
+            const mod = this._modsDict[keys[index]];
+                if(mod.status != mod.lastStatus) {
                     return true
                 }
-                
-            }
-            
         }
         return false;
     }
@@ -382,11 +390,10 @@ class ModManager {
      * @param {boolean} bool whether to set the mod as enabled or disabled
      */
     setEnabled(modName, bool){
+        this._modsDict[modName].lastStatus = this._modsDict[modName].status;
+        this._modsDict[modName].status = bool
         if(!modName.includes(".json")) modName+=".json";
-        const fs = require('fs');
-        let path = this.getPath();
-        let dataInfo = this.getModInfo(path,modName);
-        dataInfo.status = bool;
+       
 
         if(!bool){ //if a mod is being disabled call its offload script
             this.callOnOffloadModScript(modName.replace(".json",""));
@@ -395,13 +402,15 @@ class ModManager {
             this.callOnLoadModScript(modName.replace(".json",""));
         }
 
-        fs.writeFileSync(path+modName,JSON.stringify(dataInfo));
+        
+        
+        this.setModActive(modName,bool)
     }
 
     switchStatusOfMod(modName){
         let path = this.getPath();
         let dataInfo = this.getModInfo(path,modName);
-        this.setEnabled(modName, !dataInfo.status)
+        this.setEnabled(modName, !this.getModActive(modName))
     }
 
     /**
@@ -456,6 +465,7 @@ class ModManager {
     addModEntry(name,status=true,danger=false, params={}){
         var mod = {};
         mod.status = status;
+        mod.lastStatus = status;
         mod.name = name;
         mod.parameters = params;
         mod.danger = danger;
@@ -539,7 +549,7 @@ class ModManager {
     setup(mods) {
         let promises = [];
         mods.forEach((mod) => {
-            if (mod.status && !this._mods.contains(mod.name)) {
+            if (this.getModActive(mod.name) && !this._mods.contains(mod.name)) {
                 this.setParameters(mod.name, mod.parameters);
                 promises.push(this.loadScript(mod.name));
                 this._mods.push(mod.name);
