@@ -61,7 +61,6 @@ MATTIE.msgAPI._dreamXCompat = function(helpsArr,msgs){
             $gameMessage.setChoiceFaces([]);
         }
     }
-}
 
 
 /**
