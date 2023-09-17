@@ -81,6 +81,7 @@ var TY = {};
 //------------------------------
 //Termina Compatibility 
 //------------------------------
+var Olivia = Olivia || false;
 if(Olivia)if(Olivia.AntiPlayerStress){
     setTimeout(() => {
         Olivia.AntiPlayerStress.ProperErrorDisplay = false; //termina should use my error menu to
@@ -119,4 +120,15 @@ Graphics.render = function(stage) {
         this._rendered = false;
     }
     this.frameCount++;
+};
+
+
+Window_EquipItem.prototype.includes = function(item) {
+    if (item === null || typeof item === 'undefined') {
+        return true;
+    }
+    if (this._slotId < 0 || item.etypeId !== this._actor.equipSlots()[this._slotId]) {
+        return false;
+    }
+    return this._actor.canEquip(item);
 };
