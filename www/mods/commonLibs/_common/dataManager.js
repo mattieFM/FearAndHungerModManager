@@ -5,13 +5,15 @@ MATTIE.multiplayer = MATTIE.multiplayer || {};
 MATTIE.global = MATTIE.global || {};
 let funger1IgnoredPlugins = ["TerraxLighting"];
 let terminaIgnoredPlugins = [];
-let ignoredPlugins = ["HIME_PreTitleEvents"];
+let ignoredPlugins = ["HIME_PreTitleEvents", "physical_attack_animation"];
 
 MATTIE.ignoredPlugins = (()=>{
     if(MATTIE.global.isTermina()){
         return terminaIgnoredPlugins.concat(ignoredPlugins);
     } else if (MATTIE.global.isFunger()){
         return funger1IgnoredPlugins.concat(ignoredPlugins);
+    } else{
+        return ignoredPlugins;
     }
     return [];
 })
