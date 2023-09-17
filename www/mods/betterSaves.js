@@ -76,7 +76,7 @@ MATTIE.betterSaves = {};
     };
 
     function updateOldSaves() {
-        if(MATTIE.DataManager.global.get("migratedSaves")){
+        if(!MATTIE.DataManager.global.get("migratedSaves")){
             MATTIE.saves.savedLatest = DataManager.latestSavefileId(); 
             const globalInfo = DataManager.loadGlobalInfo();
             const maxSaves = DataManager.maxSavefiles();

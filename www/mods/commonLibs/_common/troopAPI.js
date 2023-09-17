@@ -115,6 +115,8 @@ Game_Troop.prototype.convertLocalIndexToGlobal = function(index){
     return newIndex > 0 ? newIndex : index;
 }
 
+
+
 /** @description the base function to setup the battle event of a game troop */
 MATTIE_RPG.TroopApi_Game_Troop_Setup_Battle_Event = Game_Troop.prototype.setupBattleEvent;
 /** 
@@ -139,6 +141,16 @@ Game_Troop.prototype.increaseTurn  = function(){
     });
 }
 
+Game_Troop.prototype.isEventRunning = function() {
+    if(this._interpreter.isRunning()) return true
+    let keys = Object.keys(this._additionalTroops)
+    for (let index = 0; index < keys.length; index++) {
+        const additionalTroop = this._additionalTroops[keys[index]];
+        if(additionalTroop._interpreter.isRunning()) return true;
+    }
+    return false
+};
+
 
 
 /** @description the base function to update the interpreter of a game troop */
@@ -147,8 +159,10 @@ MATTIE_RPG.TroopApi_Game_Troop_UpdateInterpreter = Game_Troop.prototype.updateIn
  * @description override the update interpreter to also update battle events of all additional troops
  */
 Game_Troop.prototype.updateInterpreter = function() {
+    console.log("updated interpreter")
     MATTIE_RPG.TroopApi_Game_Troop_UpdateInterpreter.call(this);
     this.forEachAdditionalTroop((additionalTroop) =>{
+        console.log("updated additional troop interpreter")
         additionalTroop.updateInterpreter();
     });
 }
@@ -160,12 +174,14 @@ MATTIE_RPG.TroopApi_Game_Troop_Meets_Conditions = Game_Troop.prototype.meetsCond
  * @param {} page the page of the game troop, not the id
  */
 Game_Troop.prototype.meetsConditions = function(page) {
+    if(this != $gameTroop) console.log("page:" + page)
     
     var c = page.conditions;
     if (!c.turnEnding && !c.turnValid && !c.enemyValid &&
         !c.actorValid && !c.switchValid) {
         return false;  // Conditions not set
     }
+
     let prevEnemyValid = c.enemyValid
     if (c.enemyValid) {
         var enemy = this.baseMembers()[c.enemyIndex];
@@ -196,6 +212,10 @@ Game_Troop.prototype.meetsConditions = function(page) {
 //Run Time Troop Class
 //--------------------------------------
 
+
+
+
+
 /** 
  * @description a class that handles adding troops to the current combat at runtime 
  * @param {int} troopId, the id of the troop this class represents
@@ -211,6 +231,16 @@ MATTIE.troopAPI.runtimeTroop.prototype = Object.create(Game_Troop.prototype);
 MATTIE.troopAPI.runtimeTroop.prototype.constructor = MATTIE.troopAPI.runtimeTroop;
 
 MATTIE.troopAPI.runtimeTroop.prototype.getSwitchValue = function(id){
+    switch (id) {
+        case MATTIE.static.switch.toughEnemyMode: //is_enemy_tough_mode should always return its global value
+        case MATTIE.static.switch.backstab:  //backstab should apply to all enemies
+            return $gameSwitches.value(id)
+            break;
+    
+        default:
+            break;
+    }
+
     if(typeof this.localSwitches[id] != 'undefined'){
         return this.localSwitches[id];
     }
@@ -250,6 +280,7 @@ MATTIE.troopAPI.runtimeTroop.prototype.getLocalSwitches = function(){
 MATTIE.troopAPI.runtimeTroop.prototype.initialize = function(troopId, xOffset=0, yOffset=0){
     Game_Troop.prototype.initialize.call(this);
     this._interpreter.setTroop(this);
+    this.clear()
     this.setup(troopId, xOffset, yOffset);
     this._interpreter.setTroop(this);
     /** @description an array of the sprites of the enemies in this troop */
@@ -309,16 +340,17 @@ MATTIE.troopAPI.runtimeTroop.prototype.addSpritesToCurrentBattleSet = function()
  */
 MATTIE.troopAPI.runtimeTroop.prototype.spawn = function(){
     if($gameParty.inBattle()){ //check if the game party is in battler
-        if($gameTroop){ //check if there is a current troop
+        if($gameTroop){ //check if there is a current troop;
             this.setupTroopId();
             console.log(this.getMId())
-            this.setupBattleEvent(); //setup battle event 
+            
             $gameTroop.addRunTimeTroop(this); //pass this runtime troop to the active troop
+            
             this.addSpritesToCurrentBattleSet();
             this._interpreter.setTroop(this);
         }
 
-    }
+    } 
     return this;
 }
 
@@ -435,6 +467,7 @@ Game_Interpreter.prototype.command111 = function() {
     switch (this._params[0]) {
         case 0:  // Switch
             if(this.getTroop() !== $gameTroop){
+                console.log("getting value for " + this._params[1])
                 result = (this.getTroop().getSwitchValue(this._params[1]) === (this._params[2] === 0));
             }else{
                 result = ($gameSwitches.value(this._params[1]) === (this._params[2] === 0));
@@ -655,6 +688,7 @@ Spriteset_Battle.prototype.getAllBattlerSprites = function(){
  * @description try to space out the additional enemies as much as possible
  */
 Spriteset_Battle.prototype.refreshSpacing = function(shouldAffectBase = true) {
+    if(!this.additionalEnemyTroops) this.additionalEnemyTroops = {};
     let dict = this.additionalEnemyTroops;
     if(shouldAffectBase)
     dict[-1] = this._enemySprites;
@@ -740,3 +774,16 @@ BattleManager.getCurrentTroopMId = function(){
     return mId;
     
 }
+BattleManager.cantStartInputting = function(){
+    return this._cantStart;
+}
+
+BattleManager.setCantStartInputting = function(bool){
+    this._cantStart = bool;
+}
+
+/** @description the base is common event reserved method */
+MATTIE_RPG.TroopApi_battleMan_startInput = BattleManager.startInput;
+BattleManager.startInput = function() {
+    if(!this.cantStartInputting()) MATTIE_RPG.TroopApi_battleMan_startInput.call(this);
+};

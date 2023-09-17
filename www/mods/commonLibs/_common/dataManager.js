@@ -139,18 +139,34 @@ MATTIE.DataManager.global.get = function(key){
     return MATTIE.DataManager.global.data[key];
 }
 
+/**
+ * 
+ * @param {*} orgFilePath the path to the file from www/ 
+ * @param {*} destPath the path within the img folder
+ * @param {*} name the name of the file
+ */
+MATTIE.DataManager.addFileToImgFolder = function(orgFilePath,destPath,name,name2=null){
+    if(!name.endsWith(".png"))name +=".png"
+    if(name2)if(!name2.endsWith(".png")) name2+=".png"
+    let fs = require('fs');
+    var path = require('path');
+    let src = path.dirname(process.mainModule.filename);
+    
+    orgFilePath = src + orgFilePath + name;
+    destinationPath = src +"/img/" + destPath + (name2 || name);
+    fs.copyFileSync(orgFilePath,destinationPath)
+
+}
+
 
 MATTIE.DataManager.init = function(){
     MATTIE.DataManager.global.createGlobalData();
     MATTIE.DataManager.global.loadGlobalData();
 }
 
-
-
 MATTIE.DataManager.onLoad = function(){
     MATTIE.isDev = MATTIE.DataManager.global.get("isDev")
     MATTIE.multiplayer.isDev = MATTIE.DataManager.global.get("isDev")
-
 }
 
 MATTIE.DataManager.addToOnLoad = function(cb){
@@ -271,7 +287,6 @@ MATTIE.DataManager.saveGameFromObj = function (savefileId,obj) {
         DataManager.saveGlobalInfo(globalInfo);
         return true;
 }
-
 
 
 
