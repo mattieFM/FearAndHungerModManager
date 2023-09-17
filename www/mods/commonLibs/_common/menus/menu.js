@@ -18,13 +18,13 @@ MATTIE.menus.toModMenu = function(){
 
 /** go to load scene */
 MATTIE.menus.toLoadMenu = function(){
-    SceneManager.goto(Scene_Load);
+    SceneManager.push(Scene_Load);
 }
 
 /** go to new game menu */
 MATTIE.menus.toNewMenu = function(){
     DataManager.setupNewGame();
-    SceneManager.goto(Scene_Map);
+    SceneManager.push(Scene_Map);
 }
 
 /**

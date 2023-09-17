@@ -1,6 +1,7 @@
 var MATTIE = MATTIE || {};
 MATTIE.msgAPI = MATTIE.msgAPI || {};
 
+//check DreamX exists for compatibility reasons
 var DreamX = DreamX || false;
 
 
@@ -39,6 +40,7 @@ MATTIE.msgAPI.showChoices = function(choices, defaultChoice, cancelChoice, cb, m
             choices.forEach(()=>helpsArr.push(helps))
         }
 
+        MATTIE.msgAPI._dreamXCompat(helpsArr);
         MATTIE.msgAPI._dreamXCompat(helpsArr,msgs);
         
         $gameMessage.add(msg);
@@ -58,6 +60,7 @@ MATTIE.msgAPI._dreamXCompat = function(helpsArr,msgs){
             $gameMessage.setChoiceMessages(msgs);
             $gameMessage.setChoiceFaces([]);
         }
+    }
 }
 
 

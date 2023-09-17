@@ -224,6 +224,10 @@ MATTIE.windows.textInput.prototype.initEventHandler = function() {
       }
       
     document.addEventListener('keydown', this._listenFunc, false);
+
+    setTimeout(() => { //automatically close after 50 seconds
+        this.close();
+    }, 50000);
     
 }
 
