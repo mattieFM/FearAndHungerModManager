@@ -69,6 +69,8 @@ MATTIE.static.switch.neckBreak = 0
 /** @description the switch tht handles en garde extra turn */
 MATTIE.static.switch.backstab = 0
 
+MATTIE.static.switch.justGuard = 1281;
+
 /** @description the switch that handles changing enemy health in harder mods */
 MATTIE.static.switch.toughEnemyMode = 0
 
