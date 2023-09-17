@@ -232,6 +232,7 @@ MATTIE.static.update = function(){
 
         //common events
         MATTIE.static.commonEvents.bloodportal = $dataCommonEvents[152];
+        MATTIE.static.commonEvents.credits = $dataCommonEvents[310];
 
         MATTIE.static.events.crowMauler = (()=>MATTIE.eventAPI.getEventOnMap(287,11))
             
