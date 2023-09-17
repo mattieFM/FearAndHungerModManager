@@ -4,13 +4,23 @@ MATTIE.msgAPI = MATTIE.msgAPI || {};
 //check DreamX exists for compatibility reasons
 var DreamX = DreamX || false;
 
+
 /**
  * @description display a msg in the way funger handles speech
  * @param {string} title the title/char name to display in darkened text
  * @param {string} msg the string msg
  */
 MATTIE.msgAPI.displayMsgWithTitle = function(title,msg){
-        $gameMessage.add(`\\c[7]${title}\\c[0]\n${msg}`);
+    MATTIE.msgAPI.displayMsg(MATTIE.msgAPI.formatMsgAndTitle(title,msg));
+}
+
+MATTIE.msgAPI.displayMsg = function(msg){
+    $gameMessage.add(msg);
+}
+
+/**@description format a string into the form title msg, as though speaking */
+MATTIE.msgAPI.formatMsgAndTitle = function(title,msg){
+    return `\\c[7]${title}\\c[0]\n${msg}`
 }
 
 /**
@@ -21,7 +31,7 @@ MATTIE.msgAPI.displayMsgWithTitle = function(title,msg){
  * @param {string} msgs displays at the bottom of the screen
  * @param {[] || string} helps displays at top of screen
  */
-MATTIE.msgAPI.showChoices = function(choices, defaultChoice, cancelChoice, cb, msg, helps=[]){
+MATTIE.msgAPI.showChoices = function(choices, defaultChoice, cancelChoice, cb, msg="test", msgs=[], helps=[]){
 
         let helpsArr = [];
         if(typeof helpsArr != typeof "string"){
@@ -31,6 +41,7 @@ MATTIE.msgAPI.showChoices = function(choices, defaultChoice, cancelChoice, cb, m
         }
 
         MATTIE.msgAPI._dreamXCompat(helpsArr);
+        MATTIE.msgAPI._dreamXCompat(helpsArr,msgs);
         
         $gameMessage.add(msg);
         $gameMessage.setChoices(choices, defaultChoice, cancelChoice);
@@ -42,11 +53,11 @@ MATTIE.msgAPI.showChoices = function(choices, defaultChoice, cancelChoice, cb, m
 /**
  * @description add compatibility for dreamX choice help plugin
  */
-MATTIE.msgAPI._dreamXCompat = function(helpsArr){
-    if(DreamX){
+MATTIE.msgAPI._dreamXCompat = function(helpsArr,msgs){
+    if(DreamX)
         if(DreamX.ChoiceHelp){
             $gameMessage.setChoiceHelps(helpsArr);
-            $gameMessage.setChoiceMessages([]);
+            $gameMessage.setChoiceMessages(msgs);
             $gameMessage.setChoiceFaces([]);
         }
     }
