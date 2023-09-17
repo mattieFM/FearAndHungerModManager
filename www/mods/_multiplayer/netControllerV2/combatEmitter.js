@@ -130,14 +130,16 @@ Game_Action.prototype.apply = function(target) {
 MATTIE.multiplayer.Game_Action_testApply = Game_Action.prototype.testApply;
 Game_Action.prototype.testApply = function(target) {
     let targets = this.getTargetResults();
-    if(targets)
-    if(Object.keys(targets).includes(target.name())){
-        console.log("hit is forcing on" + target.name());
-        if(target.result().forceHit)
-        target.result().forceHit(targets[target.name()])
-    } else {
-        if(target.result().forceHit)
-        target.result().forceHit(undefined)
+    if(targets){
+        if(Object.keys(targets).includes(target.name())){
+            if(target.result().forceHit)
+            target.result().forceHit(targets[target.name()])
+        } else {
+            if(target)
+            if(target.result())
+            if(target.result().forceHit)
+            target.result().forceHit(undefined)
+        }
     }
     return MATTIE.multiplayer.Game_Action_testApply.call(this,target)
 };
@@ -222,6 +224,10 @@ BattleManager.startTurn = function() {
     netActionBattler.battler = battler;
     netActionBattler.isExtraTurn = isExtraTurn;
     this._netActionBattlers.push(netActionBattler);
+  }
+
+  BattleManager.clearNetActionBuffer = function(){
+    this._netActionBattlers = [];
   }
 
 

@@ -24,6 +24,7 @@ BattleManager.endBattle = function(result) {
     MATTIE.multiplayer.BattleController.emitTurnEndEvent();
     MATTIE.multiplayer.getCurrentNetController().emitBattleEndEvent($gameTroop._troopId, MATTIE.multiplayer.currentBattleEnemy);
     MATTIE.multiplayer.inBattle = false;
+    BattleManager.clearNetActionBuffer();
     enemyLog("Battle Ended");
     return res;
 }
