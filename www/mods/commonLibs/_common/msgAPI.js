@@ -14,7 +14,22 @@ MATTIE.msgAPI.displayMsgWithTitle = function(title,msg){
     MATTIE.msgAPI.displayMsg(MATTIE.msgAPI.formatMsgAndTitle(title,msg));
 }
 
-MATTIE.msgAPI.displayMsg = function(msg){
+/**
+ * 
+ * @param {*} msg string msg
+ * @param {int} background optional
+ * Sets the background of the message window;
+ * options are 0 (fully opaque), 1 (transparent), 2 (invisible background).
+ * The default is 0.
+ * @param {int} pos
+ * Sets the position of the message window;
+ * 0 is top
+ * 1 is middle
+ * default is 2.
+ */
+MATTIE.msgAPI.displayMsg = function(msg, background=2, pos=2){
+    $gameMessage.setBackground(background);
+    $gameMessage.setPositionType(pos);
     $gameMessage.add(msg);
 }
 
@@ -31,7 +46,7 @@ MATTIE.msgAPI.formatMsgAndTitle = function(title,msg){
  * @param {string} msgs displays at the bottom of the screen
  * @param {[] || string} helps displays at top of screen
  */
-MATTIE.msgAPI.showChoices = function(choices, defaultChoice, cancelChoice, cb, msg="test", msgs=[], helps=[]){
+MATTIE.msgAPI.showChoices = function(choices, defaultChoice, cancelChoice, cb, msg=null, msgs=[], helps=[]){
 
         let helpsArr = [];
         if(typeof helpsArr != typeof "string"){
@@ -43,7 +58,7 @@ MATTIE.msgAPI.showChoices = function(choices, defaultChoice, cancelChoice, cb, m
         MATTIE.msgAPI._dreamXCompat(helpsArr);
         MATTIE.msgAPI._dreamXCompat(helpsArr,msgs);
         
-        $gameMessage.add(msg);
+        if(msg) $gameMessage.add(msg);
         $gameMessage.setChoices(choices, defaultChoice, cancelChoice);
         $gameMessage.setChoiceCallback(function(n) {
             cb(n);
@@ -73,6 +88,8 @@ MATTIE.msgAPI.footerMsg = function(msg){
     Game_Interpreter.prototype.setGabText(msg);
     Game_Interpreter.prototype.showGab();
 }   
+
+
 
 
 //=============================================================================
