@@ -98,8 +98,8 @@ MATTIE.DataManager.localFileDirectoryPath = function() {
 */
 MATTIE.DataManager.createDir = function(path=null){
     let fs = require('fs');
-    if(!path) path = MATTIE.DataManager.localFileDirectoryPath();
     if(path) path = MATTIE.DataManager.localFileDirectoryPath() + path;
+    if(!path) path = MATTIE.DataManager.localFileDirectoryPath();
     if(!fs.existsSync(path)){
         fs.mkdir(path);
     }

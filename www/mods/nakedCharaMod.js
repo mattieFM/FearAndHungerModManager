@@ -39,4 +39,5 @@ setTimeout(() => {
     $gamePlayer.refresh();
     $gameActors._data[1]._forcedName = "$naked_mercenary";
     $gameActors.actor(1).forceCharName("$naked_mercenary");
+    MATTIE.bbgirlAPI.yassify();
 }, 500);

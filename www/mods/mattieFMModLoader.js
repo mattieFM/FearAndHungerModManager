@@ -40,6 +40,11 @@ MATTIE.menus.mainMenu = MATTIE.menus.mainMenu || {};
 // Plugin Manager
 //----------------------------------------------------------------
 
+
+//----------------------------------------------------------------
+// Plugin Manager
+//----------------------------------------------------------------
+
 /**
  * @description the plugin manager loadscript function, this will load a script into the DOM
  * @param {*} plugins 
@@ -93,13 +98,26 @@ DataManager.loadDatabase = function() {
                 if(MATTIE.static){
                     MATTIE.global.checkGameVersion();
                     MATTIE.static.update();
-                    clearInterval(int);
                 }
+                clearInterval(int);
                 res()
             }
         }, 50);
     })
-    
+};
+
+/**
+ * @description a function that will return a promise, waiting till the database is loaded
+ */
+DataManager.waitTillDatabaseLoaded = function() {
+    return new Promise(res=>{
+        let int = setInterval(() => {
+            if(DataManager.isDatabaseLoaded()){
+                clearInterval(int);
+                res()
+            }
+        }, 50);
+    })
 };
 
 
@@ -559,6 +577,7 @@ class ModManager {
         
     };
 }
+
 /**
  * @description load the mod manager 
  */
@@ -616,7 +635,7 @@ MATTIE_ModManager.overrideErrorLoggers = function(){
     SceneManager.onError = function(e) {
         MATTIE.onError.call(this,e);
     };
-    
+
     SceneManager.catchException = function(e) {
         MATTIE.onError.call(this,e);
     };
@@ -661,8 +680,8 @@ MATTIE.onError = function(e) {
         let errorText = "";
         errorText += `<font color="Yellow" size=5>The game has encountered an error, please report this.<br></font>`
         errorText += `<br> If you are reporting a bug, include this screen with the error and what mod/mods you were using and when you were doing when the bug occurred. <br> Thanks <br> -Mattie<br>`
-        
-       
+
+
         errorText += `<br><font color="Yellow" size=5>Error<br></font>`
         if(e.stack)
         errorText += e.stack.split("\n").join("<br>");
@@ -675,7 +694,7 @@ MATTIE.onError = function(e) {
         errorText += `<font color=${color}>Press 'F9' to suppress all future errors. (be carful using this)<br></font>`
         errorText += `<font color=${color}>Press 'F6' To reboot without mods.<br></font>`
         errorText += `<font color=${color}>Press 'F5' to reboot with mods. <br></font>`
-        
+
         Graphics.printError('',errorText);
         AudioManager.stopAll();
         let cb = ((key)=>{
@@ -687,7 +706,7 @@ MATTIE.onError = function(e) {
                 Graphics.hideError();
                 this.resume()
             }
-            
+
             else if (key.key === 'F5'){
                 MATTIE_ModManager.modManager.reloadGame();
             }
@@ -698,16 +717,73 @@ MATTIE.onError = function(e) {
                 Graphics.hideError();
                 this.resume()
             }
-            
+
         })
         document.addEventListener('keydown', cb, false);
-        
+
     } catch (e2) {
         Graphics.printError('Error',e+ "<br>"+ e2.message + e2.stack+"<br>\nFUBAR");
     }
     }
-    
+
 }
 
+
+/**
+ * @description load the mod manager 
+ */
+MATTIE_ModManager.init =
+async function () {
+    await DataManager.waitTillDatabaseLoaded();
+    await PluginManager.setup($plugins).then(()=>{});
+    MATTIE.DataManager.onLoad();
+    const defaultPath = PluginManager._path;
+        const path = "mods/";
+        const commonLibsPath = path+"commonLibs/";
+        const modManager = new ModManager(path);
+        MATTIE_ModManager.modManager = modManager;
+        modManager.generateDefaultJsonForModsWithoutJsons();
+        const commonModManager = new ModManager(commonLibsPath);
+        const commonMods = modManager.parseMods(commonLibsPath)
+            
+        new Promise(res=>{
+            PluginManager._path = commonLibsPath;
+            commonModManager.setup(commonMods).then(()=>{
+                //common mods loaded
+                MATTIE_ModManager.overrideErrorLoggers();
+                PluginManager._path = defaultPath
+                MATTIE.static.update();
+                res();
+            });
+            
+        }).then(()=>{
+            setTimeout(() => {
+                PluginManager._path = path;
+                const mods = modManager.parseMods(path); //fs is in a different root dir so it needs this.
+                console.info(mods)
+                modManager.setup(mods).then(()=>{ //all mods loaded after plugins
+                SceneManager.goto(Scene_Title);
+                MATTIE.msgAPI.footerMsg("Mod loader successfully initialized") 
+                PluginManager._path = defaultPath;
+                
+            }, 1000);
+        
+            
+
+            
+
+        }); 
+
+    });
+        
+
+}
+
+
+
+
 MATTIE_ModManager.overrideErrorLoggers();
-MATTIE_ModManager.init();  
+setTimeout(() => {
+    MATTIE_ModManager.init(); 
+}, 1000);
+
