@@ -231,10 +231,14 @@ MATTIE.troopAPI.runtimeTroop.prototype.constructor = MATTIE.troopAPI.runtimeTroo
 MATTIE.troopAPI.runtimeTroop.prototype.getSwitchValue = function(id){
     switch (id) {
         case MATTIE.static.switch.toughEnemyMode: //is_enemy_tough_mode should always return its global value
-        case MATTIE.static.switch.justGuard: //enemies should be able to all see this
+         //enemies should be able to all see this
         case MATTIE.static.switch.backstab:  //backstab should apply to all enemies
             return $gameSwitches.value(id)
             break;
+
+        case MATTIE.static.switch.justGuard:
+            return $gameSwitches.value(id) || this.localSwitches[id]; //gaurd can come local or global
+        
     
         default:
             break;
