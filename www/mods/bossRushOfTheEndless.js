@@ -43,12 +43,12 @@ MATTIE.bossRush =  MATTIE.bossRush || {};
         [MATTIE.static.troops.isayahId, MATTIE.static.troops.ironShakespeareId],
         [MATTIE.static.troops.knightSpectorId, MATTIE.static.troops.gauntKnightId,MATTIE.static.troops.oldKnightId],
         [MATTIE.static.troops.crowMaulerId, MATTIE.static.troops.doubleHeadedCrowId],
-        [MATTIE.static.troops.namelessId,MATTIE.static.troops.oldGuardianId, MATTIE.static.troops.lizardMageId],
-        [MATTIE.static.troops.skinGrannyId, MATTIE.static.troops.fancoisId, MATTIE.static.troops.chambaraId, MATTIE.static.troops.valteilId]
-        [MATTIE.static.troops.gorothId, MATTIE.static.troops.sylvianId, MATTIE.static.troops.griffithId, MATTIE.static.troops.GOFAHID]
+        [MATTIE.static.troops.namelessId, MATTIE.static.troops.oldGuardianId, MATTIE.static.troops.lizardMageId],
+        [MATTIE.static.troops.skinGrannyId, MATTIE.static.troops.fancoisId, MATTIE.static.troops.chambaraId, MATTIE.static.troops.valteilId],
+        [MATTIE.static.troops.gorothId, MATTIE.static.troops.sylvianId, MATTIE.static.troops.griffithId, MATTIE.static.troops.GOFAHID],
     ]
 
-    MATTIE.bossRush.currentFightIndex = 0;
+    MATTIE.bossRush.currentFightIndex = 8;
 
     /** @description the method to handle the boss rush functionality */
     function rush(){
