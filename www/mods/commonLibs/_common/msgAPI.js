@@ -59,7 +59,7 @@ MATTIE.msgAPI.showChoices = function(choices, defaultChoice, cancelChoice, cb, m
         MATTIE.msgAPI._dreamXCompat(helpsArr);
         MATTIE.msgAPI._dreamXCompat(helpsArr,msgs);
         
-        if(msg) $gameMessage.add(msg);
+        if(msg!=null) $gameMessage.add(msg);
         $gameMessage.setChoices(choices, defaultChoice, cancelChoice);
         $gameMessage.setChoiceCallback(function(n) {
             cb(n);
