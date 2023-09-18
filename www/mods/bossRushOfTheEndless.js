@@ -48,7 +48,7 @@ MATTIE.bossRush =  MATTIE.bossRush || {};
         [MATTIE.static.troops.gorothId, MATTIE.static.troops.sylvianId, MATTIE.static.troops.griffithId, MATTIE.static.troops.GOFAHID],
     ]
 
-    MATTIE.bossRush.currentFightIndex = 8;
+    MATTIE.bossRush.currentFightIndex = 0;
 
     /** @description the method to handle the boss rush functionality */
     function rush(){
