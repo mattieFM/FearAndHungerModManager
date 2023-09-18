@@ -250,24 +250,35 @@ MATTIE.bossRush =  MATTIE.bossRush || {};
     }
 
     function onUseBook (){
+        
         SceneManager.goto(Scene_Map);
         setTimeout(() => {
-            MATTIE.msgAPI.showChoices(["Read a page","Read The Whole Book","Gouge Out Your Eyes"],1,2,(i)=>{
-                switch (i) {
-                    case 0: //read one page
-                        startNextFight();
-                        break;
-                    case 1: //read every page
-                        rush();
-                        break;
-                    default:
-                        $gameParty.leader().addState(MATTIE.static.states.blind)
-                        MATTIE.msgAPI.footerMsg("You vision fades as you claw out your eyes... It is a dark world now")
+            if($gameParty.members().filter(actor=>actor.actorId()===MATTIE.static.actors.nashrahId).length >=1) {
+                $gameParty.removeActor(MATTIE.static.actors.nashrahId)
+                MATTIE.msgAPI.displayMsg("Nas'hrah burns to a crisp.")
+            }
+            let int = setInterval(() => {
+                if(!$gameMessage.isBusy()){
+                    clearInterval(int);
+                    MATTIE.msgAPI.showChoices(["Read a page","Read The Whole Book","Gouge Out Your Eyes"],1,2,(i)=>{
+                        switch (i) {
+                            case 0: //read one page
+                                startNextFight();
+                                break;
+                            case 1: //read every page
+                                rush();
+                                break;
+                            default:
+                                $gameParty.leader().addState(MATTIE.static.states.blind)
+                                MATTIE.msgAPI.footerMsg("You vision fades as you claw out your eyes... It is a dark world now")
+                        }
+                    },"",[
+                        getPageDescription(MATTIE.bossRush.currentFightIndex),
+                        "It is as though an otherworldly entity wants you \nto read every page, to drink up your fear and feast \nupon it, Give into it's desire?",
+                        "You cannot look away, you cannot simply avert \nyour gaze, you NEED to read it... or you need\nto be incapable of ever reading it\n"]) 
                 }
-            },"",[
-                getPageDescription(MATTIE.bossRush.currentFightIndex),
-                "It is as though an otherworldly entity wants you \nto read every page, to drink up your fear and feast \nupon it, Give into it's desire?",
-                "You cannot look away, you cannot simply avert \nyour gaze, you NEED to read it... or you need\nto be incapable of ever reading it\n"]) 
+            })
+            
         }, 500);
     }
     
@@ -322,7 +333,7 @@ MATTIE.bossRush =  MATTIE.bossRush || {};
 
     let bookOfPrimalFears = new MATTIE.items.runTimeItem();
     bookOfPrimalFears.setIconIndex(12);
-    bookOfPrimalFears.setName("The Dread Powers");
+    bookOfPrimalFears.setName("Spider Silk Book");
     bookOfPrimalFears.setDescription("A book containing 12 pages. \nThe book appears to be woven from spider silk.")
     bookOfPrimalFears.setItemType(2); //set book
     bookOfPrimalFears.setCallback(onUseBook);    
