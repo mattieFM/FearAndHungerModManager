@@ -526,6 +526,7 @@ MATTIE.static.update = function(){
             "3463-3479", //misasma scenes
             "3481-3503", //more misasma scenes
 
+            724, //moonless joining
              //fallscenes 
             "2341-2342",
             2828,
@@ -541,6 +542,12 @@ MATTIE.static.update = function(){
             987, //auto run cahara prision scene
 
 
+            //---------------------------------
+            //Coin Events
+            //---------------------------------
+            "2727-2732",
+            2957,
+            3145,
 
 
 
@@ -892,7 +899,9 @@ MATTIE.static.update = function(){
         //
         MATTIE.static.switch.godAffinitySwitches = MATTIE.static.rangeParser(MATTIE.static.switch.godAffinitySwitches);
         MATTIE.static.variable.godAffinityAndPrayerVars = MATTIE.static.rangeParser(MATTIE.static.variable.godAffinityAndPrayerVars);
-        MATTIE.static.variable.ignoredVars = [ //ignored vars
+        MATTIE.static.variable.ignoredVars = [ //ignored vars\
+            14,
+            "357-359", //coin choice
             12,
             11,
             4,
