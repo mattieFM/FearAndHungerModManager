@@ -81,6 +81,8 @@ MATTIE.static.switch.ignoredSelfSwitches = [];
 //states
 /** this is the state that governs "death" in combat */
 MATTIE.static.states.knockout = 0;
+/** @description block teh enemy from acting for one round */
+MATTIE.static.states.cantDoShitOnce = 36
 
 //troopids
 MATTIE.static.troops.crowMauler = 51;

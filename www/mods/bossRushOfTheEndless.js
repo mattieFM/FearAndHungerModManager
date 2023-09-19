@@ -95,9 +95,14 @@ MATTIE.bossRush =  MATTIE.bossRush || {};
         
         $gamePlayer.makeEncounterCount();
         SceneManager.push(Scene_Battle);
-
+        
         setTimeout(() => {
-            /** @type {Game_Enemy} */
+            if($gameParty.leader().hasSkill(MATTIE.static.skills.enGarde.id)){
+                $gameSwitches.setValue(MATTIE.static.switch.backstab,false);
+                MATTIE.msgAPI.footerMsg("True Ambush Round --All Enemies cannot attack this round.")
+            }
+            setTimeout(() => {
+                /** @type {Game_Enemy} */
             let spider = $gameTroop.baseMembers()[0]
 
 
@@ -105,9 +110,7 @@ MATTIE.bossRush =  MATTIE.bossRush || {};
             spider.die();
             
             spider.hide();
-            if($gameParty.leader().hasSkill(MATTIE.static.skills.enGarde.id)){
-                $gameSwitches.setValue(MATTIE.static.switch.backstab,true);
-            }
+            
                 for (let index = 0; index < roundIds.length; index++) {
                     const additionalId = roundIds[index];
                     let additionalTroop = new MATTIE.troopAPI.runtimeTroop(additionalId);
@@ -124,11 +127,23 @@ MATTIE.bossRush =  MATTIE.bossRush || {};
                     additionalTroop.spawn();
                 }  
                 setTimeout(() => {
+                    if($gameParty.leader().hasSkill(MATTIE.static.skills.enGarde.id)){
+                        $gameVariables.setValue(19,-1)
+                        $gameTroop.forEachAdditionalTroop(troop=>{
+                            troop.setVariableValue(19,-1)
+                            troop.baseMembers().forEach(enemy=>{
+                                enemy.addState(MATTIE.static.states.cantDoShitOnce); //add cant do shit one turn
+                            })
+                        })                        
+                        //$gameSwitches.setValue(MATTIE.static.switch.backstab,true);
+                    }
                    BattleManager.setCantStartInputting(false);
                    BattleManager.setEventCallback(function(n) {
                     cb();
                     }.bind(this));
                 }, 500);
+            }, 500);
+            
                 
                 
 
