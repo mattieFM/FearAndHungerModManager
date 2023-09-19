@@ -96,7 +96,7 @@ BattleManager.getAllPlayerActions = function () {
 
 
 Game_Action.prototype.forceHit = function(bool){
-    this.forcedHit = bool;
+    this._forcedHit = bool;
 }
 /**
  * 
@@ -147,14 +147,14 @@ Game_Action.prototype.testApply = function(target) {
 /** @description extend the is hit function to include if it is being forced to hit */
 MATTIE.multiplayer.Game_ActionResultisHit = Game_ActionResult.prototype.isHit
 Game_ActionResult.prototype.isHit = function() {
-    if(typeof this.forceHit != 'undefined'){
-        return this.forceHit;
+    if(typeof this._forceHit != 'undefined'){
+        return this._forceHit;
     }
     return (MATTIE.multiplayer.Game_ActionResultisHit.call(this))
 };
 /** @description set a action result as forced hit */
 Game_ActionResult.prototype.forceHit = function(bool=undefined) {
-    this.forceHit = bool;
+    this._forceHit = bool;
 };
 
 
