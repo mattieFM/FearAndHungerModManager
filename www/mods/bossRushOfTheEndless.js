@@ -12,6 +12,8 @@ MATTIE.bossRush =  MATTIE.bossRush || {};
         if(!MATTIE.DataManager.global.get("bossRushInstalled")){
         
             MATTIE.DataManager.addFileToImgFolder("/img/system/","/system/",fileName,"_"+fileName)
+            MATTIE.DataManager.addFileToImgFolder("/mods/_bossRushOfTheEndless/images/","/pictures/","endingBook.png")
+            MATTIE.DataManager.addFileToImgFolder("/mods/_bossRushOfTheEndless/images/","/pictures/","endingF.png")
             MATTIE.DataManager.addFileToImgFolder("/mods/_bossRushOfTheEndless/images/","/system/",fileName)
             MATTIE.DataManager.global.set("bossRushInstalled", true)
             alert("boss rush mod installed --game will need to be reloaded");
@@ -23,6 +25,7 @@ MATTIE.bossRush =  MATTIE.bossRush || {};
 
     MATTIE.bossRush.offload = function(){
         MATTIE.DataManager.global.set("bossRushInstalled", false);
+        if(MATTIE.DataManager.checkExists("/img/system/" + "_"+fileName +".png"))
         MATTIE.DataManager.addFileToImgFolder("/img/system/","/system/","_"+fileName,fileName)
         alert ("boss rush mod uninstalled")
     }
@@ -37,60 +40,70 @@ MATTIE.bossRush =  MATTIE.bossRush || {};
         [MATTIE.static.troops.salmonSnakeId, MATTIE.static.troops.blackWitchId],
         [MATTIE.static.troops.caveMotherId, MATTIE.static.troops.harvestManId, MATTIE.static.troops.bodySnatcherId],
         [MATTIE.static.troops.redManId, MATTIE.static.troops.greaterBlightId, MATTIE.static.troops.blightId, MATTIE.static.troops.moldedId],
-        [MATTIE.static.troops.torturerId, MATTIE.static.troops.moonlessGaurdId,MATTIE.static.troops.bodySnatcherId],
-        [MATTIE.static.troops.isayahId, MATTIE.static.troops.ironShakespeareId]
+        [MATTIE.static.troops.torturerId, MATTIE.static.troops.moonlessGaurdId],
+        [MATTIE.static.troops.isayahId, MATTIE.static.troops.ironShakespeareId],
         [MATTIE.static.troops.knightSpectorId, MATTIE.static.troops.gauntKnightId,MATTIE.static.troops.oldKnightId],
         [MATTIE.static.troops.crowMaulerId, MATTIE.static.troops.doubleHeadedCrowId],
-        [MATTIE.static.troops.namelessId,MATTIE.static.troops.oldGuardianId, MATTIE.static.troops.lizardMageId],
-        [MATTIE.static.troops.skinGrannyId, MATTIE.static.troops.fancoisId, MATTIE.static.troops.chambaraId, MATTIE.static.troops.valteilId]
-        [MATTIE.static.troops.gorothId, MATTIE.static.troops.sylvianId, MATTIE.static.troops.griffithId, MATTIE.static.troops.GOFAHID]
+        [MATTIE.static.troops.namelessId, MATTIE.static.troops.oldGuardianId, MATTIE.static.troops.lizardMageId],
+        [MATTIE.static.troops.skinGrannyId, MATTIE.static.troops.fancoisId, MATTIE.static.troops.chambaraId, MATTIE.static.troops.valteilId],
+        [MATTIE.static.troops.gorothId, MATTIE.static.troops.sylvianId, MATTIE.static.troops.griffithId, MATTIE.static.troops.GOFAHID],
     ]
 
     MATTIE.bossRush.currentFightIndex = 0;
 
     /** @description the method to handle the boss rush functionality */
     function rush(){
-        if(MATTIE.bossRush.currentFightIndex < MATTIE.bossRush.fights.length && !$gameParty.leader().isDead() && !(SceneManager._scene instanceof Scene_Gameover)){
+        if(!$gameParty.leader().isDead() && !(SceneManager._scene instanceof Scene_Gameover)){
             startNextFight(()=>{
+                $gameMessage.clear();
                 SceneManager.goto(Scene_Map);
+                $gameMessage.clear();
                 setTimeout(() => {
                     MATTIE.msgAPI.showChoices(["Continue Reading"],0,0,()=>{
                         rush();  
-                    },getPageDescription(MATTIE.bossRush.currentFightIndex),[getPageDescription(MATTIE.bossRush.currentFightIndex)])
+                    },getPageDescription(MATTIE.bossRush.currentFightIndex))
             }, 1000)});
-        }
-        
+        } 
     }
 
 
+
     function startNextFight(cb = ()=>{}){
-        startFight(MATTIE.bossRush.currentFightIndex,cb);
-        MATTIE.bossRush.currentFightIndex++;
+        if(MATTIE.bossRush.currentFightIndex < MATTIE.bossRush.fights.length){
+            $gameTroop.setup(MATTIE.bossRush.fights[MATTIE.bossRush.currentFightIndex], 0,0, cb)
+            MATTIE.bossRush.currentFightIndex++;
+        } else {
+            win()
+        }
+        
     }
     
 
     /**
-     * @description start a fight at x index in the arr and call a callback when fight ends
-     * @param {*} x the index of the fight to start
+     * @description start a fight arr and call a callback when fight ends
+     * @param {*} the array of all troops in the fight
      * @param {*} cb the callback to call when the fight ends
      */
-    function startFight(x,cb=()=>{}){
+    function startFight(arr,cb=()=>{}){
         BattleManager.setCantStartInputting(true);
 
         if($gameParty.leader().hasSkill(MATTIE.static.skills.enGarde.id)){
             $gameSwitches.setValue(MATTIE.static.switch.backstab,true);
         }
-        let roundIds = MATTIE.bossRush.fights[x];
+        let roundIds = arr;
         let first = 142
         BattleManager.setup(first, false, true);
-        BattleManager.setEventCallback(function(n) {
-            cb();
-        }.bind(this));
+        
         $gamePlayer.makeEncounterCount();
         SceneManager.push(Scene_Battle);
-
+        
         setTimeout(() => {
-            /** @type {Game_Enemy} */
+            if($gameParty.leader().hasSkill(MATTIE.static.skills.enGarde.id)){
+                $gameSwitches.setValue(MATTIE.static.switch.backstab,false);
+                MATTIE.msgAPI.footerMsg("True Ambush Round --All Enemies cannot attack this round.")
+            }
+            setTimeout(() => {
+                /** @type {Game_Enemy} */
             let spider = $gameTroop.baseMembers()[0]
 
 
@@ -98,9 +111,7 @@ MATTIE.bossRush =  MATTIE.bossRush || {};
             spider.die();
             
             spider.hide();
-            if($gameParty.leader().hasSkill(MATTIE.static.skills.enGarde.id)){
-                $gameSwitches.setValue(MATTIE.static.switch.backstab,true);
-            }
+            
                 for (let index = 0; index < roundIds.length; index++) {
                     const additionalId = roundIds[index];
                     let additionalTroop = new MATTIE.troopAPI.runtimeTroop(additionalId);
@@ -117,8 +128,23 @@ MATTIE.bossRush =  MATTIE.bossRush || {};
                     additionalTroop.spawn();
                 }  
                 setTimeout(() => {
+                    if($gameParty.leader().hasSkill(MATTIE.static.skills.enGarde.id)){
+                        $gameVariables.setValue(19,-1)
+                        $gameTroop.forEachAdditionalTroop(troop=>{
+                            troop.setVariableValue(19,-1)
+                            troop.baseMembers().forEach(enemy=>{
+                                enemy.addState(MATTIE.static.states.cantDoShitOnce); //add cant do shit one turn
+                            })
+                        })                        
+                        //$gameSwitches.setValue(MATTIE.static.switch.backstab,true);
+                    }
                    BattleManager.setCantStartInputting(false);
+                   BattleManager.setEventCallback(function(n) {
+                    cb();
+                    }.bind(this));
                 }, 500);
+            }, 500);
+            
                 
                 
 
@@ -127,6 +153,98 @@ MATTIE.bossRush =  MATTIE.bossRush || {};
         
     }
 
+    function falseGodEnding(){
+        $gameSystem.disableMenu();
+                        MATTIE.fxAPI.deleteImage(1);
+                        MATTIE.fxAPI.showImage("ending",1,0,0);
+                        setTimeout(() => {
+                            MATTIE.msgAPI.displayMsg("You defeated Le'garde, the prophesied one with delusions",1,1);
+                            MATTIE.msgAPI.displayMsg("of creating a new era with his godhood.\n\n",1,1);
+                            MATTIE.msgAPI.displayMsg("You faced down the new gods.\n\n\n",1,1);
+                            MATTIE.msgAPI.displayMsg("You glimpsed the birth of a new god, and survived...\n\n\n",1,1);
+                            MATTIE.msgAPI.displayMsg("You witnessed the traces of multiple old gods",1,1);
+                            MATTIE.msgAPI.displayMsg("and fought against them vigorously.\n\n",1,1);
+                            MATTIE.msgAPI.displayMsg("After your victory and escape from the dungeons,",1,1);
+                            MATTIE.msgAPI.displayMsg("you can't help but wonder what was on the next page of",1,1);
+                            MATTIE.msgAPI.displayMsg("that book. Somehow without knowing what is on it, your",1,1);
+                            MATTIE.msgAPI.displayMsg("quest to rid this world of evil feels incomplete.",1,1);
+                            MATTIE.msgAPI.displayMsg("You spend the rest of your days hunting down all the macabre",1,1);
+                            MATTIE.msgAPI.displayMsg("beasts that hide in the shadows.\n\n",1,1); 
+                            MATTIE.msgAPI.displayMsg("The beasts would come to know your name.\n\n\n",1,1); 
+                            MATTIE.msgAPI.displayMsg("The gods would come to forget it.\n\n\n",1,1); 
+                            let int = setInterval(() => {
+                                if(!$gameMessage.isBusy()){
+                                    clearInterval(int);
+                                    MATTIE.fxAPI.showImage("endingF",2,0,0);
+                                    setTimeout(() => {
+                                        $gameSystem.enableMenu();
+                                        MATTIE.msgAPI.showChoices(["View Credits","Return to main menu"],0,0,(n)=>{
+                                            switch (n) {
+                                                case value:
+                                                    $gameTemp.reserveCommonEvent(MATTIE.static.commonEvents.credits.id);
+                                                    break;
+                                            
+                                                default:
+                                                    SceneManager.goto(Scene_Gameover);
+                                                    break;
+                                            }
+                                        })
+                                        
+                                       
+                                    }, 5000);
+                                }
+                                
+                            }, 100);
+                        }, 500);
+    }
+
+    function onUseVictoryBook(){
+        SceneManager.goto(Scene_Map);
+        setTimeout(() => {
+            MATTIE.fxAPI.showImage("endingBook",1,0,0);
+            MATTIE.msgAPI.displayMsg("The book reads as follows:\n\n\n",1,1);
+            MATTIE.msgAPI.displayMsg("You never escaped the dungeons...",1,1);
+            MATTIE.msgAPI.displayMsg("Your efforts would go unsung, but your part in the greater",1,1);
+            MATTIE.msgAPI.displayMsg("scheme of things was vital nevertheless",1,1);
+            MATTIE.msgAPI.displayMsg("You had a vital part in the birth of a new god.",1,1);
+            MATTIE.msgAPI.displayMsg("One that is not a mere new god but ont that rivals the",1,1);
+            MATTIE.msgAPI.displayMsg("older ones.\n\n",1,1);
+            MATTIE.msgAPI.displayMsg("The farther you read... the more the text becomes distorted",1,1);
+            MATTIE.msgAPI.displayMsg("and warped.",1,1);
+            MATTIE.msgAPI.showChoices(["Continue Reading","Accept your Victory"],1,0,(n)=>{
+                switch (n) {
+                    case 0: //continue reading
+                        setTimeout(() => {
+                            
+                            MATTIE.msgAPI.displayMsg("A new page weaves itself out of spider thread as\nyou turn the page.\n\n",1,1);
+                            MATTIE.msgAPI.displayMsg(MATTIE.msgAPI.formatMsgAndTitle("Mother of Puppets","All that... And yet you still crave more?\n\n"),1,1);
+                            MATTIE.msgAPI.displayMsg(MATTIE.msgAPI.formatMsgAndTitle("Mother of Puppets","Well then... I invite you into my web, shall we meet soon.\n\n"),1,1);
+                            MATTIE.msgAPI.displayMsg("this ending is not done yet :) sending you to the other ending",1,1);
+                            let int = setInterval(() => {
+                                if(!$gameMessage.isBusy()){
+                                    clearInterval(int);
+                                    MATTIE.fxAPI.deleteImage(1);
+                                    falseGodEnding();
+                                }
+                                
+                            }, 100);
+                        }, 1000);
+                        
+                        break;
+                    case 1: //accept your victory
+                        falseGodEnding();
+                        
+                        
+                    break;
+                
+                    default:
+                        break;
+                }
+                
+            })
+        }, 500);
+        
+    }
 
     function onCraftProtoBook (){
         MATTIE.bossRush.currentFightIndex = 0;
@@ -148,28 +266,50 @@ MATTIE.bossRush =  MATTIE.bossRush || {};
     }
 
     function onUseBook (){
+        
         SceneManager.goto(Scene_Map);
         setTimeout(() => {
-            MATTIE.msgAPI.showChoices(["Read a page","Read The Whole Book","Gouge Out Your Eyes"],1,2,(i)=>{
-                switch (i) {
-                    case 0: //read one page
-                        startNextFight();
-                        MATTIE.bossRush.currentFightIndex++;
-                        break;
-                    case 1: //read every page
-                        rush();
-                    break;
-                    default:
-                        $gameParty.leader().addState(MATTIE.static.states.blind)
-                        MATTIE.msgAPI.footerMsg("You vision fades as you claw out your eyes... It is a dark world now")
+            if($gameParty.members().filter(actor=>actor.actorId()===MATTIE.static.actors.nashrahId).length >=1) {
+                $gameParty.removeActor(MATTIE.static.actors.nashrahId)
+                MATTIE.msgAPI.displayMsg("Nas'hrah burns to a crisp.")
+            }
+            let int = setInterval(() => {
+                if(!$gameMessage.isBusy()){
+                    clearInterval(int);
+                    MATTIE.msgAPI.showChoices(["Read a page","Read The Whole Book","Gouge Out Your Eyes"],1,2,(i)=>{
+                        switch (i) {
+                            case 0: //read one page
+                                startNextFight();
+                                break;
+                            case 1: //read every page
+                                rush();
+                                break;
+                            default:
+                                $gameParty.leader().addState(MATTIE.static.states.blind)
+                                MATTIE.msgAPI.footerMsg("You vision fades as you claw out your eyes... It is a dark world now")
+                        }
+                    },"",[
+                        getPageDescription(MATTIE.bossRush.currentFightIndex),
+                        "It is as though an otherworldly entity wants you \nto read every page, to drink up your fear and feast \nupon it, Give into it's desire?",
+                        "You cannot look away, you cannot simply avert \nyour gaze, you NEED to read it... or you need\nto be incapable of ever reading it\n"]) 
                 }
-            },"",[
-                getPageDescription(MATTIE.bossRush.currentFightIndex),
-                "It is as though an otherworldly entity wants you \nto read every page, to drink up your fear and feast \nupon it, Give into it's desire?",
-                "You cannot look away, you cannot simply avert \nyour gaze, you NEED to read it... or you need\nto be incapable of ever reading it\n"]) 
+            })
+            
         }, 500);
     }
     
+    function win(){
+        SceneManager.goto(Scene_Map)
+        setTimeout(() => {
+            $gameParty.loseItem(bookOfPrimalFears._data,1,false);;
+            MATTIE.fxAPI.startScreenShake(5,5,150)
+            MATTIE.fxAPI.setupTint(155,255,155, 0, 150);
+            MATTIE.msgAPI.displayMsg("The book's ink comes alive once more, weaving a new book.")
+            
+            $gameParty.gainItem(rewardBook._data,1,false)
+        }, 1500);
+        
+    }
 
     function getPageDescription(index){
         let pageDescriptions = [
@@ -197,9 +337,11 @@ MATTIE.bossRush =  MATTIE.bossRush || {};
 
     let protoBookOfFears = new MATTIE.items.runTimeItem()
     protoBookOfFears.addRecipe([11,87,98],98);
+    protoBookOfFears.addRecipeUnlock(11);
+    protoBookOfFears.addRecipeUnlock(87);
     protoBookOfFears.setIconIndex(13);
     protoBookOfFears.setName("Book of Primal Fears");
-    protoBookOfFears.setDescription("A book containing 12 pages, each describing a primal fear. \nThe book bears the mark of Gol Goroth, and has a certain weight to it.")
+    protoBookOfFears.setDescription("A book containing 12 pages, each describing a primal fear. The \nbook bears the mark of Gol Goroth, and carries an unnatural weight")
     protoBookOfFears.setItemType(2); //set book
     protoBookOfFears.setCraftingCallback(onCraftProtoBook);
     protoBookOfFears.spawn();
@@ -207,11 +349,21 @@ MATTIE.bossRush =  MATTIE.bossRush || {};
 
     let bookOfPrimalFears = new MATTIE.items.runTimeItem();
     bookOfPrimalFears.setIconIndex(12);
-    bookOfPrimalFears.setName("The Dread Powers");
+    bookOfPrimalFears.setName("Spider Silk Book");
     bookOfPrimalFears.setDescription("A book containing 12 pages. \nThe book appears to be woven from spider silk.")
     bookOfPrimalFears.setItemType(2); //set book
     bookOfPrimalFears.setCallback(onUseBook);    
     bookOfPrimalFears.spawn();
+
+
+
+    let rewardBook = new MATTIE.items.runTimeItem();
+    rewardBook.setIconIndex(14);
+    rewardBook.setName("Book of Futility");
+    rewardBook.setDescription("A very old book, its cover displays a very faded\nsymbol of goroth, it contains one page.")
+    rewardBook.setItemType(2); //set book
+    rewardBook.setCallback(onUseVictoryBook);    
+    rewardBook.spawn();
 
     let  = new MATTIE.items.runTimeItem();
 

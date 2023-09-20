@@ -69,6 +69,8 @@ MATTIE.static.switch.neckBreak = 0
 /** @description the switch tht handles en garde extra turn */
 MATTIE.static.switch.backstab = 0
 
+MATTIE.static.switch.justGuard = 1281;
+
 /** @description the switch that handles changing enemy health in harder mods */
 MATTIE.static.switch.toughEnemyMode = 0
 
@@ -79,6 +81,8 @@ MATTIE.static.switch.ignoredSelfSwitches = [];
 //states
 /** this is the state that governs "death" in combat */
 MATTIE.static.states.knockout = 0;
+/** @description block teh enemy from acting for one round */
+MATTIE.static.states.cantDoShitOnce = 36
 
 //troopids
 MATTIE.static.troops.crowMauler = 51;
@@ -106,9 +110,10 @@ MATTIE.static.troops.ragnId = 120;
 MATTIE.static.troops.oldKnightId = 21
 MATTIE.static.troops.whiteAngelId = 100;
 MATTIE.static.troops.doubleHeadedCrowId = 135;
+MATTIE.static.troops.crowMaulerId = 51;
 MATTIE.static.troops.secretId = 0; //enki marraige
 MATTIE.static.troops.namelessId =97
-MATTIE.static.troops.oldGuardianId =
+MATTIE.static.troops.oldGuardianId = 101;
 MATTIE.static.troops.lizardMageId = 214;
 MATTIE.static.troops.skinGrannyId = 109;
 MATTIE.static.troops.fancoisId = 115;
@@ -232,6 +237,7 @@ MATTIE.static.update = function(){
 
         //common events
         MATTIE.static.commonEvents.bloodportal = $dataCommonEvents[152];
+        MATTIE.static.commonEvents.credits = $dataCommonEvents[310];
 
         MATTIE.static.events.crowMauler = (()=>MATTIE.eventAPI.getEventOnMap(287,11))
             

@@ -129,6 +129,7 @@ MATTIE.DataManager.global.createGlobalData = function(){
    
 }
 
+
 MATTIE.DataManager.global.set = function(key,val){
     let fs = require('fs');
     let path = MATTIE.DataManager.localFileDirectoryPath();
@@ -157,6 +158,22 @@ MATTIE.DataManager.addFileToImgFolder = function(orgFilePath,destPath,name,name2
     orgFilePath = src + orgFilePath + name;
     destinationPath = src +"/img/" + destPath + (name2 || name);
     fs.copyFileSync(orgFilePath,destinationPath)
+
+}
+
+/**
+ * 
+ * @param {*} orgFilePath the path to the file from www/ 
+ * @param {*} destPath the path within the img folder
+ * @param {*} name the name of the file
+ */
+MATTIE.DataManager.checkExists = function(pathInWww){
+    let fs = require('fs');
+    var path = require('path');
+    let src = path.dirname(process.mainModule.filename);
+    
+    filePath = src + pathInWww;
+    return fs.existsSync(filePath)
 
 }
 
