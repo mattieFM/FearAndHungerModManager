@@ -4,6 +4,11 @@
 var MATTIE = MATTIE || {};
 MATTIE.compat = MATTIE.compat || {};
 MATTIE.compat.pauseDecrypt = false;
+
+
+
+var Yanfly = Yanfly || false;
+
 //override this so that when we request an image it will not try to decrypt it.
 Bitmap.prototype._requestImage = function(url){
     if(Bitmap._reuseImages.length !== 0){

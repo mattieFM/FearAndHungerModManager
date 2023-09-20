@@ -25,6 +25,12 @@ MATTIE.devTools = MATTIE.devTools || {};
     Input.addKeyBind('2', ()=>{
         SceneManager.onError(new Error("hiya im an error"))
     }, "THROW ERROR (DEV)", -2)
+
+    Input.addKeyBind('3', ()=>{
+        console.log("here")
+        $gameSystem.enableMenu();
+        $gameScreen.clearPictures();
+    }, "clear images (DEV)", -2)
     
     Input.addKeyBind('v', ()=>{
         let amount = 1;

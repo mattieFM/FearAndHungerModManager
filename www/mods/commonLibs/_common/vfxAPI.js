@@ -43,3 +43,11 @@ MATTIE.fxAPI.setupTint = function(red, green, blue, gray, framesDur){
 MATTIE.fxAPI.startScreenShake = function(intensity, speed, duration){
     $gameScreen.startShake(intensity, speed, duration);
 }
+
+MATTIE.fxAPI.showImage = function(name,id,x ,y){
+    $gameScreen.showPicture(id,name,0,x,y,100,100,255,0)
+}
+
+MATTIE.fxAPI.deleteImage = function(id){
+    $gameScreen.erasePicture(id)
+}

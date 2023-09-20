@@ -249,7 +249,8 @@ MATTIE.items.runTimeItem = class {
         let recipeUnlock = `\n<Item Recipe: ${this._data.id}>\n`
         $dataItems[unlockItemId].note += recipeUnlock;
 
-        DataManager.processISNotetags1([null,this._data,$dataItems[unlockItemId]],0)
+        this.addRecipeUnlock(unlockItemId);
+        DataManager.processISNotetags1([null,this._data],0)
 
         this._data.note += recipeString;
 
@@ -258,6 +259,12 @@ MATTIE.items.runTimeItem = class {
         
         itemIds.map(itemId=>DataManager.addSynthesisIngredient(this._data, "item "+itemId))
        
+    }
+
+    addRecipeUnlock(unlockItemId){
+        let recipeUnlock = `\n<Item Recipe: ${this._data.id}>\n`
+        $dataItems[unlockItemId].note += recipeUnlock;
+        DataManager.processISNotetags1([null,$dataItems[unlockItemId]],0)
     }
 
     /** @description set a callback to be called when this item is used */
