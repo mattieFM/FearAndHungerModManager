@@ -25,6 +25,7 @@ MATTIE.bossRush =  MATTIE.bossRush || {};
 
     MATTIE.bossRush.offload = function(){
         MATTIE.DataManager.global.set("bossRushInstalled", false);
+        if(MATTIE.DataManager.checkExists("/img/system/" + "_"+fileName +".png"))
         MATTIE.DataManager.addFileToImgFolder("/img/system/","/system/","_"+fileName,fileName)
         alert ("boss rush mod uninstalled")
     }
@@ -69,7 +70,7 @@ MATTIE.bossRush =  MATTIE.bossRush || {};
 
     function startNextFight(cb = ()=>{}){
         if(MATTIE.bossRush.currentFightIndex < MATTIE.bossRush.fights.length){
-            startFight(MATTIE.bossRush.currentFightIndex, cb);
+            $gameTroop.setup(MATTIE.bossRush.fights[MATTIE.bossRush.currentFightIndex], 0,0, cb)
             MATTIE.bossRush.currentFightIndex++;
         } else {
             win()
@@ -79,17 +80,17 @@ MATTIE.bossRush =  MATTIE.bossRush || {};
     
 
     /**
-     * @description start a fight at x index in the arr and call a callback when fight ends
-     * @param {*} x the index of the fight to start
+     * @description start a fight arr and call a callback when fight ends
+     * @param {*} the array of all troops in the fight
      * @param {*} cb the callback to call when the fight ends
      */
-    function startFight(x,cb=()=>{}){
+    function startFight(arr,cb=()=>{}){
         BattleManager.setCantStartInputting(true);
 
         if($gameParty.leader().hasSkill(MATTIE.static.skills.enGarde.id)){
             $gameSwitches.setValue(MATTIE.static.switch.backstab,true);
         }
-        let roundIds = MATTIE.bossRush.fights[x];
+        let roundIds = arr;
         let first = 142
         BattleManager.setup(first, false, true);
         
