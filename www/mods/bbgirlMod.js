@@ -22,6 +22,7 @@ MATTIE.prevFun5325c = Game_Actor.prototype.characterName;
 
     MATTIE.bbgirlMod.offload = function(){
         MATTIE.DataManager.global.set("bbgirlInstalled", false);
+        if(MATTIE.DataManager.checkExists("/img/characters/" + "_"+fileName +".png"))
         MATTIE.DataManager.addFileToImgFolder("/img/characters/","/characters/","_"+fileName,fileName)
         alert ("bgirl mod uninstalled")
     }

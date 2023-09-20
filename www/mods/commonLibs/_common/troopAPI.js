@@ -21,15 +21,97 @@ Game_Troop.prototype.initialize = function() {
 MATTIE_RPG.TroopApi_Game_Troop_Setup = Game_Troop.prototype.setup;
 /**
  * @description the setup function for a game troop, extended to also support offset and additional troops
- * @param {int} troopId the troop id 
+ * @param {int || int[]} troopId the troop id or an array of ids 
  * @param {int} xOffset default 0, offset the entire troop by this amount
  * @param {int} yOffset default 0, offset the entire troop by this amount
  */
-Game_Troop.prototype.setup = function(troopId, xOffset =0, yOffset =0){
-    MATTIE_RPG.TroopApi_Game_Troop_Setup.call(this,troopId)
-    this._interpreter.setTroop(this);
+Game_Troop.prototype.setup = function(troopId, xOffset =0, yOffset =0, cb = ()=>{}){
+
     /** @type {MATTIE.troopAPI.runtimeTroop[]} an array of all additional troops */
     this._additionalTroops = {};
+
+    if(typeof troopId == 'number'){
+        MATTIE_RPG.TroopApi_Game_Troop_Setup.call(this,troopId)
+        this._interpreter.setTroop(this);
+    }else{
+        this.setupMultiCombat(troopId, cb)
+    }
+    
+}
+
+
+/**
+ * @description start a fight arr and call a callback when fight ends
+ * @param {*} the array of all troops in the fight
+ * @param {*} cb the callback to call when the fight ends
+ */
+Game_Troop.prototype.setupMultiCombat = function (arr,cb=()=>{}){
+    BattleManager.setCantStartInputting(true);
+
+    if($gameParty.leader().hasSkill(MATTIE.static.skills.enGarde.id)){
+        $gameSwitches.setValue(MATTIE.static.switch.backstab,true);
+    }
+    let roundIds = arr;
+    let first = 142;
+    BattleManager.setup(first, false, true);
+    
+    $gamePlayer.makeEncounterCount();
+    SceneManager.push(Scene_Battle);
+    
+    setTimeout(() => {
+        if($gameParty.leader().hasSkill(MATTIE.static.skills.enGarde.id)){
+            $gameSwitches.setValue(MATTIE.static.switch.backstab,false);
+            MATTIE.msgAPI.footerMsg("True Ambush Round --All Enemies cannot attack this round.")
+        }
+        setTimeout(() => {
+            /** @type {Game_Enemy} */
+        let spider = $gameTroop.baseMembers()[0]
+
+
+        spider.performDamage();
+        spider.die();
+        
+        spider.hide();
+        
+            for (let index = 0; index < roundIds.length; index++) {
+                const additionalId = roundIds[index];
+                let additionalTroop = new MATTIE.troopAPI.runtimeTroop(additionalId);
+                switch (additionalId) {
+                    case MATTIE.static.troops.skinGrannyId:
+                        //skin granny needs this to be false for her to transform
+                        additionalTroop.setSwitchValue(1807,false)
+                        break;
+                
+                    default:
+                        break;
+                }
+    
+                additionalTroop.spawn();
+            }  
+            setTimeout(() => {
+                if($gameParty.leader().hasSkill(MATTIE.static.skills.enGarde.id)){
+                    $gameVariables.setValue(19,-1)
+                    $gameTroop.forEachAdditionalTroop(troop=>{
+                        troop.setVariableValue(19,-1)
+                        troop.baseMembers().forEach(enemy=>{
+                            enemy.addState(MATTIE.static.states.cantDoShitOnce); //add cant do shit one turn
+                        })
+                    })                        
+                    //$gameSwitches.setValue(MATTIE.static.switch.backstab,true);
+                }
+               BattleManager.setCantStartInputting(false);
+               BattleManager.setEventCallback(function(n) {
+                cb();
+                }.bind(this));
+            }, 500);
+        }, 500);
+        
+            
+            
+
+    }, 3000);
+    
+    
 }
 
 /** 
