@@ -216,6 +216,9 @@ class BaseNetController extends EventEmitter {
         if(data.runTimeTroopSpawn){
             this.onRuntimeTroopEvent(data.runTimeTroopSpawn,data.id);
         }
+        if(data.pvpEvent){
+            this.onPvpEventData(data.pvpEvent, data.id);
+        }
     }
 
     //-----------------------------------------------------
@@ -250,9 +253,12 @@ class BaseNetController extends EventEmitter {
             let actorDataArr = data.actorData;
             let actorHealthArr = actorDataArr.map(data=>data.hp);
             let enemyStatesArr = data.enemyStates;
-            this.syncActorData(actorDataArr, id)
-            this.syncEnemyHealths(enemyHealthArr);
-            this.syncEnemyStates(enemyStatesArr);
+            if(actorDataArr)
+                this.syncActorData(actorDataArr, id)
+            if(enemyHealthArr)
+                this.syncEnemyHealths(enemyHealthArr);
+            if(enemyStatesArr)
+                this.syncEnemyStates(enemyStatesArr);
             setTimeout(() => {
                 BattleManager.doneSyncing(); //done syncing  
             }, MATTIE.multiplayer.combatEmitter.minSyncTime);
@@ -281,6 +287,7 @@ class BaseNetController extends EventEmitter {
         for (let index = 0; index < $gameTroop.members().length; index++) {
             const enemy = $gameTroop.members()[index];
             let netStates = enemyStatesArr[index];
+                if(netStates)
                 netStates.forEach(state => {
                     if(!enemy.isStateAffected(state)){
                         enemy.addState(state);
@@ -356,15 +363,15 @@ class BaseNetController extends EventEmitter {
         let id = senderId;
         if(MATTIE.multiplayer.currentBattleEvent){
             MATTIE.multiplayer.currentBattleEvent.setReadyIfExists(id,val); //set the player as unready in combat arr @legacy
-            $gameTroop.setReadyIfExists(id,val,isExtraTurn); //set the player as unready in combat arr <- this one is actually used
             if(val===false)console.log("net unready recived")
         }
+        $gameTroop.setReadyIfExists(id,val,isExtraTurn); //set the player as unready in combat arr <- this one is actually used
             
 
         if($gameTroop.getIdsInCombatWithExSelf().includes(id)) //only setup net actions if we are in combat with that troop
         if(readyObj.actions){
+            
             let actions = JSON.parse(readyObj.actions);
-           
             actions.forEach(action => {
                 let shouldAddAction = true;
                 if(action){
@@ -393,7 +400,7 @@ class BaseNetController extends EventEmitter {
                             action._netTarget = action.netPartyId;
                         } else {
                             if(MATTIE.multiplayer.scaling.partyActionsTargetAll){
-
+    
                             }else{
                                 //force the action to target no one if this is a net action
                                 if(action.netPartyId != this.peerId) shouldAddAction = false;
@@ -402,18 +409,153 @@ class BaseNetController extends EventEmitter {
                         }
                     }
                     if(shouldAddAction){
-                        actor.partyIndex = ()=>this.netPlayers[senderId].battleMembers().indexOf(actor); //set the party index function
-                        actor.setCurrentAction(action);
-                        BattleManager.addNetActionBattler(actor,isExtraTurn);
+                        if(!MATTIE.multiplayer.pvp.inPVP){
+                            this.processNormalAction(actor,action,isExtraTurn,senderId);
+                        }else{
+                            this.processPvpAction(actor,action,isExtraTurn,senderId);
+                        }
                     }
                     
                 }
                 
             });
+            
         }
         
         
         
+    }
+
+    /**
+     * @description add a action to a net battler when not in pvp
+     * @param {Game_Actor} actor actor that these actions are for
+     * @param {Game_Action} action the action itself
+     * @param {bool} isExtraTurn whether this is an extra turn
+     * @param {UUID} senderId id of the net user that sent these actions
+     */
+    processNormalAction(actor,action,isExtraTurn,senderId){
+        actor.partyIndex = ()=>this.netPlayers[senderId].battleMembers().indexOf(actor); //set the party index function
+        actor.setCurrentAction(action);
+        BattleManager.addNetActionBattler(actor,isExtraTurn);
+    }
+
+
+    /**
+     * @description handle pvp action
+     * @param {Game_Actor} actor actor that these actions are for
+     * @param {Game_Action} action the action itself
+     * @param {bool} isExtraTurn whether this is an extra turn
+     * @param {UUID} senderId id of the net user that sent these actions
+     */
+    processPvpAction(actor,action,isExtraTurn,senderId){
+        let targetActor = $gameActors.actor(action.targetActorId);
+        let legCut = false;
+        let armCut = false;
+        console.log(action);
+        /** @type {Game_Enemy} */
+        let originalTarget = $gameTroop.members()[action._targetIndex];
+        action.forcedTargets = [];
+        let netActor = this.netPlayers[senderId].$netActors.netActor(actor.actorId())
+        let troopId = MATTIE.multiplayer.pvp.PvpController.mapActorToTroop(netActor.baseActorId || actor.actorId()); //get the troop for this actor
+        if(troopId){ 
+            let targetActorIndex = 0;
+            /** @type {Game_Enemy} */
+            let battler = $gameTroop._additionalTroops[troopId].baseMembers()[2]; //just grab the first member for now
+            console.log(battler);
+            actor.partyIndex = ()=>this.netPlayers[senderId].battleMembers().indexOf(actor); //just say thye go first for now to test
+            action._netTarget = false;
+            
+
+            if(originalTarget){//if the original target was a game troop then scale dmg appropriately 
+                let atkScaler = actor.mhp / originalTarget.mhp;
+                atkScaler = MATTIE.util.clamp(atkScaler,0,1); //clamp the atk scaler between .5 and 1
+                
+                if(originalTarget.name().toLowerCase().includes("torso")){
+
+                    battler.enemy().params[2] = MATTIE.util.clamp(actor.atk * atkScaler,4,100)//min damage 10
+                } else if(originalTarget.name().toLowerCase().includes("head")){
+                    battler.enemy().params[2] = MATTIE.util.clamp(actor.atk /7,4,100)//more dmg to head
+                } else if(originalTarget.name().toLowerCase().includes("arm")){
+                    armCut = true;
+                    battler.enemy().params[2] = 1
+                    targetActor.addState(MATTIE.static.states.armCut)
+
+                } else if(originalTarget.name().toLowerCase().includes("leg")){
+                    legCut = true;
+                    battler.enemy().params[2] = 1
+                    targetActor.addState(MATTIE.static.states.legCut)
+                    
+                }
+                
+                else{
+                    battler.enemy().params[2] = 0
+                }
+                
+                
+
+                
+            }
+
+            battler.setCurrentAction(action);
+                        //change the damage formula to be raw damage stat.
+            /** @type {rm.types.Item} */
+            let clonedItem = JsonEx.makeDeepCopy(battler._actions[battler._actions.length-1].item())
+            clonedItem.damage.formula = "a.atk";
+            
+            battler._actions[battler._actions.length-1].item = function(){
+                return clonedItem;
+            }
+           
+            targetActorIndex = $gameParty._actors.indexOf(parseInt(action.targetActorId));
+            
+            battler._actions[battler._actions.length-1]._netTarget = false;
+            battler._actions[battler._actions.length-1].setSubject(battler);
+            battler._actions[battler._actions.length-1].setTarget(targetActorIndex);
+
+            Object.keys(action.targetResults).forEach(key=>{
+                let actor = $gameActors.actor(action.targetActorId);
+                if(actor){
+                    let newKey = actor.name();
+                    action.targetResults[newKey] = action.targetResults[key]
+                }
+                
+            })
+
+
+            if(armCut || legCut){
+                console.log("limb cut")
+                /** @type {rm.types.Effect} */
+                let effect = {};
+                effect.code = 21;
+                effect.dataId = MATTIE.static.states.bleeding;
+                effect.value1 = 1;
+                effect.value2 = 0;
+                battler._actions[battler._actions.length-1].item().effects.push(effect)
+                effect.code = 21;
+                effect.dataId = 3;
+                effect.value1 = 1;
+                effect.value2 = 0;
+                battler._actions[battler._actions.length-1].item().effects.push(effect)
+                effect.code = 44;
+                effect.dataId = 240;
+                effect.value1 = 1;
+                effect.value2 = 0;
+                battler._actions[battler._actions.length-1].item().effects.push(effect)
+            }
+            
+
+            battler._actions[battler._actions.length-1].loadRng(action.targetResults)
+
+
+
+
+
+            
+            
+            
+            BattleManager.addNetActionBattler(battler,isExtraTurn);
+
+        }
     }
 
 
@@ -1338,6 +1480,41 @@ class BaseNetController extends EventEmitter {
         }
         
     }
+
+    //-----------------------------------------------------
+    //Pvp Event
+    //-----------------------------------------------------
+    /**
+     * @description emit the pvp event to trigger combat with a net player
+     * @param {*} targetedPlayerId 
+     * @param {bool} bool whether this is starting or ending a fight
+     * @emits "pvpEvent"
+     */
+    emitPvpEvent(targetedPlayerId, bool= true){
+        let obj = {};
+        obj.pvpEvent = {};
+        obj.pvpEvent.start = bool;
+        obj.pvpEvent.targetedPlayer = targetedPlayerId
+        this.sendViaMainRoute(obj);
+        this.emit("pvpEvent");
+    }
+
+    /** @description process the pvp data event from the client and start a combat if they are targeting this player */
+    onPvpEventData(pvpData,senderId){
+        let targetedPlayer = pvpData.targetedPlayer;
+        let start = pvpData.start; //whether this event is saying a player joined or left
+        if(start){
+            if(this.peerId === targetedPlayer){
+                MATTIE.multiplayer.pvp.PvpController.startCombatWith(senderId);
+            } else {
+                MATTIE.multiplayer.pvp.PvpController.onCombatantJoin(senderId,targetedPlayer);
+            }
+        }else{
+            MATTIE.multiplayer.pvp.PvpController.onCombatantLeave(senderId,targetedPlayer);
+        }
+        
+    }
+
 
     //-----------------------------------------------------
     // MISC

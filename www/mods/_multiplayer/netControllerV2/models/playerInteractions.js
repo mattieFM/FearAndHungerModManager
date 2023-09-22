@@ -91,7 +91,9 @@ MATTIE.multiplayer.conversations.prototype.talkOptionsCb = function(n){
             this.resurrect();
             break;
         case 3: //Attack
-            this.nameSpeak("Mattie", "That feature isn't implemented.")
+            this.nameSpeak("Mattie", "You try to attack");
+            MATTIE.multiplayer.pvp.PvpController.emitCombatStartWith(this.targetPeerId);
+            MATTIE.multiplayer.pvp.PvpController.startCombatWith(this.targetPeerId);
             break;
         case 4: //Cancel
             break;

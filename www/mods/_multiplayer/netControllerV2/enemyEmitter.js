@@ -20,6 +20,7 @@ Game_System.prototype.onBattleStart = function() {
 
 MATTIE.multiplayer.BattleManager_EndBattle = BattleManager.endBattle;
 BattleManager.endBattle = function(result) {
+    MATTIE.multiplayer.BattleController.emitBattleEnd();
     var res = MATTIE.multiplayer.BattleManager_EndBattle.call(this, result);
     MATTIE.multiplayer.BattleController.emitTurnEndEvent();
     MATTIE.multiplayer.getCurrentNetController().emitBattleEndEvent($gameTroop._troopId, MATTIE.multiplayer.currentBattleEnemy);
@@ -128,7 +129,9 @@ Game_Troop.prototype.removeIdFromCombatArr = function(id){
 }
 
 Game_Troop.prototype.setReadyIfExists = function (id, bool,isExtraTurn) {
+    console.log("set ready if exists")
     if(Object.keys(this._combatants).indexOf(id) != -1){
+        console.log("exists")
         this._combatants[id] = {};
         this._combatants[id].bool = bool
         this._combatants[id].isExtraTurn = isExtraTurn;
@@ -137,7 +140,6 @@ Game_Troop.prototype.setReadyIfExists = function (id, bool,isExtraTurn) {
 
 Game_Troop.prototype.allReady = function () {
     let val = true;
-    console.log(this._combatants);
     Object.keys(this._combatants).forEach(key => {
         let element = this._combatants[key].bool;
         if(element == false){

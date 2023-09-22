@@ -31,6 +31,25 @@ class PlayerModel {
         this.isSpectating = false;
 
         this.conversationModel = new MATTIE.multiplayer.conversations();
+
+        /** @description an array of all player's ids who currently in combat with this player */
+        this.pvpCombatArr = [];
+    }
+
+    /** @description add an id to the pvp arr if it does not already exist*/
+    addIdToPvp(id){
+        if(this.pvpCombatArr.indexOf(id) == -1) this.pvpCombatArr.push(id);
+    }
+
+    /** @description remove an id from the pvp arr if it exists */
+    removeIdFromPvp(id){
+        let index =this.pvpCombatArr.indexOf(id)
+        if(index > 0)this.pvpCombatArr.slice(index)
+    }
+
+    /** @description remove all values from the pvp arr */
+    clearPvpArr(){
+        this.pvpCombatArr = [];
     }
 
     /**
@@ -99,6 +118,16 @@ class PlayerModel {
         this.followerIds.forEach(followerId=>{
             let actor = this.$netActors.baseActor(followerId);
             arr.push(actor);
+        })
+        return arr;
+    }
+
+    /** @description get the ids of the actors in this party */
+    memberIds(){
+        let arr = [];
+        arr.push(this.actorId);
+        this.followerIds.forEach(followerId=>{
+            arr.push(followerId);
         })
         return arr;
     }
@@ -394,3 +423,14 @@ Game_Player.prototype.getMapId = function(){
 Game_Player.prototype.isOnMap = function() {
     return this.getMapId() === $gameMap.mapId();
 }
+
+
+//----------------------------------------
+//Game Actor Overrides
+//----------------------------------------
+MATTIE.multiplayer.Game_ActorsActor = Game_Actors.prototype.actor;
+Game_Actors.prototype.actor = function(actorId) {
+    if(this._data[actorId])
+    if(!this._data[actorId].peerId) this._data[actorId].peerId = MATTIE.multiplayer.getCurrentNetController()? MATTIE.multiplayer.getCurrentNetController().peerId : false;
+    return MATTIE.multiplayer.Game_ActorsActor.call(this,actorId);
+};

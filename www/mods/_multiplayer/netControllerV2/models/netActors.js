@@ -61,7 +61,11 @@ MATTIE.multiplayer.NetActors.prototype.createNewNetActor = function(baseActorId)
     let newDataActor = JsonEx.makeDeepCopy($dataActors[baseActorId]);
     $dataActors.push(newDataActor);
     let dataActorId = $dataActors.length-1;
+    $dataActors[dataActorId].peerId = this.peerId;
     let newNetActor = new MATTIE.multiplayer.NetActor(new Game_Actor(dataActorId), dataActorId, baseActorId, this.peerId);
+    $gameActors.actor(dataActorId).peerId = this.peerId;
+    newNetActor.peerId = this.peerId;
+    console.log(newNetActor.peerId)
     this._data.push(newNetActor);
 }
 
@@ -102,6 +106,18 @@ MATTIE.multiplayer.NetActors.prototype.dataActor = function(baseActorId){
     this._data.forEach(element => {
         if(element.dataActorId == baseActorId) {
             actor = element.gameActor;
+            return actor;
+        }
+    });
+    return actor;
+}
+
+
+MATTIE.multiplayer.NetActors.prototype.netActor = function(id){
+    let actor = null;
+    this._data.forEach(element => {
+        if(element.dataActorId == id) {
+            actor = element;
             return actor;
         }
     });
