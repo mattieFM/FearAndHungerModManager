@@ -25,7 +25,7 @@ MATTIE_RPG.TroopApi_Game_Troop_Setup = Game_Troop.prototype.setup;
  * @param {int} xOffset default 0, offset the entire troop by this amount
  * @param {int} yOffset default 0, offset the entire troop by this amount
  */
-Game_Troop.prototype.setup = function(troopId, xOffset =0, yOffset =0, cb = ()=>{}){
+Game_Troop.prototype.setup = function(troopId, xOffset =0, yOffset =0, cb = ()=>{}, onload= ()=>{}){
 
     /** @type {MATTIE.troopAPI.runtimeTroop[]} an array of all additional troops */
     this._additionalTroops = {};
@@ -34,9 +34,32 @@ Game_Troop.prototype.setup = function(troopId, xOffset =0, yOffset =0, cb = ()=>
         MATTIE_RPG.TroopApi_Game_Troop_Setup.call(this,troopId)
         this._interpreter.setTroop(this);
     }else{
-        this.setupMultiCombat(troopId, cb)
+        this.setupMultiCombat(troopId, cb, onload)
     }
     
+}
+
+Game_Troop.prototype.disableAdditionalTroops = function(){
+    this.additionalTroopsDisabled=true;
+}
+
+Game_Troop.prototype.enableAdditionalTroops = function(){
+    this.additionalTroopsDisabled=false;
+}
+
+Game_Troop.prototype.clearAllPages = function(){
+    this.clearPages();
+    this.forEachAdditionalTroop(add=>{add.clearPages()})
+}
+
+Game_Troop.prototype.clearPages = function(){
+    /** @type {rm.types.Troop} */
+    let clonedDataTroop = JsonEx.makeDeepCopy(this.troop());
+    clonedDataTroop.pages = []; //clear all actions so that it can't do shit
+    this.troop = function(){
+
+        return clonedDataTroop;
+    }
 }
 
 
@@ -45,7 +68,7 @@ Game_Troop.prototype.setup = function(troopId, xOffset =0, yOffset =0, cb = ()=>
  * @param {*} the array of all troops in the fight
  * @param {*} cb the callback to call when the fight ends
  */
-Game_Troop.prototype.setupMultiCombat = function (arr,cb=()=>{}){
+Game_Troop.prototype.setupMultiCombat = function (arr, cb=()=>{}, onload=()=>{}){
     BattleManager.setCantStartInputting(true);
 
     if($gameParty.leader().hasSkill(MATTIE.static.skills.enGarde.id)){
@@ -99,10 +122,12 @@ Game_Troop.prototype.setupMultiCombat = function (arr,cb=()=>{}){
                     })                        
                     //$gameSwitches.setValue(MATTIE.static.switch.backstab,true);
                 }
-               BattleManager.setCantStartInputting(false);
-               BattleManager.setEventCallback(function(n) {
+                onload();
+                BattleManager.setCantStartInputting(false);
+                BattleManager.setEventCallback(function(n) {
                 cb();
                 }.bind(this));
+                
             }, 500);
         }, 500);
         
@@ -206,6 +231,7 @@ MATTIE_RPG.TroopApi_Game_Troop_Setup_Battle_Event = Game_Troop.prototype.setupBa
  */
 Game_Troop.prototype.setupBattleEvent = function() {
     MATTIE_RPG.TroopApi_Game_Troop_Setup_Battle_Event.call(this);
+    if(!this.additionalTroopsDisabled)
     this.forEachAdditionalTroop((additionalTroop)=>{
         additionalTroop.setupBattleEvent();
     });
@@ -218,6 +244,7 @@ MATTIE_RPG.TroopApi_Game_Troop_IncreaseTurn = Game_Troop.prototype.increaseTurn;
  */
 Game_Troop.prototype.increaseTurn  = function(){
     MATTIE_RPG.TroopApi_Game_Troop_IncreaseTurn.call(this);
+    if(!this.additionalTroopsDisabled)
     this.forEachAdditionalTroop((additionalTroop)=>{
         additionalTroop.increaseTurn();
     });
@@ -241,10 +268,9 @@ MATTIE_RPG.TroopApi_Game_Troop_UpdateInterpreter = Game_Troop.prototype.updateIn
  * @description override the update interpreter to also update battle events of all additional troops
  */
 Game_Troop.prototype.updateInterpreter = function() {
-    console.log("updated interpreter")
     MATTIE_RPG.TroopApi_Game_Troop_UpdateInterpreter.call(this);
+    if(!this.additionalTroopsDisabled)
     this.forEachAdditionalTroop((additionalTroop) =>{
-        console.log("updated additional troop interpreter")
         additionalTroop.updateInterpreter();
     });
 }

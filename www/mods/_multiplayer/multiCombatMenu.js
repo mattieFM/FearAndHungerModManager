@@ -92,22 +92,25 @@ Spriteset_Battle.prototype.addNetBattler = function(actor) {
 }
 
 Scene_Battle.prototype.refreshNetBattlers = function(){
-    MATTIE.multiplayer.multiCombat.netPlayerOffset = $gameParty.battleMembers().length;
-    let playersIds = $gameTroop.getIdsInCombatWith();
-    let netCont = MATTIE.multiplayer.getCurrentNetController();
-    if(!this._spriteset._netActorSprites) this._spriteset._netActorSprites = [];
-    if(!this._spriteset._netActors) this._spriteset._netActors = [];
-    for (let index = 0; index < this._spriteset._netActorSprites.length+1; index++) {
-        this._spriteset.removeNetBattler(0); //becouse this is destructive just remove index 0 for every time.
-    }
-    playersIds.forEach(id => {
-        if(id !== netCont.peerId){
-            netCont.netPlayers[id].battleMembers().forEach(actor =>{
-                this._spriteset.addNetBattler(actor);
-            });
+    if(!MATTIE.multiplayer.pvp.inPVP){
+        MATTIE.multiplayer.multiCombat.netPlayerOffset = $gameParty.battleMembers().length;
+        let playersIds = $gameTroop.getIdsInCombatWith();
+        let netCont = MATTIE.multiplayer.getCurrentNetController();
+        if(!this._spriteset._netActorSprites) this._spriteset._netActorSprites = [];
+        if(!this._spriteset._netActors) this._spriteset._netActors = [];
+        for (let index = 0; index < this._spriteset._netActorSprites.length+1; index++) {
+            this._spriteset.removeNetBattler(0); //becouse this is destructive just remove index 0 for every time.
         }
-    });
-    this._spriteset.updateNetBattlers();
+        playersIds.forEach(id => {
+            if(id !== netCont.peerId){
+                netCont.netPlayers[id].battleMembers().forEach(actor =>{
+                    this._spriteset.addNetBattler(actor);
+                });
+            }
+        });
+        this._spriteset.updateNetBattlers();
+    }
+    
 }
 
 
@@ -174,7 +177,7 @@ MATTIE.windows.multiplayer.multiCombat.allyCount.prototype.initialize = function
     })
 };
 MATTIE.windows.multiplayer.multiCombat.allyCount.prototype.getText = function(){
-    return("Allies: "+ MATTIE.windows.multiplayer.multiCombat.allyCount.prototype.getTotalAllies()).toString();
+    return(MATTIE.multiplayer.pvp.inPVP ? "Enemies" : "Allies: "+ MATTIE.windows.multiplayer.multiCombat.allyCount.prototype.getTotalAllies()).toString();
 }
 
 MATTIE.windows.multiplayer.multiCombat.allyCount.prototype.getTotalAllies = function() {

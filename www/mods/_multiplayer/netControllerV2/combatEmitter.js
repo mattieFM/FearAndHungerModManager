@@ -87,6 +87,11 @@ BattleManager.getAllPlayerActions = function () {
             if(action){ //only do stuff if the action exists
                 action.setNetTarget(MATTIE.multiplayer.getCurrentNetController().peerId)
                 action.preloadRng(action.makeTargets());
+                if(MATTIE.multiplayer.pvp.inPVP) {
+                    let targetTroopId =  $gameTroop.mapMemberIndexToTroopId(action._targetIndex);
+                    let targetActorId =  MATTIE.multiplayer.pvp.PvpController.mapTroopToActor(targetTroopId);
+                    action.targetActorId = targetActorId
+                }
                 arr.push(action);
             }
         }
@@ -95,8 +100,21 @@ BattleManager.getAllPlayerActions = function () {
 }
 
 
-Game_Action.prototype.forceHit = function(bool){
-    this._forcedHit = bool;
+Game_Action.prototype.forceHit = function(obj){
+    if(typeof obj != 'undefined'){
+        this._forcedHit = obj.res;
+        this._preloadMissed = obj.miss;
+        this._preloadEvade = obj.evade;
+    } else{
+        this._forcedHit = undefined;
+        this._preloadMissed = undefined;
+        this._preloadEvade = undefined;
+    }
+    
+}
+
+Game_Action.prototype.makeTargetResultsId = function(target, id =MATTIE.multiplayer.getCurrentNetController().peerId){
+    return target.name()+ (this.subject().isActor() ? this.subject()._classId + "-": "")+"-"+this._targetIndex+"-"+this._item._itemId+"-";
 }
 /**
  * 
@@ -104,23 +122,29 @@ Game_Action.prototype.forceHit = function(bool){
  */
 Game_Action.prototype.preloadRng = function(targets){
     BattleManager.targetResults = {};
+    this.targetResults = {};
     targets.forEach(target => {
-        let rand = Math.random();
-        let rand2 = Math.random();
-        let missed = (rand >= this.itemHit(target));
-        let evaded = (!missed && rand2 < this.itemEva(target));
-        BattleManager.targetResults[target.name()] = (!missed && !evaded);
+        this._preloadMissed = (Math.random() >= this.itemHit(target));
+        this._preloadEvade = (!this._preloadMissed && Math.random() < this.itemEva(target));
+        let crit = (Math.random() < this.itemCri(target));
+        this.targetResults[this.makeTargetResultsId(target)] = {};
+        this.targetResults[this.makeTargetResultsId(target)].crit = crit;
+        this.targetResults[this.makeTargetResultsId(target)].evade = this._preloadEvade;
+        this.targetResults[this.makeTargetResultsId(target)].miss = this._preloadMissed;
+        this.targetResults[this.makeTargetResultsId(target)].res = (!this._preloadMissed && !this._preloadEvade);
+        this.targetResults[this.makeTargetResultsId(target)].dmg = this.makeDamageValue(target, crit);
     });    
-    this.targetResults = BattleManager.targetResults;
+    BattleManager.targetResults = Object.assign(BattleManager.targetResults || {}, this.targetResults);
 }
 
-Game_Action.prototype.loadRng = function(results){
-    BattleManager.targetResults = Object.assign({}, BattleManager.targetResults||{}, results)
-    console.log(BattleManager.targetResults);
+Game_Action.prototype.loadRng = function(results,id){
+    this._id = id;
+    this.targetResults = Object.assign(this.targetResults || {}, results)
+    console.log(this.targetResults);
 }
 
 Game_Action.prototype.getTargetResults = function(){
-    return BattleManager.targetResults;
+    return this.targetResults || BattleManager.targetResults;
 }
 
 MATTIE.multiplayer.Game_Action_Apply = Game_Action.prototype.apply;
@@ -130,10 +154,12 @@ Game_Action.prototype.apply = function(target) {
 MATTIE.multiplayer.Game_Action_testApply = Game_Action.prototype.testApply;
 Game_Action.prototype.testApply = function(target) {
     let targets = this.getTargetResults();
+    console.log(targets);
     if(targets){
-        if(Object.keys(targets).includes(target.name())){
+        console.log(this.makeTargetResultsId(target))
+        if(Object.keys(targets).includes(this.makeTargetResultsId(target))){
             if(target.result().forceHit)
-            target.result().forceHit(targets[target.name()])
+            target.result().forceHit(targets[this.makeTargetResultsId(target)])
         } else {
             if(target)
             if(target.result())
@@ -144,19 +170,47 @@ Game_Action.prototype.testApply = function(target) {
     return MATTIE.multiplayer.Game_Action_testApply.call(this,target)
 };
 
+
+/** @description the base make damage value function for a game action */
+MATTIE.multiplayer.Game_ActionmakeDamageValue = Game_Action.prototype.makeDamageValue;
+Game_Action.prototype.makeDamageValue = function(target, critical) {
+    let targets = this.getTargetResults();
+    if(targets){
+        if(Object.keys(targets).includes(this.makeTargetResultsId(target))){
+            if(target.result().forceHit){
+                if(targets[this.makeTargetResultsId(target)].crit)
+                    critical = targets[this.makeTargetResultsId(target)].crit;
+                if(targets[this.makeTargetResultsId(target)].dmg)
+                    return targets[this.makeTargetResultsId(target)].dmg;
+            }
+            
+        } 
+    }
+    return MATTIE.multiplayer.Game_ActionmakeDamageValue.call(this,target, critical)
+}
+
 /** @description extend the is hit function to include if it is being forced to hit */
 MATTIE.multiplayer.Game_ActionResultisHit = Game_ActionResult.prototype.isHit
 Game_ActionResult.prototype.isHit = function() {
-    if(typeof this._forceHit != 'undefined'){
-        return this._forceHit;
+    if(typeof this._forcedHit != 'undefined'){
+        this.missed = this._preloadMissed;
+        this.evaded = this._preloadEvade;
+        return this._forcedHit && !this.missed && !this.evaded;
     }
     return (MATTIE.multiplayer.Game_ActionResultisHit.call(this))
 };
 /** @description set a action result as forced hit */
-Game_ActionResult.prototype.forceHit = function(bool=undefined) {
-    this._forceHit = bool;
+Game_ActionResult.prototype.forceHit = function(obj) {
+    if(typeof obj != 'undefined'){
+        this._forcedHit = obj.res;
+        this._preloadMissed = obj.miss;
+        this._preloadEvade = obj.evade;
+    } else{
+        this._forcedHit = undefined;
+        this._preloadMissed = undefined;
+        this._preloadEvade = undefined;
+    }
 };
-
 
 
 
@@ -172,7 +226,6 @@ Game_Action.prototype.subject = function() {
             return MATTIE.multiplayer.getCurrentNetController().netPlayers[this._netTarget].$netActors.dataActor(this._subjectActorId);
         }
     }
-
     if (this._subjectActorId > 0) {
         return $gameActors.actor(this._subjectActorId);
     } else {
@@ -271,20 +324,12 @@ BattleManager.startTurn = function() {
         if(val === 0 ){//if both palyers sort by speed
             val = b.speed() - a.speed();
         }
-        if(val === 0){ //if speed is same... sort by hp, this is just so that the same exact order will display on all screens
-            val = b.hp - a.hp;
-        }
 
-        if(val === 0 ){ //finnally sort by luck cus its funny
-            val = b.mp - a.mp;
-        }
-
-        if(val === 0 ){ //finnally sort by luck cus its funny
-            val = b.luk - a.luk;
-        }
-
-        if(val === 0 ){ //finnally sort by luck cus its funny
-            val = b.name() - a.name();
+        if(val === 0 ){ //finnally sort by id
+            if(a.isActor() && b.isActor()){
+                val = (b.peerId || b.netID).localeCompare((a.peerId || a.netID));
+            }
+            
         }
 
         return val;

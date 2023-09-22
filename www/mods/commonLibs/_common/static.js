@@ -82,8 +82,22 @@ MATTIE.static.switch.ignoredSelfSwitches = [];
 /** this is the state that governs "death" in combat */
 MATTIE.static.states.knockout = 0;
 /** @description block teh enemy from acting for one round */
-MATTIE.static.states.cantDoShitOnce = 36
+MATTIE.static.states.cantDoShitOnce = 36;
 
+/** @description block teh enemy from acting for ever round */
+MATTIE.static.states.cantDoShitOnce = 13;
+
+/** @description state that makes host not die */
+MATTIE.static.states.resistDeath = 91;
+
+/** @description state for leg loss */
+MATTIE.static.states.legCut = 14;
+
+/** @description state for arm loss */
+MATTIE.static.states.armCut = 3;
+
+/** @description state for bleeding */
+MATTIE.static.states.bleeding = 5;
 //troopids
 MATTIE.static.troops.crowMauler = 51;
 MATTIE.static.troops.salmonSnakeId = 50;

@@ -14,8 +14,8 @@ MATTIE.clipboard.get = function(){
 
 MATTIE.clipboard.put = function(string){
     if(Utils.isNwjs){
-        data = nwGui.Clipboard.get().set(string);
+        data = nwGui.Clipboard.get().set(string || "");
     }else{
-        data = window.navigator.clipboard.writeText(string)
+        data = window.navigator.clipboard.writeText(string || "")
         }
 }

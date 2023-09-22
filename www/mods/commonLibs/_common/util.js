@@ -31,3 +31,12 @@ MATTIE.util.getDist = function(x1,x2,y1,y2){
 MATTIE.util.randChance = function(chance){
     return (Math.random() <= chance)
 }
+
+/**
+ * @description clamp a number between a min and a max
+ * @param {*} num the number
+ * @param {*} min the min number
+ * @param {*} max the max number
+ * @returns 
+ */
+MATTIE.util.clamp = (num, min, max) => Math.min(Math.max(num, min), max);
