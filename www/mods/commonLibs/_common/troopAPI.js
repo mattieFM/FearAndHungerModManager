@@ -510,7 +510,7 @@ MATTIE_RPG.TroopApi_Game_Interpreter_OperateVariable = Game_Interpreter.prototyp
 Game_Interpreter.prototype.operateVariable = function(variableId, operationType, value) {
     if(this.getTroop() instanceof MATTIE.troopAPI.runtimeTroop){ //if the interpreter is targeting a runtime troop
         try {
-            var oldValue = $gameVariables.value(variableId);
+            var oldValue = this.getTroop().getVariableValue(variableId);
             switch (operationType) {
             case 0:  // Set
                 this.getTroop().setVariableValue(variableId, oldValue = value);
