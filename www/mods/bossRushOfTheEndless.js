@@ -137,6 +137,12 @@ MATTIE.bossRush =  MATTIE.bossRush || {};
                             })
                         })                        
                         //$gameSwitches.setValue(MATTIE.static.switch.backstab,true);
+                    }else{
+                        $gameVariables.setValue(19,0)
+                        $gameTroop.forEachAdditionalTroop(troop=>{
+                            troop.setVariableValue(19,0)
+                        })        
+
                     }
                    BattleManager.setCantStartInputting(false);
                    BattleManager.setEventCallback(function(n) {
