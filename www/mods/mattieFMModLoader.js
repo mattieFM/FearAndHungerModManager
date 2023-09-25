@@ -689,7 +689,11 @@ MATTIE.onError = function(e) {
         if(e.message)
         errorText += e.message
         if(e.lineno)
-        errorText += e.lineno
+        errorText += "<br>at Line:" + e.lineno
+        if(e.fileName)
+        errorText += "<br>File:" +e.fileName
+        if(e.name)
+        errorText += "<br>name:" +e.name
 
         errorText += `<font color=${color}><br><br>Press 'F7' or 'escape' to try to continue despite this error. <br></font>`
         errorText += `<font color=${color}>Press 'F9' to suppress all future errors. (be carful using this)<br></font>`
