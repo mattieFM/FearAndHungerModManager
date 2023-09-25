@@ -88,7 +88,6 @@ MATTIE.betterCrowMauler.crowController = function () {
 /** @description whether this instance's crow mauler is dead */
 MATTIE.betterCrowMauler.crowController.prototype.isDead = function(){
     let bool = this.self.checkSelfSwitch("A");
-    console.log("isdead: "+bool);
     return bool;
 }
 

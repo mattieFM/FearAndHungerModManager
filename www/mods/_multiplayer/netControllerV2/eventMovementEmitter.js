@@ -14,6 +14,7 @@ Game_CharacterBase.prototype.moveStraight = function(d,callAnyways=false) {
                 }
                 let obj = {};
             
+                obj.mapId = this._mapId;
                 obj.id = this.eventId();
                 obj.x = this._x;
                 obj.y = this._y;

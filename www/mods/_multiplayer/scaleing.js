@@ -162,7 +162,6 @@ Game_Map.prototype.checkPassage = function(x, y, bit) {
         let netCont = MATTIE.multiplayer.getCurrentNetController();
         let playerIds =Object.keys(netCont.netPlayers);
         for (let index = 0; index < playerIds.length; index++) {
-            console.log("here")
             /** @type {PlayerModel} */
             const netPlayer = netCont.netPlayers[playerIds[index]];
             if(netPlayer.$gamePlayer.x === x && netPlayer.$gamePlayer.y === y) return false

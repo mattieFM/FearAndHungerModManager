@@ -54,7 +54,6 @@ class ClientController extends BaseNetController {
     connect(hostId=this.hostId){
         if(!this.lastHostId) this.lastHostId = "";
         if(this.lastHostId.includes(hostId) && this.canTryToReconnect) {
-            console.log("last")
             this.reconnectAllConns();
             this.sendPlayerInfo();
             this.lastHostId = hostId;
