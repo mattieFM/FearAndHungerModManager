@@ -124,7 +124,8 @@ MATTIE.multiplayer.pvp.PvpController.setupCombat = function(actorIds){
     }
 
     $gameTroop.setupMultiCombat(troops, ()=>{
-        alert("on end")
+        //alert("on end")
+        console.log("on end");
     },()=>{
         console.log($gameTroop.members())
         $gameTroop.members().forEach(enemy=>{
