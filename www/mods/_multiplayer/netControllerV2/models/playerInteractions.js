@@ -82,7 +82,7 @@ MATTIE.multiplayer.conversations.prototype.nameSpeak = function(name,msg){
 MATTIE.multiplayer.conversations.prototype.talkOptionsCb = function(n){
     switch (n) {
         case 0: //Talk
-           this.nameSpeak("Mattie", "Hiya, im the dev, you can't talk yet XD. Eventually there will likely be flavor text for interactions between chars here. Or even a small in game chat functionality.")
+            this.greeting();
             break;
         case 1: //Trade
             this.nameSpeak("Mattie", "That feature isn't implemented. You can drop items to trade.")
@@ -95,7 +95,10 @@ MATTIE.multiplayer.conversations.prototype.talkOptionsCb = function(n){
             MATTIE.multiplayer.pvp.PvpController.emitCombatStartWith(this.targetPeerId);
             MATTIE.multiplayer.pvp.PvpController.startCombatWith(this.targetPeerId);
             break;
-        case 4: //Cancel
+        case 4: //Show Love
+            this.nameSpeak("Mattie", "That feature isn't implemented. You can drop items to trade.")
+            break;
+        case 5: //cancel
             break;
         default:
             break;
@@ -111,10 +114,11 @@ MATTIE.multiplayer.conversations.prototype.talkOptions = function(){
             "Trade",
             "Resurrect",
             "Attack",
+            "Show Love",
             "Cancel"
         ],
     0,
-    4,
+    5,
     (n)=>this.talkOptionsCb(n)
     ,"You talk to " + this.targetName)
 }

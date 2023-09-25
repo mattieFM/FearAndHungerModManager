@@ -509,9 +509,9 @@ MATTIE.static.update = function(){
             298, //call outfit check
             2434, //lord of flies outfit
             2980, //penance armor
-            //"3081-3085", //penance_1-5?
-            //3107, //penance1_6?
-            //3109, //assist_penance?
+            "3081-3085", //penance_1-5?
+            3107, //penance1_6?
+            3109, //assist_penance?
 
             //--------------------------------------------------------------------------
             //          Event Switches / Blocking Switches
