@@ -8,7 +8,7 @@
 var MATTIE = MATTIE || {};
 
 (()=>{
-    Input.addKeyBind('b', ()=>{
+    Input.addKeyBind('', ()=>{
         $gameTemp.reserveCommonEvent(152);
     }, "Blood Portal", 1);
 

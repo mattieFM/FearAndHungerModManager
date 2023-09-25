@@ -109,8 +109,9 @@ Input.checkScope = function(scope){
 
 
 const keys = {};
+let i = 12;
 Input.addKeyBind = function (key, cb, name ="", scope = 0) {
-    
+    if(!key) key = i.toString();
     if(name != ""){
         let tempFunc = Window_KeyConfig.prototype.actionKey;
         let tempFunc2 = Window_KeyAction.prototype.makeCommandList;
@@ -125,6 +126,7 @@ Input.addKeyBind = function (key, cb, name ="", scope = 0) {
             this.addCommand(name, 'ok', true, key);
         }
     }
+    i++;
 
     keys[name]={
         key: key,
