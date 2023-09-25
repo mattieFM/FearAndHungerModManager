@@ -46,6 +46,11 @@ Game_Event.prototype.start = function (){
     return MATTIE.multiplayer.spectate.start.call(this);
 }
 
+MATTIE.multiplayer.spectate.checkEventTriggerAuto = Game_Event.prototype.checkEventTriggerAuto;
+Game_Event.prototype.checkEventTriggerAuto = function() {
+    if(!MATTIE.multiplayer.isSpectator) MATTIE.multiplayer.spectate.checkEventTriggerAuto .call(this);
+};
+
 //make sure player can't somehow wind up back on normal map
 
 Scene_Map.prototype.initialize = function(){

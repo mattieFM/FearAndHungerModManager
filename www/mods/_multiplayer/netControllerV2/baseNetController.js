@@ -1032,10 +1032,13 @@ class BaseNetController extends EventEmitter {
     
     /** @emits ctrlSwitch */
     emitSwitchEvent(ctrlSwitch){
-        let obj = {};
-        obj.ctrlSwitch = ctrlSwitch
-        this.sendViaMainRoute(obj)
-        this.emit("ctrlSwitch", obj)
+        if(!MATTIE.static.maps.onMenuMap()){ 
+            //only send switches if not in a menu
+            let obj = {};
+            obj.ctrlSwitch = ctrlSwitch
+            this.sendViaMainRoute(obj)
+            this.emit("ctrlSwitch", obj)
+        }
     }
 
     
