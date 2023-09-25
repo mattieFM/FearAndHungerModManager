@@ -6,15 +6,15 @@ MATTIE.devTools = MATTIE.devTools || {};
 //
 (()=>{
 
-    Input.addKeyBind('p', ()=>{
+    Input.addKeyBind('', ()=>{
         SceneManager.push(MATTIE.scenes.Scene_Dev);
     }, "CHEAT (DEV)", 1)
 
-    Input.addKeyBind(';', ()=>{
+    Input.addKeyBind('', ()=>{
         SceneManager.push(Scene_Debug);
     }, "DEBUG (DEV)", -2)
 
-    Input.addKeyBind('m', ()=>{
+    Input.addKeyBind('', ()=>{
         SceneManager.push(MATTIE.scenes.Scene_Dev);
     }, "DEV MENU (DEV)", -2)
 
@@ -22,11 +22,11 @@ MATTIE.devTools = MATTIE.devTools || {};
 
     
 
-    Input.addKeyBind('2', ()=>{
+    Input.addKeyBind('', ()=>{
         SceneManager.onError(new Error("hiya im an error"))
     }, "THROW ERROR (DEV)", -2)
 
-    Input.addKeyBind('3', ()=>{
+    Input.addKeyBind('', ()=>{
         console.log("here")
         $gameSystem.enableMenu();
         $gameScreen.clearPictures();

@@ -8,9 +8,9 @@
 var MATTIE = MATTIE || {};
 
 (()=>{
-    Input.addKeyBind('b', ()=>{
+    Input.addKeyBind('', ()=>{
         $gameTemp.reserveCommonEvent(152);
-    }, "Blood Portal", 1);
+    }, "Blood Portal", 1, "b", "b");
 
     DataManager.changeActivationCondition(MATTIE.static.skills.bloodportal,2);
     DataManager.clearEffects(MATTIE.static.skills.bloodportal);

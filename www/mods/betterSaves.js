@@ -60,7 +60,7 @@ MATTIE.betterSaves = {};
         return false
     }
 
-    Input.addKeyBind('q', ()=>{
+    Input.addKeyBind('', ()=>{
         MATTIE.saves.suspendRun();
     }, "SuspendRun",1)
     
