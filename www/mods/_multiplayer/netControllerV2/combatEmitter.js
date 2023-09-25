@@ -140,7 +140,6 @@ Game_Action.prototype.preloadRng = function(targets){
 Game_Action.prototype.loadRng = function(results,id){
     this._id = id;
     this.targetResults = Object.assign(this.targetResults || {}, results)
-    console.log(this.targetResults);
 }
 
 Game_Action.prototype.getTargetResults = function(){
@@ -154,9 +153,7 @@ Game_Action.prototype.apply = function(target) {
 MATTIE.multiplayer.Game_Action_testApply = Game_Action.prototype.testApply;
 Game_Action.prototype.testApply = function(target) {
     let targets = this.getTargetResults();
-    console.log(targets);
     if(targets){
-        console.log(this.makeTargetResultsId(target))
         if(Object.keys(targets).includes(this.makeTargetResultsId(target))){
             if(target.result().forceHit)
             target.result().forceHit(targets[this.makeTargetResultsId(target)])

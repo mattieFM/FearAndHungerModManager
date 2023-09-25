@@ -140,6 +140,8 @@ Window_EquipItem.prototype.includes = function(item) {
 
 
 /**
+ * @override we override this method to return an empty bit map if one does not exist, that way if something calls this before the bit map is initialized
+ * it won't error and give time for this to init hopefully.
  * The bitmap used for the window contents.
  *
  * @property contents

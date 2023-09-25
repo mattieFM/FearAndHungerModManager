@@ -18,7 +18,6 @@ MATTIE.betterSaves = {};
 
     MATTIE.betterSaves.offload = function(){
         MATTIE.DataManager.global.set("migratedSaves", false);
-        console.log("offload")
     }
 
     MATTIE_ModManager.modManager.addOffloadScriptToMod(betterSavesName,MATTIE.betterSaves.offload)

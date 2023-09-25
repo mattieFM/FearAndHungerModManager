@@ -168,15 +168,15 @@ class BaseNetController extends EventEmitter {
             this.onTransferData(data.transfer,id)
         }
         if(data.ctrlSwitch){
-            if(SceneManager._scene.isActive())
+            if(SceneManager._scene.isActive() && MATTIE.multiplayer.varSyncer.syncedOnce)
             this.onCtrlSwitchData(data.ctrlSwitch, id)
         }
         if(data.cmd) {
-            //if(SceneManager._scene.isActive())
+            if(SceneManager._scene.isActive() && MATTIE.multiplayer.varSyncer.syncedOnce)
             this.onCmdEventData(data.cmd,data.id)
         }
         if(data.event){
-            if(SceneManager._scene.isActive())
+            if(SceneManager._scene.isActive() && MATTIE.multiplayer.varSyncer.syncedOnce)
             this.onEventMoveEventData(data.event)
         }
         if(data.battleStart){
@@ -383,7 +383,6 @@ class BaseNetController extends EventEmitter {
                         tempAction.isForAll()
                         partyAction = tempAction.isForAll();
                     }
-                    console.log(action);
                      //wether the action is targeting all members of the party
                    
                     /** @type {PlayerModel} */
@@ -451,7 +450,6 @@ class BaseNetController extends EventEmitter {
         let targetActor = $gameActors.actor(action.targetActorId);
         let legCut = false;
         let armCut = false;
-        console.log(action);
         /** @type {Game_Enemy} */
         let originalTarget = $gameTroop.members()[action._targetIndex];
         action.forcedTargets = [];
@@ -461,7 +459,6 @@ class BaseNetController extends EventEmitter {
             let targetActorIndex = 0;
             /** @type {Game_Enemy} */
             let battler = $gameTroop._additionalTroops[troopId].baseMembers()[2]; //just grab the first member for now
-            console.log(battler);
             actor.partyIndex = ()=>this.netPlayers[senderId].battleMembers().indexOf(actor); //just say thye go first for now to test
             action._netTarget = false;
             
@@ -523,7 +520,6 @@ class BaseNetController extends EventEmitter {
 
 
             if(armCut || legCut){
-                console.log("limb cut")
                 /** @type {rm.types.Effect} */
                 let effect = {};
                 effect.code = 21;
@@ -573,18 +569,21 @@ class BaseNetController extends EventEmitter {
      * 2: down
      */
     emitMoveEvent(direction,x=undefined,y=undefined,transfer=false) {
-        this.emit("moveEvent",direction,x,y,transfer);
-        let obj = {};
-        obj.move = {};
-        obj.move.d = direction;
-        if(x){
-            obj.move.x = x;
-            obj.move.y = y;
+        if(!MATTIE.static.maps.onMenuMap()){ //only fire move event if not in menu
+            this.emit("moveEvent",direction,x,y,transfer);
+            let obj = {};
+            obj.move = {};
+            obj.move.d = direction;
+            if(x){
+                obj.move.x = x;
+                obj.move.y = y;
+            }
+            if(transfer){
+                obj.move.t=true
+            }
+            this.sendViaMainRoute(obj)
         }
-        if(transfer){
-            obj.move.t=true
-        }
-        this.sendViaMainRoute(obj)
+        
     }
 
     /**
@@ -923,10 +922,8 @@ class BaseNetController extends EventEmitter {
      * @emits updateNetPlayers
      */
     onUpdateNetPlayersData(netPlayers, id){
-        console.log("update net players")
         this.updateNetPlayers(netPlayers)
         this.updateNetPlayerFollowers(netPlayers);
-        this.emit('updateNetPlayers', netPlayers);
     }
 
     /** updates net players
@@ -1004,18 +1001,21 @@ class BaseNetController extends EventEmitter {
 
         onEventMoveEventData(eventData){
             /** @type {Game_Event} */
+            let mapId = eventData.mapId;
             let event = $gameMap.event(eventData.id);
             if(event){
-                if(Math.abs(event._x - eventData.x) > 2 || Math.abs(event._y - eventData.y) > 2){
-                    //event.processMoveCommand(eventData,false,true);
-                    event.setTransparent(false)
-                    event._x = eventData.x;
-                    event._y = eventData.y;
-                    event._realX = eventData.realX
-                    event._realY = eventData.realY
-                    event.update()
-                } 
-                event.moveStraight(eventData.d,true)
+                if(mapId ===  $gameMap.mapId()){
+                    if(Math.abs(event._x - eventData.x) > 2 || Math.abs(event._y - eventData.y) > 2){
+                        //event.processMoveCommand(eventData,false,true);
+                        event.setTransparent(false)
+                        event._x = eventData.x;
+                        event._y = eventData.y;
+                        event._realX = eventData.realX
+                        event._realY = eventData.realY
+                        event.update()
+                    } 
+                    event.moveStraight(eventData.d,true)
+                }
             }
             
 
@@ -1086,13 +1086,11 @@ class BaseNetController extends EventEmitter {
                 MATTIE.static.switch.syncedSwitches.forEach(id=>{
                     obj.syncedSwitches[id] = $gameSwitches.value(id);
                 })
-                console.log("host var sync sent")
                 this.sendViaMainRoute(obj)
                 this.emit("randomVars", obj)
                 MATTIE.multiplayer.varSyncRequested = false;
             }else{
                 setTimeout(() => {
-                    console.log("delayed")
                     this.emitUpdateSyncedVars();
                 }, 1000);
             }
@@ -1121,7 +1119,6 @@ class BaseNetController extends EventEmitter {
     onUpdateSyncedVarsData(syncedVars){
         MATTIE.multiplayer.varSyncer.shouldSync = false;
         MATTIE.multiplayer.varSyncer.syncedOnce = true;
-        console.log("client vars synced")
         Object.keys(syncedVars).forEach(id=>{
             let val = syncedVars[id];
             $gameVariables.setValue(id,val,true); //last var as true to skip net broadcast
@@ -1135,7 +1132,6 @@ class BaseNetController extends EventEmitter {
      onUpdateSyncedSwitchData(syncedSwitch){
         MATTIE.multiplayer.varSyncer.shouldSync = false;
         MATTIE.multiplayer.varSyncer.syncedOnce = true;
-        console.log("client vars synced")
         Object.keys(syncedSwitch).forEach(id=>{
             let val = syncedSwitch[id];
             $gameSwitches.setValue(id,val,true); //last var as true to skip net broadcast
@@ -1196,11 +1192,9 @@ class BaseNetController extends EventEmitter {
      * @param {*} equipChangeObj the net obj for equip change
      */
     onEquipmentChangeData(equipChangeObj, id){
-        console.log('equip chane data')
         let actorId = equipChangeObj.actorId;
         let itemSlot = equipChangeObj.itemSlot;
         let itemId = equipChangeObj.itemId;
-        console.log(this.netPlayers[id].$netActors.length());
         let actor =this.netPlayers[id].$netActors.baseActor(actorId);
         if(actor){
             if(itemSlot === 0){
@@ -1326,7 +1320,6 @@ class BaseNetController extends EventEmitter {
         obj.enemyState.enemyIndex = enemyIndex;
         obj.enemyState.addState = addState;
         obj.enemyState.stateId = stateId;
-        console.log("enemyStateEmit" + JSON.stringify(obj))
         this.sendViaMainRoute(obj);
         this.emit("enemyState");
     }
@@ -1359,7 +1352,6 @@ class BaseNetController extends EventEmitter {
      * @param {*} id sender id, make sure local player is in combat with this troop before doing anything
      */
     onEnemyStateEventData(enemyStateObj,id){
-        console.log("enemyStateData" + JSON.stringify(enemyStateObj))
         if($gameTroop.getIdsInCombatWithExSelf().includes(id)){
             let enemyIndex = enemyStateObj.enemyIndex;
             let addState = enemyStateObj.addState;
@@ -1470,7 +1462,6 @@ class BaseNetController extends EventEmitter {
      * @param {*} id the sender id
      */
     onSpectateEventData(spectateObj,id){
-        console.log("spectate event data")
         let bool = spectateObj.val;
         let spectatorId = spectateObj.id;
         if(spectatorId === this.peerId){

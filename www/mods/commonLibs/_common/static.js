@@ -236,6 +236,8 @@ MATTIE.static.update = function(){
             //hexen control vars
             [53,280,"A"], 
             [39,332,"A"],
+            //char creation menu switches
+            [10,1,"A"],
         ]
         MATTIE.static.switch.ignoredSelfSwitches = MATTIE.static.switch.ignoredSelfSwitches.map(arr=>JSON.stringify(arr));
 
@@ -418,6 +420,11 @@ MATTIE.static.update = function(){
             //-------------------------------------------------------
             //          Menu Switches
             //-------------------------------------------------------
+            242, //knight select
+            243, //dark preist select
+            246, //merc select
+            244, //out lander select
+
             "5-8", //probably char creation switches
             "213-214", //more menus
             "295-296", //intro

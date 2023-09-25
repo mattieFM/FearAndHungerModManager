@@ -41,7 +41,6 @@ MATTIE.multiplayer.spectate.start = Game_Event.prototype.start;
 Game_Event.prototype.start = function (){
     var list = this.list().map(ev=>ev.code);
     if(MATTIE.multiplayer.isSpectator) {
-        console.log(list);
         if(!list.includes(201)) return
     }
     return MATTIE.multiplayer.spectate.start.call(this);

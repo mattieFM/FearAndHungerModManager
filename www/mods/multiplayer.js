@@ -143,7 +143,6 @@ MATTIE.multiplayer.getCurrentNetController = ()=>{
     MATTIE.menus.mainMenu.removeBtnFromMainMenu("Continue","continue");
     MATTIE.menus.mainMenu.removeBtnFromMainMenu("New Game","newgame");
     MATTIE.menus.mainMenu.removeBtnFromMainMenu("Continue Suspended Run","suspend");
-    console.log("Multiplayer Init")
 
     
 
