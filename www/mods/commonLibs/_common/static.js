@@ -25,6 +25,7 @@ MATTIE.static.commands.selfSwitch = 123;
 //maps
 
 MATTIE.static.maps.menuMaps = [];
+MATTIE.static.maps.charCreationMap = 0;
 //items
 MATTIE.static.items.emptyScroll = null;
 MATTIE.static.items.icons = {};
@@ -164,6 +165,7 @@ MATTIE.static.events.images.coin = MATTIE.static.events.images.shiny;
 //Functions
 /** @description check if the player is on a menu map */
 MATTIE.static.maps.onMenuMap = () => MATTIE.static.maps.menuMaps.includes($gameMap.mapId())
+MATTIE.static.maps.onStartMap = () => MATTIE.static.maps.charCreationMap == $gameMap.mapId();
 
 
 //Update Function
@@ -214,6 +216,8 @@ MATTIE.static.update = function(){
 
 
         ]
+        MATTIE.static.maps.charCreationMap = 10;
+
         MATTIE.static.maps.menuMaps = MATTIE.static.rangeParser(MATTIE.static.maps.menuMaps);
 
 
@@ -900,6 +904,7 @@ MATTIE.static.update = function(){
             //---------------------------
             //God Affinities
             //---------------------------
+            3509, //orgy
             "2169-2172", //allmer and sylvian and grogorth god statue controll switches
             1397, //sylvian god statue
             1396, //goroth statue 
@@ -920,6 +925,7 @@ MATTIE.static.update = function(){
             //---------------------------
             //God Affinities
             //---------------------------
+            33, //orgy var (love corner)
             "35-38", //GOD Vars... GROGAROTH_VAR
             79, //god of the depths var 2
             "162-165", //more affinities... Afinity_God
