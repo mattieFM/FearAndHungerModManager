@@ -90,7 +90,8 @@ MATTIE.betterSaves = {};
                         var name = JSON.stringify($gameParty.leader().name);
                         
                         globalInfo[index].difficulty=diff;
-                        globalInfo[index].name=name.replace("\"","").replace("\"","");
+                        if(name) globalInfo[index].name=name.replace("\"","").replace("\"","");
+                        else globalInfo[index].name="";
                     }
                     
                 }
