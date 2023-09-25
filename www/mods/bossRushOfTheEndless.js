@@ -53,6 +53,7 @@ MATTIE.bossRush =  MATTIE.bossRush || {};
 
     /** @description the method to handle the boss rush functionality */
     function rush(){
+        MATTIE.bossRush.currentFightIndex = 0; //reset rush
         if(!$gameParty.leader().isDead() && !(SceneManager._scene instanceof Scene_Gameover)){
             startNextFight(()=>{
                 $gameMessage.clear();
@@ -78,87 +79,6 @@ MATTIE.bossRush =  MATTIE.bossRush || {};
         
     }
     
-
-    /**
-     * @description start a fight arr and call a callback when fight ends
-     * @param {*} the array of all troops in the fight
-     * @param {*} cb the callback to call when the fight ends
-     */
-    function startFight(arr,cb=()=>{}){
-        BattleManager.setCantStartInputting(true);
-
-        if($gameParty.leader().hasSkill(MATTIE.static.skills.enGarde.id)){
-            $gameSwitches.setValue(MATTIE.static.switch.backstab,true);
-        }
-        let roundIds = arr;
-        let first = 142
-        BattleManager.setup(first, false, true);
-        
-        $gamePlayer.makeEncounterCount();
-        SceneManager.push(Scene_Battle);
-        
-        setTimeout(() => {
-            if($gameParty.leader().hasSkill(MATTIE.static.skills.enGarde.id)){
-                $gameSwitches.setValue(MATTIE.static.switch.backstab,false);
-                MATTIE.msgAPI.footerMsg("True Ambush Round --All Enemies cannot attack this round.")
-            }
-            setTimeout(() => {
-                /** @type {Game_Enemy} */
-            let spider = $gameTroop.baseMembers()[0]
-
-
-            spider.performDamage();
-            spider.die();
-            
-            spider.hide();
-            
-                for (let index = 0; index < roundIds.length; index++) {
-                    const additionalId = roundIds[index];
-                    let additionalTroop = new MATTIE.troopAPI.runtimeTroop(additionalId);
-                    switch (additionalId) {
-                        case MATTIE.static.troops.skinGrannyId:
-                            //skin granny needs this to be false for her to transform
-                            additionalTroop.setSwitchValue(1807,false)
-                            break;
-                    
-                        default:
-                            break;
-                    }
-        
-                    additionalTroop.spawn();
-                }  
-                setTimeout(() => {
-                    if($gameParty.leader().hasSkill(MATTIE.static.skills.enGarde.id)){
-                        $gameVariables.setValue(19,-1)
-                        $gameTroop.forEachAdditionalTroop(troop=>{
-                            troop.setVariableValue(19,-1)
-                            troop.baseMembers().forEach(enemy=>{
-                                enemy.addState(MATTIE.static.states.cantDoShitOnce); //add cant do shit one turn
-                            })
-                        })                        
-                        //$gameSwitches.setValue(MATTIE.static.switch.backstab,true);
-                    }else{
-                        $gameVariables.setValue(19,0)
-                        $gameTroop.forEachAdditionalTroop(troop=>{
-                            troop.setVariableValue(19,0)
-                        })        
-
-                    }
-                   BattleManager.setCantStartInputting(false);
-                   BattleManager.setEventCallback(function(n) {
-                    cb();
-                    }.bind(this));
-                }, 500);
-            }, 500);
-            
-                
-                
-
-        }, 3000);
-        
-        
-    }
-
     function falseGodEnding(){
         $gameSystem.disableMenu();
                         MATTIE.fxAPI.deleteImage(1);

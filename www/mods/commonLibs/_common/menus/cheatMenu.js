@@ -100,7 +100,8 @@ MATTIE.windows.Window_CheatItem.prototype.setCategory = function(category) {
 MATTIE.windows.Window_CheatItem.prototype.makeItemList = function() {
     let allItems = MATTIE.windows.Window_CheatItem.allItems();
     this._data = allItems.filter(function(item) {
-        return this.includes(item);
+        if(this) return this.includes(item);
+        else return false;
     }, this);
     if (this.includes(null)) {
         this._data.push(null);

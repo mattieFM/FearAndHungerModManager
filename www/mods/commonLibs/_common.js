@@ -109,14 +109,45 @@ Input.checkScope = function(scope){
 
 
 const keys = {};
-Input.addKeyBind = function (key, cb, name ="", scope = 0) {
+let i = 128;
+/**
+ * 
+ * @param {*} key (optional) always bind to this key on boot
+ * @param {*} cb the call back to run
+ * @param {*} name the name of this command 
+ * @param {*} scope the scope of this command
+ * @param {*} wasdDefualt the default key in wasd layout
+ * @param {*} defaultKey the default key in defualt layout
+ */
+Input.addKeyBind = function (key, cb, name ="", scope = 0, wasdDefualt = null, defaultKey = null) {
+    if(typeof key === 'number') key = String.fromCharCode(key);
     
+    if(typeof defaultKey === 'number') key = String.fromCharCode(defaultKey);
+    if(!key) key = String.fromCharCode(i);
+
+    //setup default keybinds
+    if(wasdDefualt) {
+        if(typeof wasdDefualt != 'number'){
+            ConfigManager.wasdMap[wasdDefualt.toUpperCase().charCodeAt(0)] = wasdDefualt; 
+        }else{
+            ConfigManager.wasdMap[wasdDefualt] = String.fromCharCode(wasdDefualt); 
+        }
+       
+    }
+    if(defaultKey) {
+        if(typeof defaultKey != 'number'){
+            ConfigManager.defaultMap[defaultKey.toUpperCase().charCodeAt(0)] = defaultKey; 
+        }else{
+            ConfigManager.defaultMap[defaultKey] = String.fromCharCode(defaultKey); 
+        }
+    }
+
     if(name != ""){
         let tempFunc = Window_KeyConfig.prototype.actionKey;
         let tempFunc2 = Window_KeyAction.prototype.makeCommandList;
         //this is so that keys can be rebound
         Window_KeyConfig.prototype.actionKey = function(action) {
-            if(action === key) return name;
+            if(action === key || action == wasdDefualt || action == defaultKey) return name;
             return tempFunc.call(this,action);
         }
         //this is so that keys can be rebound
@@ -125,6 +156,7 @@ Input.addKeyBind = function (key, cb, name ="", scope = 0) {
             this.addCommand(name, 'ok', true, key);
         }
     }
+    i++;
 
     keys[name]={
         key: key,

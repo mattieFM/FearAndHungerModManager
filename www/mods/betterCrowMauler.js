@@ -9,15 +9,15 @@ if(!MATTIE_ModManager.modManager.checkMod("multiplayer")) MATTIE.betterCrowMaule
 //----------------------------------------------------------------------
 // Key Binds
 //----------------------------------------------------------------------
-Input.addKeyBind("x",()=>{
+Input.addKeyBind("",()=>{
     MATTIE.betterCrowMauler.crowCont.enter();
 },"spawn crow (DEV)",-2);
 
-Input.addKeyBind("c",()=>{
+Input.addKeyBind("",()=>{
     MATTIE.betterCrowMauler.crowCont.despawn();
 },"despawn crow (DEV)",-2);
 
-Input.addKeyBind("r",()=>{
+Input.addKeyBind("",()=>{
     let additionalTroop = new MATTIE.troopAPI.runtimeTroop(170, 0, 0)
     additionalTroop.spawn();
     
