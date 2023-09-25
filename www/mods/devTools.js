@@ -8,7 +8,7 @@ MATTIE.devTools = MATTIE.devTools || {};
 
     Input.addKeyBind('', ()=>{
         SceneManager.push(MATTIE.scenes.Scene_Dev);
-    }, "CHEAT (DEV)", 1)
+    }, "CHEAT", 1, "p", "p")
 
     Input.addKeyBind('', ()=>{
         SceneManager.push(Scene_Debug);
