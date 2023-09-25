@@ -546,6 +546,8 @@ MATTIE.static.update = function(){
             "3463-3479", //misasma scenes
             "3481-3503", //more misasma scenes
 
+            118, //elevator fall scene auto run swithc
+            116, //above ^^
             724, //moonless joining
              //fallscenes 
             "2341-2342",
@@ -706,7 +708,6 @@ MATTIE.static.update = function(){
             //door switches
             58,
             116,
-            118,
             647,
             659,
             806,
