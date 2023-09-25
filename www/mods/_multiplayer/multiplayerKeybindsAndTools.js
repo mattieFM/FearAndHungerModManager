@@ -57,3 +57,12 @@ Input.addKeyBind('z', async ()=>{
     SceneManager.goto(Scene_Gameover)
 
 }, "die (DEV)",-2)
+
+Input.addKeyBind('j', async ()=>{
+    setTimeout(() => {
+        MATTIE.msgAPI.displayMsg("test")
+    }, 500);
+    MATTIE.msgAPI.displayMsg("test")
+
+}, "sendMsg (DEV)",-2)
+
