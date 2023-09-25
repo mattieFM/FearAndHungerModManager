@@ -123,6 +123,7 @@ MATTIE.multiplayer.gamePlayer.override = function() {
             MATTIE.emitTransfer();
             MATTIE.multiplayer.setEnemyHost();
             MATTIE.multiplayer.getCurrentNetController().updatePlayersOnCurrentMap();
+            $gamePlayer.setTransparent(false); //make sure the player is not transparent
         }
     }
 
