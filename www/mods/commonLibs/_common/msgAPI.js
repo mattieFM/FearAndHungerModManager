@@ -27,7 +27,7 @@ MATTIE.msgAPI.displayMsgWithTitle = function(title,msg){
  * 1 is middle
  * default is 2.
  */
-MATTIE.msgAPI.displayMsg = function(msg, background=2, pos=2){
+MATTIE.msgAPI.displayMsg = function(msg, background=0, pos=2){
     $gameMessage.setBackground(background);
     $gameMessage.setPositionType(pos);
     $gameMessage.add(msg);
