@@ -462,6 +462,7 @@ MATTIE.static.update = function(){
             //--------------------------------------------------------------------------
             //          Weird Switches (That probably should be ignored)
             //--------------------------------------------------------------------------
+            1996, //not in use switch, seems to handle some autorun blocking events
             41, //"disabled" switch. This has something to do with movement speed so it should not be forwarded
             80, //"Wizard Summon" something with nzashra probably?
             126, //"Shielding1"
@@ -527,6 +528,9 @@ MATTIE.static.update = function(){
             //--------------------------------------------------------------------------
             //          Event Switches / Blocking Switches
             //--------------------------------------------------------------------------
+            "2970-2972", //rat buckman scene
+            800, //return from mehabre after using passages
+            41, //disabled //unable to move --quit breathing
             127, //"PrisonRape" probably handles the guard rape scene, so shouldn't be forwarded
             "136-138", //"MercTorture" probably handles torturer capturing merc.
             229, //"LoveCornerMercenary" not sure, but sounds like it might be blocking
@@ -549,7 +553,9 @@ MATTIE.static.update = function(){
             2837, //enki burning?
             2839, //ragn burning?
             //2901, //dogs?
-            "2968-2969", //turture hiding/ambush event
+            1044, //backstab scene
+            2961, //turture scene 1 (called on first encounter with turturer)
+            "2967-2969", //turture hiding/ambush event
             "3261-3272", //fear talk events?
             "3281-3291", //more fear scenes?
             "3301-3347", //Captain_Spot1... Cahara_Spot1... more fear scenes?
@@ -557,7 +563,7 @@ MATTIE.static.update = function(){
             "3463-3479", //misasma scenes
             "3481-3503", //more misasma scenes
             979, //enki attacking. (autorun event when enki attack)
-
+            338, //night lerch leap
             118, //elevator fall scene auto run swithc
             116, //above ^^
             724, //moonless joining
