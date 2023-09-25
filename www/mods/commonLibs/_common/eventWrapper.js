@@ -38,7 +38,7 @@ class MapEvent {
             id: id,
             name: "EV" + id.padZero(3),
             note: "",
-            /** @type {rm.types.Page[]} */
+            /** @type {rm.types.EventPage[]} */
             pages: [],
             x: 0,
             y: 0,
@@ -75,7 +75,15 @@ class MapEvent {
      * Add a new page for the event's actions.
      */
     addPage() {
-        this.data.pages.push({
+        this.data.pages.push(this.setDefaultPage());
+    }
+
+    /**
+     * 
+     * @returns the default page objectt
+     */
+    setDefaultPage(){
+        return {
             conditions: this.setDefaultConditions(),
             directionFix: true,
             image: MapEvent.setDefaultImage(),
@@ -89,7 +97,7 @@ class MapEvent {
             through: false,
             trigger: 0,
             walkAnime: true
-        });
+        }
     }
 
     /**
@@ -185,8 +193,19 @@ class MapEvent {
      * @param {*} pageId the id of the page to add the command to
      * @param {*} route the id of the action
      */
-    addMoveRoute(pageId, route, wait){
-        this.addCommand(pageId,205,[0, {"list":route,"wait":wait}]);
+    addMoveRoute(pageId, moveCode, wait){
+        this.addCommand(pageId,205,[0, {"list":[{"code":moveCode,"indent":null},{"code":0}],"wait":wait}]);
+    }
+
+    /**
+     * 
+     * @param {*} pageId the page Id to add the command to
+     * @param {*} tint the tint object
+     * @param {*} frames who many frames to tint for
+     */
+    addTintScreen(pageId,tint,frames,wait){
+        console.log([tint,frames,wait])
+        this.addCommand(pageId,223,[tint,frames,wait]);
     }
 
     /**

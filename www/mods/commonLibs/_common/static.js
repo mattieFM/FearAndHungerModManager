@@ -27,6 +27,7 @@ MATTIE.static.commands.selfSwitch = 123;
 MATTIE.static.maps.menuMaps = [];
 MATTIE.static.maps.charCreationMap = 0;
 MATTIE.static.maps.startMap = 0;
+MATTIE.static.maps.fortress = 74;
 //items
 MATTIE.static.items.emptyScroll = null;
 MATTIE.static.items.icons = {};

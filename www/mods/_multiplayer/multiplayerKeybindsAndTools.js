@@ -27,14 +27,24 @@ Input.addKeyBind('n', ()=>{
     $gamePlayer.reserveTransfer(mapId,x,y, 0, 2);
     setTimeout(() => {
         $gamePlayer.performTransfer();
-    }, 100);
+    }, 250);
     
 
 }, "TP", 0)
 
+Input.addKeyBind('', ()=>{
+    //teleport the player to the fortress
+    $gamePlayer.reserveTransfer(MATTIE.static.maps.fortress,15,11, 0, 2);
+    setTimeout(() => {
+        $gamePlayer.performTransfer();
+    }, 250);
+    
+
+}, "TP TO SPAWN", 0)
 
 
-Input.addKeyBind('v', async ()=>{
+
+Input.addKeyBind('', async ()=>{
     let torturer = new MATTIE.actorAPI.Data_Actor_Wrapper();
     torturer.buildDataActorFromEventAndTroop(await MATTIE.eventAPI.getEventOnMap(132,3), $dataTroops[17])//add turturer as actor
     torturer.create();
@@ -53,14 +63,14 @@ Input.addKeyBind('v', async ()=>{
 }, "addActor (DEV)",-2)
 
 
-Input.addKeyBind('z', async ()=>{
+Input.addKeyBind('', async ()=>{
     SceneManager.goto(Scene_Gameover)
 
 }, "die (DEV)",-2)
 
-// Input.addKeyBind('j', async ()=>{
-//     console.log("tried to marraige")
-//     MATTIE.eventAPI.marriageAPI.displayMarriage(1,3,false,$gamePlayer.x,$gamePlayer.y);
+Input.addKeyBind('', async ()=>{
+    console.log("tried to marraige")
+    MATTIE.eventAPI.marriageAPI.displayMarriage(1,3,true,$gamePlayer.x,$gamePlayer.y);
 
-// }, "sendMsg (DEV)",-2)
+}, "sex (DEV)",-2)
 

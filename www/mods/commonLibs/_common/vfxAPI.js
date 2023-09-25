@@ -34,10 +34,21 @@ Game_Screen.prototype.updateTone = function(){
 }
 
 MATTIE.fxAPI.setupTint = function(red, green, blue, gray, framesDur){
-    var tint = [red, green,
-        blue, gray];
+    let tint = this.formatTint(red,green,blue,grey)
     $gameScreen.startTint(tint,framesDur)
     $gameScreen.forceTint(true);
+}
+/**
+ * 
+ * @param {*} red the red value
+ * @param {*} green the green value
+ * @param {*} blue the blue value
+ * @param {*} grey the grey value
+ * @returns formatted tint obj
+ */
+MATTIE.fxAPI.formatTint = function(red,green, blue, grey) {
+    var tint = [red, green, blue, grey];
+    return tint;
 }
 
 MATTIE.fxAPI.startScreenShake = function(intensity, speed, duration){

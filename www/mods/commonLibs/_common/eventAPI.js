@@ -263,6 +263,7 @@ MATTIE.eventAPI.marriageAPI.displaySex = function(actorId1,actorId2, x, y, spawn
     marriage.data.pages[0].conditions = marriage.setDefaultConditions();
     marriage.data.pages[0].trigger = 0;
     marriage.data.pages[0].list = [];
+    marriage.data.pages[0].directionFix =true
     marriage.addSpokenText(0,"[Intense Moaning]", $gameActors.actor(actorId1).name() + " & " + $gameActors.actor(actorId2).name())
     marriage.addText(0,"Best not to interrupt them.")
 
@@ -284,13 +285,53 @@ MATTIE.eventAPI.marriageAPI.displaySex = function(actorId1,actorId2, x, y, spawn
  * @returns {MapEvent} the map event that was created
  */
 MATTIE.eventAPI.marriageAPI.displayMarriage = function(actorId1,actorId2, success, x, y){
+    //up is failed marriage 
+    //left starts to merge
+    //right is sex
+    //down is mostly merged
     let sexEvent = this.displaySex(actorId1,actorId2,x,y, false);
+  
     sexEvent.data.pages[0].list = [];
     sexEvent.data.pages[0].trigger = 4;
- 
-    sexEvent.addMoveRoute(0,[Game_Character.ROUTE_TURN_DOWN, true])
-    sexEvent.addWait(0, 90);
+    sexEvent.data.pages[0].directionFix =false
 
+    //failed marriage commands
+    if(!success){
+        sexEvent.data.pages[1] = JsonEx.makeDeepCopy(sexEvent.data.pages[0]);
+        
+        sexEvent.addSpokenText(1,"Whheeezee....","Amalgam of Flesh");
+        
+    } else{
+        sexEvent.addPage();
+    }
+
+    sexEvent.data.pages[1].conditions = sexEvent.setDefaultConditions();
+    sexEvent.data.pages[1].conditions.selfSwitchValid=true;
+    sexEvent.data.pages[1].directionFix = true
+    sexEvent.data.pages[1].trigger = 0;
+    
+    
+ 
+    //marriage commands
+    sexEvent.addMoveRoute(0,Game_Character.ROUTE_TURN_RIGHT, true);
+    sexEvent.addWait(0, 90);
+    sexEvent.addTintScreen(0, MATTIE.fxAPI.formatTint(-155,-155,-155,0), 40,  true)
+    sexEvent.addMoveRoute(0,Game_Character.ROUTE_TURN_LEFT, true);
+    sexEvent.addWait(0, 90);
+    sexEvent.addTintScreen(0, MATTIE.fxAPI.formatTint(-155,-155,-155,0), 40,  true)
+    sexEvent.addMoveRoute(0,Game_Character.ROUTE_TURN_DOWN, true);
+    sexEvent.addWait(0, 90);
+    sexEvent.addTintScreen(0, MATTIE.fxAPI.formatTint(-255,-255,-255,0), 70,  true)
+    if(!success){
+        
+        sexEvent.addMoveRoute(0,Game_Character.ROUTE_TURN_UP, true);
+    }
+    sexEvent.addWait(0, 90);
+    sexEvent.addTintScreen(0, MATTIE.fxAPI.formatTint(-255,-255,-255,0), 70,  false)
+    sexEvent.addWait(0, 35);
+    sexEvent.addCommand(0,123,["A",0]) //set self switch
+
+    
 
     sexEvent.spawn(x,y)
 }
