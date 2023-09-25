@@ -275,6 +275,7 @@ MATTIE.items.runTimeItem = class {
     spawn (){
         MATTIE.items.runtimeItems.push(this);
         $dataItems[this._data.id] = this._data;
+        if(DataManager.processItemCategoriesNotetags1) DataManager.processItemCategoriesNotetags1([null,this._data]) //termina compatability
         DataManager.setCallbackOnItem(this._data.id,this.cb);
     }
 
