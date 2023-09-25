@@ -18,6 +18,9 @@ setInterval(() => {
 
 
 Scene_Map.prototype.onMapLoaded = function () {
+    setTimeout(()=>{
+        MATTIE.multiplayer.hasLoadedVars = true;
+    }, MATTIE.multiplayer.varSyncer.syncEveryx)
     MATTIE.multiplayer.varSyncer.onMapLoaded.call(this);
     if(!MATTIE.static.maps.onMenuMap()){
         setTimeout(()=>{

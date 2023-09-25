@@ -12,10 +12,8 @@ MATTIE.eventAPI.addItemDropToCurrentMap = function(item){
     event.addPage();
     event.data.pages[1].conditions.selfSwitchValid=true;
     event.setImage(0, MATTIE.static.events.images.shiny());
-    event.addCommand(0,101,["", 0, 0, 2]);
-    event.addCommand(0,401,["There is something shining here...."]);
-    event.addCommand(0,101,["", 0, 0, 2]);
-    event.addCommand(0,401,["You find... A " + itemObj.name]);
+    event.addText(0,"There is something shining here....");
+    event.addText(0,"You find... A " + itemObj.name);
     if(item.isArmor()) event.addCommand(0,128,[itemObj.id,0,0,1]); //give armor
     else if (item.isWeapon()) event.addCommand(0,127,[itemObj.id,0,0,1]); //give weapon
     else event.addCommand(0,126,[itemObj.id,0,0,1]); //give item
@@ -206,4 +204,93 @@ MATTIE.eventAPI.createEnemyFromExisting = function(mapId, eventId, alivePageId, 
 
 MATTIE.eventAPI.removePersistingEvent = function(eventId) {
     delete MATTIE.eventAPI.dataEvents[eventId];
+}
+
+
+MATTIE.eventAPI.marriageAPI = {};
+/**
+ * @description display sex between the two actors specified (will default to Cahara+Enki if a solution cannot be found)
+ * @param {*} actorId1 the id of the first actor
+ * @param {*} actorId2 the id of the second actor
+ * @param {*} x the x pos on the map to display the sex 
+ * @param {*} y the y pos on the map to display the sex
+ * @returns {MapEvent} the map event that was created
+ */
+MATTIE.eventAPI.marriageAPI.displaySex = function(actorId1,actorId2, x, y, spawn=true){
+    let marriage = new MapEvent();
+    marriage.copyActionsFromEventOnMap(84,1); //copy event from the first room ritual circle
+    /** @description a dict mapping the actor index to the page index that the game uses for this marriage */
+
+    //map all ghouls to be id 16
+    let ghoulIds = [16,17,18];
+    if(ghoulIds.includes(actorId1)) actorId1 = 16;
+    if(ghoulIds.includes(actorId2)) actorId2 = 16;
+
+    let mappings = [
+        {"id1":1,"id2":16,"pageIndex":5}, //merc ghoul
+        {"id1":3,"id2":16,"pageIndex":6}, //knight ghoul
+        {"id1":4,"id2":16,"pageIndex":7}, //priest ghoul
+        {"id1":5,"id2":16,"pageIndex":8}, //outlander ghoul
+        {"id1":9,"id2":16,"pageIndex":10}, //marriage ghoul
+
+        {"id1":3,"id2":6,"pageIndex":11}, //knight legarde
+        {"id1":1,"id2":3,"pageIndex":12}, //knight merc
+        {"id1":5,"id2":3,"pageIndex":13}, //outlander knight
+        {"id1":1,"id2":5,"pageIndex":14},  //outlander merc
+        {"id1":1,"id2":6,"pageIndex":15}, //legard merc
+
+        {"id1":9,"id2":1,"pageIndex":16},  //marriage merc
+        {"id1":1,"id2":4,"pageIndex":17}  //marriage merc
+    ]
+    
+    let findMapping = function(id1,id2){
+        let defaultMapping = mappings[11];
+        for (let index = 0; index < mappings.length; index++) {
+            const element = mappings[index];
+            if((element.id1 == id1 && element.id2 == id2)||(element.id2 == id1 && element.id1 == id2)){
+                return element
+            }
+            
+        }
+        return defaultMapping;
+    }
+
+    let mapping = findMapping(actorId1,actorId2);
+
+    //set to only have the one page that we want
+    marriage.data.pages = [marriage.data.pages[mapping.pageIndex]];
+
+    marriage.data.pages[0].conditions = marriage.setDefaultConditions();
+    marriage.data.pages[0].trigger = 0;
+    marriage.data.pages[0].list = [];
+    marriage.addSpokenText(0,"[Intense Moaning]", $gameActors.actor(actorId1).name() + " & " + $gameActors.actor(actorId2).name())
+    marriage.addText(0,"Best not to interrupt them.")
+
+    if(spawn)
+    marriage.spawn(x,y);
+
+    return marriage;
+    
+}
+
+
+/**
+ * @description display a marriage (will default to Cahara+Enki if a solution cannot be found)
+ * @param {int} actorId1 the id of the first actor
+ * @param {int} actorId2 the id of the second actor
+ * @param {bool} success whether the marriage is successful or failed
+ * @param {int} x the x pos on the map to display the marriage 
+ * @param {int} y the y pos on the map to display the marriage
+ * @returns {MapEvent} the map event that was created
+ */
+MATTIE.eventAPI.marriageAPI.displayMarriage = function(actorId1,actorId2, success, x, y){
+    let sexEvent = this.displaySex(actorId1,actorId2,x,y, false);
+    sexEvent.data.pages[0].list = [];
+    sexEvent.data.pages[0].trigger = 4;
+ 
+    sexEvent.addMoveRoute(0,[Game_Character.ROUTE_TURN_DOWN, true])
+    sexEvent.addWait(0, 90);
+
+
+    sexEvent.spawn(x,y)
 }

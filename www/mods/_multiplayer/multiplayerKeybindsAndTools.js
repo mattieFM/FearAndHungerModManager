@@ -58,11 +58,9 @@ Input.addKeyBind('z', async ()=>{
 
 }, "die (DEV)",-2)
 
-Input.addKeyBind('j', async ()=>{
-    setTimeout(() => {
-        MATTIE.msgAPI.displayMsg("test")
-    }, 500);
-    MATTIE.msgAPI.displayMsg("test")
+// Input.addKeyBind('j', async ()=>{
+//     console.log("tried to marraige")
+//     MATTIE.eventAPI.marriageAPI.displayMarriage(1,3,false,$gamePlayer.x,$gamePlayer.y);
 
-}, "sendMsg (DEV)",-2)
+// }, "sendMsg (DEV)",-2)
 
