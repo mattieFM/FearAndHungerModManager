@@ -85,7 +85,7 @@ MATTIE.multiplayer.conversations.prototype.talkOptionsCb = function(n){
             this.greeting();
             break;
         case 1: //Trade
-            this.nameSpeak("Mattie", "That feature isn't implemented. You can drop items to trade.")
+            this.nameSpeak("Mattie", "That feature isn't implemented. \nYou can drop items to trade.")
             break;
         case 2: //Resurrect
             this.resurrect();
@@ -96,7 +96,7 @@ MATTIE.multiplayer.conversations.prototype.talkOptionsCb = function(n){
             MATTIE.multiplayer.pvp.PvpController.startCombatWith(this.targetPeerId);
             break;
         case 4: //Show Love
-            this.nameSpeak("Mattie", "That feature isn't implemented. You can drop items to trade.")
+            MATTIE.eventAPI.marriageAPI.displayMarriage($gameParty.leader().actorId(),this.target.$gamePlayer.actorId,true,$gamePlayer.x,$gamePlayer.y);
             break;
         case 5: //cancel
             break;
