@@ -26,6 +26,7 @@ MATTIE.static.commands.selfSwitch = 123;
 
 MATTIE.static.maps.menuMaps = [];
 MATTIE.static.maps.charCreationMap = 0;
+MATTIE.static.maps.startMap = 0;
 //items
 MATTIE.static.items.emptyScroll = null;
 MATTIE.static.items.icons = {};
@@ -165,8 +166,8 @@ MATTIE.static.events.images.coin = MATTIE.static.events.images.shiny;
 //Functions
 /** @description check if the player is on a menu map */
 MATTIE.static.maps.onMenuMap = () => MATTIE.static.maps.menuMaps.includes($gameMap.mapId())
-MATTIE.static.maps.onStartMap = () => MATTIE.static.maps.charCreationMap == $gameMap.mapId();
-
+MATTIE.static.maps.onStartMap = () => MATTIE.static.maps.startMap == $gameMap.mapId();
+MATTIE.static.maps.onCharCreateMap = () => MATTIE.static.maps.charCreationMap == $gameMap.mapId();
 
 //Update Function
 
@@ -216,7 +217,8 @@ MATTIE.static.update = function(){
 
 
         ]
-        MATTIE.static.maps.charCreationMap = 10;
+        MATTIE.static.maps.charCreationMap = 2;
+        MATTIE.static.maps.startMap = 10;
 
         MATTIE.static.maps.menuMaps = MATTIE.static.rangeParser(MATTIE.static.maps.menuMaps);
 
