@@ -556,6 +556,7 @@ MATTIE.static.update = function(){
             1815, // fracioua domination scene
             "3463-3479", //misasma scenes
             "3481-3503", //more misasma scenes
+            979, //enki attacking. (autorun event when enki attack)
 
             118, //elevator fall scene auto run swithc
             116, //above ^^
