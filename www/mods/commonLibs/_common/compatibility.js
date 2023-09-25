@@ -137,3 +137,20 @@ Window_EquipItem.prototype.includes = function(item) {
     }
     return this._actor.canEquip(item);
 };
+
+
+/**
+ * The bitmap used for the window contents.
+ *
+ * @property contents
+ * @type Bitmap
+ */
+Object.defineProperty(Window.prototype, 'contents', {
+    get: function() {
+        return this._windowContentsSprite ? this._windowContentsSprite.bitmap : ImageManager.loadEmptyBitmap();
+    },
+    set: function(value) {
+        if(this._windowContentsSprite) this._windowContentsSprite.bitmap = value;
+    },
+    configurable: true
+});
