@@ -80,7 +80,13 @@ class PlayerModel {
             MATTIE.multiplayer.isSpectator = bool;
             if(!bool) {
                 SceneManager.goto(Scene_Map); 
-                MATTIE.actorAPI.changePartyLeader(MATTIE.actorAPI.lastLeader);
+                if(MATTIE.actorAPI.lastLeader != MATTIE.static.actors.ghost._data.id){
+                    MATTIE.actorAPI.changePartyLeader(MATTIE.actorAPI.lastLeader);
+                }
+                else{
+                    MATTIE.actorAPI.changePartyLeader(MATTIE.static.actors.mercenaryId);
+                }
+                
             } else { //
                 $gameParty.leader().setHp(50);
                 SceneManager.goto(MATTIE.scenes.multiplayer.Scene_Spectate);

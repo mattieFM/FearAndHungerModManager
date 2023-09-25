@@ -1071,35 +1071,29 @@ class BaseNetController extends EventEmitter {
      * @emits randomVars
      */
     emitUpdateSyncedVars(){
-        if(!MATTIE.multiplayer.varSyncRequested){
-            MATTIE.multiplayer.varSyncRequested = true;
-            
-            let obj = {};
-            obj.syncedVars = {};
-            obj.syncedSwitches = {};
-            if(MATTIE.multiplayer.hasLoadedVars){
-                MATTIE.static.variable.syncedVars.forEach(id=>{
-                    obj.syncedVars[id] = $gameVariables.value(id);
-                })
-        
-                MATTIE.static.variable.secondarySyncedVars.forEach(id=>{
-                    obj.syncedVars[id] = $gameVariables.value(id);
-                })
-        
-                MATTIE.static.switch.syncedSwitches.forEach(id=>{
-                    obj.syncedSwitches[id] = $gameSwitches.value(id);
-                })
-                this.sendViaMainRoute(obj)
-                this.emit("randomVars", obj)
-                MATTIE.multiplayer.varSyncRequested = false;
-            }else{
-                setTimeout(() => {
-                    this.emitUpdateSyncedVars();
-                }, 1000);
-            }
-        }
-        
-        
+        let obj = {};
+        obj.syncedVars = {};
+        obj.syncedSwitches = {};
+        if(MATTIE.multiplayer.hasLoadedVars){
+            MATTIE.static.variable.syncedVars.forEach(id=>{
+                obj.syncedVars[id] = $gameVariables.value(id);
+            })
+    
+            MATTIE.static.variable.secondarySyncedVars.forEach(id=>{
+                obj.syncedVars[id] = $gameVariables.value(id);
+            })
+    
+            MATTIE.static.switch.syncedSwitches.forEach(id=>{
+                obj.syncedSwitches[id] = $gameSwitches.value(id);
+            })
+            this.sendViaMainRoute(obj)
+            this.emit("randomVars", obj)
+            MATTIE.multiplayer.varSyncRequested = false;
+        }else{
+            setTimeout(() => {
+                this.emitUpdateSyncedVars();
+            }, 1000);
+        } 
     }
 
     /**

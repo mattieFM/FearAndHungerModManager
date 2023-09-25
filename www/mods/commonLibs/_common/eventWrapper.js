@@ -38,6 +38,7 @@ class MapEvent {
             id: id,
             name: "EV" + id.padZero(3),
             note: "",
+            /** @type {rm.types.Page[]} */
             pages: [],
             x: 0,
             y: 0,
@@ -157,6 +158,44 @@ class MapEvent {
      */
     addCommand(pageId, command, parameters,indent=0){
         this.data.pages[pageId].list.push(this.createCommand(command,parameters,indent))
+    }
+
+    /**
+     * @description add text command to page
+     * @param {*} pageId 
+     * @param {*} text 
+     */
+    addText(pageId, text){
+        this.addCommand(pageId,101,["", 0, 0, 2]);
+        this.addCommand(pageId,401,[text]);
+    }
+
+    /**
+     * @description add text command to page with a speaker
+     * @param {*} pageId 
+     * @param {*} text 
+     */
+    addSpokenText(pageId, text, speaker){
+        this.addCommand(pageId,101,["", 0, 0, 2]);
+        this.addCommand(pageId,401,[MATTIE.msgAPI.formatMsgAndTitle(speaker,text)]);
+    }
+
+    /**
+     * @description add the move route command to a page
+     * @param {*} pageId the id of the page to add the command to
+     * @param {*} route the id of the action
+     */
+    addMoveRoute(pageId, route, wait){
+        this.addCommand(pageId,205,[0, {"list":route,"wait":wait}]);
+    }
+
+    /**
+     * @description add a wait command to a page
+     * @param {*} pageId the page id to add the command to
+     * @param {*} frames the number of frames to wait
+     */
+    addWait(pageId, frames){
+        this.addCommand(pageId,230,[frames]);
     }
 
     /**
