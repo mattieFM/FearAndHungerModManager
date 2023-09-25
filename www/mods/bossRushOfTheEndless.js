@@ -53,6 +53,7 @@ MATTIE.bossRush =  MATTIE.bossRush || {};
 
     /** @description the method to handle the boss rush functionality */
     function rush(){
+        MATTIE.bossRush.currentFightIndex = 0; //reset rush
         if(!$gameParty.leader().isDead() && !(SceneManager._scene instanceof Scene_Gameover)){
             startNextFight(()=>{
                 $gameMessage.clear();
