@@ -49,14 +49,14 @@ Game_Event.prototype.start = function (){
 //make sure autorun events cannot run while ghost
 MATTIE.multiplayer.spectate.checkEventTriggerAuto = Game_Event.prototype.checkEventTriggerAuto;
 Game_Event.prototype.checkEventTriggerAuto = function() {
-    if(!MATTIE.multiplayer.isSpectator) MATTIE.multiplayer.spectate.checkEventTriggerAuto .call(this);
+    if(!MATTIE.multiplayer.isSpectator) MATTIE.multiplayer.spectate.checkEventTriggerAuto.call(this);
 };
 
-//override battle processing to not allow ghosts to enter into combat ever
-MATTIE.multiplayer.spectate.command301 = Game_Interpreter.prototype.command301
-Game_Interpreter.prototype.command301 = function() {
-    if(!MATTIE.multiplayer.isSpectator) MATTIE.multiplayer.spectate.command301.call(this); //spectators cannot enter battles
-}
+// //override battle processing to not allow ghosts to enter into combat ever
+// MATTIE.multiplayer.spectate.command301 = Game_Interpreter.prototype.command301
+// Game_Interpreter.prototype.command301 = function() {
+//     if(!MATTIE.multiplayer.isSpectator) MATTIE.multiplayer.spectate.command301.call(this); //spectators cannot enter battles
+// }
 
 //make sure player can't somehow wind up back on normal map
 Scene_Map.prototype.initialize = function(){
