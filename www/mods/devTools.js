@@ -18,6 +18,43 @@ MATTIE.devTools = MATTIE.devTools || {};
         SceneManager.push(MATTIE.scenes.Scene_Dev);
     }, "DEV MENU (DEV)", -2)
 
+    Input.addKeyBind('', ()=>{
+        let pocketCatEvent = new MapEvent();
+        pocketCatEvent.copyActionsFromEventOnMap(10,8);
+        pocketCatEvent.spawn($gamePlayer.x, $gamePlayer.y)
+    }, "Spawn Cat (DEV)", -2)
+
+    Input.addKeyBind('', ()=>{
+        let sex = MATTIE.eventAPI.marriageAPI.displaySex(1,i,$gamePlayer.x, $gamePlayer.y, false);
+        sex.data.pages[0].image.characterName="$caharSect";
+        sex.spawn($gamePlayer.x, $gamePlayer.y);
+    }, "Spawn CaharSex (DEV)", -2)
+
+    Input.addKeyBind('', ()=>{
+        let caharahSitting = new MapEvent();
+        caharahSitting.copyActionsFromEventOnMap(274,6);
+        caharahSitting.data.pages = [caharahSitting.data.pages[0]];
+        caharahSitting.data.pages[0].conditions = caharahSitting.setDefaultConditions();
+        caharahSitting.data.pages[0].list = []
+        caharahSitting.spawn($gamePlayer.x, $gamePlayer.y)
+    }, "Spawn Bussy Sitting (DEV)", -2)
+
+    let i = 1;
+    Input.addKeyBind('', ()=>{
+        MATTIE.eventAPI.marriageAPI.displaySex(1,i,$gamePlayer.x, $gamePlayer.y);
+        i++;
+        if(i>5)i=1;
+    }, "Spawn Bussy Focking (DEV)", -2)
+
+    Input.addKeyBind('', ()=>{
+        let caharahSitting = new MapEvent();
+        caharahSitting.copyActionsFromEventOnMap(274,6);
+        caharahSitting.data.pages = [caharahSitting.data.pages[2]];
+        caharahSitting.data.pages[0].list = []
+        caharahSitting.data.pages[0].conditions = caharahSitting.setDefaultConditions();
+        caharahSitting.spawn($gamePlayer.x, $gamePlayer.y)
+    }, "Spawn Bussy standing (DEV)", -2)
+
 
 
     
