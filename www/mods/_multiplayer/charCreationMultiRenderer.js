@@ -47,6 +47,12 @@ MATTIE.multiplayer.charCreationRenderer.renderNetPlayerPortraitsOnScreen = funct
                     
                 })
             } 
+            setTimeout(()=>{
+                for (let index = 10; index <= i; index++) {
+                    $gameScreen.erasePicture(index);
+                }
+                
+            },60000)
         }, 5000);
 }
 
