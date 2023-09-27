@@ -291,8 +291,6 @@ MATTIE.bossRush =  MATTIE.bossRush || {};
     rewardBook.setCallback(onUseVictoryBook);    
     rewardBook.spawn();
 
-    let  = new MATTIE.items.runTimeItem();
-
 
 
 })()
