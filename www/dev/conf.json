@@ -1,9 +1,9 @@
 {
     "plugins": [],
-    "recurseDepth": 10,
+    "recurseDepth": 50,
     "source": {
-        "includePattern": ".+\\.js(doc|x)?$",
-        "excludePattern": "(^|\\/|\\\\)_"
+        "include": ["./www/mods/"],
+        "includePattern": ".+\\.js(doc|x)?$"
     },
     "sourceType": "module",
     "tags": {
