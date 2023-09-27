@@ -15,7 +15,7 @@ MATTIE.msgAPI.displayMsgWithTitle = function(title,msg){
 }
 
 /**
- * 
+ * s
  * @param {*} msg string msg
  * @param {int} background optional
  * Sets the background of the message window;
