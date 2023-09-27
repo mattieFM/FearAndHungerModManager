@@ -18,8 +18,8 @@ jobs:
         uses: andstor/jsdoc-action@v1
         with:
           source_dir: ./www/mods
-          output_dir: ./out
-          config_file: conf.json
+          output_dir: ./www/dev/DevDocs
+          config_file: ./www/dev/conf.json
           template: minami
           front_page: README.md
 
