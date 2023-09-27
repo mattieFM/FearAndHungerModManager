@@ -19,6 +19,7 @@ jobs:
       - name: Build
         uses: andstor/jsdoc-action@v1
         with:
+          recurse: true
           source_dir: ./www/mods
           output_dir: ./www/dev/DevDocs
           config_file: ./www/dev/conf.json
