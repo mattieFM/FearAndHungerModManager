@@ -1,10 +1,8 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Source: commonLibs/_common/menus/mainMenu.js | Source: commonLibs/_common/menus/mainMenu.js</title>
+    <title>Tutorial: INSTALL | Tutorial: INSTALL</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -32,7 +30,7 @@
         
     </div>
     <div class="title">
-        <h1><a href="index.html" class="link">Source: commonLibs/_common/menus/mainMenu.js</a></h1>
+        <h1><a href="index.html" class="link">Tutorial: INSTALL</a></h1>
         
             <span class="version">v1.0.0</span>
         
@@ -58,66 +56,91 @@
 <div class="main" id="main">
     
 
+<section>
+    <header>
+        
 
+        <h2>INSTALL</h2>
+    </header>
 
     
-    <section>
+        
+
+        <ul id="example-nav" class="nav nav-tabs hidden">
+            <li role="presentation" id="example-result-btn" class="active" onclick="showResult()">
+                <a href="#">Result</a>
+            </li>
+            <li role="presentation" id="example-js-btn" class="hidden" onclick="showJs()">
+                <a href="#">JS</a>
+            </li>
+            <li role="presentation" id="example-html-btn" class="hidden" onclick="showHtml()">
+                <a href="#">HTML</a>
+            </li>
+        </ul>
         <article>
-            <pre class="prettyprint source linenums"><code>var MATTIE = MATTIE || {};
-MATTIE.menus = MATTIE.menus || {};
-MATTIE.windows = MATTIE.windows || {};
-MATTIE.scenes = MATTIE.scenes || {};
-MATTIE.TextManager = MATTIE.TextManager || {};
-MATTIE.CmdManager = MATTIE.CmdManager || {};
-MATTIE.menus.mainMenu = MATTIE.menus.mainMenu || {};
-
-var MATTIE_RPG = MATTIE_RPG || {};
-TextManager.Mods = 'Mods';
-
-/** @description removes a */
-MATTIE.menus.mainMenu.removeBtnFromMainMenu = function (displayText, sym) {
-	const prevFunc = Window_TitleCommand.prototype.addCommand;
-	Window_TitleCommand.prototype.addCommand = function (name, symbol, enabled, ext) {
-		if (name != displayText &amp;&amp; symbol != sym) {
-			prevFunc.call(this, name, symbol, enabled, ext);
-		}
-	};
-};
-
-/**
- * @description add a new button to the main menu
- * @param {string} displayText the text to display
- * @param {string} cmdText the string to name the command (must be unique)
- * @param {Function} cb the callback
- */
-
-MATTIE.menus.mainMenu.addBtnToMainMenu = function (displayText, cmdText, cb, enabled = true) {
-	cmdText = `MATTIEModManager${cmdText}`;
-
-	const previousFunc = Scene_Title.prototype.createCommandWindow;
-
-	Scene_Title.prototype.createCommandWindow = function () {
-		previousFunc.call(this);
-		this._commandWindow.setHandler(cmdText, (cb).bind(this));
-	};
-	const prevWindowTitle = Window_TitleCommand.prototype.makeCommandList;
-
-	Window_TitleCommand.prototype.makeCommandList = function () {
-		let bool = enabled;
-		try {
-			bool = enabled();
-		} catch (error) {
-			// throw error
-		}
-		prevWindowTitle.call(this);
-		this.addCommand(displayText, cmdText, bool);
-	};
-};
-</code></pre>
+            
+            <iframe id="example-result" width="100%" height="800" frameborder="0" src=tutorials/install.html></iframe>
+            <div id="example-js" class="hidden"><pre class="prettyprint source"></pre></div>
+            <div id="example-html" class="hidden"><pre class="prettyprint source"></pre></div>
         </article>
-    </section>
+    
+</section>
 
 
+    <script>
+        var exampleResult = document.getElementById('example-result');
+        var exampleJs = document.getElementById('example-js');
+        var exampleHtml = document.getElementById('example-html');
+        var exampleResultBtn = document.getElementById('example-result-btn');
+        var exampleJsBtn = document.getElementById('example-js-btn');
+        var exampleHtmlBtn = document.getElementById('example-html-btn');
+
+        function setActive(el) {
+            el.className += ' active';
+        }
+
+        function setInactive(el) {
+            el.className = el.className.replace(/\s*active\s*/g, '');
+        }
+
+        function show(el) {
+            el.className = el.className.replace(/\s*hidden\s*/g, '');
+        }
+
+        function hide(el) {
+            el.className += ' hidden';
+        }
+
+        function showJs() {
+            hide(exampleHtml);
+            hide(exampleResult);
+            setInactive(exampleHtmlBtn);
+            setInactive(exampleResultBtn);
+
+            show(exampleJs);
+            setActive(exampleJsBtn);
+        }
+
+        function showHtml() {
+            hide(exampleJs);
+            hide(exampleResult);
+            setInactive(exampleJsBtn);
+            setInactive(exampleResultBtn);
+
+            show(exampleHtml);
+            setActive(exampleHtmlBtn);
+        }
+
+        function showResult() {
+            hide(exampleJs);
+            hide(exampleHtml);
+            setInactive(exampleJsBtn);
+            setInactive(exampleHtmlBtn);
+
+            show(exampleResult);
+            setActive(exampleResultBtn);
+        }
+    </script>
 
 
 </div>
@@ -132,13 +155,7 @@ MATTIE.menus.mainMenu.addBtnToMainMenu = function (displayText, cmdText, cb, ena
 <script src="scripts/linenumber.js"></script>
 
     <script>
-        var id = '_sub'.replace(/"/g, '_');
-        var selectedApi = document.getElementById(id); // do not use jquery selector
-        var $selectedApi = $(selectedApi);
-
-        $selectedApi.removeClass('hidden');
-        $selectedApi.parent().find('.glyphicon').removeClass('glyphicon-plus').addClass('glyphicon-minus');
-        showLnbApi();
+        showLnbExamples();
     </script>
 
 </body>
