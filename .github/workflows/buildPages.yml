@@ -25,10 +25,6 @@ jobs:
           config_file: ./www/dev/conf.json
           template: tui-jsdoc-template
           front_page: README.md
-
-  deploy: 
-    runs-on: ubuntu-latest
-    steps:
       - name: deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
