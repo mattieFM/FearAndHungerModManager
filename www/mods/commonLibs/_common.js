@@ -23,7 +23,9 @@ MATTIE.GameInfo.getCharName = (data=$gameParty)=>{ return data.menuActor()._name
 MATTIE.GameInfo.isHardMode = (data=$gameSwitches)=>data._data[2190] === true;
 MATTIE.GameInfo.isTerrorAndStarvation = (data=$gameSwitches)=>(!data._data[2190] && data._data[3153] === true);
 
-
+/**
+ * @description test
+ */
 class CommonMod {
     constructor() {
          this.status = true;

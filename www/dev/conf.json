@@ -12,6 +12,15 @@
     },
     "templates": {
         "cleverLinks": false,
-        "monospaceLinks": false
-    }
+        "monospaceLinks": false,
+        "logo": {
+            "url": "http://nhnent.github.io/tui.component.tree/latest/styles/logo.png",
+            "width": "150px",
+            "height": "13px",
+            "link": "https://github.com/nhnent/tui.jsdoc-template"
+        }
+    },
+    "opts": {
+        "template": "node_modules/tui-jsdoc-template"
+      }
 }

@@ -1,0 +1,18 @@
+{
+    "name": "",
+    "main": "www/index.html",
+    "js-flags": "--expose-gc",
+    "window": {
+        "title": "",
+        "toolbar": false,
+        "width": 816,
+        "height": 624,
+        "icon": "www/icon/icon.png"
+    },
+    "devDependencies": {
+        "docdash": "^2.0.2",
+        "jaguarjs-jsdoc": "^1.1.0",
+        "jsdoc": "^4.0.2",
+        "tui-jsdoc-template": "^1.2.2"
+    }
+}

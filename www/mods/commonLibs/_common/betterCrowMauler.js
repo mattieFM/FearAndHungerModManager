@@ -1,6 +1,7 @@
 var MATTIE = MATTIE || {};
 var MATTIE_RPG = MATTIE_RPG || {};
 
+
 MATTIE.betterCrowMauler = MATTIE.betterCrowMauler || {};
 /**
  *  @description the number of milliseconds util it is checked if crow mauler can spawn 
@@ -45,6 +46,7 @@ MATTIE.betterCrowMauler.timeScaler = (t) => (.2 + (10 * (t/MATTIE.betterCrowMaul
 /** @description a scaler to scale the crow's spawn chance by */
 MATTIE.betterCrowMauler.scaler = 1;
 
+/** @class */
 MATTIE.betterCrowMauler.crowController = function () {
     setTimeout(() => {
         this.disableBaseCrowMauler();  
