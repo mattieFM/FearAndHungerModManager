@@ -22,6 +22,7 @@
  */
 
 var MATTIE_ModManager = MATTIE_ModManager || {};
+/** @global */
 var MATTIE = MATTIE || {};
 var MATTIE_RPG = MATTIE_RPG || {};
 
@@ -629,6 +630,7 @@ async function () {
 //----------------------------------------------------------------
 
 /**
+ * @global
  * @description override the scene manager error functions with our own error screen instead
  */
 MATTIE_ModManager.overrideErrorLoggers = function(){
