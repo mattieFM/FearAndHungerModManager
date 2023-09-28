@@ -1,18 +1,38 @@
 {
-    "name": "",
-    "main": "www/index.html",
-    "js-flags": "--expose-gc",
-    "window": {
-        "title": "",
-        "toolbar": false,
-        "width": 816,
-        "height": 624,
-        "icon": "www/icon/icon.png"
-    },
-    "devDependencies": {
-        "docdash": "^2.0.2",
-        "jaguarjs-jsdoc": "^1.1.0",
-        "jsdoc": "^4.0.2",
-        "tui-jsdoc-template": "^1.2.2"
-    }
+  "name": "",
+  "main": "www/index.html",
+  "js-flags": "--expose-gc",
+  "window": {
+    "title": "",
+    "toolbar": false,
+    "width": 816,
+    "height": 624,
+    "icon": "www/icon/icon.png"
+  },
+  "devDependencies": {
+    "docdash": "^2.0.2",
+    "eslint": "^8.50.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.28.1",
+    "jsdoc": "^4.0.2",
+    "taffydb": "^2.7.3",
+    "tui-jsdoc-template": "^1.2.2"
+  },
+  "scripts": {
+    "build:docs:prod": "jsdoc -c ./www/dev/conf.json -r",
+    "build:prod": "npm run build:docs:prod",
+    "lint:mods": "eslint www/mods/ --fix**"
+  },
+  "description": "Welcome to MATTIE's Fear And Hunger Mod Manager. This mod manager works for both F&H 1 and 2.",
+  "version": "1.0.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mattieFM/FearAndHungerModManager.git"
+  },
+  "author": "mattiefm",
+  "license": "SEE LICENSE IN LICENCE",
+  "bugs": {
+    "url": "https://github.com/mattieFM/FearAndHungerModManager/issues"
+  },
+  "homepage": "https://github.com/mattieFM/FearAndHungerModManager#readme"
 }
