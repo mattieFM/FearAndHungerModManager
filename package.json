@@ -20,8 +20,8 @@
   },
   "scripts": {
     "build:docs:prod": "jsdoc -c ./www/dev/conf.json -r",
-    "build:prod": "eslint www/mods/ --fix** && npm run build:docs:prod",
-    "lint:mods": "eslint www/mods/ --fix**"
+    "build:prod": "npm run lint:mods && npm run build:docs:prod",
+    "lint:mods": "eslint -c ./.eslintrc.js www/mods/ --fix**"
   },
   "description": "Welcome to MATTIE's Fear And Hunger Mod Manager. This mod manager works for both F&H 1 and 2.",
   "version": "1.0.0",
