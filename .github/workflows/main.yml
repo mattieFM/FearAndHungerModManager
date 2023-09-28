@@ -23,7 +23,7 @@ jobs:
           source_dir: ./www/mods
           output_dir: ./www/dev/DevDocs
           config_file: ./www/dev/conf.json
-          template: minami
+          template: tui-jsdoc-template
           front_page: README.md
 
       - name: Deploy
