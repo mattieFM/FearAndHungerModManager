@@ -1,0 +1,14 @@
+*
+!.gitignore
+!www/
+!www/index.html
+www/*/
+!www/js/
+www/js/*
+!www/mods/
+!www/mods/*
+!www/mods/**/*
+
+!www/dev/
+!www/dev/*
+!www/dev/**/*
