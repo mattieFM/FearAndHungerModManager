@@ -172,7 +172,7 @@ MATTIE.Prev_Input_Update = Input.update;
             let key = obj.key;
             let cb = obj.cb;
             if(key.contains("&")){
-                /**@type {[]} */
+                /**@type {any[]} */
                 let combinedKeys = key.split("&");
                 
                 let pressed = (()=>{
@@ -241,7 +241,7 @@ Game_Map.prototype.lastMapId = function(){
  * @param {*} mapId the map id that this event is on
  * @param {*} eventId the event id of this event
  * @param {*} letter the letter of this switch
- * @returns {[]}
+ * @returns {string[]}
  */
 Game_SelfSwitches.prototype.formatKey = function(mapId, eventId, letter){
     var key = [mapId, eventId, letter];

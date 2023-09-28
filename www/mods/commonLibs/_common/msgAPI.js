@@ -45,7 +45,7 @@ MATTIE.msgAPI.formatMsgAndTitle = function(title,msg){
  * @param {*} cancelChoice which index cancels the menu
  * @param {*} cb a function that takes the index response of the use
  * @param {string} msgs displays at the bottom of the screen
- * @param {[] || string} helps displays at top of screen
+ * @param {any[]|string} helps displays at top of screen
  */
 MATTIE.msgAPI.showChoices = function(choices, defaultChoice, cancelChoice, cb, msg=null, msgs=[], helps=[]){
 

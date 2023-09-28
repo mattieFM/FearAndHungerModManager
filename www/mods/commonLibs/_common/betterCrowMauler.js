@@ -63,7 +63,10 @@ MATTIE.betterCrowMauler.crowController = function () {
     
     /** @description the id of the mapId crow mauler was spawned in last */
     this.mapId = 0;
-    /** @type {MapEvent} The current crow obj if spawned*/
+    /** 
+     * @description The current crow obj if spawned
+     * @type {MapEvent} 
+     * */
     this.self = new MapEvent();
 
     let prevFunc = Game_Player.prototype.performTransfer;
