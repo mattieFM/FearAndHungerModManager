@@ -2,7 +2,7 @@ var MATTIE = MATTIE || {};
 MATTIE.optimisations = MATTIE.optimisations || {};
 
 // rewrite loadallsavefile images to only load up to the max number of saves
-DataManager.loadAllSavefileImages = function () {
+DataManager.loadAllSavefileImages = function () { //
 	const globalInfo = this.loadGlobalInfo();
 	if (globalInfo) {
 		for (let i = 1; i < DataManager.maxSavefiles(); i++) {
