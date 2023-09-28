@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Home - Documentation</title>
+    <title>commonLibs/_common.js - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -29,85 +29,269 @@
 
 <div id="main">
     
+    <h1 class="page-title">commonLibs/_common.js</h1>
+    
 
     
 
 
 
     
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>var MATTIE = MATTIE || {};
+MATTIE.menus = MATTIE.menus || {};
+MATTIE.windows = MATTIE.windows || {};
+MATTIE.scenes = MATTIE.scenes || {};
+MATTIE.TextManager = MATTIE.TextManager || {};
+MATTIE.CmdManager = MATTIE.CmdManager || {};
+MATTIE.modLoader = MATTIE.modLoader || {};
+MATTIE.menus.mainMenu = MATTIE.menus.mainMenu || {};
+MATTIE.global = MATTIE.global || {};
+MATTIE.global.version = 1;
+MATTIE.GameInfo = {};
+MATTIE.GameInfo.getDifficulty = (data=$gameSwitches)=>{
+    var difficulty = "Fear &amp; Hunger"
+    if (MATTIE.GameInfo.isHardMode(data)) { //Hard mode
+        difficulty = "Hard Mode" //funnier name: "Trepidation &amp; Famine"
+    }
+    else if (MATTIE.GameInfo.isTerrorAndStarvation(data)) { //terror and starvation
+        difficulty = "Terror And Starvation"
+    } 
+    return difficulty;
+}
+MATTIE.GameInfo.getCharName = (data=$gameParty)=>{ return data.menuActor()._name;};
+MATTIE.GameInfo.isHardMode = (data=$gameSwitches)=>data._data[2190] === true;
+MATTIE.GameInfo.isTerrorAndStarvation = (data=$gameSwitches)=>(!data._data[2190] &amp;&amp; data._data[3153] === true);
 
 
+class CommonMod {
+    constructor() {
+         this.status = true;
+         this.name = "commonMod";
+         this.params = {};
+         this.loaded = false;
+    }
 
+    setLoaded(loaded){
+        this.loaded = loaded;
+    }
 
+    setStatus(status){
+        this.status = status;
+    }
 
+    setName(name){
+        this.name = name;
+    }
 
+    setParams(params){
+        this.params = params;
+    }
 
+    addParam(key,val){
+        this.params[key,val];
+    }
 
+    register(cb){
+        cb();
+    }
 
+}
+
+// --UTIL--
+function updateKeys(keys,name="") {
+    Object.keys(keys).forEach(key => {
+        Input.keyMapper[key.toUpperCase().charCodeAt(0)] = key; //add our key to the list of watched keys
+    });
+};
+
+function updateKey(key,name="") {
+    if(key.includes("&amp;")){  
+        let keys = key.split("&amp;");
+        keys.forEach(element=>{
+            Input.keyMapper[element.toUpperCase().charCodeAt(0)] = element; //add our key to the list of watched keys
+        })
+    }else{
+        Input.keyMapper[key.toUpperCase().charCodeAt(0)] = key; //add our key to the list of watched keys
+    }
     
+};
+
+/**
+ * 
+ * @param {int} scope 
+ * -2 = in dev mode
+ * -1 = never
+ * 0 = global
+ * 1 = on scene_map
+ * 2 = on scene_battle
+ * 3 = on scene_menu
+ */
+Input.checkScope = function(scope){
+    switch (scope) {
+        case -1:
+            return false;
+        case 0:
+            return true;
+        case 1:
+            return SceneManager._scene instanceof Scene_Map;
+        case 2:
+            return SceneManager._scene instanceof Scene_Battle;
+        case 3:
+            return SceneManager._scene instanceof Scene_Menu;
+        case -2:
+            return MATTIE.isDev;
+        default:
+            return false;
+    }
+}
 
 
-    <section class="readme">
-        <article><h1>FearAndHungerModManager</h1>
-<p>Welcome to MATTIE's Fear And Hunger Mod Manager. This mod manager works for both F&amp;H 1 and 2.</p>
-<h2>Mod Loader Features</h2>
-<p>-Abiltiy to toggle on and off any and all mods you have installed.<br>
-<img src="https://github.com/mattieFM/FearAndHungerModManager/assets/66142165/e3012f3c-b75d-4ec4-a4d0-282b8ad24cf4" alt="image"></p>
-<p>-Save File Protection.<br>
--All mods are marked as either &quot;safe for save files&quot; or &quot;unsafe for save files&quot; if you are running mods that are unsafe for game files, the mod loader will create a seperate set of saves and protect your vanilla saves. If you are using mods that are safe for game files than the mod loader will load your normal saves for the game.<br>
--There are settings to make the mod manager always use its own saves or always use vanilla saves.<br>
--Ability to have seperate saves for each mod or combination of mods.<br>
--Config files to allow customisation of mods.<br>
--Automatically disables incompatible mods, and helps reduce crashes.</p>
-<h1>Mods</h1>
-<p>Most mods will work for both F&amp;H1 and F&amp;H2. But if they are not working properly than the mod loader should automatically disable them and inform you which one it believes is not supported.</p>
-<h3>Better Saves</h3>
-<p>-Allows as many save files as you would like, by default max saves is set to 99 but can be set to how ever large a value you would like.<br>
--Also displays name and difficulty on save files, as shown below:<br>
-<img src="https://github.com/mattieFM/FearAndHungerModManager/assets/66142165/37b1610a-fd7f-4559-83ed-8103e536113f" alt="image"></p>
-<h3>Dev Tools.</h3>
-<p>-Press &quot;i&quot; to open and close a cheat menu.<br>
--Press &quot;v&quot; to use a better form of phase step.</p>
-<h3>Unlocked Blood Portal</h3>
-<p>-Press &quot;b&quot; to open the blood portal menu from anywhere. Allowing fast travel from any location.</p>
-<h3>Quick Save / Load</h3>
-<p>-Press &quot;o&quot; to open the quick load menu<br>
--Press &quot;l&quot; to open the quick save menu</p>
-<h3>Multiplayer</h3>
-<p>-WIP
--A lot of changes</p>
-<h1>Install</h1>
-<p>-First Decrypt Fear and Hunger files, this can be done with any RPGMaker MV decrypter, but the one me and Frap use is linked below:
-https://bitbucket.org/SilicaAndPina/rpgmv-decryptor/downloads/
--Download this repo.<br>
--add the mods folder to your game's www/ folder.<br>
--replace your game's index.html file with mine.<br>
--The mod loader &amp; all my mods are now installed.<br>
--once the game launches on the main menu you can see a mods tab to activate or deactivate any mod/mods you would like.<br>
-<img src="https://github.com/mattieFM/FearAndHungerModManager/assets/66142165/0afa2d96-8f7f-451c-a972-b6f520cbc214" alt="image"></p>
-<h1>development info</h1>
-<p>Mods consist of 2 files, a .js file and a .json file, the .json file contains information about the mod, think of it as a config file of sorts. It must contain the following values<br>
-{<br>
-&quot;name&quot;:(string)(the file name of the mod)<br>
-&quot;status&quot;:(boolean)(this is wether the mod is enabled or not, it should be set to false by default untill the user enables it),<br>
-&quot;parameters&quot;:(dict)(a dictionary of any config options / values that you want the user to be able to edit),<br>
-&quot;danger&quot;: (boolean) (wether or not this mod poses a risk to save file and save data, could this mod result in damage to the save data or not)<br>
-}</p>
-<p>there is one more value that is not required which is:<br>
-{<br>
-&quot;dependencies&quot;: (array) (array of file names without prefixes that need to be loaded before this mod can be run).<br>
-}<br>
-The Mod Loader will attempt to load mods without a .json file by creating a json file with default values for them. This allows compatibility with Cheshire's mods and things of the sort.</p>
-<p>the .js file is akin to a plugin file for RPG maker but it does not need any of the specific rpg maker metadata or comments as the mod is loaded as a mod rather than a plugin.<br>
-Any mod with _ at the front of its name will be loaded before files without a _, this is useful for loading Libraries that are common between all of your mods. The commonLib's folder is not ment to be edited ever, these are files specific to the mod loader and are loaded before everything else.</p>
-<p>Example mods can be found in the mods folder, and the commonLibs folder is also provided, this mod is loaded first before all other mods. _Common.js should NOT be edited, if you want to add a common.js file
-that loads before all other mods for your own mods, just add an _ to the name of it and it will load before them.</p>
-<p>\</p>
-<p>Eventually I will propperly map out control vars and switches in the game to actual variables, but currently if you need to acsess game data open fear and hunger in rpgmaker mv, and then find the nubmer of the switch
-you want to acsess then just user $gameSwitches[index] to return the value.</p></article>
+
+const keys = {};
+let i = 128;
+/**
+ * 
+ * @param {*} key (optional) always bind to this key on boot
+ * @param {*} cb the call back to run
+ * @param {*} name the name of this command 
+ * @param {*} scope the scope of this command
+ * @param {*} wasdDefualt the default key in wasd layout
+ * @param {*} defaultKey the default key in defualt layout
+ */
+Input.addKeyBind = function (key, cb, name ="", scope = 0, wasdDefualt = null, defaultKey = null) {
+    if(typeof key === 'number') key = String.fromCharCode(key);
+    
+    if(typeof defaultKey === 'number') key = String.fromCharCode(defaultKey);
+    if(!key) key = String.fromCharCode(i);
+
+    //setup default keybinds
+    if(wasdDefualt) {
+        if(typeof wasdDefualt != 'number'){
+            ConfigManager.wasdMap[wasdDefualt.toUpperCase().charCodeAt(0)] = wasdDefualt; 
+        }else{
+            ConfigManager.wasdMap[wasdDefualt] = String.fromCharCode(wasdDefualt); 
+        }
+       
+    }
+    if(defaultKey) {
+        if(typeof defaultKey != 'number'){
+            ConfigManager.defaultMap[defaultKey.toUpperCase().charCodeAt(0)] = defaultKey; 
+        }else{
+            ConfigManager.defaultMap[defaultKey] = String.fromCharCode(defaultKey); 
+        }
+    }
+
+    if(name != ""){
+        let tempFunc = Window_KeyConfig.prototype.actionKey;
+        let tempFunc2 = Window_KeyAction.prototype.makeCommandList;
+        //this is so that keys can be rebound
+        Window_KeyConfig.prototype.actionKey = function(action) {
+            if(action === key || action == wasdDefualt || action == defaultKey) return name;
+            return tempFunc.call(this,action);
+        }
+        //this is so that keys can be rebound
+        Window_KeyAction.prototype.makeCommandList = function() {
+            tempFunc2.call(this);
+            this.addCommand(name, 'ok', true, key);
+        }
+    }
+    i++;
+
+    keys[name]={
+        key: key,
+        cb: ()=>{if(Input.checkScope(scope))cb()}
+    };
+    updateKey(key, name);
+}
+MATTIE.Prev_Input_Update = Input.update;
+    Input.update = function () {
+        MATTIE.Prev_Input_Update.call(this);
+        for(var name in keys){
+            let obj = keys[name]
+            let key = obj.key;
+            let cb = obj.cb;
+            if(key.contains("&amp;")){
+                /**@type {any[]} */
+                let combinedKeys = key.split("&amp;");
+                
+                let pressed = (()=>{
+                    for (let index = 0; index &lt; combinedKeys.length-1; index++) {
+                        const element = combinedKeys[index];
+                        if(!Input.isPressed(element)) return false;
+                    }
+                    return Input.isRepeated(combinedKeys[combinedKeys.length-1]);
+                })();
+                if(pressed){
+                    cb();
+                }
+            }else{
+                if(Input.isRepeated(key)){
+                    cb();
+                }
+            }
+            
+            
+        }
+            
+    }
+
+
+    this.forceModdedSaves = MATTIE.DataManager.global.get("forceModded");
+    this.forceVanillaSaves = MATTIE.DataManager.global.get("forceVanilla");
+    MATTIE.menus.mainMenu.addBtnToMainMenu(TextManager.Mods,TextManager.Mods,
+    MATTIE.menus.toModMenu.bind(this));
+
+// --ENGINE OVERRIDES--
+
+// MATTIE_RPG.Game_Map_Setup = Game_Map.prototype.setup;
+// Game_Map.prototype.setup = function(mapId) {
+//     /** @description the last map that the player was on */
+//     this._lastMapId = mapId;
+//     console.log(this._lastMapId);
+//     MATTIE_RPG.Game_Map_Setup.call(this, mapId)
+// };
+
+MATTIE_RPG.Game_Player_PerformTransfer = Game_Player.prototype.performTransfer;
+Game_Player.prototype.performTransfer = function (){
+    $gameMap._lastMapId = $gameMap.mapId();
+    MATTIE_RPG.Game_Player_PerformTransfer.call(this);
+}
+
+/** @description check if the spot is passible in any direction */
+/** @param {Game_Event} event */
+MATTIE.isPassableAnyDir = function(event){
+    let dirs = [2,4,6,8]; //dir 4 dirsections
+    for (let index = 0; index &lt; dirs.length; index++) {
+        const dir = dirs[index];
+        if(event.canPass(event.x,event.y,dir)) return true;
+        
+    }
+}
+
+/**
+ * @description get the last map id
+ * @returns the id of the last map 
+ */
+Game_Map.prototype.lastMapId = function(){
+    return this._lastMapId;
+}
+/**
+ * @description format the key of a self swtich id
+ * @param {*} mapId the map id that this event is on
+ * @param {*} eventId the event id of this event
+ * @param {*} letter the letter of this switch
+ * @returns {string[]}
+ */
+Game_SelfSwitches.prototype.formatKey = function(mapId, eventId, letter){
+    var key = [mapId, eventId, letter];
+    return key;
+}
+
+</code></pre>
+        </article>
     </section>
-
-
 
 
 

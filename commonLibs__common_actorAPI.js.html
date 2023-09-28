@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Home - Documentation</title>
+    <title>commonLibs/_common/actorAPI.js - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -29,85 +29,422 @@
 
 <div id="main">
     
+    <h1 class="page-title">commonLibs/_common/actorAPI.js</h1>
+    
 
     
 
 
 
     
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>var MATTIE = MATTIE || {};
+MATTIE.actorAPI = MATTIE.actorAPI || {};
 
+var Yanfly = Yanfly || false;
 
+/**
+ * @description force the first actor in the battlemembers function to always be i
+ * @param {int} i actor index
+ */
+MATTIE.actorAPI.forceMainChar = function(i){
+    var lastBattleMembers = Game_Party.prototype.battleMembers;
+    Game_Party.prototype.battleMembers = function() {
+        var val = lastBattleMembers.call(this);
+        val[0]= $gameActors.actor(i)
+        
+        return val;
+    };
+}
+MATTIE.actorAPI.Data_Actor_Wrapper = class {
+    constructor(params) {
+        /** 
+         * @description the actual data actors data for this wrapper
+         * @type {MATTIE.actorAPI.Data_Actor} 
+         */
+        this._data = this.buildDefaultDataActor();
 
+        /**
+         * @description an array of skills to teach to the actor once created
+         */
+        this.skills = [];
+        
+    }
 
-
-
-
-
+    /**
+     * @param {boolean} shouldSet, whether to set this._data to the result
+     * @returns {MATTIE.actorAPI.Data_Actor} with default values
+     */
+    buildDefaultDataActor (shouldSet = true){
+        /** @type {MATTIE.actorAPI.Data_Actor} */
+        var dataActor = new MATTIE.actorAPI.Data_Actor();
+        dataActor.battlerName = ""; 
+        dataActor.characterName = ""; 
+        dataActor.characterIndex = 0;  
+        dataActor.classId = 1;
+        dataActor.equips = []; 
+        dataActor.faceIndex = 0;
+        dataActor.faceName = "";
+        dataActor.traits = [];
+        dataActor.initialLevel = 2;
+        dataActor.maxLevel = 99;
+        dataActor.name = "";
+        dataActor.note = ""
+        dataActor.profile = "";
+        if(shouldSet) this._data = dataActor;
+        return dataActor;
+    }
 
     
 
+    /**
+     * @param {rm.types.Actor} actor
+     * @param {boolean} shouldSet, whether to set this._data to the result
+     * @returns {MATTIE.actorAPI.Data_Actor} with default values
+     */
+    buildDataActorFromExistingActor (actor, shouldSet = true){
+        /** @type {MATTIE.actorAPI.Data_Actor} */
+        var dataActor = new MATTIE.actorAPI.Data_Actor();
+        dataActor.battlerName = actor.battlerName; 
+        dataActor.characterName = actor.characterName; 
+        dataActor.characterIndex = actor.characterIndex;  
+        dataActor.classId = actor.classId;
+        dataActor.equips = actor.equips; 
+        dataActor.faceIndex = actor.faceIndex;
+        dataActor.faceName = actor.faceName;
+        dataActor.traits = actor.traits;
+        dataActor.initialLevel = actor.initialLevel;
+        dataActor.maxLevel = actor.maxLevel;
+        dataActor.name = actor.name;
+        dataActor.nickname = actor.nickname;
+        dataActor.note = actor.note;
+        dataActor.profile = actor.profile;
 
-    <section class="readme">
-        <article><h1>FearAndHungerModManager</h1>
-<p>Welcome to MATTIE's Fear And Hunger Mod Manager. This mod manager works for both F&amp;H 1 and 2.</p>
-<h2>Mod Loader Features</h2>
-<p>-Abiltiy to toggle on and off any and all mods you have installed.<br>
-<img src="https://github.com/mattieFM/FearAndHungerModManager/assets/66142165/e3012f3c-b75d-4ec4-a4d0-282b8ad24cf4" alt="image"></p>
-<p>-Save File Protection.<br>
--All mods are marked as either &quot;safe for save files&quot; or &quot;unsafe for save files&quot; if you are running mods that are unsafe for game files, the mod loader will create a seperate set of saves and protect your vanilla saves. If you are using mods that are safe for game files than the mod loader will load your normal saves for the game.<br>
--There are settings to make the mod manager always use its own saves or always use vanilla saves.<br>
--Ability to have seperate saves for each mod or combination of mods.<br>
--Config files to allow customisation of mods.<br>
--Automatically disables incompatible mods, and helps reduce crashes.</p>
-<h1>Mods</h1>
-<p>Most mods will work for both F&amp;H1 and F&amp;H2. But if they are not working properly than the mod loader should automatically disable them and inform you which one it believes is not supported.</p>
-<h3>Better Saves</h3>
-<p>-Allows as many save files as you would like, by default max saves is set to 99 but can be set to how ever large a value you would like.<br>
--Also displays name and difficulty on save files, as shown below:<br>
-<img src="https://github.com/mattieFM/FearAndHungerModManager/assets/66142165/37b1610a-fd7f-4559-83ed-8103e536113f" alt="image"></p>
-<h3>Dev Tools.</h3>
-<p>-Press &quot;i&quot; to open and close a cheat menu.<br>
--Press &quot;v&quot; to use a better form of phase step.</p>
-<h3>Unlocked Blood Portal</h3>
-<p>-Press &quot;b&quot; to open the blood portal menu from anywhere. Allowing fast travel from any location.</p>
-<h3>Quick Save / Load</h3>
-<p>-Press &quot;o&quot; to open the quick load menu<br>
--Press &quot;l&quot; to open the quick save menu</p>
-<h3>Multiplayer</h3>
-<p>-WIP
--A lot of changes</p>
-<h1>Install</h1>
-<p>-First Decrypt Fear and Hunger files, this can be done with any RPGMaker MV decrypter, but the one me and Frap use is linked below:
-https://bitbucket.org/SilicaAndPina/rpgmv-decryptor/downloads/
--Download this repo.<br>
--add the mods folder to your game's www/ folder.<br>
--replace your game's index.html file with mine.<br>
--The mod loader &amp; all my mods are now installed.<br>
--once the game launches on the main menu you can see a mods tab to activate or deactivate any mod/mods you would like.<br>
-<img src="https://github.com/mattieFM/FearAndHungerModManager/assets/66142165/0afa2d96-8f7f-451c-a972-b6f520cbc214" alt="image"></p>
-<h1>development info</h1>
-<p>Mods consist of 2 files, a .js file and a .json file, the .json file contains information about the mod, think of it as a config file of sorts. It must contain the following values<br>
-{<br>
-&quot;name&quot;:(string)(the file name of the mod)<br>
-&quot;status&quot;:(boolean)(this is wether the mod is enabled or not, it should be set to false by default untill the user enables it),<br>
-&quot;parameters&quot;:(dict)(a dictionary of any config options / values that you want the user to be able to edit),<br>
-&quot;danger&quot;: (boolean) (wether or not this mod poses a risk to save file and save data, could this mod result in damage to the save data or not)<br>
-}</p>
-<p>there is one more value that is not required which is:<br>
-{<br>
-&quot;dependencies&quot;: (array) (array of file names without prefixes that need to be loaded before this mod can be run).<br>
-}<br>
-The Mod Loader will attempt to load mods without a .json file by creating a json file with default values for them. This allows compatibility with Cheshire's mods and things of the sort.</p>
-<p>the .js file is akin to a plugin file for RPG maker but it does not need any of the specific rpg maker metadata or comments as the mod is loaded as a mod rather than a plugin.<br>
-Any mod with _ at the front of its name will be loaded before files without a _, this is useful for loading Libraries that are common between all of your mods. The commonLib's folder is not ment to be edited ever, these are files specific to the mod loader and are loaded before everything else.</p>
-<p>Example mods can be found in the mods folder, and the commonLibs folder is also provided, this mod is loaded first before all other mods. _Common.js should NOT be edited, if you want to add a common.js file
-that loads before all other mods for your own mods, just add an _ to the name of it and it will load before them.</p>
-<p>\</p>
-<p>Eventually I will propperly map out control vars and switches in the game to actual variables, but currently if you need to acsess game data open fear and hunger in rpgmaker mv, and then find the nubmer of the switch
-you want to acsess then just user $gameSwitches[index] to return the value.</p></article>
+        if(shouldSet) this._data = dataActor;
+        return dataActor;
+    }
+
+    /**
+     * @description create a data actor from game event and game troop
+     * @param {rm.types.Event} gameEvent 
+     * @param {rm.types.Troop} gameTroop 
+     * @param {boolean} shouldSet, whether to set this._data to the result
+     */
+    buildDataActorFromEventAndTroop (gameEvent, gameTroop, page =0){
+        this.buildDataActorFromExistingActor($dataActors[1]); 
+        let members =gameTroop.members;
+        let traits = []
+        let note = ""
+        members.forEach((member)=>{
+            let enemy =  $dataEnemies[member.enemyId];
+            if(enemy.traits){
+                if(enemy.traits.length > 0) traits.concat(enemy.traits)
+            }
+            if(enemy.note)note = enemy.note;
+            enemy.actions.forEach(action=>{
+                this.skills.push(action.skillId);
+            })
+        })
+
+        this._data.characterName = gameEvent.pages[page].image.characterName;
+        this._data.characterIndex = gameEvent.pages[page].image.characterIndex;
+        this._data.traits = traits;
+        this._data.name = gameTroop.name;
+        this._data.nickname = "";
+        this._data.note = note;
+
+        return this._data;
+    }
+
+    /**
+     * @description gets the traits of the first data actor and assumes these are default
+     * @returns the default traits for a dataActor
+     */
+    getDefaultTraits (){
+        var fearAndHunger1 = $dataActors[1].traits;
+        if(MATTIE.global.version === 1) return fearAndHunger1
+    }
+
+    /**
+     * @description gets the equip of the first data actor and assumes these are default
+     * @returns the default equip for a dataActor
+     */
+    getDefaultEquip (){
+        var fearAndHunger1 = $dataActors[1].equips;
+        if(MATTIE.global.version === 1) return fearAndHunger1
+    }
+
+    /**
+     * @description add this dataActor to the list of $dataActors
+     */
+    create () {
+        let dataClass = new MATTIE.actorAPI.Data_Class();
+        this.skills.forEach(skillId=>{
+            dataClass.addDefaultLearning(skillId);
+        })
+        dataClass.data.name = this._data.name;
+        dataClass.data.note = this._data.note;
+        dataClass.create();
+        this._data.classId = dataClass.data.id;
+        this._data.id = $dataActors.length;
+
+        if(Yanfly){
+            this._data.plusParams = [0, 0, 0, 0, 0, 0, 0, 0];
+            this._data.rateParams = [1, 1, 1, 1, 1, 1, 1, 1];
+            this._data.flatParams = [0, 0, 0, 0, 0, 0, 0, 0];
+            this._data.maxParams = [];
+            this._data.minParams = [];
+            //DataManager.processBPCNotetags1([this._data]);
+        }
+
+        $dataActors[$dataActors.length] = this._data;
+        $gameActors.actor($dataActors.length-1);
+        
+       
+        
+
+    }
+
+
+    /** @description replace the actor at this index with this actor */
+    replace (i){
+        $dataActors[i] = this._data;
+        console.log($dataActors[i] );
+        $gameActors._data[i] = false;
+        console.log($gameActors._data[i])
+        $gameActors.actor(i);
+
+    }
+}
+
+MATTIE.actorAPI.Data_Class = class {
+    constructor(){
+        this.data ={};
+
+        /** 
+         * @description the xp curve of this class
+         * @type {int}
+         * */
+        this.data.expParams = this.defaultExpParam();
+        /**
+         * @description an array of the traits of this class
+         * @type {rm.types.Trait[]}
+         */
+        this.data.traits = this.defaultTraits();
+
+        /**
+         * @description an array of skill ids to learn and the levels
+         * @type {rm.types.ClassLearning[]}
+         */
+        this.data.learnings = this.defaultLearnings();
+
+        /**
+         * @description the name of the class
+         * @type {string}
+         */
+        this.data.name =this.defaultName();
+
+
+        /**
+         * @description the note of the class
+         * @type {string}
+         */
+        this.data.note = this.defaultNote();
+
+        /**
+         * @description A massive array of ints
+         * @type {int[]}
+         */
+        this.data.params = this.defaultParams();
+
+        /**
+         * @description the id of the class
+         * defined in the create method
+         */
+        this.data.id;
+
+    }
+
+    addDefaultLearning(skillId){
+        /** @type {rm.types.ClassLearning} */
+        var learning = {};
+        learning.level = 1;
+        learning.skillId = skillId;
+        learning.note = "";
+
+        this.data.learnings.push(learning)
+    }
+
+    defaultExpParam(){
+        return $dataClasses[1].expParams;
+    }
+
+    defaultTraits(){
+        return $dataClasses[1].traits;
+    }
+
+    defaultLearnings(){
+        return $dataClasses[1].learnings;
+    }
+
+    defaultName(){
+        return $dataClasses[1].name;
+    }
+
+    defaultNote(){
+        return $dataClasses[1].note;
+    }
+
+    defaultParams(){
+        return $dataClasses[1].params;
+    }
+
+    create(){
+        this.data.id = $dataClasses.length;
+        if(Yanfly){
+            this.data.plusParams = [0, 0, 0, 0, 0, 0, 0, 0];
+            this.data.rateParams = [1, 1, 1, 1, 1, 1, 1, 1];
+            this.data.flatParams = [0, 0, 0, 0, 0, 0, 0, 0];
+            this.data.maxParams = [];
+            this.data.minParams = [];
+            //DataManager.processBPCNotetags1([this._data]);
+        }
+        $dataClasses[$dataClasses.length] = this.data;
+    }
+}
+
+MATTIE.actorAPI.Data_Actor = class {
+    constructor(params) {
+        /**
+         * @description The file name of the actor's battler graphic.
+         * @type {string}
+         */
+        this.battlerName;
+        /**
+         * @description The index (0..7) of the actor's walking graphic.
+         * @type {int}
+         */
+        this.characterIndex;
+        /**
+         * @descriptionThe file name of the actor's walking graphic.
+         * @type {string}
+         */
+        this.characterName;
+        /**
+         * @description The actor's class ID.
+         * @type {int}
+         */
+        this.classId;
+        /** 
+         * @description appears to be optional
+         * @type {string} 
+         * */
+        this.doc;
+        /**
+         * @description The actor's initial equipment. An array of weapon IDs or armor IDs with the following subscripts:
+         * @type {number[]} 
+         */
+        this.equips;
+        /**
+         * @description  The index (0..7) of the actor's face graphic.
+         * @type {number}
+         */
+        this.faceIndex;
+        /**
+         * @description  The file name of the actor's face graphic.
+         * @type {string}
+         */
+        this.faceName;
+        /**
+         * @description The ID.
+         * @type {string}
+         */
+        this.id;
+        /**
+         *  @description The actor's initial level.
+         *  @type {number}
+         */
+        this.initialLevel;
+        /**
+         * @description appears to be optional, uncertain of what this is
+         * @type {boolean}
+         */
+        this.internal;
+        /**
+         * @description appears to be optional, uncertain of what this is
+         * @type {string[]}
+         */
+        this.links;
+        /**
+         * @description The actor's max level
+         * @type {number}
+         */
+        this.maxLevel;
+        /**
+         * @description The name.
+         * @type {string}
+         */
+        this.name;
+        /**
+         * @description The actor's nickname.
+         * @type {string}
+         */
+        this.nickname;
+        /**
+         * @description appears to be optional, uncertain of what this is
+         * @type {string[]}
+         */
+        this.parameters;
+        /**
+         * @description The profile.
+         * @type {string}
+         */
+        this.profile;
+        /**
+         * @description The array of Trait data.
+         * @type {rm.types.Trait[]}
+         */
+        this.traits;
+        /**
+         * @description the note of this actor, some plugins might use this
+         * @type {string}
+         */
+        this.note;
+
+        /**
+         * @description the id of this dataActor
+         * @type {int}
+         */
+        this.id;
+    }
+    
+}
+MATTIE.actorAPI.lastLeader = null
+/**
+ * @description swap out the party leader
+ * @param {int} i, actor index
+ */
+MATTIE.actorAPI.changePartyLeader= function(i){
+    MATTIE.actorAPI.lastLeader = $gameParty.leader().actorId();
+    MATTIE.actorAPI.changePartyMember(0,i);
+    
+}
+
+/**
+ * @description change a party member to a different actor at index
+ * @param {*} partyMemberIndex index of actor to change
+ * @param {*} i actor index
+ */
+MATTIE.actorAPI.changePartyMember = function(partyMemberIndex, i){
+    $gameParty._actors[partyMemberIndex] = i;
+}
+
+
+
+</code></pre>
+        </article>
     </section>
-
-
 
 
 

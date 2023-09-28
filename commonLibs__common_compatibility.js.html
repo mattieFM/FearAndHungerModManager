@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Home - Documentation</title>
+    <title>commonLibs/_common/compatibility.js - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -29,12 +29,87 @@
 
 <div id="main">
     
+    <h1 class="page-title">commonLibs/_common/compatibility.js</h1>
+    
 
     
 
 
 
     
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>//TODO: make this less hacky in the future.
+//TODO: add popup that appears if the user forgot to decompile the game before using the modmanager.
+
+var MATTIE = MATTIE || {};
+MATTIE.compat = MATTIE.compat || {};
+MATTIE.compat.pauseDecrypt = false;
+
+
+
+var Yanfly = Yanfly || false;
+
+//override this so that when we request an image it will not try to decrypt it.
+Bitmap.prototype._requestImage = function(url){
+    if(Bitmap._reuseImages.length !== 0){
+        this._image = Bitmap._reuseImages.pop();
+    }else{
+        this._image = new Image();
+    }
+
+    if (this._decodeAfterRequest &amp;&amp; !this._loader) {
+        this._loader = ResourceHandler.createLoader(url, this._requestImage.bind(this, url), this._onError.bind(this));
+    }
+
+    this._image = new Image();
+    this._url = url;
+    this._loadingState = 'requesting';
+
+    if(!Decrypter.checkImgIgnore(url) &amp;&amp; Decrypter.hasEncryptedImages &amp;&amp; !MATTIE.compat.pauseDecrypt) {
+        this._loadingState = 'decrypting';
+        Decrypter.decryptImg(url, this);
+    } else {
+        this._image.src = url;
+
+        this._image.addEventListener('load', this._loadListener = Bitmap.prototype._onLoad.bind(this));
+        this._image.addEventListener('error', this._errorListener = this._loader || Bitmap.prototype._onError.bind(this));
+    }
+};
+
+
+ImageManager.loadBitmap = function(folder, filename, hue, smooth, forceNoDecrypt = false) {
+    //this is a hacky soltion but should work fine for now
+    if(forceNoDecrypt) MATTIE.compat.pauseDecrypt = true;
+    setTimeout(() => {
+        MATTIE.compat.pauseDecrypt = false
+    }, 1000);
+    if (filename) {
+        
+        var path = folder + encodeURIComponent(filename) + '.png';
+
+        var bitmap = this.loadNormalBitmap(path, hue || 0);
+        bitmap.smooth = smooth;
+        return bitmap;
+    } else {
+        return this.loadEmptyBitmap();
+    }
+};
+
+
+/**
+ * @description we override this such that it will not return an undefined result ever. Even if another mod fucks up
+ * @todo I don't like this way of fixing this bug but does work.
+ * @param unsafe, if true does not add anything 
+ * @returns the datamap event obj
+ */
+MATTIE_RPG.Game_Event_Event = Game_Event.prototype.event;
+Game_Event.prototype.event = function() {
+    let val = MATTIE_RPG.Game_Event_Event.call(this);
+    if(!val) val = $dataMap.events[1];
+    if(!val) val = new MapEvent().data;
+    return val;
+};
 
 
 
@@ -42,72 +117,70 @@
 
 
 
+//for some reason cheshire doesn't check if TY exists, so we will define it here.
+var TY = {};
 
 
-    
 
 
-    <section class="readme">
-        <article><h1>FearAndHungerModManager</h1>
-<p>Welcome to MATTIE's Fear And Hunger Mod Manager. This mod manager works for both F&amp;H 1 and 2.</p>
-<h2>Mod Loader Features</h2>
-<p>-Abiltiy to toggle on and off any and all mods you have installed.<br>
-<img src="https://github.com/mattieFM/FearAndHungerModManager/assets/66142165/e3012f3c-b75d-4ec4-a4d0-282b8ad24cf4" alt="image"></p>
-<p>-Save File Protection.<br>
--All mods are marked as either &quot;safe for save files&quot; or &quot;unsafe for save files&quot; if you are running mods that are unsafe for game files, the mod loader will create a seperate set of saves and protect your vanilla saves. If you are using mods that are safe for game files than the mod loader will load your normal saves for the game.<br>
--There are settings to make the mod manager always use its own saves or always use vanilla saves.<br>
--Ability to have seperate saves for each mod or combination of mods.<br>
--Config files to allow customisation of mods.<br>
--Automatically disables incompatible mods, and helps reduce crashes.</p>
-<h1>Mods</h1>
-<p>Most mods will work for both F&amp;H1 and F&amp;H2. But if they are not working properly than the mod loader should automatically disable them and inform you which one it believes is not supported.</p>
-<h3>Better Saves</h3>
-<p>-Allows as many save files as you would like, by default max saves is set to 99 but can be set to how ever large a value you would like.<br>
--Also displays name and difficulty on save files, as shown below:<br>
-<img src="https://github.com/mattieFM/FearAndHungerModManager/assets/66142165/37b1610a-fd7f-4559-83ed-8103e536113f" alt="image"></p>
-<h3>Dev Tools.</h3>
-<p>-Press &quot;i&quot; to open and close a cheat menu.<br>
--Press &quot;v&quot; to use a better form of phase step.</p>
-<h3>Unlocked Blood Portal</h3>
-<p>-Press &quot;b&quot; to open the blood portal menu from anywhere. Allowing fast travel from any location.</p>
-<h3>Quick Save / Load</h3>
-<p>-Press &quot;o&quot; to open the quick load menu<br>
--Press &quot;l&quot; to open the quick save menu</p>
-<h3>Multiplayer</h3>
-<p>-WIP
--A lot of changes</p>
-<h1>Install</h1>
-<p>-First Decrypt Fear and Hunger files, this can be done with any RPGMaker MV decrypter, but the one me and Frap use is linked below:
-https://bitbucket.org/SilicaAndPina/rpgmv-decryptor/downloads/
--Download this repo.<br>
--add the mods folder to your game's www/ folder.<br>
--replace your game's index.html file with mine.<br>
--The mod loader &amp; all my mods are now installed.<br>
--once the game launches on the main menu you can see a mods tab to activate or deactivate any mod/mods you would like.<br>
-<img src="https://github.com/mattieFM/FearAndHungerModManager/assets/66142165/0afa2d96-8f7f-451c-a972-b6f520cbc214" alt="image"></p>
-<h1>development info</h1>
-<p>Mods consist of 2 files, a .js file and a .json file, the .json file contains information about the mod, think of it as a config file of sorts. It must contain the following values<br>
-{<br>
-&quot;name&quot;:(string)(the file name of the mod)<br>
-&quot;status&quot;:(boolean)(this is wether the mod is enabled or not, it should be set to false by default untill the user enables it),<br>
-&quot;parameters&quot;:(dict)(a dictionary of any config options / values that you want the user to be able to edit),<br>
-&quot;danger&quot;: (boolean) (wether or not this mod poses a risk to save file and save data, could this mod result in damage to the save data or not)<br>
-}</p>
-<p>there is one more value that is not required which is:<br>
-{<br>
-&quot;dependencies&quot;: (array) (array of file names without prefixes that need to be loaded before this mod can be run).<br>
-}<br>
-The Mod Loader will attempt to load mods without a .json file by creating a json file with default values for them. This allows compatibility with Cheshire's mods and things of the sort.</p>
-<p>the .js file is akin to a plugin file for RPG maker but it does not need any of the specific rpg maker metadata or comments as the mod is loaded as a mod rather than a plugin.<br>
-Any mod with _ at the front of its name will be loaded before files without a _, this is useful for loading Libraries that are common between all of your mods. The commonLib's folder is not ment to be edited ever, these are files specific to the mod loader and are loaded before everything else.</p>
-<p>Example mods can be found in the mods folder, and the commonLibs folder is also provided, this mod is loaded first before all other mods. _Common.js should NOT be edited, if you want to add a common.js file
-that loads before all other mods for your own mods, just add an _ to the name of it and it will load before them.</p>
-<p>\</p>
-<p>Eventually I will propperly map out control vars and switches in the game to actual variables, but currently if you need to acsess game data open fear and hunger in rpgmaker mv, and then find the nubmer of the switch
-you want to acsess then just user $gameSwitches[index] to return the value.</p></article>
+
+//------------------------------
+//Termina Compatibility 
+//------------------------------
+var Olivia = Olivia || false;
+if(Olivia)if(Olivia.AntiPlayerStress){
+    setTimeout(() => {
+        Olivia.AntiPlayerStress.ProperErrorDisplay = false; //termina should use my error menu to
+    }, 5000);
+}
+
+//---------------------------------
+// Engine Fixes
+//---------------------------------
+
+
+//this fixes the screen freeze
+
+/**
+ * Renders the stage to the game screen.
+ *
+ * @static
+ * @method render
+ * @param {Stage} stage The stage object to be rendered
+ */
+Graphics.render = function(stage) {
+    if (this._skipCount &lt;= 0) {
+        var startTime = Date.now();
+        if (stage) {
+            this._renderer.render(stage);
+            if (this._renderer.gl &amp;&amp; this._renderer.gl.flush) {
+                this._renderer.gl.flush();
+            }
+        }
+        var endTime = Date.now();
+        var elapsed = endTime - startTime;
+        this._skipCount = Math.min(Math.floor(elapsed / 15), this._maxSkip);
+        this._rendered = true;
+    } else {
+        this._skipCount--;
+        this._rendered = false;
+    }
+    this.frameCount++;
+};
+
+
+Window_EquipItem.prototype.includes = function(item) {
+    if (item === null || typeof item === 'undefined') {
+        return true;
+    }
+    if (this._slotId &lt; 0 || item.etypeId !== this._actor.equipSlots()[this._slotId]) {
+        return false;
+    }
+    return this._actor.canEquip(item);
+};
+</code></pre>
+        </article>
     </section>
-
-
 
 
 

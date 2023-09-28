@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Home - Documentation</title>
+    <title>commonLibs/_common/items.js - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -29,85 +29,301 @@
 
 <div id="main">
     
+    <h1 class="page-title">commonLibs/_common/items.js</h1>
+    
 
     
 
 
 
     
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>var MATTIE_ModManager = MATTIE_ModManager || {};
+var MATTIE = MATTIE || {};
+MATTIE.items = MATTIE.items  || {};
+MATTIE.global = MATTIE.global || {};
+MATTIE.static = MATTIE.static || {};
+
+var Yanfly = Yanfly || {};
 
 
+const EffectCodes = {
+    RECOVER_HP:  11,
+    RECOVER_MP: 12,
+    GAIN_TP: 13,
+    ADD_STATE: 21,
+    REMOVE_STATE: 22,
+    ADD_BUFF: 31,
+    ADD_DEBUFF: 32,
+    REMOVE_BUFF: 33,
+    REMOVE_DEBUFF: 34,
+    SPECIAL: 41,
+    GROW: 42,
+    LEARN_SKILL: 43,
+    COMMON_EVENT: 44,
+    SPECIAL_ESCAPE:  0,  
+}
 
 
+/**
+ * 
+ * @param {EffectCodes} code what type of effect is this? refer to game action effects 
+ * @param {int} dataId the dataid, mostly used for status effects and common events
+ * @param {int} scalar multiplicitive value?
+ * @param {int} value addative value?
+ */
+DataManager.buildEffect = function(code,dataId,scalar,value){
+    let effect = {};
+    effect.code = code;
+    effect.dataId = dataId;
+    effect.value1 = scalar;
+    effect.value2 = value;
+    return effect
+}
 
+DataManager.buildCommonEventEffect = function(commonEventId){
+    return DataManager.buildEffect(EffectCodes.COMMON_EVENT, commonEventId, 0, 0)
+}
 
+/**
+ * @description change the activation condition of an item
+ * @param {*} x 
+ * 0: always
+ * 1: in battle
+ * 2: in menu
+ * 3: never
+ */
+DataManager.changeActivationCondition = function(obj,x) {
+    obj.occasion = x;
+}
 
+/**
+ * @description call a callback when the item is consumed
+ * @param {*} id the item id
+ * @param {*} cb the function to call when the item is consumed
+ */
+DataManager.setCallbackOnItem = function(id,cb) {
+    $dataItems[id].hasCallback = true;
+    $dataItems[id].cb = cb;
+}
 
+/**
+ * @description call a callback when the item is consumed
+ * @param {*} id the item id
+ * @param {*} cb the function to call when the item is consumed
+ */
+DataManager.setCallbackOnObj = function(obj,cb) {
+    obj.hasCallback = true;
+    obj.cb = cb;
+}
 
+/**
+ * @description clear all effects of the item, basically make it do nothing when used
+ * @param {*} id the item id
+ */
+DataManager.disableBaseItem = function(id) {
+    $dataItems[id].disableBase = true; //this is my var to know if base is diabled
+    $dataItems[id].effects = []; //this is what stops the item effects
+    $dataItems[id].repeats = 0; //probs not needed
+}
+
+DataManager.clearEffects = function(obj){
+    obj.effect = [];
+}
+
+/**
+ * @description add an effect to an item
+ * @param {*} id the id of the item
+ * @param {*} effect the effect to add
+ */
+DataManager.addItemEffect = function(id,effect) {
+    $dataItems[id].effects.push(effect);
+}
+
+/**
+ * @description add an effect to an item
+ * @param {*} id the id of the item
+ * @param {*} effect the effect to add
+ */
+DataManager.addEffect = function(obj,effect) {
+    obj.effects.push(effect);
+}
+MATTIE.items.object = Game_Item.prototype.object;
+Game_Item.prototype.object = function() {
+    return MATTIE.items.object.call(this);
+    //else return null;
+};
+
+MATTIE.items.setObject = Game_Item.prototype.setObject;
+Game_Item.prototype.setObject = function(item) {
+    MATTIE.items.setObject.call(this,item);
+    if(item){
+        if(item.hasCallback){
+            this.setCb(item.cb)
+        }
+        this.disableBase = item.disableBase;
+    }
     
 
+};
 
-    <section class="readme">
-        <article><h1>FearAndHungerModManager</h1>
-<p>Welcome to MATTIE's Fear And Hunger Mod Manager. This mod manager works for both F&amp;H 1 and 2.</p>
-<h2>Mod Loader Features</h2>
-<p>-Abiltiy to toggle on and off any and all mods you have installed.<br>
-<img src="https://github.com/mattieFM/FearAndHungerModManager/assets/66142165/e3012f3c-b75d-4ec4-a4d0-282b8ad24cf4" alt="image"></p>
-<p>-Save File Protection.<br>
--All mods are marked as either &quot;safe for save files&quot; or &quot;unsafe for save files&quot; if you are running mods that are unsafe for game files, the mod loader will create a seperate set of saves and protect your vanilla saves. If you are using mods that are safe for game files than the mod loader will load your normal saves for the game.<br>
--There are settings to make the mod manager always use its own saves or always use vanilla saves.<br>
--Ability to have seperate saves for each mod or combination of mods.<br>
--Config files to allow customisation of mods.<br>
--Automatically disables incompatible mods, and helps reduce crashes.</p>
-<h1>Mods</h1>
-<p>Most mods will work for both F&amp;H1 and F&amp;H2. But if they are not working properly than the mod loader should automatically disable them and inform you which one it believes is not supported.</p>
-<h3>Better Saves</h3>
-<p>-Allows as many save files as you would like, by default max saves is set to 99 but can be set to how ever large a value you would like.<br>
--Also displays name and difficulty on save files, as shown below:<br>
-<img src="https://github.com/mattieFM/FearAndHungerModManager/assets/66142165/37b1610a-fd7f-4559-83ed-8103e536113f" alt="image"></p>
-<h3>Dev Tools.</h3>
-<p>-Press &quot;i&quot; to open and close a cheat menu.<br>
--Press &quot;v&quot; to use a better form of phase step.</p>
-<h3>Unlocked Blood Portal</h3>
-<p>-Press &quot;b&quot; to open the blood portal menu from anywhere. Allowing fast travel from any location.</p>
-<h3>Quick Save / Load</h3>
-<p>-Press &quot;o&quot; to open the quick load menu<br>
--Press &quot;l&quot; to open the quick save menu</p>
-<h3>Multiplayer</h3>
-<p>-WIP
--A lot of changes</p>
-<h1>Install</h1>
-<p>-First Decrypt Fear and Hunger files, this can be done with any RPGMaker MV decrypter, but the one me and Frap use is linked below:
-https://bitbucket.org/SilicaAndPina/rpgmv-decryptor/downloads/
--Download this repo.<br>
--add the mods folder to your game's www/ folder.<br>
--replace your game's index.html file with mine.<br>
--The mod loader &amp; all my mods are now installed.<br>
--once the game launches on the main menu you can see a mods tab to activate or deactivate any mod/mods you would like.<br>
-<img src="https://github.com/mattieFM/FearAndHungerModManager/assets/66142165/0afa2d96-8f7f-451c-a972-b6f520cbc214" alt="image"></p>
-<h1>development info</h1>
-<p>Mods consist of 2 files, a .js file and a .json file, the .json file contains information about the mod, think of it as a config file of sorts. It must contain the following values<br>
-{<br>
-&quot;name&quot;:(string)(the file name of the mod)<br>
-&quot;status&quot;:(boolean)(this is wether the mod is enabled or not, it should be set to false by default untill the user enables it),<br>
-&quot;parameters&quot;:(dict)(a dictionary of any config options / values that you want the user to be able to edit),<br>
-&quot;danger&quot;: (boolean) (wether or not this mod poses a risk to save file and save data, could this mod result in damage to the save data or not)<br>
-}</p>
-<p>there is one more value that is not required which is:<br>
-{<br>
-&quot;dependencies&quot;: (array) (array of file names without prefixes that need to be loaded before this mod can be run).<br>
-}<br>
-The Mod Loader will attempt to load mods without a .json file by creating a json file with default values for them. This allows compatibility with Cheshire's mods and things of the sort.</p>
-<p>the .js file is akin to a plugin file for RPG maker but it does not need any of the specific rpg maker metadata or comments as the mod is loaded as a mod rather than a plugin.<br>
-Any mod with _ at the front of its name will be loaded before files without a _, this is useful for loading Libraries that are common between all of your mods. The commonLib's folder is not ment to be edited ever, these are files specific to the mod loader and are loaded before everything else.</p>
-<p>Example mods can be found in the mods folder, and the commonLibs folder is also provided, this mod is loaded first before all other mods. _Common.js should NOT be edited, if you want to add a common.js file
-that loads before all other mods for your own mods, just add an _ to the name of it and it will load before them.</p>
-<p>\</p>
-<p>Eventually I will propperly map out control vars and switches in the game to actual variables, but currently if you need to acsess game data open fear and hunger in rpgmaker mv, and then find the nubmer of the switch
-you want to acsess then just user $gameSwitches[index] to return the value.</p></article>
+/** @param {*} cb the callback to call*/
+Game_Item.prototype.setCb = function(cb) {
+    this.cb = cb;
+};
+
+Game_Item.prototype.clearCb = function() {
+    this.cb = null;
+};
+
+Game_Item.prototype.getCb = function() {
+    return this.cb;
+};
+
+Game_Item.prototype.useItem = function() {
+    if(this.cb)this.cb();
+};
+
+//this is called anytime any battler uses a action/skill/...etc...
+MATTIE.items.apply = Game_Battler.prototype.useItem ;
+Game_Battler.prototype.useItem  = function(item) {
+    MATTIE.items.apply.call(this,item);
+    if(item.cb) item.cb();
+};
+
+
+MATTIE.items.runtimeItems = [];
+
+MATTIE.items.runTimeItem = class {
+    
+    constructor(params) {
+        /**
+         * @description the actual data item of this class 
+         * @type {rm.types.Item}
+         * */
+        this._data  = this.buildDefaultParams();
+        this.setId();
+        this.cb = ()=>{};
+    }
+
+    /**
+     * @description create the default data item
+     * @returns the default dataItem obj
+     */
+    buildDefaultParams (){
+        let obj = {};
+        obj.name = "generic name"
+        obj.animationId = 0;
+        obj.consumable = 0;
+        obj.damage = 1;
+        obj.description = "A generic Item";
+        obj.effects = [];
+        obj.hitType = 0;
+        obj.iconIndex = 0;
+        obj.itypeId = 1;
+        obj.meta = "";
+        obj.note = "";
+        obj.occasion = 0;
+        obj.price = 0;
+        obj.repeats = 0;
+        obj.scope = 0; 
+        obj.speed = 1;
+        obj.successRate = 100;
+        obj.tpGain = 0;
+        return obj;
+        
+    }
+
+    /** @description 1: normal, 0: weapon, 0: armor?, 2: book */
+    setItemType(type){
+        this._data.itypeId = type;
+    }
+
+    setIconIndex(index){
+        this._data.iconIndex = index;
+    }
+
+    setId(){
+        this._data.id = $dataItems.length;
+    }
+
+    /**
+     * @description set the name of this item
+     * @param {String} name the new name
+     */
+    setName(name){
+        this._data.name = name;
+    }
+
+     /**
+     * @description set the desc of this item
+     * @param {String} desc the new desc
+     */
+     setDescription(desc){
+        this._data.description = desc;
+    }
+
+    /**
+     * @description set a callback to occur when this item is crafted
+     * @param {Function} cb the callback to be called 
+     */
+    setCraftingCallback(cb){
+        let openingTag = "&lt;Custom Synthesis Effect>";
+        let closingTag = "&lt;/Custom Synthesis Effect>";
+        this._data.craftingCb = cb;
+        let script = `$dataItems[${this._data.id}].craftingCb()`
+        this._data.customSynthEval = script;
+    }
+
+    /**
+     * @description add a recipe to the current item
+     * @param {id[]} itemIds array of items needed for this recipe
+     * @param {id}unlockItemId, the item that will unlock the recipe for this item
+     */
+    addRecipe (itemIds,unlockItemId){
+        let openingTag = "&lt;Synthesis Ingredients>\n";
+        let closingTag = "&lt;/Synthesis Ingredients>\n";
+        let items = itemIds.map(itemId=>("item "+itemId)).join("\n");
+        let recipeString = openingTag + items + closingTag;
+
+        let recipeUnlock = `\n&lt;Item Recipe: ${this._data.id}>\n`
+        $dataItems[unlockItemId].note += recipeUnlock;
+
+        this.addRecipeUnlock(unlockItemId);
+        DataManager.processISNotetags1([null,this._data],0)
+
+        this._data.note += recipeString;
+
+        
+
+        
+        itemIds.map(itemId=>DataManager.addSynthesisIngredient(this._data, "item "+itemId))
+       
+    }
+
+    addRecipeUnlock(unlockItemId){
+        let recipeUnlock = `\n&lt;Item Recipe: ${this._data.id}>\n`
+        $dataItems[unlockItemId].note += recipeUnlock;
+        DataManager.processISNotetags1([null,$dataItems[unlockItemId]],0)
+    }
+
+    /** @description set a callback to be called when this item is used */
+    setCallback(cb){
+        this.cb = cb;
+    }
+
+    spawn (){
+        MATTIE.items.runtimeItems.push(this);
+        $dataItems[this._data.id] = this._data;
+        if(DataManager.processItemCategoriesNotetags1) DataManager.processItemCategoriesNotetags1([null,this._data]) //termina compatability
+        DataManager.setCallbackOnItem(this._data.id,this.cb);
+    }
+
+    
+}</code></pre>
+        </article>
     </section>
-
-
 
 
 

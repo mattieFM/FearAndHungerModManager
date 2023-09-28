@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Home - Documentation</title>
+    <title>commonLibs/_common/betterCrowMauler.js - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -29,85 +29,360 @@
 
 <div id="main">
     
+    <h1 class="page-title">commonLibs/_common/betterCrowMauler.js</h1>
+    
 
     
 
 
 
     
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>var MATTIE = MATTIE || {};
+var MATTIE_RPG = MATTIE_RPG || {};
+
+MATTIE.betterCrowMauler = MATTIE.betterCrowMauler || {};
+/**
+ *  @description the number of milliseconds util it is checked if crow mauler can spawn 
+ *  @default 10000
+ * */
+MATTIE.betterCrowMauler.spawnInterval = 10000;
+/**
+ *  @description the chance that crow mauler will spawn every interval 
+ *  @default .03
+ * */
+MATTIE.betterCrowMauler.spawnChance = .03;
+
+/**
+ *  @description the chance that crow mauler will follow you into the next room
+ *  @default .2
+ * */
+MATTIE.betterCrowMauler.followChance = .15;
+
+/**
+ *  @description the chance that crow mauler will despawn when you leave a room
+ *  @default .05
+ * */
+MATTIE.betterCrowMauler.despawnChance = .15;
+
+/**
+ * @description the chance of crow mauler entering someones battle
+ * @default .005
+ */
+MATTIE.betterCrowMauler.combatEnterChance = .005;
 
 
+/** 
+ * @description the min amount of time that must pass before crow can spawn in ms 
+ * @default 100 sec
+ * 
+*/
+MATTIE.betterCrowMauler.timeToSpawnMin = 100000;
 
+MATTIE.betterCrowMauler.timeToSpawnMax = 10000000;
+MATTIE.betterCrowMauler.timeScaler = (t) => (.2 + (10 * (t/MATTIE.betterCrowMauler.timeToSpawnMax)));
 
+/** @description a scaler to scale the crow's spawn chance by */
+MATTIE.betterCrowMauler.scaler = 1;
 
-
-
-
-
+MATTIE.betterCrowMauler.crowController = function () {
+    setTimeout(() => {
+        this.disableBaseCrowMauler();  
+    }, 5000);
     
+    this.timeElapsed = 0;
+
+    /** @description whether this instance of the controller has spawned a crow mauler on this level */
+    this.hasSpawned = false;
+
+    /**@description whether a crow mauler has forced its way into this combat */
+    this.inBattle = false;
+
+    /** @description whether this instance of the controller's crow mauler is on screen or not  */
+    this.onScreen = false;
+    
+    /** @description the id of the mapId crow mauler was spawned in last */
+    this.mapId = 0;
+    /** 
+     * @description The current crow obj if spawned
+     * @type {MapEvent} 
+     * */
+    this.self = new MapEvent();
+
+    let prevFunc = Game_Player.prototype.performTransfer;
+    let that = this;
+    Game_Player.prototype.performTransfer = function() {
+        prevFunc.call(this);
+        that.onEnterRoom();
+        this.inBattle = false;
+    }
+
+    setInterval(() => {
+        this.timeElapsed+=MATTIE.betterCrowMauler.spawnInterval;
+        if(this.crowCanSpawn()){
+            if((!MATTIE.static.maps.onMenuMap()))
+            this.spawnTick();
+            this.battleSpawnTick(); 
+        }
+        
+    }, MATTIE.betterCrowMauler.spawnInterval);
+}
+
+/** @description whether this instance's crow mauler is dead */
+MATTIE.betterCrowMauler.crowController.prototype.isDead = function(){
+    let bool = this.self.checkSelfSwitch("A");
+    console.log("isdead: "+bool);
+    return bool;
+}
+
+/** @description a function to return the scaler, ment to be overriden if other mods need to change this */
+MATTIE.betterCrowMauler.crowController.prototype.getScaling = function(){
+    return MATTIE.betterCrowMauler.scaler * MATTIE.betterCrowMauler.timeScaler(this.timeElapsed);
+}
+
+/**
+ * @description disable crow mauler
+ * @todo make sure this works properly
+ */
+MATTIE.betterCrowMauler.crowController.prototype.disableBaseCrowMauler = function(){
+    $gameSwitches.setValue(MATTIE.static.switch.crowMaulerDisabled,true);
+}
+
+/**
+ * @description the function called every x ms to check if crow mauler should spawn
+ */
+MATTIE.betterCrowMauler.crowController.prototype.spawnTick = function(){
+    if(!this.onScreen &amp;&amp; !this.hasSpawned &amp;&amp; !this.isDead() &amp;&amp; !$gameParty.inBattle() &amp;&amp; SceneManager._scene instanceof Scene_Map)  this.update();
+}
+
+MATTIE.betterCrowMauler.crowController.prototype.battleSpawnTick = function(){
+    if(!this.isDead() &amp;&amp; $gameParty.inBattle() &amp;&amp; this.shouldEnterCombat() &amp;&amp; !this.inBattle){
+        MATTIE.msgAPI.footerMsg("A terrifying presence has entered the room...")
+        MATTIE.msgAPI.footerMsg("A terrifying presence is getting closer");
+        
+        setTimeout(() => {
+            MATTIE.msgAPI.footerMsg("A terrifying presence is behind you");
+            
+            setTimeout(() => {
+                this.invadeBattle();
+            }, 35000);
+            
+        }, 5000);
+       
+    }
+    
+}
+
+/** @description spawns crow mauler into the current battle */
+MATTIE.betterCrowMauler.crowController.prototype.invadeBattle = function(net=false){
+    if($gameParty.inBattle()){
+        this.inBattle = true;
+        let additionalTroop = new MATTIE.troopAPI.runtimeTroop(MATTIE.static.troops.crowMauler, 500, 0)
+        additionalTroop.spawn(net);
+    }
+    
+}
 
 
-    <section class="readme">
-        <article><h1>FearAndHungerModManager</h1>
-<p>Welcome to MATTIE's Fear And Hunger Mod Manager. This mod manager works for both F&amp;H 1 and 2.</p>
-<h2>Mod Loader Features</h2>
-<p>-Abiltiy to toggle on and off any and all mods you have installed.<br>
-<img src="https://github.com/mattieFM/FearAndHungerModManager/assets/66142165/e3012f3c-b75d-4ec4-a4d0-282b8ad24cf4" alt="image"></p>
-<p>-Save File Protection.<br>
--All mods are marked as either &quot;safe for save files&quot; or &quot;unsafe for save files&quot; if you are running mods that are unsafe for game files, the mod loader will create a seperate set of saves and protect your vanilla saves. If you are using mods that are safe for game files than the mod loader will load your normal saves for the game.<br>
--There are settings to make the mod manager always use its own saves or always use vanilla saves.<br>
--Ability to have seperate saves for each mod or combination of mods.<br>
--Config files to allow customisation of mods.<br>
--Automatically disables incompatible mods, and helps reduce crashes.</p>
-<h1>Mods</h1>
-<p>Most mods will work for both F&amp;H1 and F&amp;H2. But if they are not working properly than the mod loader should automatically disable them and inform you which one it believes is not supported.</p>
-<h3>Better Saves</h3>
-<p>-Allows as many save files as you would like, by default max saves is set to 99 but can be set to how ever large a value you would like.<br>
--Also displays name and difficulty on save files, as shown below:<br>
-<img src="https://github.com/mattieFM/FearAndHungerModManager/assets/66142165/37b1610a-fd7f-4559-83ed-8103e536113f" alt="image"></p>
-<h3>Dev Tools.</h3>
-<p>-Press &quot;i&quot; to open and close a cheat menu.<br>
--Press &quot;v&quot; to use a better form of phase step.</p>
-<h3>Unlocked Blood Portal</h3>
-<p>-Press &quot;b&quot; to open the blood portal menu from anywhere. Allowing fast travel from any location.</p>
-<h3>Quick Save / Load</h3>
-<p>-Press &quot;o&quot; to open the quick load menu<br>
--Press &quot;l&quot; to open the quick save menu</p>
-<h3>Multiplayer</h3>
-<p>-WIP
--A lot of changes</p>
-<h1>Install</h1>
-<p>-First Decrypt Fear and Hunger files, this can be done with any RPGMaker MV decrypter, but the one me and Frap use is linked below:
-https://bitbucket.org/SilicaAndPina/rpgmv-decryptor/downloads/
--Download this repo.<br>
--add the mods folder to your game's www/ folder.<br>
--replace your game's index.html file with mine.<br>
--The mod loader &amp; all my mods are now installed.<br>
--once the game launches on the main menu you can see a mods tab to activate or deactivate any mod/mods you would like.<br>
-<img src="https://github.com/mattieFM/FearAndHungerModManager/assets/66142165/0afa2d96-8f7f-451c-a972-b6f520cbc214" alt="image"></p>
-<h1>development info</h1>
-<p>Mods consist of 2 files, a .js file and a .json file, the .json file contains information about the mod, think of it as a config file of sorts. It must contain the following values<br>
-{<br>
-&quot;name&quot;:(string)(the file name of the mod)<br>
-&quot;status&quot;:(boolean)(this is wether the mod is enabled or not, it should be set to false by default untill the user enables it),<br>
-&quot;parameters&quot;:(dict)(a dictionary of any config options / values that you want the user to be able to edit),<br>
-&quot;danger&quot;: (boolean) (wether or not this mod poses a risk to save file and save data, could this mod result in damage to the save data or not)<br>
-}</p>
-<p>there is one more value that is not required which is:<br>
-{<br>
-&quot;dependencies&quot;: (array) (array of file names without prefixes that need to be loaded before this mod can be run).<br>
-}<br>
-The Mod Loader will attempt to load mods without a .json file by creating a json file with default values for them. This allows compatibility with Cheshire's mods and things of the sort.</p>
-<p>the .js file is akin to a plugin file for RPG maker but it does not need any of the specific rpg maker metadata or comments as the mod is loaded as a mod rather than a plugin.<br>
-Any mod with _ at the front of its name will be loaded before files without a _, this is useful for loading Libraries that are common between all of your mods. The commonLib's folder is not ment to be edited ever, these are files specific to the mod loader and are loaded before everything else.</p>
-<p>Example mods can be found in the mods folder, and the commonLibs folder is also provided, this mod is loaded first before all other mods. _Common.js should NOT be edited, if you want to add a common.js file
-that loads before all other mods for your own mods, just add an _ to the name of it and it will load before them.</p>
-<p>\</p>
-<p>Eventually I will propperly map out control vars and switches in the game to actual variables, but currently if you need to acsess game data open fear and hunger in rpgmaker mv, and then find the nubmer of the switch
-you want to acsess then just user $gameSwitches[index] to return the value.</p></article>
+/**
+ * @description checks if crow mauler can spawn
+ * @returns {boolean}
+ */
+MATTIE.betterCrowMauler.crowController.prototype.crowCanSpawn = function(){
+    return $gameSwitches.value(MATTIE.static.switch.crowMaulerCanSpawn) &amp;&amp; !$gameSwitches.value(MATTIE.static.switch.crowMaulerDead) &amp;&amp; this.timeElapsed > MATTIE.betterCrowMauler.timeToSpawnMin;
+}
+
+/**
+ * @description get all possible entry or exit event tiles in the room
+ * @returns an array of every event that has an active transfer event in its list
+ */
+MATTIE.betterCrowMauler.crowController.prototype.getAllTransferPointsOnMap = function(){
+    let arr = []
+    if($gameMap){
+        arr = $gameMap.events().filter((event)=>{
+            if(event.event()){
+                let page = event.event().pages[event._pageIndex];
+                if(page){
+                    return page.list.map(cmd=>cmd.code).includes(MATTIE.static.commands.transferId);
+                }
+                return false
+            }
+            
+            
+        })
+    }
+    
+    return arr
+}
+
+/**
+ * @description find the closest spawn point to a provided x and y
+ * @param {int} x;
+ * @param {int} y;
+ * @returns {Game_Event} the closest possible spawn point to the players current x and y
+ */
+MATTIE.betterCrowMauler.crowController.prototype.findClosestSpawnPoint = function(x,y){
+    let spawnPoints = this.getAllTransferPointsOnMap();
+    let closest = spawnPoints[0];
+    if(closest){
+        let dist = MATTIE.util.getDist(x,closest.x,y,closest.y);
+        for (let index = 1; index &lt; spawnPoints.length; index++) {
+            /** @type {Game_Event} */
+            const element = spawnPoints[index];
+            let thisDist = MATTIE.util.getDist(x,element.x,y,element.y);
+            if(thisDist &lt; dist) {
+                if(MATTIE.isPassableAnyDir(element)){
+                    dist = thisDist;
+                    closest = element
+                }
+                
+            }
+        }
+    }
+    return closest;
+}
+
+MATTIE.betterCrowMauler.crowController.prototype.createCrowObj = function(){
+    let event = MATTIE.eventAPI.createEnemyFromExisting(53,207,2,9);
+    return event;
+}
+
+/**
+ * @description crow mauler enter the room
+ */
+MATTIE.betterCrowMauler.crowController.prototype.enter = function(){
+    MATTIE.msgAPI.footerMsg("A terrifying presence has entered the room...")
+    this.spawn();
+}
+
+/**
+ * @description spawn the crow mauler event removing the previous one if it exists
+ */
+MATTIE.betterCrowMauler.crowController.prototype.spawn = function(){
+    this.timeElapsed = 0;
+        if(!this.hasSpawned &amp;&amp; !this.isDead() &amp;&amp; !$gameParty.inBattle()){
+            this.onScreen = true;
+            let spot = this.findClosestSpawnPoint($gamePlayer.x, $gamePlayer.y);
+            if(spot){
+                this.self = this.createCrowObj();
+                this.self.spawn(spot.x,spot.y);
+            
+                this.mapId = $gameMap.mapId();
+                this.hasSpawned = true;
+            }
+           
+        }
+    
+}
+
+
+/**
+ * @description crow mauler follow player from last room to this room
+ */
+MATTIE.betterCrowMauler.crowController.prototype.follow = function(){
+    setTimeout(() => {
+        MATTIE.msgAPI.footerMsg("A terrifying presence has followed you into the room...");
+    },4000);
+    setTimeout(() => 
+    {
+        this.spawn();
+    }, 6000);
+    
+}
+
+/** 
+ * @description checks if the crow mauler can follow the player, if the crow mauler was in the last room and rand chance.
+ * 
+ * */
+MATTIE.betterCrowMauler.crowController.prototype.canFollow = function(){
+    return MATTIE.util.randChance(MATTIE.betterCrowMauler.followChance*this.getScaling()) &amp;&amp; (this.mapId === $gameMap.lastMapId());
+}
+
+
+/** 
+ * @description checks a random chance to see if the crow should despawn
+ * 
+ * */
+MATTIE.betterCrowMauler.crowController.prototype.shouldDespawn = function(){
+    return !this.isDead() &amp;&amp; MATTIE.util.randChance(MATTIE.betterCrowMauler.despawnChance);
+}
+
+/** 
+ * @description checks a random chance to see if the crow should appear in combat
+ * 
+ * */
+
+MATTIE.betterCrowMauler.crowController.prototype.shouldEnterCombat = function(){
+    return !this.isDead() &amp;&amp; !this.onScreen &amp;&amp; MATTIE.util.randChance(MATTIE.betterCrowMauler.combatEnterChance*this.getScaling());
+}
+
+
+MATTIE.betterCrowMauler.crowController.prototype.despawn = function(){
+    if(!this.isDead()){
+        this.self.removeThisEvent();
+        this.hasSpawned = false;
+    }
+    
+}
+
+
+MATTIE.betterCrowMauler.crowController.prototype.onEnterRoom = function(){
+    if($gameMap.mapId() != this.mapId) this.onScreen = false;
+    if(!this.isDead() &amp;&amp; !this.onScreen){
+        if(this.canFollow() &amp;&amp; this.crowCanSpawn()){
+            this.despawn();
+            this.follow();
+        } else if(this.shouldDespawn()){
+            this.despawn();
+        }
+    }
+   
+}
+
+MATTIE.betterCrowMauler.crowController.prototype.update = function(){
+    console.log("updated")
+    if(MATTIE.util.randChance(MATTIE.betterCrowMauler.spawnChance*this.getScaling())){
+        console.log("entered")
+        this.enter();
+    }
+}
+/**
+ * @description set up the crow mauler class and assign it to the variable we use
+ */
+MATTIE.betterCrowMauler.betterCrowMaulerInit = function(){
+    let crowCont = new MATTIE.betterCrowMauler.crowController();
+    if(MATTIE.betterCrowMauler)
+    MATTIE.betterCrowMauler.crowCont = crowCont; 
+}
+
+
+
+/** @description cleanup the crow controller if it exists */
+MATTIE.betterCrowMauler.betterCrowMaulerCleanup = function(){
+    if(MATTIE.betterCrowMauler)
+    MATTIE.betterCrowMauler.crowCont = null; 
+}
+
+
+
+//--------------------------------------------------
+// Multiplayer Compatibility
+//--------------------------------------------------
+MATTIE.betterCrowMauler.multiplayerCompatPRevFunc = MATTIE.betterCrowMauler.crowController.prototype.getScaling;
+if(MATTIE.multiplayer){
+    MATTIE.betterCrowMauler.crowController.prototype.getScaling = function(){
+        if(MATTIE.multiplayer.getCurrentNetController){
+            let netCont = MATTIE.multiplayer.getCurrentNetController();
+            return 1 / Object.keys(netCont.netPlayers).length * MATTIE.betterCrowMauler.multiplayerCompatPRevFunc.call(this);
+        }else{
+            return MATTIE.betterCrowMauler.scaler;
+        }
+    }
+    
+}</code></pre>
+        </article>
     </section>
-
-
 
 
 
