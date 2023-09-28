@@ -14,10 +14,10 @@
         "cleverLinks": false,
         "monospaceLinks": false,
         "logo": {
-            "url": "http://nhnent.github.io/tui.component.tree/latest/styles/logo.png",
+            "url": "https://github.com/mattieFM/FearAndHungerModManager/blob/main/www/mods/commonLibs/_common/images/logo.png?raw=true",
             "width": "150px",
             "height": "13px",
-            "link": "https://github.com/nhnent/tui.jsdoc-template"
+            "link": "https://github.com/mattieFM/FearAndHungerModManager/blob/main/www/mods/commonLibs/_common/images/modLoadingScreen.png"
         }
     },
     "opts": {
