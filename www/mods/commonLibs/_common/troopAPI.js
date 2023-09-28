@@ -13,7 +13,10 @@ MATTIE_RPG.TroopApi_Game_Troop_Initialize = Game_Troop.prototype.initialize;
 /** @description the extended method for inializing a game troop, this also inializeds the .additionalTroops thing that we use later */
 Game_Troop.prototype.initialize = function() {
     MATTIE_RPG.TroopApi_Game_Troop_Initialize.call(this);
-    /** @type {MATTIE.troopAPI.runtimeTroop[]} an array of all additional troops */
+    /** 
+     * @description an array of all additional troops
+     * @type {MATTIE.troopAPI.runtimeTroop[]} 
+     */
     if(!this._additionalTroops)this._additionalTroops = {};
 };
 
@@ -21,13 +24,16 @@ Game_Troop.prototype.initialize = function() {
 MATTIE_RPG.TroopApi_Game_Troop_Setup = Game_Troop.prototype.setup;
 /**
  * @description the setup function for a game troop, extended to also support offset and additional troops
- * @param {int || int[]} troopId the troop id or an array of ids 
+ * @param {int | int[]} troopId the troop id or an array of ids 
  * @param {int} xOffset default 0, offset the entire troop by this amount
  * @param {int} yOffset default 0, offset the entire troop by this amount
  */
 Game_Troop.prototype.setup = function(troopId, xOffset =0, yOffset =0, cb = ()=>{}){
 
-    /** @type {MATTIE.troopAPI.runtimeTroop[]} an array of all additional troops */
+    /** 
+     * @description an array of all additional troops
+     * @type {MATTIE.troopAPI.runtimeTroop[]}  
+     * */
     this._additionalTroops = {};
 
     if(typeof troopId == 'number'){

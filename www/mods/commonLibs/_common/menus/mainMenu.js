@@ -24,7 +24,7 @@ MATTIE.menus.mainMenu.removeBtnFromMainMenu = function(displayText,sym){
  * @description add a new button to the main menu
  * @param {string} displayText the text to display
  * @param {string} cmdText the string to name the command (must be unique)
- * @param {()=>{}} cb the callback
+ * @param {Function} cb the callback
  */
 
 MATTIE.menus.mainMenu.addBtnToMainMenu = function (displayText,cmdText,cb,enabled=true) {

@@ -212,8 +212,8 @@ MATTIE.actorAPI.Data_Class = class {
         this.data.note = this.defaultNote();
 
         /**
-         * @description no idea
-         * @type {int[]} a massive array of ints
+         * @description A massive array of ints
+         * @type {int[]}
          */
         this.data.params = this.defaultParams();
 
