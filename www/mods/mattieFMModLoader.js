@@ -49,20 +49,20 @@ MATTIE.menus.mainMenu = MATTIE.menus.mainMenu || {};
  * @returns {Promise}
  */
 PluginManager.loadScript = function (name) {
-	return new Promise((res) => {
-		MATTIE.global.checkGameVersion().then(() => {
-			const url = this._path + name;
-			const script = document.createElement('script');
-			script.type = 'text/javascript';
-			script.src = url;
-			script.async = false;
-			script.onerror = this.onError.bind(this);
-			script._url = url;
-			script.addEventListener('load', (ev) => {
-				res();
-			});
-			document.body.appendChild(script);
+	// eslint-disable-next-line no-async-promise-executor
+	return new Promise(async (res) => {
+		await MATTIE.global.checkGameVersion();
+		const url = this._path + name;
+		const script = document.createElement('script');
+		script.type = 'text/javascript';
+		script.src = url;
+		script.async = false;
+		script.onerror = this.onError.bind(this);
+		script._url = url;
+		script.addEventListener('load', (ev) => {
+			res();
 		});
+		document.body.appendChild(script);
 	});
 };
 /**
