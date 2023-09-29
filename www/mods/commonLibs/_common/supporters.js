@@ -1,3 +1,4 @@
+var MATTIE = MATTIE || {};
 MATTIE.supporters = MATTIE.supporters || {};
 
 /** @description a list of supporters and beta testers */

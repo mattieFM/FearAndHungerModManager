@@ -3,6 +3,7 @@
     "status":true,
     "parameters":{},
     "dependencies": [
+        "_common/yanflyChecker",
         "_common/betterPhysAtkAnim",
         
         "_common/systemEvents",

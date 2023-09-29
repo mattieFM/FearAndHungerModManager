@@ -1,7 +1,7 @@
 var MATTIE_ModManager = MATTIE_ModManager || {};
 
 MATTIE.scenes = MATTIE.scenes || {};
-MATTIE.global = MATTIE.global || {};
+
 MATTIE.static = MATTIE.static || {};
 MATTIE.emptyScroll = MATTIE.emptyScroll || {};
 console.log(MATTIE.modLoader._mods);

@@ -4,10 +4,8 @@ var MATTIE_ModManager = MATTIE_ModManager || {};
  * @description The api for interacting with items
  */
 MATTIE.itemAPI = MATTIE.itemAPI || {};
-MATTIE.global = MATTIE.global || {};
-MATTIE.static = MATTIE.static || {};
 
-var Yanfly = Yanfly || {};
+MATTIE.static = MATTIE.static || {};
 
 const EffectCodes = {
 	RECOVER_HP: 11,
