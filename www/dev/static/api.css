@@ -10,6 +10,7 @@
     --memberColor: #a5bf9f;
     --linkColor: #8ab5ba;
     --font: serif;
+    --fontScaler: 1.2;
     background-color: var(--main-bg-color);
 
     scrollbar-color: #473636,
@@ -27,7 +28,7 @@
 }
 
 body {
-    font-size: 12px;
+    font-size: calc(12px * var(--fontScaler));
     font-family: var(--font);
 }
 ul, ol, li {list-style:none; padding-left:0; margin-left:0;}
@@ -56,7 +57,7 @@ ul, ol, li {list-style:none; padding-left:0; margin-left:0;}
     font-style: italic;
 }
 .lnb h3 {
-    font-size: 1.5em;
+    font-size: calc(1.5em * var(--fontScaler));
     color: var(--classColor);
 }
 .lnb h3 a {
@@ -94,14 +95,14 @@ ul, ol, li {list-style:none; padding-left:0; margin-left:0;}
     outline: 0;
 }
 .lnb .lnb-api .toggle-subnav {
-    font-size: 10px;
+    font-size: calc(10px * var(--fontScaler));
 }
 .lnb .member-type {
     margin-top: 5px;
     margin-left: 5px;
     color: var(--memberColor);
     font-weight: normal;
-    font-size: 10px;
+    font-size: calc(10px * var(--fontScaler));
     cursor: text;
 }
 .lnb .inner li {
@@ -120,7 +121,7 @@ ul, ol, li {list-style:none; padding-left:0; margin-left:0;}
 
 .lnb .version {
     color: #aaa;
-    font-size: 1.2em;
+    font-size: calc(1.2em * var(--fontScaler));
 }
 
 /* LNB-TAB */
@@ -134,11 +135,11 @@ ul, ol, li {list-style:none; padding-left:0; margin-left:0;}
 }
 .lnb-tab li a {
     color: #aaa;
-    font-size: 0.9em;
+    font-size: calc(0.9em * var(--fontScaler));
 }
 .lnb-tab li.selected a {
     color: #fff;
-    font-size: 1em;
+    font-size: calc(1em * var(--fontScaler));
 }
 .lnb-tab li+li a h4:before {
     content: "\007C";
@@ -167,7 +168,7 @@ ul, ol, li {list-style:none; padding-left:0; margin-left:0;}
     border-bottom: 1px solid #999;
 }
 .main section header h2 {
-    font-size:18px;
+    font-size: calc(18px * var(--fontScaler));
     font-weight:bold;
     padding-left : 5px;
     border-left: 5px solid #dc9656;
@@ -181,20 +182,20 @@ ul, ol, li {list-style:none; padding-left:0; margin-left:0;}
     border-radius: 7px;
 }
 .main section article h3.subsection-title {
-    font-size:16px;
+    font-size: calc(16px * var(--fontScaler));
     color: var(--classColor);
     padding:35px 0 0 5px;
     border-bottom: 1px solid #dedede;
 }
 .main section article dl h4 {
-    font-size: 12px;
+    font-size: calc(12px * var(--fontScaler));
     font-weight: bold;
 }
 .main section article dl h4 .signature {
-    font-size: 9pt;
+    font-size: calc(9pt * var(--fontScaler));
 }
 .main section article dl h4 .type-signature {
-    font-size: 9pt;
+    font-size: calc(9pt * var(--fontScaler));
     color: #31708f;
     font-weight: normal;
 }
@@ -211,7 +212,7 @@ ul, ol, li {list-style:none; padding-left:0; margin-left:0;}
 .main section article .container-source {
     margin: -15px -15px 3px 0;
     font-weight: normal;
-    font-size: 8pt;
+    font-size: calc(8pt * var(--fontScaler));
     text-align: right;
     padding-right: 10px;
 }
@@ -235,7 +236,7 @@ ul, ol, li {list-style:none; padding-left:0; margin-left:0;}
 .main section article table td.type,
 .main section article table td.attributes {
     font-family: Verdana, sans-serif;
-    font-size: 90%;
+    font-size: calc(90% * var(--fontScaler));
 }
 .main section article table,
 .main section article table th,
@@ -264,7 +265,7 @@ ul, ol, li {list-style:none; padding-left:0; margin-left:0;}
 .main section article table td h6 {
     padding: 0 0 0 3px;
     margin: 3px 0 0 3px;
-    font-size: 85%;
+    font-size: calc(85% * var(--fontScaler));
 }
 .main section article .container-properties table.props {
     margin-top: -3px;
@@ -285,7 +286,7 @@ ul, ol, li {list-style:none; padding-left:0; margin-left:0;}
 }
 .main .main-detail .tag-author a {
     color:#181818;
-    font-size:11px;
+    font-size: calc(11px * var(--fontScaler));
     text-decoration:none;
 }
 .linenums li.selected {
@@ -312,7 +313,7 @@ footer {
 
 /* README*/
 .readme {
-    font-size: 14px;
+    font-size: calc(14px * var(--fontScaler));
 }
 .readme p,
 .readme ul,
@@ -326,7 +327,7 @@ footer {
     max-width: 100%;
 }
 .readme h1 {
-    font-size:24px;
+    font-size: calc(24px * var(--fontScaler));
     font-weight:normal;
     padding: 10px 0 5px 0;
     border-bottom: 1px solid #428bca;
@@ -344,21 +345,21 @@ footer {
 .readme h2 {
     padding-bottom: 3px;
     border-bottom: 1px solid #dedede;
-    font-size: 22px;
+    font-size: calc(22px * var(--fontScaler));
 }
 .readme h3 {
-    font-size: 20px;
+    font-size: calc(20px * var(--fontScaler));
     padding-bottom: 3px;
 }
 
 .readme h4 {
-    font-size: 18px;
+    font-size: calc(18px * var(--fontScaler));
 }
 .readme h5 {
-    font-size: 16px;
+    font-size: calc(16px * var(--fontScaler));
 }
 .readme h6 {
-    font-size: 15px;
+    font-size: calc(15px * var(--fontScaler));
 }
 .readme table {
     margin: 5px 30px 20px;
@@ -369,7 +370,7 @@ footer {
     border-bottom: 1px solid #dedede;
 }
 .readme section header h2 {
-    font-size:20px;
+    font-size: calc(20px * var(--fontScaler));
     padding-left:10px;
     border-left:5px solid var(--classColor);
 }
@@ -412,7 +413,7 @@ footer {
     font-weight: normal;
 }
 .search-container ul {
-    font-size: 13px;
+    font-size: calc(13px * var(--fontScaler));
     position: absolute;
     width: 100%;
     background-color: #456e82;
@@ -443,7 +444,7 @@ footer {
     color: #ff4141;
 }
 .search-container ul li .group {
-    font-size: 11px;
+    font-size: calc(11px * var(--fontScaler));
     color: #ccc;
     margin-left: 10px;
 }
@@ -479,11 +480,11 @@ span.param-type {
     color: #aaa;
 }
 pre.prettyprint {
-    font-size: 0.9em;
+    font-size: calc(0.9em * var(--fontScaler));
     border-radius: 0;
 }
 span.icon {
-    font-size: 8pt;
+    font-size: calc(8pt * var(--fontScaler));
     border-radius: 3px;
     padding: 1px 2px;
 }
@@ -508,6 +509,6 @@ span.icon.red {
     border-color: #ebccd1;
 }
 span.arrow {
-    font-size: 8pt;
+    font-size: calc(8pt * var(--fontScaler));
     padding-right: 5px;
 }
