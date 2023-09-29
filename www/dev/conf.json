@@ -8,7 +8,7 @@
     "source": {
         "include": [
             "./www/mods/",
-            "README.MD"
+            "./README.MD"
         ],
         "includePattern": ".+\\.js(doc|x)?$"
     },
