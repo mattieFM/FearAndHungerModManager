@@ -64,6 +64,9 @@ MATTIE.global.checkGameVersion = function () {
 //--------------------------------------------------------------
 // Mod data
 //--------------------------------------------------------------
+/**
+ * @class the class that handles global data
+ */
 MATTIE.DataManager.global = function () {
 	throw new Error('This is a static class');
 };
@@ -133,11 +136,16 @@ MATTIE.DataManager.global.get = function (key) {
 
 /**
  *
- * @param {*} orgFilePath the path to the file from www/
- * @param {*} destPath the path within the img folder
- * @param {*} name the name of the file
+ * @param {string} orgFilePath the path to the file from www/
+ * @param {string} destPath the path within the img folder
+ * @param {string} name the name of the file
+ * @param {string} name2 the name of the destination file if different than normal name
+ * @param {boolean} force whether this should overwrite or not
+ * @param {boolean} deleteOrg whether the original file should be deleted after coping
+ *
+ * @returns {bool} if there is already a file at the dest location
  */
-MATTIE.DataManager.addFileToImgFolder = function (orgFilePath, destPath, name, name2 = null) {
+MATTIE.DataManager.addFileToImgFolder = function (orgFilePath, destPath, name, name2 = null, force = false, deleteOrg = false) {
 	if (!name.endsWith('.png'))name += '.png';
 	if (name2) if (!name2.endsWith('.png')) name2 += '.png';
 	const fs = require('fs');
@@ -146,7 +154,21 @@ MATTIE.DataManager.addFileToImgFolder = function (orgFilePath, destPath, name, n
 
 	orgFilePath = src + orgFilePath + name;
 	destinationPath = `${src}/img/${destPath}${name2 || name}`;
-	fs.copyFileSync(orgFilePath, destinationPath);
+
+	const fileExists = fs.existsSync(destinationPath);
+
+	if (!fileExists || force) {
+		console.log("created:" + destinationPath)
+		fs.copyFileSync(orgFilePath, destinationPath);
+	}
+	if(deleteOrg){
+		fs.unlink(orgFilePath);
+	}
+
+	
+	
+
+	return fileExists;
 };
 
 /**

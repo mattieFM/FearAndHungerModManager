@@ -178,7 +178,6 @@ Game_Troop.prototype.addRuntimeTroop = function (troop) {
  *
 */
 Game_Troop.prototype.getMId = function () {
-	const id = MTroopId;
 	const notMtroopId = !(this instanceof MATTIE.troopAPI.RuntimeTroop) ? -1 : -2;
 	return this._MTroopId ? this._MTroopId : notMtroopId;
 };
