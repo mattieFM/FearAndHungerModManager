@@ -1,4 +1,3 @@
-var MATTIE = MATTIE || {};
 MATTIE.quickSaves = MATTIE.quickSaves || {};
 
 MATTIE.quickSaves.quickSaveId = 9998;

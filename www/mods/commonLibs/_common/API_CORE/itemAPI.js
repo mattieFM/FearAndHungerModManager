@@ -1,6 +1,9 @@
 var MATTIE_ModManager = MATTIE_ModManager || {};
-var MATTIE = MATTIE || {};
-MATTIE.items = MATTIE.items || {};
+/**
+ * @namespace MATTIE.itemAPI
+ * @description The api for interacting with items
+ */
+MATTIE.itemAPI = MATTIE.itemAPI || {};
 MATTIE.global = MATTIE.global || {};
 MATTIE.static = MATTIE.static || {};
 
@@ -106,15 +109,15 @@ DataManager.addItemEffect = function (id, effect) {
 DataManager.addEffect = function (obj, effect) {
 	obj.effects.push(effect);
 };
-MATTIE.items.object = Game_Item.prototype.object;
+MATTIE.itemAPI.object = Game_Item.prototype.object;
 Game_Item.prototype.object = function () {
-	return MATTIE.items.object.call(this);
+	return MATTIE.itemAPI.object.call(this);
 	// else return null;
 };
 
-MATTIE.items.setObject = Game_Item.prototype.setObject;
+MATTIE.itemAPI.setObject = Game_Item.prototype.setObject;
 Game_Item.prototype.setObject = function (item) {
-	MATTIE.items.setObject.call(this, item);
+	MATTIE.itemAPI.setObject.call(this, item);
 	if (item) {
 		if (item.hasCallback) {
 			this.setCb(item.cb);
@@ -141,15 +144,15 @@ Game_Item.prototype.useItem = function () {
 };
 
 // this is called anytime any battler uses a action/skill/...etc...
-MATTIE.items.apply = Game_Battler.prototype.useItem;
+MATTIE.itemAPI.apply = Game_Battler.prototype.useItem;
 Game_Battler.prototype.useItem = function (item) {
-	MATTIE.items.apply.call(this, item);
+	MATTIE.itemAPI.apply.call(this, item);
 	if (item.cb) item.cb();
 };
 
-MATTIE.items.RunTimeItems = [];
+MATTIE.itemAPI.RunTimeItems = [];
 
-MATTIE.items.RunTimeItem = class {
+MATTIE.itemAPI.RunTimeItem = class {
 	constructor(params) {
 		/**
          * @description the actual data item of this class
@@ -262,7 +265,7 @@ MATTIE.items.RunTimeItem = class {
 	}
 
 	spawn() {
-		MATTIE.items.RunTimeItems.push(this);
+		MATTIE.itemAPI.RunTimeItems.push(this);
 		$dataItems[this._data.id] = this._data;
 		if (DataManager.processItemCategoriesNotetags1) DataManager.processItemCategoriesNotetags1([null, this._data]); // termina compatability
 		DataManager.setCallbackOnItem(this._data.id, this.cb);

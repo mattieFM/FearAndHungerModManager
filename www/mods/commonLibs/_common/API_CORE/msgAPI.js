@@ -1,4 +1,7 @@
-var MATTIE = MATTIE || {};
+/**
+ * @namespace MATTIE.msgAPI
+ * @description The api for display in game messages to the player. Basically a glorified wrapper for ShowText command.
+ */
 MATTIE.msgAPI = MATTIE.msgAPI || {};
 
 // check DreamX exists for compatibility reasons

@@ -1,5 +1,7 @@
-var MATTIE = MATTIE || {};
-
+/**
+ * @namespace MATTIE.fxAPI
+ * @description The api for screen effects. IE: filters, screen shake, etc...
+ */
 MATTIE.fxAPI = {};
 
 //----------------------------------------------

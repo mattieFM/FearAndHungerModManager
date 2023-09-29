@@ -1,4 +1,3 @@
-var MATTIE = MATTIE || {};
 MATTIE.static = MATTIE.static || {};
 
 DataManager.changeActivationCondition(MATTIE.static.skills.hurting, 0);

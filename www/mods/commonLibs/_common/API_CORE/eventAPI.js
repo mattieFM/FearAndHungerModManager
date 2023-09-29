@@ -1,4 +1,8 @@
-var MATTIE = MATTIE || {};
+/**
+ * @namespace MATTIE.eventAPI
+ * @description The main API the modding engine uses to perform any actions regarding events
+ * This api is mostly for runtime events, if you want to add new compile time events look at loading data assets.
+ */
 MATTIE.eventAPI = MATTIE.eventAPI || {};
 MATTIE.eventAPI.dataEvents = MATTIE.eventAPI.dataEvents || {};
 MATTIE.eventAPI.blankEvent = {};

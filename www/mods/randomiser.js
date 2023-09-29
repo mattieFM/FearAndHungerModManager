@@ -1,4 +1,3 @@
-var MATTIE = MATTIE || {};
 MATTIE.randomiser = MATTIE.randomiser || {};
 MATTIE.static = MATTIE.static || {};
 

@@ -5,7 +5,7 @@
 *
 * mods define their
 */
-var MATTIE = MATTIE || {};
+
 MATTIE.saves = MATTIE.saves || {};
 MATTIE.saves.suspendedRunId = 9998;
 MATTIE.betterSaves = {};

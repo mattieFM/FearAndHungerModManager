@@ -1,6 +1,8 @@
-var MATTIE = MATTIE || {};
 var MATTIE_ModManager = MATTIE_ModManager || {};
-
+/**
+ * @description we override the localfile directory function to return the modded saves folder when applicable
+ * @returns path
+ */
 StorageManager.localFileDirectoryPath = function () {
 	const path = require('path');
 

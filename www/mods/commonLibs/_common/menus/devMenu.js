@@ -1,4 +1,3 @@
-var MATTIE = MATTIE || {};
 MATTIE.devTools = MATTIE.devTools || {};
 MATTIE.menus = MATTIE.menus || {};
 MATTIE.windows = MATTIE.windows || {};

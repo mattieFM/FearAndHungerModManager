@@ -1,4 +1,3 @@
-var MATTIE = MATTIE || {};
 MATTIE.bbgirlMod = {};
 
 MATTIE.prevFun5325c = Game_Actor.prototype.characterName;

@@ -1,19 +1,85 @@
 var MATTIE_ModManager = MATTIE_ModManager || {};
-var MATTIE = MATTIE || {};
+
 MATTIE.global = MATTIE.global || {};
+/**
+ * @namespace MATTIE.static
+ * @description This namespace contains all game specific values IE: if you need crow mauler's id it should be here.
+ * This also allows us to update values that are present in both 1 & 2 to their correct values
+ */
 MATTIE.static = MATTIE.static || {};
+
+/**
+ * @namespace MATTIE.static.items
+ * @description This name space contains all static item values
+ */
 MATTIE.static.items = MATTIE.static.items || {};
+
+/**
+ * @namespace MATTIE.static.actors
+ * @description This name space contains all static actor values
+ */
 MATTIE.static.actors = MATTIE.static.actors || {};
+
+/**
+ * @namespace MATTIE.static.skills
+ * @description This name space contains all static skills values
+ */
 MATTIE.static.skills = MATTIE.static.skills || {};
+
+/**
+ * @namespace MATTIE.static.states
+ * @description This name space contains all static state values
+ */
 MATTIE.static.states = MATTIE.static.states || {};
+
+/**
+ * @namespace MATTIE.static.rpg
+ * @description This name space contains very few rpgmaker constants
+ * @deprecated create a types declaration later when we have a chance
+ */
 MATTIE.static.rpg = MATTIE.static.rpg || {};
+
+/**
+ * @namespace MATTIE.static.commonEvents
+ * @description contains common event info
+ */
 MATTIE.static.commonEvents = MATTIE.static.commonEvents || {};
+
+/**
+ * @namespace MATTIE.static.variable
+ * @description contains game variables
+ */
 MATTIE.static.variable = MATTIE.static.variable || {};
+
+/**
+ * @namespace MATTIE.static.switch
+ * @description contains game switches
+ */
 MATTIE.static.switch = MATTIE.static.switch || {};
+
+/**
+ * @namespace MATTIE.static.commands
+ * @description contains rpgmaker command codes
+ * @deprecated build a types declaration later
+ */
 MATTIE.static.commands = MATTIE.static.commands || {};
 
+/**
+ * @namespace MATTIE.static.maps
+ * @description contains map info
+ */
 MATTIE.static.maps = MATTIE.static.maps || {};
+
+/**
+ * @namespace MATTIE.static.events
+ * @description contains events info
+ */
 MATTIE.static.events = MATTIE.static.events || {};
+
+/**
+ * @namespace MATTIE.static.events.images
+ * @description contains images info
+ */
 MATTIE.static.events.images = MATTIE.static.events.images || {};
 
 // commandIds
@@ -44,9 +110,16 @@ MATTIE.static.skills.enGarde = null;
 MATTIE.static.rpg.battleProcessingId = 301;
 
 // Variableids
+/** @description a list of sync variables for multiplayer */
 MATTIE.static.variable.syncedVars = [];
+
+/** @description a list of ignored variables for multiplayer */
 MATTIE.static.variable.ignoredVars = [];
+
+/** @description a list of secondary synced variables for multiplayer (less prio) */
 MATTIE.static.variable.secondarySyncedVars = [];
+
+/** @description a list of all variables that govern god affinity */
 MATTIE.static.variable.godAffinityAndPrayerVars = [];
 
 // switchids

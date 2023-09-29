@@ -1,8 +1,13 @@
 // TODO: make this less hacky in the future.
 // TODO: add popup that appears if the user forgot to decompile the game before using the modmanager.
 
-var MATTIE = MATTIE || {};
+/**
+ * @namespace MATTIE.compat
+ * @description the name space used for compatibility changes
+ * */
 MATTIE.compat = MATTIE.compat || {};
+
+/** @description whether decryption of images should be forcibly stopped or not */
 MATTIE.compat.pauseDecrypt = false;
 
 var Yanfly = Yanfly || false;

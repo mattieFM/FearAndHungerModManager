@@ -1,4 +1,3 @@
-var MATTIE = MATTIE || {};
 MATTIE.util = MATTIE.util || {};
 
 /**

@@ -1,4 +1,7 @@
-var MATTIE = MATTIE || {};
+/**
+ * @namespace MATTIE.troopAPI
+ * @description The api for managing troops. This api allows multi troop combat and runtime troop creation
+ */
 MATTIE.troopAPI = MATTIE.troopAPI || {};
 MATTIE.troopAPI.config = MATTIE.troopAPI.config || {};
 

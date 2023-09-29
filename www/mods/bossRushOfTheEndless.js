@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-var MATTIE = MATTIE || {};
+
 MATTIE.bossRush = MATTIE.bossRush || {};
 
 (() => {
@@ -242,7 +242,7 @@ MATTIE.bossRush = MATTIE.bossRush || {};
 		return pageDescriptions[index];
 	}
 
-	let protoBookOfFears = new MATTIE.items.RunTimeItem();
+	let protoBookOfFears = new MATTIE.itemAPI.RunTimeItem();
 	protoBookOfFears.addRecipe([11, 87, 98], 98);
 	protoBookOfFears.addRecipeUnlock(11);
 	protoBookOfFears.addRecipeUnlock(87);
@@ -253,7 +253,7 @@ MATTIE.bossRush = MATTIE.bossRush || {};
 	protoBookOfFears.setCraftingCallback(onCraftProtoBook);
 	protoBookOfFears.spawn();
 
-	let bookOfPrimalFears = new MATTIE.items.RunTimeItem();
+	let bookOfPrimalFears = new MATTIE.itemAPI.RunTimeItem();
 	bookOfPrimalFears.setIconIndex(12);
 	bookOfPrimalFears.setName('Spider Silk Book');
 	bookOfPrimalFears.setDescription('A book containing 12 pages. \nThe book appears to be woven from spider silk.');
@@ -261,7 +261,7 @@ MATTIE.bossRush = MATTIE.bossRush || {};
 	bookOfPrimalFears.setCallback(onUseBook);
 	bookOfPrimalFears.spawn();
 
-	let rewardBook = new MATTIE.items.RunTimeItem();
+	let rewardBook = new MATTIE.itemAPI.RunTimeItem();
 	rewardBook.setIconIndex(14);
 	rewardBook.setName('Book of Futility');
 	rewardBook.setDescription('A very old book, its cover displays a very faded\nsymbol of goroth, it contains one page.');
