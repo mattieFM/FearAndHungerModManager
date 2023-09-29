@@ -1,4 +1,3 @@
-var MATTIE = MATTIE || {};
 MATTIE.multiplayer = MATTIE.multiplayer || {};
 /** a full list of any system events that might fire */
 MATTIE.systemEvents = [

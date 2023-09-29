@@ -1,6 +1,19 @@
-var MATTIE = MATTIE || {};
+/**
+ * @namespace MATTIE.menus
+ * @description a wrapper class for transitioning and switching between scenes
+ */
 MATTIE.menus = MATTIE.menus || {};
+
+/**
+ * @namespace MATTIE.windows
+ * @description all additional windows added by the modding api
+*/
 MATTIE.windows = MATTIE.windows || {};
+
+/**
+ * @namespace MATTIE.scenes
+ * @description all additional scenes added by the modding api
+*/
 MATTIE.scenes = MATTIE.scenes || {};
 MATTIE.TextManager = MATTIE.TextManager || {};
 MATTIE.CmdManager = MATTIE.CmdManager || {};

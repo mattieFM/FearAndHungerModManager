@@ -1,5 +1,5 @@
 var MATTIE_ModManager = MATTIE_ModManager || {};
-var MATTIE = MATTIE || {};
+
 MATTIE.scenes = MATTIE.scenes || {};
 MATTIE.global = MATTIE.global || {};
 MATTIE.static = MATTIE.static || {};

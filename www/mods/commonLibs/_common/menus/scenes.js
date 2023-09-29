@@ -1,4 +1,3 @@
-var MATTIE = MATTIE || {};
 MATTIE.menus = MATTIE.menus || {};
 MATTIE.windows = MATTIE.windows || {};
 MATTIE.scenes = MATTIE.scenes || {};
@@ -6,6 +5,10 @@ MATTIE.TextManager = MATTIE.TextManager || {};
 MATTIE.CmdManager = MATTIE.CmdManager || {};
 MATTIE.modLoader = MATTIE.modLoader || {};
 
+/**
+ * @class
+ * @description the base menu page with the manager logo
+ * */
 MATTIE.scenes.base = function () {
 	this.initialize.apply(this, arguments);
 };

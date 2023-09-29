@@ -1,4 +1,7 @@
-var MATTIE = MATTIE || {};
+/**
+ * @namespace MATTIE.clipboard
+ * @description a simple wrapper for interacting with the clipboard
+ * */
 MATTIE.clipboard = MATTIE.clipboard || {};
 
 MATTIE.clipboard.get = function () {

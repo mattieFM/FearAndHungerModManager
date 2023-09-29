@@ -1,4 +1,8 @@
 var MATTIE = MATTIE || {};
+/**
+ * @namespace MATTIE.DataManager
+ * @description The manager that handles all interactions with filesystem
+ */
 MATTIE.DataManager = MATTIE.DataManager || {};
 MATTIE.DataManager.dataPath = '/modData/';
 MATTIE.multiplayer = MATTIE.multiplayer || {};

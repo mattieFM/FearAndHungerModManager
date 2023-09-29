@@ -20,7 +20,8 @@
     "tui-jsdoc-template": "^1.2.2"
   },
   "scripts": {
-    "build:docs:prod": "jsdoc -c ./www/dev/conf.json -r",
+    "build:docs:prod": "jsdoc -c ./www/dev/prodConf.json -r",
+    "build:docs:dev": "jsdoc -c ./www/dev/devConf.json -r",
     "build:prod": "npm run lint:mods && npm run build:docs:prod",
     "lint:mods": "eslint -c ./.eslintrc.js www/mods/ --fix**"
   },

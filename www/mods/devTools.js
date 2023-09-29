@@ -1,5 +1,3 @@
-var MATTIE = MATTIE || {};
-
 MATTIE.devTools = MATTIE.devTools || {};
 //
 (() => {

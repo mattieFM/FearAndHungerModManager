@@ -1,4 +1,7 @@
-var MATTIE = MATTIE || {};
+/**
+ * @namespace MATTIE.bbgirlAPI
+ * @description the api for all jokes and memes in the engine. Handles making Cahara naked, displaying dungeon knights avatars etc...
+ */
 MATTIE.bbgirlAPI = MATTIE.bbgirlAPI || {};
 
 var Imported = Imported || {};

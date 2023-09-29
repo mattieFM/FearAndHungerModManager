@@ -22,7 +22,6 @@
  * event.spawn(11, 7);
  */
 
-var MATTIE = MATTIE || {};
 MATTIE.eventAPI = MATTIE.eventAPI || {};
 MATTIE.eventAPI.dataEvents = MATTIE.eventAPI.dataEvents || {};
 let val = 999;

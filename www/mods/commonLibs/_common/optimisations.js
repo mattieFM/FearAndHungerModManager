@@ -1,4 +1,3 @@
-var MATTIE = MATTIE || {};
 MATTIE.optimisations = MATTIE.optimisations || {};
 
 // rewrite loadallsavefile images to only load up to the max number of saves

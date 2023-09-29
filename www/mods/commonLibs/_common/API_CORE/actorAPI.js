@@ -1,6 +1,10 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable max-classes-per-file */
-var MATTIE = MATTIE || {};
+
+/**
+ * @namespace MATTIE.actorAPI
+ * @description The main API the modding engine uses to perform any actions regarding actors
+ */
 MATTIE.actorAPI = MATTIE.actorAPI || {};
 
 var Yanfly = Yanfly || false;
@@ -18,6 +22,9 @@ MATTIE.actorAPI.forceMainChar = function (i) {
 		return val;
 	};
 };
+/**
+ *  @description A class that wraps data actor information allowing easy creation of data actors.
+ * */
 MATTIE.actorAPI.Data_Actor_Wrapper = class {
 	constructor(params) {
 		/**
@@ -172,8 +179,10 @@ MATTIE.actorAPI.Data_Actor_Wrapper = class {
 	}
 };
 
+/** @description an object that models a DataClass */
 MATTIE.actorAPI.Data_Class = class {
 	constructor() {
+		/** @type {rm.types.Actor} */
 		this.data = {};
 
 		/**
@@ -218,6 +227,10 @@ MATTIE.actorAPI.Data_Class = class {
 		this.data.id;
 	}
 
+	/**
+	 * @description add a skill to the array of default known skills IE: lvl 1 available skills
+	 * @param {int} skillId the id of the skill to add
+	 */
 	addDefaultLearning(skillId) {
 		/** @type {rm.types.ClassLearning} */
 		const learning = {};
@@ -228,30 +241,40 @@ MATTIE.actorAPI.Data_Class = class {
 		this.data.learnings.push(learning);
 	}
 
+	/** @returns a deepcopy of the expParams of the first actor */
 	defaultExpParam() {
-		return $dataClasses[1].expParams;
+		return JsonEx.makeDeepCopy($dataClasses[1].expParams);
 	}
 
+	/** @returns a deepcopy of the traits of the first actor */
 	defaultTraits() {
-		return $dataClasses[1].traits;
+		return JsonEx.makeDeepCopy($dataClasses[1].traits);
 	}
 
+	/** @returns a deepcopy of the learnings of the first actor */
 	defaultLearnings() {
-		return $dataClasses[1].learnings;
+		return JsonEx.makeDeepCopy($dataClasses[1].learnings);
 	}
 
+	/** @returns a deepcopy of the name of the first actor */
 	defaultName() {
-		return $dataClasses[1].name;
+		return JsonEx.makeDeepCopy($dataClasses[1].name);
 	}
 
+	/** @returns a deepcopy of the note of the first actor */
 	defaultNote() {
-		return $dataClasses[1].note;
+		return JsonEx.makeDeepCopy($dataClasses[1].note);
 	}
 
+	/** @returns a deepcopy of the params of the first actor */
 	defaultParams() {
-		return $dataClasses[1].params;
+		return JsonEx.makeDeepCopy($dataClasses[1].params);
 	}
 
+	/**
+	 * @description add this data class to the global runtime array of data classes $dataClasses
+	 * @returns null
+	 */
 	create() {
 		this.data.id = $dataClasses.length;
 		if (Yanfly) {
@@ -266,6 +289,9 @@ MATTIE.actorAPI.Data_Class = class {
 	}
 };
 
+/**
+ * @description a class to model a data actor json object
+ */
 MATTIE.actorAPI.Data_Actor = class {
 	constructor(params) {
 		/**
@@ -371,7 +397,10 @@ MATTIE.actorAPI.Data_Actor = class {
 		this.id;
 	}
 };
+
+/** @description store the last known leader in a variable so that we can revert changes */
 MATTIE.actorAPI.lastLeader = null;
+
 /**
  * @description swap out the party leader
  * @param {int} i, actor index

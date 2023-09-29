@@ -5,7 +5,6 @@
 *
 * mods define their
 */
-var MATTIE = MATTIE || {};
 
 (() => {
 	Input.addKeyBind('', () => {
