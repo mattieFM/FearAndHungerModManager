@@ -1,8 +1,10 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Tutorial: INSTALL | Tutorial: INSTALL</title>
+    <title>Source: _common/API_CORE/heSoBBGirlAPI.js | Source: _common/API_CORE/heSoBBGirlAPI.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -30,7 +32,7 @@
         
     </div>
     <div class="title">
-        <h1><a href="index.html" class="link">Tutorial: INSTALL</a></h1>
+        <h1><a href="index.html" class="link">Source: _common/API_CORE/heSoBBGirlAPI.js</a></h1>
         
             <span class="version">v1.2.4</span>
         
@@ -56,91 +58,80 @@
 <div class="main" id="main">
     
 
-<section>
-    <header>
-        
 
-        <h2>INSTALL</h2>
-    </header>
 
     
-        
-
-        <ul id="example-nav" class="nav nav-tabs hidden">
-            <li role="presentation" id="example-result-btn" class="active" onclick="showResult()">
-                <a href="#">Result</a>
-            </li>
-            <li role="presentation" id="example-js-btn" class="hidden" onclick="showJs()">
-                <a href="#">JS</a>
-            </li>
-            <li role="presentation" id="example-html-btn" class="hidden" onclick="showHtml()">
-                <a href="#">HTML</a>
-            </li>
-        </ul>
+    <section>
         <article>
-            
-            <iframe id="example-result" width="100%" height="800" frameborder="0" src=tutorials/install.html></iframe>
-            <div id="example-js" class="hidden"><pre class="prettyprint source"></pre></div>
-            <div id="example-html" class="hidden"><pre class="prettyprint source"></pre></div>
+            <pre class="prettyprint source linenums"><code>/**
+ * @namespace MATTIE.bbgirlAPI
+ * @description the api for all jokes and memes in the engine. Handles making Cahara naked, displaying dungeon knights avatars etc...
+ */
+MATTIE.bbgirlAPI = MATTIE.bbgirlAPI || {};
+
+var Imported = Imported || {};
+
+/**
+ * @description bbgirl slay queen. Girl boss, pussy boss, girlqueen
+ */
+MATTIE.bbgirlAPI.yassify = function () {
+	console.log('yassed');
+	const yassssifyyDict = {
+		Actor1: {
+			0: 'portrarL_cahara',
+			6: 'portraitL_enki',
+			2: 'portraitR_darce',
+			3: 'portraitR_girl',
+			7: 'portraitL_ragn',
+		},
+		Actor2: {
+			0: 'portraitL_legarde',
+
+		},
+		Actor3: {
+			0: 'portraitL_nashrah',
+		},
+	};
+	Window_MenuStatus.prototype.drawFace = function (faceName, faceIndex, x, y, width, height) {
+		console.log(faceName);
+		console.log(faceIndex);
+		var width = this.bustWidth();
+
+		let bustName = `${faceName}_${faceIndex + 1}`;
+		const keys = Object.keys(yassssifyyDict);
+
+		keys.forEach((key) => {
+			if (faceName.includes(key)) {
+				const portraitKeys = Object.keys(yassssifyyDict[key]);
+				const portraits = yassssifyyDict[key];
+				if (portraitKeys.includes(faceIndex.toString())) {
+					bustName = portraits[faceIndex.toString()];
+				}
+			}
+		});
+		const bitmap = ImageManager.loadPicture(bustName);
+
+		let ox = 0;
+		let oy = 0;
+		if (Galv.BM.offsets[bustName]) {
+			ox = Galv.BM.offsets[bustName][0] || 0;
+			oy = Galv.BM.offsets[bustName][1] || 0;
+		}
+
+		const sw = width;
+		const sh = Galv.BM.bustHeight;
+		const dx = x - 1;
+		const dy = y + Galv.BM.bust;
+		const sx = bitmap.width / 2 - width / 2 - ox;
+		const sy = oy;
+		this.contents.unlimitedBlt(bitmap, sx, sy, sw, sh, dx, dy);
+	};
+};
+</code></pre>
         </article>
-    
-</section>
+    </section>
 
 
-    <script>
-        var exampleResult = document.getElementById('example-result');
-        var exampleJs = document.getElementById('example-js');
-        var exampleHtml = document.getElementById('example-html');
-        var exampleResultBtn = document.getElementById('example-result-btn');
-        var exampleJsBtn = document.getElementById('example-js-btn');
-        var exampleHtmlBtn = document.getElementById('example-html-btn');
-
-        function setActive(el) {
-            el.className += ' active';
-        }
-
-        function setInactive(el) {
-            el.className = el.className.replace(/\s*active\s*/g, '');
-        }
-
-        function show(el) {
-            el.className = el.className.replace(/\s*hidden\s*/g, '');
-        }
-
-        function hide(el) {
-            el.className += ' hidden';
-        }
-
-        function showJs() {
-            hide(exampleHtml);
-            hide(exampleResult);
-            setInactive(exampleHtmlBtn);
-            setInactive(exampleResultBtn);
-
-            show(exampleJs);
-            setActive(exampleJsBtn);
-        }
-
-        function showHtml() {
-            hide(exampleJs);
-            hide(exampleResult);
-            setInactive(exampleJsBtn);
-            setInactive(exampleResultBtn);
-
-            show(exampleHtml);
-            setActive(exampleHtmlBtn);
-        }
-
-        function showResult() {
-            hide(exampleJs);
-            hide(exampleHtml);
-            setInactive(exampleJsBtn);
-            setInactive(exampleHtmlBtn);
-
-            show(exampleResult);
-            setActive(exampleResultBtn);
-        }
-    </script>
 
 
 </div>
@@ -155,7 +146,13 @@
 <script src="scripts/linenumber.js"></script>
 
     <script>
-        showLnbExamples();
+        var id = '_sub'.replace(/"/g, '_');
+        var selectedApi = document.getElementById(id); // do not use jquery selector
+        var $selectedApi = $(selectedApi);
+
+        $selectedApi.removeClass('hidden');
+        $selectedApi.parent().find('.glyphicon').removeClass('glyphicon-plus').addClass('glyphicon-minus');
+        showLnbApi();
     </script>
 
 </body>

@@ -1,8 +1,10 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Tutorial: INSTALL | Tutorial: INSTALL</title>
+    <title>Source: _common/menus/scenes.js | Source: _common/menus/scenes.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -30,7 +32,7 @@
         
     </div>
     <div class="title">
-        <h1><a href="index.html" class="link">Tutorial: INSTALL</a></h1>
+        <h1><a href="index.html" class="link">Source: _common/menus/scenes.js</a></h1>
         
             <span class="version">v1.2.4</span>
         
@@ -56,91 +58,68 @@
 <div class="main" id="main">
     
 
-<section>
-    <header>
-        
 
-        <h2>INSTALL</h2>
-    </header>
 
     
-        
-
-        <ul id="example-nav" class="nav nav-tabs hidden">
-            <li role="presentation" id="example-result-btn" class="active" onclick="showResult()">
-                <a href="#">Result</a>
-            </li>
-            <li role="presentation" id="example-js-btn" class="hidden" onclick="showJs()">
-                <a href="#">JS</a>
-            </li>
-            <li role="presentation" id="example-html-btn" class="hidden" onclick="showHtml()">
-                <a href="#">HTML</a>
-            </li>
-        </ul>
+    <section>
         <article>
-            
-            <iframe id="example-result" width="100%" height="800" frameborder="0" src=tutorials/install.html></iframe>
-            <div id="example-js" class="hidden"><pre class="prettyprint source"></pre></div>
-            <div id="example-html" class="hidden"><pre class="prettyprint source"></pre></div>
+            <pre class="prettyprint source linenums"><code>MATTIE.menus = MATTIE.menus || {};
+MATTIE.windows = MATTIE.windows || {};
+MATTIE.scenes = MATTIE.scenes || {};
+MATTIE.TextManager = MATTIE.TextManager || {};
+MATTIE.CmdManager = MATTIE.CmdManager || {};
+MATTIE.modLoader = MATTIE.modLoader || {};
+
+/**
+ * @class
+ * @description the base menu page with the manager logo
+ * */
+MATTIE.scenes.base = function () {
+	this.initialize.apply(this, arguments);
+};
+
+MATTIE.scenes.base.prototype = Object.create(Scene_Base.prototype);
+MATTIE.scenes.base.prototype.constructor = MATTIE.scenes.base;
+
+MATTIE.scenes.base.prototype.create = function () {
+	Scene_Base.prototype.create.call(this);
+	this.createBackground();
+};
+
+MATTIE.scenes.base.prototype.createBackground = function () {
+	this._backSprite2 = new Sprite(ImageManager.loadBitmap('mods/commonLibs/_common/images/', 'FearAndHungerModMan', 0, true, true));
+	this.addChild(this._backSprite2);
+	this._modListWin = new MATTIE.windows.ModListWin(0, 0);
+	this.addChild(this._modListWin);
+};
+
+MATTIE.scenes.modLoader = function () {
+	this.initialize.apply(this, arguments);
+};
+
+MATTIE.scenes.modLoader.prototype = Object.create(MATTIE.scenes.base.prototype);
+MATTIE.scenes.modLoader.prototype.constructor = MATTIE.scenes.modLoader;
+
+//-----------------------------------
+// Window Item List Overrides @override
+//-----------------------------------
+// forces all items to be enabled for menu use
+Window_ItemList.prototype.forceEnableAll = function () {
+	this.forceEnable = true;
+};
+
+Window_ItemList.prototype.isCurrentItemEnabled = function () {
+	return this.forceEnable || this.isEnabled(this.item());
+};
+
+Window_ItemList.prototype.isEnabled = function (item) {
+	return this.forceEnable || $gameParty.canUse(item);
+};
+</code></pre>
         </article>
-    
-</section>
+    </section>
 
 
-    <script>
-        var exampleResult = document.getElementById('example-result');
-        var exampleJs = document.getElementById('example-js');
-        var exampleHtml = document.getElementById('example-html');
-        var exampleResultBtn = document.getElementById('example-result-btn');
-        var exampleJsBtn = document.getElementById('example-js-btn');
-        var exampleHtmlBtn = document.getElementById('example-html-btn');
-
-        function setActive(el) {
-            el.className += ' active';
-        }
-
-        function setInactive(el) {
-            el.className = el.className.replace(/\s*active\s*/g, '');
-        }
-
-        function show(el) {
-            el.className = el.className.replace(/\s*hidden\s*/g, '');
-        }
-
-        function hide(el) {
-            el.className += ' hidden';
-        }
-
-        function showJs() {
-            hide(exampleHtml);
-            hide(exampleResult);
-            setInactive(exampleHtmlBtn);
-            setInactive(exampleResultBtn);
-
-            show(exampleJs);
-            setActive(exampleJsBtn);
-        }
-
-        function showHtml() {
-            hide(exampleJs);
-            hide(exampleResult);
-            setInactive(exampleJsBtn);
-            setInactive(exampleResultBtn);
-
-            show(exampleHtml);
-            setActive(exampleHtmlBtn);
-        }
-
-        function showResult() {
-            hide(exampleJs);
-            hide(exampleHtml);
-            setInactive(exampleJsBtn);
-            setInactive(exampleHtmlBtn);
-
-            show(exampleResult);
-            setActive(exampleResultBtn);
-        }
-    </script>
 
 
 </div>
@@ -155,7 +134,13 @@
 <script src="scripts/linenumber.js"></script>
 
     <script>
-        showLnbExamples();
+        var id = '_sub'.replace(/"/g, '_');
+        var selectedApi = document.getElementById(id); // do not use jquery selector
+        var $selectedApi = $(selectedApi);
+
+        $selectedApi.removeClass('hidden');
+        $selectedApi.parent().find('.glyphicon').removeClass('glyphicon-plus').addClass('glyphicon-minus');
+        showLnbApi();
     </script>
 
 </body>

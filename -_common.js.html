@@ -1,8 +1,10 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Tutorial: INSTALL | Tutorial: INSTALL</title>
+    <title>Source: _common.js | Source: _common.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -30,7 +32,7 @@
         
     </div>
     <div class="title">
-        <h1><a href="index.html" class="link">Tutorial: INSTALL</a></h1>
+        <h1><a href="index.html" class="link">Source: _common.js</a></h1>
         
             <span class="version">v1.2.4</span>
         
@@ -56,91 +58,221 @@
 <div class="main" id="main">
     
 
-<section>
-    <header>
-        
 
-        <h2>INSTALL</h2>
-    </header>
 
     
-        
-
-        <ul id="example-nav" class="nav nav-tabs hidden">
-            <li role="presentation" id="example-result-btn" class="active" onclick="showResult()">
-                <a href="#">Result</a>
-            </li>
-            <li role="presentation" id="example-js-btn" class="hidden" onclick="showJs()">
-                <a href="#">JS</a>
-            </li>
-            <li role="presentation" id="example-html-btn" class="hidden" onclick="showHtml()">
-                <a href="#">HTML</a>
-            </li>
-        </ul>
+    <section>
         <article>
-            
-            <iframe id="example-result" width="100%" height="800" frameborder="0" src=tutorials/install.html></iframe>
-            <div id="example-js" class="hidden"><pre class="prettyprint source"></pre></div>
-            <div id="example-html" class="hidden"><pre class="prettyprint source"></pre></div>
+            <pre class="prettyprint source linenums"><code>MATTIE.menus = MATTIE.menus || {};
+MATTIE.windows = MATTIE.windows || {};
+MATTIE.scenes = MATTIE.scenes || {};
+MATTIE.TextManager = MATTIE.TextManager || {};
+MATTIE.CmdManager = MATTIE.CmdManager || {};
+MATTIE.modLoader = MATTIE.modLoader || {};
+MATTIE.menus.mainMenu = MATTIE.menus.mainMenu || {};
+MATTIE.global = MATTIE.global || {};
+MATTIE.global.version = 1;
+MATTIE.GameInfo = {};
+MATTIE.GameInfo.getDifficulty = (data = $gameSwitches) => {
+	let difficulty = 'Fear &amp; Hunger';
+	if (MATTIE.GameInfo.isHardMode(data)) { // Hard mode
+		difficulty = 'Hard Mode'; // funnier name: "Trepidation &amp; Famine"
+	} else if (MATTIE.GameInfo.isTerrorAndStarvation(data)) { // terror and starvation
+		difficulty = 'Terror And Starvation';
+	}
+	return difficulty;
+};
+MATTIE.GameInfo.getCharName = (data = $gameParty) => data.menuActor()._name;
+MATTIE.GameInfo.isHardMode = (data = $gameSwitches) => data._data[2190] === true;
+MATTIE.GameInfo.isTerrorAndStarvation = (data = $gameSwitches) => (!data._data[2190] &amp;&amp; data._data[3153] === true);
+
+// --UTIL--
+function updateKeys(keys, name = '') {
+	Object.keys(keys).forEach((key) => {
+		Input.keyMapper[key.toUpperCase().charCodeAt(0)] = key; // add our key to the list of watched keys
+	});
+}
+
+function updateKey(key, name = '') {
+	if (key.includes('&amp;')) {
+		const keys = key.split('&amp;');
+		keys.forEach((element) => {
+			Input.keyMapper[element.toUpperCase().charCodeAt(0)] = element; // add our key to the list of watched keys
+		});
+	} else {
+		Input.keyMapper[key.toUpperCase().charCodeAt(0)] = key; // add our key to the list of watched keys
+	}
+}
+
+/**
+ *
+ * @param {int} scope
+ * -2 = in dev mode
+ * -1 = never
+ * 0 = global
+ * 1 = on scene_map
+ * 2 = on scene_battle
+ * 3 = on scene_menu
+ */
+Input.checkScope = function (scope) {
+	switch (scope) {
+	case -1:
+		return false;
+	case 0:
+		return true;
+	case 1:
+		return SceneManager._scene instanceof Scene_Map;
+	case 2:
+		return SceneManager._scene instanceof Scene_Battle;
+	case 3:
+		return SceneManager._scene instanceof Scene_Menu;
+	case -2:
+		return MATTIE.isDev;
+	default:
+		return false;
+	}
+};
+
+const keys = {};
+let i = 128;
+/**
+ *
+ * @param {*} key (optional) always bind to this key on boot
+ * @param {*} cb the call back to run
+ * @param {*} name the name of this command
+ * @param {*} scope the scope of this command
+ * @param {*} wasdDefualt the default key in wasd layout
+ * @param {*} defaultKey the default key in defualt layout
+ */
+Input.addKeyBind = function (key, cb, name = '', scope = 0, wasdDefualt = null, defaultKey = null) {
+	if (typeof key === 'number') key = String.fromCharCode(key);
+
+	if (typeof defaultKey === 'number') key = String.fromCharCode(defaultKey);
+	if (!key) key = String.fromCharCode(i);
+
+	// setup default keybinds
+	if (wasdDefualt) {
+		if (typeof wasdDefualt !== 'number') {
+			ConfigManager.wasdMap[wasdDefualt.toUpperCase().charCodeAt(0)] = wasdDefualt;
+		} else {
+			ConfigManager.wasdMap[wasdDefualt] = String.fromCharCode(wasdDefualt);
+		}
+	}
+	if (defaultKey) {
+		if (typeof defaultKey !== 'number') {
+			ConfigManager.defaultMap[defaultKey.toUpperCase().charCodeAt(0)] = defaultKey;
+		} else {
+			ConfigManager.defaultMap[defaultKey] = String.fromCharCode(defaultKey);
+		}
+	}
+
+	if (name != '') {
+		const tempFunc = Window_KeyConfig.prototype.actionKey;
+		const tempFunc2 = Window_KeyAction.prototype.makeCommandList;
+		// this is so that keys can be rebound
+		Window_KeyConfig.prototype.actionKey = function (action) {
+			if (action === key || action == wasdDefualt || action == defaultKey) return name;
+			return tempFunc.call(this, action);
+		};
+		// this is so that keys can be rebound
+		Window_KeyAction.prototype.makeCommandList = function () {
+			tempFunc2.call(this);
+			this.addCommand(name, 'ok', true, key);
+		};
+	}
+	i++;
+
+	keys[name] = {
+		key,
+		cb: () => { if (Input.checkScope(scope))cb(); },
+	};
+	updateKey(key, name);
+};
+MATTIE.Prev_Input_Update = Input.update;
+Input.update = function () {
+	MATTIE.Prev_Input_Update.call(this);
+	Object.keys(keys).forEach((name) => {
+		const obj = keys[name];
+		const { key } = obj;
+		const { cb } = obj;
+		if (key.contains('&amp;')) {
+			/** @type {any[]} */
+			const combinedKeys = key.split('&amp;');
+
+			const pressed = (() => {
+				for (let index = 0; index &lt; combinedKeys.length - 1; index++) {
+					const element = combinedKeys[index];
+					if (!Input.isPressed(element)) return false;
+				}
+				return Input.isRepeated(combinedKeys[combinedKeys.length - 1]);
+			})();
+			if (pressed) {
+				cb();
+			}
+		} else if (Input.isRepeated(key)) {
+			cb();
+		}
+	});
+};
+
+this.forceModdedSaves = MATTIE.DataManager.global.get('forceModded');
+this.forceVanillaSaves = MATTIE.DataManager.global.get('forceVanilla');
+MATTIE.menus.mainMenu.addBtnToMainMenu(
+	TextManager.Mods,
+	TextManager.Mods,
+	MATTIE.menus.toModMenu.bind(this),
+);
+
+// --ENGINE OVERRIDES--
+
+// MATTIE_RPG.Game_Map_Setup = Game_Map.prototype.setup;
+// Game_Map.prototype.setup = function(mapId) {
+//     /** @description the last map that the player was on */
+//     this._lastMapId = mapId;
+//     console.log(this._lastMapId);
+//     MATTIE_RPG.Game_Map_Setup.call(this, mapId)
+// };
+
+MATTIE_RPG.Game_Player_PerformTransfer = Game_Player.prototype.performTransfer;
+Game_Player.prototype.performTransfer = function () {
+	$gameMap._lastMapId = $gameMap.mapId();
+	MATTIE_RPG.Game_Player_PerformTransfer.call(this);
+};
+
+/** @description check if the spot is passible in any direction */
+/** @param {Game_Event} event */
+MATTIE.isPassableAnyDir = function (event) {
+	const dirs = [2, 4, 6, 8]; // dir 4 dirsections
+	for (let index = 0; index &lt; dirs.length; index++) {
+		const dir = dirs[index];
+		if (event.canPass(event.x, event.y, dir)) return true;
+	}
+	return false;
+};
+
+/**
+ * @description get the last map id
+ * @returns the id of the last map
+ */
+Game_Map.prototype.lastMapId = function () {
+	return this._lastMapId;
+};
+/**
+ * @description format the key of a self swtich id
+ * @param {*} mapId the map id that this event is on
+ * @param {*} eventId the event id of this event
+ * @param {*} letter the letter of this switch
+ * @returns {string[]}
+ */
+Game_SelfSwitches.prototype.formatKey = function (mapId, eventId, letter) {
+	const key = [mapId, eventId, letter];
+	return key;
+};
+</code></pre>
         </article>
-    
-</section>
+    </section>
 
 
-    <script>
-        var exampleResult = document.getElementById('example-result');
-        var exampleJs = document.getElementById('example-js');
-        var exampleHtml = document.getElementById('example-html');
-        var exampleResultBtn = document.getElementById('example-result-btn');
-        var exampleJsBtn = document.getElementById('example-js-btn');
-        var exampleHtmlBtn = document.getElementById('example-html-btn');
-
-        function setActive(el) {
-            el.className += ' active';
-        }
-
-        function setInactive(el) {
-            el.className = el.className.replace(/\s*active\s*/g, '');
-        }
-
-        function show(el) {
-            el.className = el.className.replace(/\s*hidden\s*/g, '');
-        }
-
-        function hide(el) {
-            el.className += ' hidden';
-        }
-
-        function showJs() {
-            hide(exampleHtml);
-            hide(exampleResult);
-            setInactive(exampleHtmlBtn);
-            setInactive(exampleResultBtn);
-
-            show(exampleJs);
-            setActive(exampleJsBtn);
-        }
-
-        function showHtml() {
-            hide(exampleJs);
-            hide(exampleResult);
-            setInactive(exampleJsBtn);
-            setInactive(exampleResultBtn);
-
-            show(exampleHtml);
-            setActive(exampleHtmlBtn);
-        }
-
-        function showResult() {
-            hide(exampleJs);
-            hide(exampleHtml);
-            setInactive(exampleJsBtn);
-            setInactive(exampleHtmlBtn);
-
-            show(exampleResult);
-            setActive(exampleResultBtn);
-        }
-    </script>
 
 
 </div>
@@ -155,7 +287,13 @@
 <script src="scripts/linenumber.js"></script>
 
     <script>
-        showLnbExamples();
+        var id = '_sub'.replace(/"/g, '_');
+        var selectedApi = document.getElementById(id); // do not use jquery selector
+        var $selectedApi = $(selectedApi);
+
+        $selectedApi.removeClass('hidden');
+        $selectedApi.parent().find('.glyphicon').removeClass('glyphicon-plus').addClass('glyphicon-minus');
+        showLnbApi();
     </script>
 
 </body>

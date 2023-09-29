@@ -1,8 +1,10 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Tutorial: INSTALL | Tutorial: INSTALL</title>
+    <title>Source: _common/API_CORE/vfxAPI.js | Source: _common/API_CORE/vfxAPI.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -30,7 +32,7 @@
         
     </div>
     <div class="title">
-        <h1><a href="index.html" class="link">Tutorial: INSTALL</a></h1>
+        <h1><a href="index.html" class="link">Source: _common/API_CORE/vfxAPI.js</a></h1>
         
             <span class="version">v1.2.4</span>
         
@@ -56,91 +58,71 @@
 <div class="main" id="main">
     
 
-<section>
-    <header>
-        
 
-        <h2>INSTALL</h2>
-    </header>
 
     
-        
-
-        <ul id="example-nav" class="nav nav-tabs hidden">
-            <li role="presentation" id="example-result-btn" class="active" onclick="showResult()">
-                <a href="#">Result</a>
-            </li>
-            <li role="presentation" id="example-js-btn" class="hidden" onclick="showJs()">
-                <a href="#">JS</a>
-            </li>
-            <li role="presentation" id="example-html-btn" class="hidden" onclick="showHtml()">
-                <a href="#">HTML</a>
-            </li>
-        </ul>
+    <section>
         <article>
-            
-            <iframe id="example-result" width="100%" height="800" frameborder="0" src=tutorials/install.html></iframe>
-            <div id="example-js" class="hidden"><pre class="prettyprint source"></pre></div>
-            <div id="example-html" class="hidden"><pre class="prettyprint source"></pre></div>
+            <pre class="prettyprint source linenums"><code>/**
+ * @namespace MATTIE.fxAPI
+ * @description The api for screen effects. IE: filters, screen shake, etc...
+ */
+MATTIE.fxAPI = {};
+
+//----------------------------------------------
+// Game_Screen
+//----------------------------------------------
+MATTIE_RPG.fxAPI = {};
+
+/** @description the base start tint function */
+MATTIE_RPG.fxAPI.startTint = Game_Screen.prototype.startTint;
+/**
+ * @description the start tint function overriden to only fire if an effect is not being forced
+ * @param {*} tone [r,b,g,gray]
+ * @param {*} duration frames till end
+ */
+Game_Screen.prototype.startTint = function (tone, duration) {
+	if (!this.forcingTint) MATTIE_RPG.fxAPI.startTint.call(this, tone, duration);
+};
+
+/**
+ * @description set the forcing tint attribute to bool
+ */
+Game_Screen.prototype.forceTint = function (bool) {
+	this.forcingTint = bool;
+};
+
+/** @description the base update tone method */
+MATTIE_RPG.fxAPI.updateTone = Game_Screen.prototype.updateTone;
+/** @description the update tone method extended to stop forcing if duration is over */
+Game_Screen.prototype.updateTone = function () {
+	MATTIE_RPG.fxAPI.updateTone.call(this);
+	if (this._toneDuration &lt;= 0) this.forceTint(false);
+};
+
+MATTIE.fxAPI.setupTint = function (red, green, blue, gray, framesDur) {
+	const tint = [red, green,
+		blue, gray];
+	$gameScreen.startTint(tint, framesDur);
+	$gameScreen.forceTint(true);
+};
+
+MATTIE.fxAPI.startScreenShake = function (intensity, speed, duration) {
+	$gameScreen.startShake(intensity, speed, duration);
+};
+
+MATTIE.fxAPI.showImage = function (name, id, x, y) {
+	$gameScreen.showPicture(id, name, 0, x, y, 100, 100, 255, 0);
+};
+
+MATTIE.fxAPI.deleteImage = function (id) {
+	$gameScreen.erasePicture(id);
+};
+</code></pre>
         </article>
-    
-</section>
+    </section>
 
 
-    <script>
-        var exampleResult = document.getElementById('example-result');
-        var exampleJs = document.getElementById('example-js');
-        var exampleHtml = document.getElementById('example-html');
-        var exampleResultBtn = document.getElementById('example-result-btn');
-        var exampleJsBtn = document.getElementById('example-js-btn');
-        var exampleHtmlBtn = document.getElementById('example-html-btn');
-
-        function setActive(el) {
-            el.className += ' active';
-        }
-
-        function setInactive(el) {
-            el.className = el.className.replace(/\s*active\s*/g, '');
-        }
-
-        function show(el) {
-            el.className = el.className.replace(/\s*hidden\s*/g, '');
-        }
-
-        function hide(el) {
-            el.className += ' hidden';
-        }
-
-        function showJs() {
-            hide(exampleHtml);
-            hide(exampleResult);
-            setInactive(exampleHtmlBtn);
-            setInactive(exampleResultBtn);
-
-            show(exampleJs);
-            setActive(exampleJsBtn);
-        }
-
-        function showHtml() {
-            hide(exampleJs);
-            hide(exampleResult);
-            setInactive(exampleJsBtn);
-            setInactive(exampleResultBtn);
-
-            show(exampleHtml);
-            setActive(exampleHtmlBtn);
-        }
-
-        function showResult() {
-            hide(exampleJs);
-            hide(exampleHtml);
-            setInactive(exampleJsBtn);
-            setInactive(exampleHtmlBtn);
-
-            show(exampleResult);
-            setActive(exampleResultBtn);
-        }
-    </script>
 
 
 </div>
@@ -155,7 +137,13 @@
 <script src="scripts/linenumber.js"></script>
 
     <script>
-        showLnbExamples();
+        var id = '_sub'.replace(/"/g, '_');
+        var selectedApi = document.getElementById(id); // do not use jquery selector
+        var $selectedApi = $(selectedApi);
+
+        $selectedApi.removeClass('hidden');
+        $selectedApi.parent().find('.glyphicon').removeClass('glyphicon-plus').addClass('glyphicon-minus');
+        showLnbApi();
     </script>
 
 </body>

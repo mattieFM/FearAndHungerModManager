@@ -1,8 +1,10 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Tutorial: INSTALL | Tutorial: INSTALL</title>
+    <title>Source: _common/compatibility.js | Source: _common/compatibility.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -30,7 +32,7 @@
         
     </div>
     <div class="title">
-        <h1><a href="index.html" class="link">Tutorial: INSTALL</a></h1>
+        <h1><a href="index.html" class="link">Source: _common/compatibility.js</a></h1>
         
             <span class="version">v1.2.4</span>
         
@@ -56,91 +58,152 @@
 <div class="main" id="main">
     
 
-<section>
-    <header>
-        
 
-        <h2>INSTALL</h2>
-    </header>
 
     
-        
-
-        <ul id="example-nav" class="nav nav-tabs hidden">
-            <li role="presentation" id="example-result-btn" class="active" onclick="showResult()">
-                <a href="#">Result</a>
-            </li>
-            <li role="presentation" id="example-js-btn" class="hidden" onclick="showJs()">
-                <a href="#">JS</a>
-            </li>
-            <li role="presentation" id="example-html-btn" class="hidden" onclick="showHtml()">
-                <a href="#">HTML</a>
-            </li>
-        </ul>
+    <section>
         <article>
-            
-            <iframe id="example-result" width="100%" height="800" frameborder="0" src=tutorials/install.html></iframe>
-            <div id="example-js" class="hidden"><pre class="prettyprint source"></pre></div>
-            <div id="example-html" class="hidden"><pre class="prettyprint source"></pre></div>
+            <pre class="prettyprint source linenums"><code>// TODO: make this less hacky in the future.
+// TODO: add popup that appears if the user forgot to decompile the game before using the modmanager.
+
+/**
+ * @namespace MATTIE.compat
+ * @description the name space used for compatibility changes
+ * */
+MATTIE.compat = MATTIE.compat || {};
+
+/** @description whether decryption of images should be forcibly stopped or not */
+MATTIE.compat.pauseDecrypt = false;
+
+var Yanfly = Yanfly || false;
+
+// override this so that when we request an image it will not try to decrypt it.
+Bitmap.prototype._requestImage = function (url) {
+	if (Bitmap._reuseImages.length !== 0) {
+		this._image = Bitmap._reuseImages.pop();
+	} else {
+		this._image = new Image();
+	}
+
+	if (this._decodeAfterRequest &amp;&amp; !this._loader) {
+		this._loader = ResourceHandler.createLoader(url, this._requestImage.bind(this, url), this._onError.bind(this));
+	}
+
+	this._image = new Image();
+
+	//---------------
+	// very important
+	//---------------
+
+	// this line will fix the issue with caching images and let us update files during runtime.
+	fetch(url, { cache: 'reload', mode: 'no-cors' });
+
+	this._url = url;
+	this._loadingState = 'requesting';
+
+	if (!Decrypter.checkImgIgnore(url) &amp;&amp; Decrypter.hasEncryptedImages &amp;&amp; !MATTIE.compat.pauseDecrypt) {
+		this._loadingState = 'decrypting';
+		Decrypter.decryptImg(url, this);
+	} else {
+		this._image.src = url;
+
+		this._image.addEventListener('load', this._loadListener = Bitmap.prototype._onLoad.bind(this));
+		this._image.addEventListener('error', this._errorListener = this._loader || Bitmap.prototype._onError.bind(this));
+	}
+};
+
+ImageManager.loadBitmap = function (folder, filename, hue, smooth, forceNoDecrypt = false) {
+	// this is a hacky soltion but should work fine for now
+	if (forceNoDecrypt) MATTIE.compat.pauseDecrypt = true;
+	setTimeout(() => {
+		MATTIE.compat.pauseDecrypt = false;
+	}, 1000);
+	if (filename) {
+		const path = `${folder + encodeURIComponent(filename)}.png`;
+
+		const bitmap = this.loadNormalBitmap(path, hue || 0);
+		bitmap.smooth = smooth;
+		return bitmap;
+	}
+	return this.loadEmptyBitmap();
+};
+
+/**
+ * @description we override this such that it will not return an undefined result ever. Even if another mod fucks up
+ * @todo I don't like this way of fixing this bug but does work.
+ * @param unsafe, if true does not add anything
+ * @returns the datamap event obj
+ */
+MATTIE_RPG.Game_Event_Event = Game_Event.prototype.event;
+Game_Event.prototype.event = function () {
+	let val = MATTIE_RPG.Game_Event_Event.call(this);
+	if (!val) val = $dataMap.events[1];
+	if (!val) val = new MapEvent().data;
+	return val;
+};
+
+// for some reason cheshire doesn't check if TY exists, so we will define it here.
+const TY = {};
+
+//------------------------------
+// Termina Compatibility
+//------------------------------
+var Olivia = Olivia || false;
+if (Olivia) {
+	if (Olivia.AntiPlayerStress) {
+		setTimeout(() => {
+			Olivia.AntiPlayerStress.ProperErrorDisplay = false; // termina should use my error menu to
+		}, 5000);
+	}
+}
+
+//---------------------------------
+// Engine Fixes
+//---------------------------------
+
+// this fixes the screen freeze
+
+/**
+ * Renders the stage to the game screen.
+ *
+ * @static
+ * @method render
+ * @param {Stage} stage The stage object to be rendered
+ */
+Graphics.render = function (stage) {
+	if (this._skipCount &lt;= 0) {
+		const startTime = Date.now();
+		if (stage) {
+			this._renderer.render(stage);
+			if (this._renderer.gl &amp;&amp; this._renderer.gl.flush) {
+				this._renderer.gl.flush();
+			}
+		}
+		const endTime = Date.now();
+		const elapsed = endTime - startTime;
+		this._skipCount = Math.min(Math.floor(elapsed / 15), this._maxSkip);
+		this._rendered = true;
+	} else {
+		this._skipCount--;
+		this._rendered = false;
+	}
+	this.frameCount++;
+};
+
+Window_EquipItem.prototype.includes = function (item) {
+	if (item === null || typeof item === 'undefined') {
+		return true;
+	}
+	if (this._slotId &lt; 0 || item.etypeId !== this._actor.equipSlots()[this._slotId]) {
+		return false;
+	}
+	return this._actor.canEquip(item);
+};
+</code></pre>
         </article>
-    
-</section>
+    </section>
 
 
-    <script>
-        var exampleResult = document.getElementById('example-result');
-        var exampleJs = document.getElementById('example-js');
-        var exampleHtml = document.getElementById('example-html');
-        var exampleResultBtn = document.getElementById('example-result-btn');
-        var exampleJsBtn = document.getElementById('example-js-btn');
-        var exampleHtmlBtn = document.getElementById('example-html-btn');
-
-        function setActive(el) {
-            el.className += ' active';
-        }
-
-        function setInactive(el) {
-            el.className = el.className.replace(/\s*active\s*/g, '');
-        }
-
-        function show(el) {
-            el.className = el.className.replace(/\s*hidden\s*/g, '');
-        }
-
-        function hide(el) {
-            el.className += ' hidden';
-        }
-
-        function showJs() {
-            hide(exampleHtml);
-            hide(exampleResult);
-            setInactive(exampleHtmlBtn);
-            setInactive(exampleResultBtn);
-
-            show(exampleJs);
-            setActive(exampleJsBtn);
-        }
-
-        function showHtml() {
-            hide(exampleJs);
-            hide(exampleResult);
-            setInactive(exampleJsBtn);
-            setInactive(exampleResultBtn);
-
-            show(exampleHtml);
-            setActive(exampleHtmlBtn);
-        }
-
-        function showResult() {
-            hide(exampleJs);
-            hide(exampleHtml);
-            setInactive(exampleJsBtn);
-            setInactive(exampleHtmlBtn);
-
-            show(exampleResult);
-            setActive(exampleResultBtn);
-        }
-    </script>
 
 
 </div>
@@ -155,7 +218,13 @@
 <script src="scripts/linenumber.js"></script>
 
     <script>
-        showLnbExamples();
+        var id = '_sub'.replace(/"/g, '_');
+        var selectedApi = document.getElementById(id); // do not use jquery selector
+        var $selectedApi = $(selectedApi);
+
+        $selectedApi.removeClass('hidden');
+        $selectedApi.parent().find('.glyphicon').removeClass('glyphicon-plus').addClass('glyphicon-minus');
+        showLnbApi();
     </script>
 
 </body>

@@ -1,8 +1,10 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Tutorial: INSTALL | Tutorial: INSTALL</title>
+    <title>Source: _common/systemEvents.js | Source: _common/systemEvents.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -30,7 +32,7 @@
         
     </div>
     <div class="title">
-        <h1><a href="index.html" class="link">Tutorial: INSTALL</a></h1>
+        <h1><a href="index.html" class="link">Source: _common/systemEvents.js</a></h1>
         
             <span class="version">v1.2.4</span>
         
@@ -56,91 +58,290 @@
 <div class="main" id="main">
     
 
-<section>
-    <header>
-        
 
-        <h2>INSTALL</h2>
-    </header>
 
     
-        
-
-        <ul id="example-nav" class="nav nav-tabs hidden">
-            <li role="presentation" id="example-result-btn" class="active" onclick="showResult()">
-                <a href="#">Result</a>
-            </li>
-            <li role="presentation" id="example-js-btn" class="hidden" onclick="showJs()">
-                <a href="#">JS</a>
-            </li>
-            <li role="presentation" id="example-html-btn" class="hidden" onclick="showHtml()">
-                <a href="#">HTML</a>
-            </li>
-        </ul>
+    <section>
         <article>
-            
-            <iframe id="example-result" width="100%" height="800" frameborder="0" src=tutorials/install.html></iframe>
-            <div id="example-js" class="hidden"><pre class="prettyprint source"></pre></div>
-            <div id="example-html" class="hidden"><pre class="prettyprint source"></pre></div>
+            <pre class="prettyprint source linenums"><code>MATTIE.multiplayer = MATTIE.multiplayer || {};
+/** a full list of any system events that might fire */
+MATTIE.systemEvents = [
+	// these can all be found in the system interpreter code.
+	101,
+	102,
+	402,
+	403,
+	103,
+	104,
+	105,
+	108,
+	111,
+	411,
+	112,
+	413,
+	113,
+	115,
+	117,
+	118,
+	119,
+	121,
+	122,
+	123,
+	124,
+	125,
+	126,
+	127,
+	128,
+	129,
+	132,
+	133,
+	134,
+	135,
+	136,
+	137,
+	138,
+	139,
+	140,
+	201,
+	202,
+	203,
+	204,
+	205,
+	206,
+	211,
+	212,
+	213,
+	214,
+	216,
+	217,
+	221,
+	222,
+	223,
+	224,
+	225,
+	230,
+	231,
+	232,
+	233,
+	234,
+	235,
+	236,
+	241,
+	242,
+	243,
+	244,
+	245,
+	246,
+	249,
+	250,
+	251,
+	261,
+	281,
+	282,
+	283,
+	284,
+	285,
+	301,
+	601,
+	602,
+	603,
+	302,
+	303,
+	311,
+	312,
+	326,
+	313,
+	314,
+	315,
+	316,
+	317,
+	318,
+	319,
+	320,
+	321,
+	322,
+	323,
+	324,
+	325,
+	331,
+	332,
+	342,
+	333,
+	334,
+	335,
+	336,
+	337,
+	339,
+	340,
+	351,
+	352,
+	353,
+	354,
+	355,
+	356,
+	101,
+	102,
+	402,
+	403,
+	103,
+	104,
+	105,
+	108,
+	111,
+	411,
+	112,
+	413,
+	113,
+	115,
+	117,
+	118,
+	119,
+	121,
+	122,
+	123,
+	124,
+	125,
+	126,
+	127,
+	128,
+	129,
+	132,
+	133,
+	134,
+	135,
+	136,
+	137,
+	138,
+	139,
+	140,
+	201,
+	202,
+	203,
+	204,
+	205,
+	206,
+	211,
+	212,
+	213,
+	214,
+	216,
+	217,
+	221,
+	222,
+	223,
+	224,
+	225,
+	230,
+	231,
+	232,
+	233,
+	234,
+	235,
+	236,
+	241,
+	242,
+	243,
+	244,
+	245,
+	246,
+	249,
+	250,
+	251,
+	261,
+	281,
+	282,
+	283,
+	284,
+	285,
+	301,
+	601,
+	602,
+	603,
+	302,
+	303,
+	311,
+	312,
+	326,
+	313,
+	314,
+	315,
+	316,
+	317,
+	318,
+	319,
+	320,
+	321,
+	322,
+	323,
+	324,
+	325,
+	331,
+	332,
+	342,
+	333,
+	334,
+	335,
+	336,
+	337,
+	339,
+	340,
+	351,
+	352,
+	353,
+	354,
+	355,
+	356,
+	201,
+	201,
+	201,
+	201,
+	126,
+	127,
+	128,
+	101,
+	203,
+	203,
+	203,
+	203,
+	352,
+	129,
+	129,
+	123,
+	111,
+	411,
+	122,
+	356,
+	230,
+	108,
+	313,
+	121,
+	355,
+	117,
+	205,
+	322,
+	205,
+	322,
+	223,
+	250,
+	312,
+	315,
+	601,
+	602,
+	603,
+	117,
+	122,
+	121,
+
+	// these comes from a plugin or the game idk what it is but it fires constantly
+	412,
+	505,
+	404,
+];
+</code></pre>
         </article>
-    
-</section>
+    </section>
 
 
-    <script>
-        var exampleResult = document.getElementById('example-result');
-        var exampleJs = document.getElementById('example-js');
-        var exampleHtml = document.getElementById('example-html');
-        var exampleResultBtn = document.getElementById('example-result-btn');
-        var exampleJsBtn = document.getElementById('example-js-btn');
-        var exampleHtmlBtn = document.getElementById('example-html-btn');
-
-        function setActive(el) {
-            el.className += ' active';
-        }
-
-        function setInactive(el) {
-            el.className = el.className.replace(/\s*active\s*/g, '');
-        }
-
-        function show(el) {
-            el.className = el.className.replace(/\s*hidden\s*/g, '');
-        }
-
-        function hide(el) {
-            el.className += ' hidden';
-        }
-
-        function showJs() {
-            hide(exampleHtml);
-            hide(exampleResult);
-            setInactive(exampleHtmlBtn);
-            setInactive(exampleResultBtn);
-
-            show(exampleJs);
-            setActive(exampleJsBtn);
-        }
-
-        function showHtml() {
-            hide(exampleJs);
-            hide(exampleResult);
-            setInactive(exampleJsBtn);
-            setInactive(exampleResultBtn);
-
-            show(exampleHtml);
-            setActive(exampleHtmlBtn);
-        }
-
-        function showResult() {
-            hide(exampleJs);
-            hide(exampleHtml);
-            setInactive(exampleJsBtn);
-            setInactive(exampleHtmlBtn);
-
-            show(exampleResult);
-            setActive(exampleResultBtn);
-        }
-    </script>
 
 
 </div>
@@ -155,7 +356,13 @@
 <script src="scripts/linenumber.js"></script>
 
     <script>
-        showLnbExamples();
+        var id = '_sub'.replace(/"/g, '_');
+        var selectedApi = document.getElementById(id); // do not use jquery selector
+        var $selectedApi = $(selectedApi);
+
+        $selectedApi.removeClass('hidden');
+        $selectedApi.parent().find('.glyphicon').removeClass('glyphicon-plus').addClass('glyphicon-minus');
+        showLnbApi();
     </script>
 
 </body>
