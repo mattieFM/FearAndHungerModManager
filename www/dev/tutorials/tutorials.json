@@ -5,11 +5,11 @@
     "support": {
         "title": "Support The Project"
     },
-    "grid": {
-        "title": "TUI Grid"
+    "devSetup": {
+        "title": "Dev Onboarding"
     },
-    "editor": {
-        "title": "TUI Editor"
+    "about": {
+        "title": "What Is This Project"
     },
     "markdownTutorial": {
         "title": "Markdown tutorial"
