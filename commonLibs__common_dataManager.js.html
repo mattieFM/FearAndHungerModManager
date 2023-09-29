@@ -1,0 +1,404 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Source: commonLibs/_common/dataManager.js | Source: commonLibs/_common/dataManager.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/bootstrap.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-jsdoc.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/tui-doc.css">
+
+    
+        
+            <link type="text/css" rel="stylesheet" href="./api.css">
+        
+    
+</head>
+<body>
+<nav class="lnb" id="lnb">
+    <div class="logo" style="width: 150px; height: 150px">
+        
+            <a href="./index.html" rel="noopener noreferrer" target="_blank">
+                <img src="https://github.com/mattieFM/FearAndHungerModManager/blob/main/www/mods/commonLibs/_common/images/logo.png?raw=true" width="100%" height="100%">
+            </a>
+        
+    </div>
+    <div class="title">
+        <h1><a href="index.html" class="link">Source: commonLibs/_common/dataManager.js</a></h1>
+        
+            <span class="version">v1.2.4</span>
+        
+    </div>
+    <div class="search-container" id="search-container">
+        <input type="text" placeholder="Search">
+        <ul></ul>
+    </div>
+    
+        <ol class="lnb-tab">
+            <li id="api-tab">
+                <a href="#"><h4>API</h4></a>
+            </li>
+            <li id="examples-tab">
+                <a href="#"><h4>Tutorials</h4></a>
+            </li>
+        </ol>
+    
+    <div class="lnb-examples hidden"><h3>Tutorials</h3><ul><li><a href="tutorial-install.html">INSTALL</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="install_sub"></div></li><li><a href="tutorial-tmp.html">tmp</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="tmp_sub"></div></li></ul></div><div class="lnb-api hidden"><h3>Classes</h3><ul><li><a href="Asset.html">Asset</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Asset_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="Asset.html#_force">_force</a></li><li><a href="Asset.html#_force">_force</a></li><li><a href="Asset.html#destinationPath">destinationPath</a></li><li><a href="Asset.html#destinationPath">destinationPath</a></li><li><a href="Asset.html#fileName">fileName</a></li><li><a href="Asset.html#fileName">fileName</a></li><li><a href="Asset.html#imgType">imgType</a></li><li><a href="Asset.html#imgType">imgType</a></li><li><a href="Asset.html#sourcePath">sourcePath</a></li><li><a href="Asset.html#sourcePath">sourcePath</a></li><li><a href="Asset.html#type">type</a></li><li><a href="Asset.html#type">type</a></li></ul><div class="member-type">Methods</div><ul class="inner"><li><a href="Asset.html#backupImage">backupImage</a></li><li><a href="Asset.html#backupImage">backupImage</a></li><li><a href="Asset.html#loadAsset">loadAsset</a></li><li><a href="Asset.html#loadAsset">loadAsset</a></li><li><a href="Asset.html#loadImage">loadImage</a></li><li><a href="Asset.html#loadImage">loadImage</a></li><li><a href="Asset.html#restoreBackup">restoreBackup</a></li><li><a href="Asset.html#restoreBackup">restoreBackup</a></li><li><a href="Asset.html#shouldForce">shouldForce</a></li><li><a href="Asset.html#shouldForce">shouldForce</a></li><li><a href="Asset.html#unloadAsset">unloadAsset</a></li><li><a href="Asset.html#unloadAsset">unloadAsset</a></li></ul></div></li><li><a href="MapEvent.html">MapEvent</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="MapEvent_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="MapEvent.html#.generateImage">generateImage</a></li><li><a href="MapEvent.html#.generateImage">generateImage</a></li><li><a href="MapEvent.html#.setDefaultImage">setDefaultImage</a></li><li><a href="MapEvent.html#.setDefaultImage">setDefaultImage</a></li><li><a href="MapEvent.html#addCommand">addCommand</a></li><li><a href="MapEvent.html#addCommand">addCommand</a></li><li><a href="MapEvent.html#addCommandAfterIndex">addCommandAfterIndex</a></li><li><a href="MapEvent.html#addCommandAfterIndex">addCommandAfterIndex</a></li><li><a href="MapEvent.html#addPage">addPage</a></li><li><a href="MapEvent.html#addPage">addPage</a></li><li><a href="MapEvent.html#addSpriteToTilemap">addSpriteToTilemap</a></li><li><a href="MapEvent.html#addSpriteToTilemap">addSpriteToTilemap</a></li><li><a href="MapEvent.html#checkSelfSwitch">checkSelfSwitch</a></li><li><a href="MapEvent.html#checkSelfSwitch">checkSelfSwitch</a></li><li><a href="MapEvent.html#copyActionsFromCommonEvent">copyActionsFromCommonEvent</a></li><li><a href="MapEvent.html#copyActionsFromCommonEvent">copyActionsFromCommonEvent</a></li><li><a href="MapEvent.html#copyActionsFromEvent">copyActionsFromEvent</a></li><li><a href="MapEvent.html#copyActionsFromEvent">copyActionsFromEvent</a></li><li><a href="MapEvent.html#copyActionsFromEventOnMap">copyActionsFromEventOnMap</a></li><li><a href="MapEvent.html#copyActionsFromEventOnMap">copyActionsFromEventOnMap</a></li><li><a href="MapEvent.html#createCharacterSprite">createCharacterSprite</a></li><li><a href="MapEvent.html#createCharacterSprite">createCharacterSprite</a></li><li><a href="MapEvent.html#createCommand">createCommand</a></li><li><a href="MapEvent.html#createCommand">createCommand</a></li><li><a href="MapEvent.html#createGameEvent">createGameEvent</a></li><li><a href="MapEvent.html#createGameEvent">createGameEvent</a></li><li><a href="MapEvent.html#getLastEvent">getLastEvent</a></li><li><a href="MapEvent.html#getLastEvent">getLastEvent</a></li><li><a href="MapEvent.html#getListOfCommandCodesOnPage">getListOfCommandCodesOnPage</a></li><li><a href="MapEvent.html#getListOfCommandCodesOnPage">getListOfCommandCodesOnPage</a></li><li><a href="MapEvent.html#indexOfCommandOnPage">indexOfCommandOnPage</a></li><li><a href="MapEvent.html#indexOfCommandOnPage">indexOfCommandOnPage</a></li><li><a href="MapEvent.html#setDefaultConditions">setDefaultConditions</a></li><li><a href="MapEvent.html#setDefaultConditions">setDefaultConditions</a></li><li><a href="MapEvent.html#setDefaultMoveRoute">setDefaultMoveRoute</a></li><li><a href="MapEvent.html#setDefaultMoveRoute">setDefaultMoveRoute</a></li><li><a href="MapEvent.html#setId">setId</a></li><li><a href="MapEvent.html#setId">setId</a></li><li><a href="MapEvent.html#setImage">setImage</a></li><li><a href="MapEvent.html#setImage">setImage</a></li><li><a href="MapEvent.html#setName">setName</a></li><li><a href="MapEvent.html#setName">setName</a></li><li><a href="MapEvent.html#setNote">setNote</a></li><li><a href="MapEvent.html#setNote">setNote</a></li><li><a href="MapEvent.html#setPosition">setPosition</a></li><li><a href="MapEvent.html#setPosition">setPosition</a></li><li><a href="MapEvent.html#spawn">spawn</a></li><li><a href="MapEvent.html#spawn">spawn</a></li></ul></div></li><li><a href="MATTIE.betterCrowMauler.CrowController.html">CrowController</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="MATTIE.betterCrowMauler.CrowController_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="MATTIE.betterCrowMauler.CrowController.html#hasSpawned">hasSpawned</a></li><li><a href="MATTIE.betterCrowMauler.CrowController.html#hasSpawned">hasSpawned</a></li><li><a href="MATTIE.betterCrowMauler.CrowController.html#inBattle">inBattle</a></li><li><a href="MATTIE.betterCrowMauler.CrowController.html#inBattle">inBattle</a></li><li><a href="MATTIE.betterCrowMauler.CrowController.html#mapId">mapId</a></li><li><a href="MATTIE.betterCrowMauler.CrowController.html#mapId">mapId</a></li><li><a href="MATTIE.betterCrowMauler.CrowController.html#onScreen">onScreen</a></li><li><a href="MATTIE.betterCrowMauler.CrowController.html#onScreen">onScreen</a></li><li><a href="MATTIE.betterCrowMauler.CrowController.html#self">self</a></li><li><a href="MATTIE.betterCrowMauler.CrowController.html#self">self</a></li></ul><div class="member-type">Methods</div><ul class="inner"><li><a href="MATTIE.betterCrowMauler.CrowController.html#canFollow">canFollow</a></li><li><a href="MATTIE.betterCrowMauler.CrowController.html#canFollow">canFollow</a></li><li><a href="MATTIE.betterCrowMauler.CrowController.html#crowCanSpawn">crowCanSpawn</a></li><li><a href="MATTIE.betterCrowMauler.CrowController.html#crowCanSpawn">crowCanSpawn</a></li><li><a href="MATTIE.betterCrowMauler.CrowController.html#disableBaseCrowMauler">disableBaseCrowMauler</a></li><li><a href="MATTIE.betterCrowMauler.CrowController.html#disableBaseCrowMauler">disableBaseCrowMauler</a></li><li><a href="MATTIE.betterCrowMauler.CrowController.html#enter">enter</a></li><li><a href="MATTIE.betterCrowMauler.CrowController.html#enter">enter</a></li><li><a href="MATTIE.betterCrowMauler.CrowController.html#findClosestSpawnPoint">findClosestSpawnPoint</a></li><li><a href="MATTIE.betterCrowMauler.CrowController.html#findClosestSpawnPoint">findClosestSpawnPoint</a></li><li><a href="MATTIE.betterCrowMauler.CrowController.html#follow">follow</a></li><li><a href="MATTIE.betterCrowMauler.CrowController.html#follow">follow</a></li><li><a href="MATTIE.betterCrowMauler.CrowController.html#getAllTransferPointsOnMap">getAllTransferPointsOnMap</a></li><li><a href="MATTIE.betterCrowMauler.CrowController.html#getAllTransferPointsOnMap">getAllTransferPointsOnMap</a></li><li><a href="MATTIE.betterCrowMauler.CrowController.html#getScaling">getScaling</a></li><li><a href="MATTIE.betterCrowMauler.CrowController.html#getScaling">getScaling</a></li><li><a href="MATTIE.betterCrowMauler.CrowController.html#invadeBattle">invadeBattle</a></li><li><a href="MATTIE.betterCrowMauler.CrowController.html#invadeBattle">invadeBattle</a></li><li><a href="MATTIE.betterCrowMauler.CrowController.html#isDead">isDead</a></li><li><a href="MATTIE.betterCrowMauler.CrowController.html#isDead">isDead</a></li><li><a href="MATTIE.betterCrowMauler.CrowController.html#shouldDespawn">shouldDespawn</a></li><li><a href="MATTIE.betterCrowMauler.CrowController.html#shouldDespawn">shouldDespawn</a></li><li><a href="MATTIE.betterCrowMauler.CrowController.html#shouldEnterCombat">shouldEnterCombat</a></li><li><a href="MATTIE.betterCrowMauler.CrowController.html#shouldEnterCombat">shouldEnterCombat</a></li><li><a href="MATTIE.betterCrowMauler.CrowController.html#spawn">spawn</a></li><li><a href="MATTIE.betterCrowMauler.CrowController.html#spawn">spawn</a></li><li><a href="MATTIE.betterCrowMauler.CrowController.html#spawnTick">spawnTick</a></li><li><a href="MATTIE.betterCrowMauler.CrowController.html#spawnTick">spawnTick</a></li></ul></div></li><li><a href="MATTIE.DataManager.global.html">global</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="MATTIE.DataManager.global_sub"><div class="member-type">Methods</div><ul class="inner"><li><a href="MATTIE.DataManager.global.html#.createGlobalData">createGlobalData</a></li><li><a href="MATTIE.DataManager.global.html#.createGlobalData">createGlobalData</a></li></ul></div></li><li><a href="Mod.html">Mod</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="Mod_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="Mod.html#assets">assets</a></li><li><a href="Mod.html#assets">assets</a></li><li><a href="Mod.html#dependencies">dependencies</a></li><li><a href="Mod.html#dependencies">dependencies</a></li><li><a href="Mod.html#displayName">displayName</a></li><li><a href="Mod.html#displayName">displayName</a></li><li><a href="Mod.html#isDependency">isDependency</a></li><li><a href="Mod.html#isDependency">isDependency</a></li><li><a href="Mod.html#lastStatus">lastStatus</a></li><li><a href="Mod.html#lastStatus">lastStatus</a></li><li><a href="Mod.html#name">name</a></li><li><a href="Mod.html#name">name</a></li><li><a href="Mod.html#offloadScript">offloadScript</a></li><li><a href="Mod.html#offloadScript">offloadScript</a></li><li><a href="Mod.html#onloadScript">onloadScript</a></li><li><a href="Mod.html#onloadScript">onloadScript</a></li><li><a href="Mod.html#params">params</a></li><li><a href="Mod.html#params">params</a></li><li><a href="Mod.html#status">status</a></li><li><a href="Mod.html#status">status</a></li></ul><div class="member-type">Methods</div><ul class="inner"><li><a href="Mod.html#addAsset">addAsset</a></li><li><a href="Mod.html#addAsset">addAsset</a></li><li><a href="Mod.html#addToOffLoad">addToOffLoad</a></li><li><a href="Mod.html#addToOffLoad">addToOffLoad</a></li><li><a href="Mod.html#addToOnLoad">addToOnLoad</a></li><li><a href="Mod.html#addToOnLoad">addToOnLoad</a></li><li><a href="Mod.html#getStatus">getStatus</a></li><li><a href="Mod.html#getStatus">getStatus</a></li><li><a href="Mod.html#loadFromObj">loadFromObj</a></li><li><a href="Mod.html#loadFromObj">loadFromObj</a></li><li><a href="Mod.html#setStatus">setStatus</a></li><li><a href="Mod.html#setStatus">setStatus</a></li><li><a href="Mod.html#statusHasChanged">statusHasChanged</a></li><li><a href="Mod.html#statusHasChanged">statusHasChanged</a></li></ul></div></li><li><a href="ModManager.html">ModManager</a><button type="button" class="hidden toggle-subnav btn btn-link">  <span class="glyphicon glyphicon-plus"></span></button><div class="hidden" id="ModManager_sub"><div class="member-type">Members</div><ul class="inner"><li><a href="ModManager.html#_modsDict">_modsDict</a></li><li><a href="ModManager.html#_modsDict">_modsDict</a></li><li><a href="ModManager.html#_path">_path</a></li><li><a href="ModManager.html#_path">_path</a></li><li><a href="ModManager.html#forceModdedSaves">forceModdedSaves</a></li><li><a href="ModManager.html#forceModdedSaves">forceModdedSaves</a></li><li><a href="ModManager.html#forceVanillaSaves">forceVanillaSaves</a></li><li><a href="ModManager.html#forceVanillaSaves">forceVanillaSaves</a></li></ul><div class="member-type">Methods</div><ul class="inner"><li><a href="ModManager.html#addModEntry">addModEntry</a></li><li><a href="ModManager.html#addModEntry">addModEntry</a></li><li><a href="ModManager.html#addOffloadScriptToMod">addOffloadScriptToMod</a></li><li><a href="ModManager.html#addOffloadScriptToMod">addOffloadScriptToMod</a></li><li><a href="ModManager.html#addOnloadScriptToMod">addOnloadScriptToMod</a></li><li><a href="ModManager.html#addOnloadScriptToMod">addOnloadScriptToMod</a></li><li><a href="ModManager.html#callOnLoadModScript">callOnLoadModScript</a></li><li><a href="ModManager.html#callOnLoadModScript">callOnLoadModScript</a></li><li><a href="ModManager.html#callOnOffloadModScript">callOnOffloadModScript</a></li><li><a href="ModManager.html#callOnOffloadModScript">callOnOffloadModScript</a></li><li><a href="ModManager.html#checkForceModdedSaves">checkForceModdedSaves</a></li><li><a href="ModManager.html#checkForceModdedSaves">checkForceModdedSaves</a></li><li><a href="ModManager.html#checkForceVanillaSaves">checkForceVanillaSaves</a></li><li><a href="ModManager.html#checkForceVanillaSaves">checkForceVanillaSaves</a></li><li><a href="ModManager.html#checkMod">checkMod</a></li><li><a href="ModManager.html#checkMod">checkMod</a></li><li><a href="ModManager.html#checkModded">checkModded</a></li><li><a href="ModManager.html#checkModded">checkModded</a></li><li><a href="ModManager.html#checkModsChanged">checkModsChanged</a></li><li><a href="ModManager.html#checkModsChanged">checkModsChanged</a></li><li><a href="ModManager.html#checkSaveDanger">checkSaveDanger</a></li><li><a href="ModManager.html#checkSaveDanger">checkSaveDanger</a></li><li><a href="ModManager.html#checkVanilla">checkVanilla</a></li><li><a href="ModManager.html#checkVanilla">checkVanilla</a></li><li><a href="ModManager.html#disableAndReload">disableAndReload</a></li><li><a href="ModManager.html#disableAndReload">disableAndReload</a></li><li><a href="ModManager.html#generateDefaultJSONForMod">generateDefaultJSONForMod</a></li><li><a href="ModManager.html#generateDefaultJSONForMod">generateDefaultJSONForMod</a></li><li><a href="ModManager.html#generateDefaultJsonForModsWithoutJsons">generateDefaultJsonForModsWithoutJsons</a></li><li><a href="ModManager.html#generateDefaultJsonForModsWithoutJsons">generateDefaultJsonForModsWithoutJsons</a></li><li><a href="ModManager.html#getActiveRealDangerMods">getActiveRealDangerMods</a></li><li><a href="ModManager.html#getActiveRealDangerMods">getActiveRealDangerMods</a></li><li><a href="ModManager.html#getActiveRealMods">getActiveRealMods</a></li><li><a href="ModManager.html#getActiveRealMods">getActiveRealMods</a></li><li><a href="ModManager.html#getAllMods">getAllMods</a></li><li><a href="ModManager.html#getAllMods">getAllMods</a></li><li><a href="ModManager.html#getModArr">getModArr</a></li><li><a href="ModManager.html#getModArr">getModArr</a></li><li><a href="ModManager.html#getModInfo">getModInfo</a></li><li><a href="ModManager.html#getModInfo">getModInfo</a></li><li><a href="ModManager.html#getModsFolder">getModsFolder</a></li><li><a href="ModManager.html#getModsFolder">getModsFolder</a></li><li><a href="ModManager.html#getModsWithoutJson">getModsWithoutJson</a></li><li><a href="ModManager.html#getModsWithoutJson">getModsWithoutJson</a></li><li><a href="ModManager.html#getPath">getPath</a></li><li><a href="ModManager.html#getPath">getPath</a></li><li><a href="ModManager.html#parseMod">parseMod</a></li><li><a href="ModManager.html#parseMod">parseMod</a></li><li><a href="ModManager.html#parseMods">parseMods</a></li><li><a href="ModManager.html#parseMods">parseMods</a></li><li><a href="ModManager.html#reloadGame">reloadGame</a></li><li><a href="ModManager.html#reloadGame">reloadGame</a></li><li><a href="ModManager.html#reloadIfChangedGame">reloadIfChangedGame</a></li><li><a href="ModManager.html#reloadIfChangedGame">reloadIfChangedGame</a></li><li><a href="ModManager.html#setEnabled">setEnabled</a></li><li><a href="ModManager.html#setEnabled">setEnabled</a></li><li><a href="ModManager.html#setNonDanger">setNonDanger</a></li><li><a href="ModManager.html#setNonDanger">setNonDanger</a></li><li><a href="ModManager.html#setupMods">setupMods</a></li><li><a href="ModManager.html#setupMods">setupMods</a></li><li><a href="ModManager.html#setVanilla">setVanilla</a></li><li><a href="ModManager.html#setVanilla">setVanilla</a></li><li><a href="ModManager.html#switchForceModdedSaves">switchForceModdedSaves</a></li><li><a href="ModManager.html#switchForceModdedSaves">switchForceModdedSaves</a></li><li><a href="ModManager.html#switchForceVanillaSaves">switchForceVanillaSaves</a></li><li><a href="ModManager.html#switchForceVanillaSaves">switchForceVanillaSaves</a></li></ul></div></li></ul></div><div class="lnb-api hidden"><h3>Global</h3><ul><li><a href="global.html#MATTIE">MATTIE</a></li><li><a href="global.html#MATTIE_ModManager">MATTIE_ModManager</a></li><li><a href="global.html#onError">onError</a></li><li><a href="global.html#overrideErrorLoggers">overrideErrorLoggers</a></li><li><a href="global.html">render</a></li></ul></div>
+</nav>
+<div id="resizer"></div>
+
+<div class="main" id="main">
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>var MATTIE = MATTIE || {};
+MATTIE.DataManager = MATTIE.DataManager || {};
+MATTIE.DataManager.dataPath = '/modData/';
+MATTIE.multiplayer = MATTIE.multiplayer || {};
+MATTIE.global = MATTIE.global || {};
+const funger1IgnoredPlugins = ['TerraxLighting'];
+const terminaIgnoredPlugins = [];
+const ignoredPlugins = ['HIME_PreTitleEvents', 'physical_attack_animation'];
+
+MATTIE.ignoredPlugins = (() => {
+	if (MATTIE.global.isTermina()) {
+		return terminaIgnoredPlugins.concat(ignoredPlugins);
+	} if (MATTIE.global.isFunger()) {
+		return funger1IgnoredPlugins.concat(ignoredPlugins);
+	}
+	return ignoredPlugins;
+});
+
+//----------------------------------------------
+// Global Data
+//----------------------------------------------
+/** @description whether the version has been loaded and is valid */
+MATTIE.global.hasLoadedOnce = false;
+
+/** @description returns if this is termina or not */
+MATTIE.global.isTermina = () => (MATTIE.global.version === 2);
+
+/** @description returns if this is funger or not */
+MATTIE.global.isFunger = () => (MATTIE.global.version === 1);
+MATTIE.global.requestedDataBaseLoad = false;
+/** @description check the version of the game */
+MATTIE.global.checkGameVersion = function () {
+	return new Promise((res) => {
+		if (!$dataSystem) {
+			if (MATTIE.DataManager) {
+				const dataVersion = MATTIE.DataManager.global.get('version');
+				if (typeof dataVersion !== 'undefined') {
+					MATTIE.global.version = dataVersion;
+					MATTIE.global.hasLoadedOnce = true;
+					res(dataVersion);
+				} else {
+					MATTIE.DataManager.loadFileXML('System.json', ((data) => {
+						const version = data.gameTitle.toUpperCase().includes('TERMINA') ? 2 : 1;
+						MATTIE.global.version = version;
+						MATTIE.global.hasLoadedOnce = true;
+						MATTIE.DataManager.global.set('version', version);
+						res(version);
+					}));
+				}
+			} else {
+				// this should never occur,
+				// but if it does we will just resolve with 1
+				res(1);
+			}
+		} else {
+			const version = $dataSystem.gameTitle.toUpperCase().includes('TERMINA') ? 2 : 1;
+			MATTIE.global.version = version;
+			MATTIE.global.hasLoadedOnce = true;
+			res(version);
+		}
+	});
+};
+
+//--------------------------------------------------------------
+// Mod data
+//--------------------------------------------------------------
+/**
+ * @class the class that handles global data
+ */
+MATTIE.DataManager.global = function () {
+	throw new Error('This is a static class');
+};
+
+MATTIE.DataManager.global.fileName = 'modDataGlobal.json';
+
+MATTIE.DataManager.global.data = {
+
+	isDev: false,
+
+}; // default data
+
+/** @returns the path of the modData folder */
+MATTIE.DataManager.localFileDirectoryPath = function () {
+	const path = require('path');
+
+	const base = path.dirname(process.mainModule.filename);
+	return path.join(base, MATTIE.DataManager.dataPath);
+};
+
+/**
+ * @description creates a modData folder if one does not exist
+ * or if a parm is passes it will create a specfic dir inside of the moddata folder
+ *
+*/
+MATTIE.DataManager.createDir = function (path = null) {
+	const fs = require('fs');
+	if (path) path = MATTIE.DataManager.localFileDirectoryPath() + path;
+	if (!path) path = MATTIE.DataManager.localFileDirectoryPath();
+	if (!fs.existsSync(path)) {
+		fs.mkdir(path);
+	}
+};
+
+MATTIE.DataManager.global.loadGlobalData = function () {
+	const fs = require('fs');
+	const path = MATTIE.DataManager.localFileDirectoryPath();
+	MATTIE.DataManager.global.data = JSON.parse(fs.readFileSync(path + MATTIE.DataManager.global.fileName, { encoding: 'utf8', flag: 'r' }));
+	MATTIE.DataManager.onLoad();
+};
+
+MATTIE.DataManager.global.hasLoadedGlobalData = function () {
+	return !!MATTIE.DataManager.global.data;
+};
+
+/** @description creates global data if it does not exist */
+MATTIE.DataManager.global.createGlobalData = function () {
+	const fs = require('fs');
+	const path = MATTIE.DataManager.localFileDirectoryPath();
+	MATTIE.DataManager.createDir();
+	if (!fs.existsSync(path + MATTIE.DataManager.global.fileName)) {
+		fs.writeFileSync(path + MATTIE.DataManager.global.fileName, JSON.stringify({}));
+	}
+};
+
+MATTIE.DataManager.global.set = function (key, val) {
+	const fs = require('fs');
+	const path = MATTIE.DataManager.localFileDirectoryPath();
+	const name = path + MATTIE.DataManager.global.fileName;
+	MATTIE.DataManager.global.data[key] = val;
+	fs.writeFileSync(name, JSON.stringify(MATTIE.DataManager.global.data));
+};
+
+MATTIE.DataManager.global.get = function (key) {
+	return MATTIE.DataManager.global.data[key];
+};
+
+/**
+ *
+ * @param {string} orgFilePath the path to the file from www/
+ * @param {string} destPath the path within the img folder
+ * @param {string} name the name of the file
+ * @param {string} name2 the name of the destination file if different than normal name
+ * @param {boolean} force whether this should overwrite or not
+ * @param {boolean} deleteOrg whether the original file should be deleted after coping
+ *
+ * @returns {bool} if there is already a file at the dest location
+ */
+MATTIE.DataManager.addFileToImgFolder = function (orgFilePath, destPath, name, name2 = null, force = false, deleteOrg = false) {
+	if (!name.endsWith('.png'))name += '.png';
+	if (name2) if (!name2.endsWith('.png')) name2 += '.png';
+	const fs = require('fs');
+	const path = require('path');
+	const src = path.dirname(process.mainModule.filename);
+
+	orgFilePath = src + orgFilePath + name;
+	destinationPath = `${src}/img/${destPath}${name2 || name}`;
+
+	const fileExists = fs.existsSync(destinationPath);
+
+	if (!fileExists || force) {
+		console.log(`created:${destinationPath}`);
+		fs.copyFileSync(orgFilePath, destinationPath);
+	}
+	if (deleteOrg) {
+		fs.unlink(orgFilePath);
+	}
+
+	return fileExists;
+};
+
+/**
+ *
+ * @param {*} orgFilePath the path to the file from www/
+ * @param {*} destPath the path within the img folder
+ * @param {*} name the name of the file
+ */
+MATTIE.DataManager.checkExists = function (pathInWww) {
+	const fs = require('fs');
+	const path = require('path');
+	const src = path.dirname(process.mainModule.filename);
+
+	filePath = src + pathInWww;
+	return fs.existsSync(filePath);
+};
+
+MATTIE.DataManager.init = function () {
+	MATTIE.DataManager.global.createGlobalData();
+	MATTIE.DataManager.global.loadGlobalData();
+};
+
+MATTIE.DataManager.onLoad = function () {
+	MATTIE.isDev = MATTIE.DataManager.global.get('isDev');
+	MATTIE.multiplayer.isDev = MATTIE.DataManager.global.get('isDev');
+};
+
+MATTIE.DataManager.addToOnLoad = function (cb) {
+	const prevFunc = MATTIE.DataManager.onLoad;
+	MATTIE.DataManager.onLoad = function () {
+		prevFunc.call(this);
+		cb();
+	};
+};
+/**
+ * @description load a data file using an xml request, then call the callback provided with the data
+ * @param {*} src the file name IE: System.json
+ * @param {*} cb the callback
+ */
+MATTIE.DataManager.loadFileXML = function (src, cb) {
+	const xhr = new XMLHttpRequest();
+	const url = `data/${src}`;
+	xhr.open('GET', url);
+	xhr.overrideMimeType('application/json');
+	xhr.onload = function () {
+		if (xhr.status &lt; 400) {
+			const data = JSON.parse(xhr.responseText);
+			cb(data);
+		}
+	};
+	xhr.onerror = this._mapLoader || function () {
+		DataManager._errorUrl = DataManager._errorUrl || url;
+	};
+	xhr.send();
+};
+
+//--------------------------------------------------------------
+// game data
+//--------------------------------------------------------------
+
+/**
+ * @description load a save as an object to acsess information from it but not load it
+ * @param {JSON} contents a parsed json of the save you are loading
+ * @returns an object of the save's game data
+ */
+MATTIE.DataManager.extractAndReturnSaveContents = function (contents) {
+	const data = {};
+	data.$gameSystem = contents.system;
+	data.$gameScreen = contents.screen;
+	data.$gameTimer = contents.timer;
+	data.$gameSwitches = contents.switches;
+	data.$gameVariables = contents.variables;
+	data.$gameSelfSwitches = contents.selfSwitches;
+	data.$gameActors = contents.actors;
+	data.$gameParty = contents.party;
+	data.$gameMap = contents.map;
+	data.$gamePlayer = contents.player;
+	return data;
+};
+/**
+ * @description turn an object of save data into the format used to save the game
+ * @param {Object} data save data for a game parsed as an object
+ */
+MATTIE.DataManager.makeSaveContentsFromParam = function (data) {
+	// A save data does not contain $gameTemp, $gameMessage, and $gameTroop.
+	const contents = {};
+	contents.system = data.$gameSystem;
+	contents.screen = data.$gameScreen;
+	contents.timer = data.$gameTimer;
+	contents.switches = data.$gameSwitches;
+	contents.variables = data.$gameVariables;
+	contents.selfSwitches = data.$gameSelfSwitches;
+	contents.actors = data.$gameActors;
+	contents.party = data.$gameParty;
+	contents.map = data.$gameMap;
+	contents.player = data.$gamePlayer;
+	return contents;
+};
+/**
+ * @description get full game data of a save as an object.
+ * @param {integer} index the index of the save slot you want to load
+ * @returns full game data of that save
+ */
+MATTIE.DataManager.loadAndReturnSave = function (index) {
+	try {
+		const saveJson = StorageManager.load(index);
+		const saveData = MATTIE.DataManager.extractAndReturnSaveContents(JsonEx.parse(saveJson));
+		return saveData;
+	} catch (error) {
+		return null;
+	}
+};
+/**
+ * @description make save file info from param
+ * @returns save file info
+ */
+MATTIE.DataManager.makeSavefileInfo = function (data) {
+	const info = {};
+	info.globalId = DataManager._globalId;
+	info.title = $gameSystem.gameTitle;
+	info.characters = data.$gameParty.charactersForSavefile();
+	info.faces = data.$gameParty.facesForSavefile();
+	info.playtime = data.$gameSystem.playtimeText();
+	info.timestamp = Date.now();
+	return info;
+};
+
+MATTIE.DataManager.saveGameFromObj = function (savefileId, obj) {
+	const json = JsonEx.stringify(MATTIE.DataManager.makeSaveContentsFromParam(obj));
+	if (json.length >= 200000) {
+		console.warn('Save data too big!');
+	}
+	StorageManager.save(savefileId, json);
+	DataManager._lastAccessedId = savefileId;
+	const globalInfo = DataManager.loadGlobalInfo() || [];
+	globalInfo[savefileId] = MATTIE.DataManager.makeSavefileInfo(obj);
+	DataManager.saveGlobalInfo(globalInfo);
+	return true;
+};
+
+MATTIE.DataManager.init();
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<footer>
+    <img class="logo" src="https://github.com/mattieFM/FearAndHungerModManager/blob/main/www/mods/commonLibs/_common/images/logo.png?raw=true" style="width: 150px; height: 150px">
+    <div class="footer-text">NHN Entertainment. Frontend Development Lab</div>
+</footer>
+<script>prettyPrint();</script>
+<script src="scripts/jquery.min.js"></script>
+<script src="scripts/tui-doc.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+    <script>
+        var id = '_sub'.replace(/"/g, '_');
+        var selectedApi = document.getElementById(id); // do not use jquery selector
+        var $selectedApi = $(selectedApi);
+
+        $selectedApi.removeClass('hidden');
+        $selectedApi.parent().find('.glyphicon').removeClass('glyphicon-plus').addClass('glyphicon-minus');
+        showLnbApi();
+    </script>
+
+</body>
+</html>
