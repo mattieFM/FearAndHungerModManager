@@ -1,6 +1,5 @@
 var MATTIE_ModManager = MATTIE_ModManager || {};
 
-MATTIE.global = MATTIE.global || {};
 /**
  * @namespace MATTIE.static
  * @description This namespace contains all game specific values IE: if you need crow mauler's id it should be here.

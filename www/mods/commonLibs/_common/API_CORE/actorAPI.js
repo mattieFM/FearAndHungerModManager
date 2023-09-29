@@ -7,8 +7,6 @@
  */
 MATTIE.actorAPI = MATTIE.actorAPI || {};
 
-var Yanfly = Yanfly || false;
-
 /**
  * @description force the first actor in the battlemembers function to always be i
  * @param {int} i actor index

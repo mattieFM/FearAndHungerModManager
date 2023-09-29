@@ -3,6 +3,7 @@
  * y pos,
  * btns
  * width
+ * @class
  */
 MATTIE.windows.horizontalBtns = function () {
 	this.initialize.apply(this, arguments);
@@ -60,6 +61,7 @@ MATTIE.windows.horizontalBtns.prototype.makeCommandList = function () {
 /**
  * A window to display text
  * @extends Window_Base
+ * @class
  */
 MATTIE.windows.textDisplay = function () {
 	this.initialize.apply(this, arguments);
@@ -106,6 +108,7 @@ MATTIE.windows.textDisplay.prototype.windowWidth = function () {
 /**
  * A list with header
  * @extends Window_Base
+ * @class
  */
 MATTIE.windows.list = function () {
 	this.initialize.apply(this, arguments);

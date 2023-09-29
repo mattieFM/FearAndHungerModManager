@@ -13,6 +13,7 @@ MATTIE.menus.toItemCheatMenu = function () {
  * // Scene_DevItems
  * @description a scene to spawn in items for dev
  * @extends Scene_Item
+ * @class
  */
 MATTIE.scenes.Scene_DevItems = function () {
 	this.initialize.apply(this, arguments);
@@ -61,6 +62,7 @@ MATTIE.scenes.Scene_DevItems.prototype.onItemCancel = function () {
  * Window_CheatItem
  * @description a window that displays all items in the game, intended to be used for the cheat menu
  * @extends Window_ItemList
+ * @class
  */
 MATTIE.windows.Window_CheatItem = function () {
 	this.initialize.apply(this, arguments);
@@ -192,6 +194,7 @@ MATTIE.windows.EmptyScrollHelpWindow.prototype.setItem = function (item) {
 /**
  * A scene to spawn in one item that an empty scroll can provide and then close
  * @extends MATTIE.scenes.emptyScroll
+ * @class
  */
 MATTIE.scenes.emptyScroll = function () {
 	this.initialize.apply(this, arguments);
@@ -319,6 +322,7 @@ MATTIE.windows.Window_DevSkillList.prototype.isCurrentItemEnabled = function () 
  * Scene_DevActors
  * @description a scene to spawn in or remove actors
  * @extends Scene_MenuBase
+ * @class
  */
 MATTIE.scenes.Scene_DevActors = function () {
 	this.initialize.apply(this, arguments);
@@ -367,6 +371,7 @@ MATTIE.scenes.Scene_DevActors.prototype.onActorOk = function () {
  * Scene_ForceActors
  * @description a scene to change what actor you are
  * @extends Scene_DevActors
+ * @class
  */
 MATTIE.scenes.Scene_ForceActors = function () {
 	this.initialize.apply(this, arguments);
@@ -390,6 +395,7 @@ MATTIE.scenes.Scene_ForceActors.prototype.onActorOk = function () {
  * Window_AllStatus
  * @description a window that displays all actors
  * @extends Window_MenuStatus
+ * @class
  */
 MATTIE.windows.Window_AllStatus = function () {
 	this.initialize.apply(this, arguments);

@@ -6,7 +6,7 @@ var MATTIE = MATTIE || {};
 MATTIE.DataManager = MATTIE.DataManager || {};
 MATTIE.DataManager.dataPath = '/modData/';
 MATTIE.multiplayer = MATTIE.multiplayer || {};
-MATTIE.global = MATTIE.global || {};
+
 const funger1IgnoredPlugins = ['TerraxLighting'];
 const terminaIgnoredPlugins = [];
 const ignoredPlugins = ['HIME_PreTitleEvents', 'physical_attack_animation'];
@@ -23,6 +23,12 @@ MATTIE.ignoredPlugins = (() => {
 //----------------------------------------------
 // Global Data
 //----------------------------------------------
+/**
+ * @namespace MATTIE.global
+ * @description the name space for all global variables and methods mostly used for version handling
+ *
+*/
+
 /** @description whether the version has been loaded and is valid */
 MATTIE.global.hasLoadedOnce = false;
 
@@ -69,7 +75,7 @@ MATTIE.global.checkGameVersion = function () {
 // Mod data
 //--------------------------------------------------------------
 /**
- * @class the class that handles global data
+ * @class the class that handles global data in the data manager
  */
 MATTIE.DataManager.global = function () {
 	throw new Error('This is a static class');

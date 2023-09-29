@@ -23,7 +23,6 @@
 
 var MATTIE_ModManager = MATTIE_ModManager || {};
 /**
- * @global
  * @namespace MATTIE
  * @description A namespace used for the modding engine as a whole. Done to mimic the style of RPGMaker plugins.
 */

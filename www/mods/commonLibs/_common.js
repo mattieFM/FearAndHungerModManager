@@ -5,9 +5,19 @@ MATTIE.TextManager = MATTIE.TextManager || {};
 MATTIE.CmdManager = MATTIE.CmdManager || {};
 MATTIE.modLoader = MATTIE.modLoader || {};
 MATTIE.menus.mainMenu = MATTIE.menus.mainMenu || {};
-MATTIE.global = MATTIE.global || {};
+
+/** @description the current version of the game, 1 if funger 2 if Terming */
 MATTIE.global.version = 1;
+/**
+ * @namespace MATTIE.GameInfo
+ * @description a namespace containing methods to get game info
+ */
 MATTIE.GameInfo = {};
+
+/**
+ * @description check what difficulty the game is in
+ * @returns {string}
+ * */
 MATTIE.GameInfo.getDifficulty = (data = $gameSwitches) => {
 	let difficulty = 'Fear & Hunger';
 	if (MATTIE.GameInfo.isHardMode(data)) { // Hard mode
@@ -17,8 +27,25 @@ MATTIE.GameInfo.getDifficulty = (data = $gameSwitches) => {
 	}
 	return difficulty;
 };
+/**
+ * @description provided with a same object get the menu actor's name
+ * @param {Object} data
+ * @returns {string} menu actor name
+ */
 MATTIE.GameInfo.getCharName = (data = $gameParty) => data.menuActor()._name;
+
+/**
+ * @description provided with a same object check if it is hardmode
+ * @param {Object} data
+ * @returns {boolean} is hardmode
+ */
 MATTIE.GameInfo.isHardMode = (data = $gameSwitches) => data._data[2190] === true;
+
+/**
+ * @description provided with a same object check if it is t&s
+ * @param {Object} data
+ * @returns {boolean} is t&s
+ */
 MATTIE.GameInfo.isTerrorAndStarvation = (data = $gameSwitches) => (!data._data[2190] && data._data[3153] === true);
 
 // --UTIL--
@@ -38,9 +65,12 @@ function updateKey(key, name = '') {
 		Input.keyMapper[key.toUpperCase().charCodeAt(0)] = key; // add our key to the list of watched keys
 	}
 }
+/**
+ * @namespace Input
+ * @description the input object of RPG maker, note: only the added methods and functions will display in this documentation
+ */
 
 /**
- *
  * @param {int} scope
  * -2 = in dev mode
  * -1 = never
@@ -72,12 +102,12 @@ const keys = {};
 let i = 128;
 /**
  *
- * @param {*} key (optional) always bind to this key on boot
- * @param {*} cb the call back to run
- * @param {*} name the name of this command
- * @param {*} scope the scope of this command
- * @param {*} wasdDefualt the default key in wasd layout
- * @param {*} defaultKey the default key in defualt layout
+ * @param {string} key (optional) always bind to this key on boot
+ * @param {Function} cb the call back to run
+ * @param {string} name the name of this command
+ * @param {int} scope the scope of this command
+ * @param {string} wasdDefualt the default key in wasd layout
+ * @param {string} defaultKey the default key in defualt layout
  */
 Input.addKeyBind = function (key, cb, name = '', scope = 0, wasdDefualt = null, defaultKey = null) {
 	if (typeof key === 'number') key = String.fromCharCode(key);

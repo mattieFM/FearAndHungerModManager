@@ -3,12 +3,20 @@ MATTIE.windows = MATTIE.windows || {};
 MATTIE.scenes = MATTIE.scenes || {};
 MATTIE.TextManager = MATTIE.TextManager || {};
 MATTIE.CmdManager = MATTIE.CmdManager || {};
+
+/**
+ * @namespace MATTIE.menus.mainMenu
+ * @description methods related to main menu manipulation
+ * */
 MATTIE.menus.mainMenu = MATTIE.menus.mainMenu || {};
 
 var MATTIE_RPG = MATTIE_RPG || {};
 TextManager.Mods = 'Mods';
 
-/** @description removes a */
+/**
+ * @description removes a button from the main menu forcibly. That is to say this is able
+ * to override other mods that add buttons to main menu, it will just disable the command from displaying period.
+ * */
 MATTIE.menus.mainMenu.removeBtnFromMainMenu = function (displayText, sym) {
 	const prevFunc = Window_TitleCommand.prototype.addCommand;
 	Window_TitleCommand.prototype.addCommand = function (name, symbol, enabled, ext) {
