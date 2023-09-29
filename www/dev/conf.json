@@ -7,7 +7,8 @@
     "recurseDepth": 50,
     "source": {
         "include": [
-            "./www/mods/"
+            "./www/mods/",
+            "README.MD"
         ],
         "includePattern": ".+\\.js(doc|x)?$"
     },
