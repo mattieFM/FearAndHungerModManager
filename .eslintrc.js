@@ -53,9 +53,6 @@ module.exports = {
 			},
 		},
 	],
-	ignoredPatterns: [
-		"./www/js"
-	],
 	parserOptions: {
 		ecmaVersion: 'latest',
 	},

@@ -375,10 +375,7 @@ class Mod {
 				setTimeout(() => {
 					Scene_Boot.loadSystemImages();
 				}, 500);
-				
 			}, 1000);
-			
-			
 		});
 
 		this.addToOffLoad(() => {

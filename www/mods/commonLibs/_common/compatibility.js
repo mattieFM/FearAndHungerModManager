@@ -20,15 +20,13 @@ Bitmap.prototype._requestImage = function (url) {
 	}
 
 	this._image = new Image();
-	
+
 	//---------------
 	// very important
 	//---------------
 
-	//this line will fix the issue with caching images and let us update files during runtime.
-	fetch(url, { cache: 'reload', mode: 'no-cors' })
-
-
+	// this line will fix the issue with caching images and let us update files during runtime.
+	fetch(url, { cache: 'reload', mode: 'no-cors' });
 
 	this._url = url;
 	this._loadingState = 'requesting';
