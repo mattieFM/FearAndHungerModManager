@@ -1,3 +1,4 @@
+/* eslint-disable max-classes-per-file */
 /*:
  * @plugindesc V0
  * a mod for fear and hunger
@@ -36,8 +37,357 @@ MATTIE.CmdManager = MATTIE.CmdManager || {};
 MATTIE.menus.mainMenu = MATTIE.menus.mainMenu || {};
 
 //----------------------------------------------------------------
-// Plugin Manager
+// Asset Class
 //----------------------------------------------------------------
+
+/**
+ * @description assets are used to handle copying assets from mods into the game files to override or extend default
+ * assets. For instance you could copy an image from your mods data folder to the pictures folder.
+ */
+class Asset {
+	/**
+	 * @description Create a new asset.
+	 * @param {string} sourcePath the path from the working dir of the storage manager to the file
+	 * @param {string} destinationPath the path from the working dir of the storage manager to the destination of the file
+	 */
+	constructor(sourcePath, destinationPath, fileName, type) {
+		/**
+		 * @description the name of the file within the path including extension
+		 * @type {string}
+		 */
+		this.fileName = fileName;
+
+		/**
+		 * @description The path of the source file of the asset.
+		 * note that this is the path from within the www/ folder
+		 * @type {string}
+		 */
+		this.sourcePath = sourcePath;
+
+		/**
+		 * @description The path that the source file will be copied to
+		 * note that this is the path from within the www/ folder
+		 * @type {string}
+		 */
+		this.destinationPath = destinationPath;
+
+		/**
+		 * @description whether to override any existing files automatically
+		 * @default true
+		 * */
+		this._force = true;
+
+		/**
+		 * @description the type of this asset
+		 * @type {Asset.TYPES}
+		 */
+		this.type = type;
+
+		/**
+		 * @description if this asset is an image this is its type of image
+		 * @type {Asset.IMG_FOLDERS}
+		 */
+		this.imgType = null;
+
+		if (this.type === Asset.TYPES.IMG) {
+			this.imgType = Asset.IMG_FOLDERS[this.destinationPath];
+			if (!this.imgType) this.imgType = Asset.IMG_FOLDERS.PICTURES;
+		}
+	}
+
+	/**
+	 * @description check if this asset should forcibly overwrite any conflicting files
+	 * @returns {boolean}
+	 */
+	shouldForce() {
+		return this._force;
+	}
+
+	/**
+	 * @description Load an image asset into game files
+	 * @param {boolean} force whether to force overwrite the img
+	 */
+	loadImage(force = false) {
+		const fileExists = MATTIE.DataManager.addFileToImgFolder(this.sourcePath, `/${this.imgType}/`, this.fileName, this.fileName, force);
+		if (fileExists && !force) {
+			this.backupImage();
+			this.loadImage(true);
+		}
+	}
+
+	/**
+	 * @description Create a backup for an existing image.
+	 */
+	backupImage() {
+		MATTIE.DataManager.addFileToImgFolder(`/img/${this.imgType}/`, `/${this.imgType}/`, this.fileName, `_${this.fileName}`);
+	}
+
+	/**
+	 * @description Restores image from backup.
+	 */
+	restoreBackup() {
+		MATTIE.DataManager.addFileToImgFolder(`/img/${this.imgType}/`, `/${this.imgType}/`, `_${this.fileName}`, this.fileName, true, true);
+	}
+
+	/**
+	 * @description load this asset into game files
+	 */
+	loadAsset() {
+		switch (this.type) {
+		case Asset.TYPES.IMG:
+			this.loadImage();
+			break;
+		case Asset.TYPES.AUDIO:
+
+			break;
+		case Asset.TYPES.JS:
+
+			break;
+		case Asset.TYPES.DATA:
+
+			break;
+
+		default:
+			break;
+		}
+	}
+
+	/**
+	 * @description unload this asset from game files
+	 * */
+	unloadAsset() {
+		try {
+			switch (this.type) {
+			case Asset.TYPES.IMG:
+				this.restoreBackup();
+				break;
+			case Asset.TYPES.AUDIO:
+
+				break;
+			case Asset.TYPES.JS:
+
+				break;
+			case Asset.TYPES.DATA:
+
+				break;
+
+			default:
+				break;
+			}
+		} catch (error) {
+			console.warn('failed to restore backup of file');
+		}
+	}
+}
+
+Asset.TYPES = {
+	DATA: 'data',
+	IMG: 'img',
+	JS: 'js',
+	AUDIO: 'audio',
+};
+
+Asset.IMG_FOLDERS = {
+	ANIMATIONS: 'animations',
+	BATTLEBACKS_1: 'battlebacks1',
+	BATTLEBACKS_2: 'battlebacks2',
+	CHARACTERS: 'characters',
+	ENEMIES: 'enemies',
+	FACES: 'faces',
+	FOGS: 'fogs',
+	PARALLAXES: 'parallaxes',
+	PICTURES: 'pictures',
+	SV_ACTORS: 'sv_actors',
+	SV_ENEMIES: 'sv_enemies',
+	SYSTEM: 'system',
+	TILESETS: 'tilesets',
+	TITLES_1: 'titles1',
+	TITLES_2: 'titles2',
+};
+//----------------------------------------------------------------
+// Mod Class
+//----------------------------------------------------------------
+
+class Mod {
+	/**
+	 *
+	 * @param {String} name the unique name of this mod
+	 * @param {boolean} isDependency is this mod a dependency of another mod
+	 */
+	constructor(name, isDependency = false) {
+		/**
+		 * @description the name of this mod MUST BE UNQUIET
+		 * @type {string}
+		 * */
+		this.name = name;
+
+		/**
+		 * @description if this mod is a dependency of another mod or not
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.isDependency = false;
+
+		/**
+		 * @description the default status of this mod, should it be automatically enabled or not
+		 * @default false
+		 * @type {boolean}
+		 * */
+		this.status = false;
+
+		/**
+		 * @description the last status of this mod
+		 * @default false
+		 * @type {boolean}
+		 */
+		this.lastStatus = false;
+
+		/**
+		 * @description any script dependencies this mod has in the form of paths to the dependency
+		 * @type {string[]}
+		 * @default {};
+		 */
+		this.dependencies = [];
+
+		/**
+		 * @description any script dependencies this mod has in the form of paths to the dependency
+		 * @type {Asset[]}
+		 * @default {};
+		 */
+		this.assets = [];
+
+		/**
+		 * @description any user configurable parameters this mod has
+		 * @type {{}}
+		 * @default {};
+		 */
+		this.params = {};
+
+		/**
+		 * @description the name of this mod that should be displayed to the user
+		 * @default this.name
+		 * @type {string}
+		 */
+		this.displayName = this.name;
+
+		/**
+		 * @description the function to call when this mod loads
+		 * @type {Function|null}
+		 * @default null
+		 */
+		this.onloadScript = null;
+
+		/**
+		 * @description the function to call when this mod is offloaded
+		 * @type {Function|null}
+		 * @default null
+		 */
+		this.offloadScript = null;
+
+		this.name = name;
+		this.displayName = name;
+		this.status = false;
+		this.lastStatus = false;
+		this.params = {};
+		this.dependencies = [];
+	}
+
+	/**
+	 * @description add a callback to call when this mod is unloaded/disabled
+	 * @param {Function} cb the call back to be called
+	 */
+	addToOffLoad(cb) {
+		if (!this.offloadScript) {
+			this.offloadScript = cb;
+		} else {
+			const oldFunc = this.offloadScript;
+			this.offloadScript = () => {
+				oldFunc();
+				cb();
+			};
+		}
+	}
+
+	/**
+	 * @description add a callback to call when this mod is loaded
+	 * @param {Function} cb the call back to be called
+	 */
+	addToOnLoad(cb) {
+		if (!this.onloadScript) {
+			this.onloadScript = cb;
+		} else {
+			const oldFunc = this.onloadScript;
+			this.offloadScript = () => {
+				oldFunc();
+				cb();
+			};
+		}
+	}
+
+	/**
+	 * @description change the status of this mod
+	 * @param {bool} bool whether the mod is enabled or not
+	 */
+	setStatus(bool) {
+		this.lastStatus = this.status;
+		this.status = bool;
+	}
+
+	/** @description check if this mod is enabled or not */
+	getStatus() {
+		return this.status || this.isDependency;
+	}
+
+	/**
+	 * @description check if current status and last status are different
+	 * @returns {bool} whether the status has changed
+	 */
+	statusHasChanged() {
+		return (this.status !== this.lastStatus);
+	}
+
+	/**
+	 * @description add all members of an object to this mod
+	 * @param {Object} obj;
+	 */
+	loadFromObj(obj) {
+		if (obj.assets) {
+			obj.assets.forEach((asset) => {
+				this.addAsset(asset);
+			});
+			obj.asset = undefined;
+		}
+
+		Object.assign(this, obj);
+	}
+
+	/**
+	 * @description add an asset to the assets arr. this function handles setting up onload and offload scripts for assets
+	 * @param {Object} asset ;
+	 */
+	addAsset(dataAsset) {
+		const asset = new Asset(dataAsset.source, dataAsset.dest, dataAsset.name, dataAsset.type);
+
+		this.addToOnLoad(() => {
+			asset.loadAsset();
+			setTimeout(() => {
+				ImageManager._imageCache.releaseReservation(ImageManager._systemReservationId);
+				setTimeout(() => {
+					Scene_Boot.loadSystemImages();
+				}, 500);
+				
+			}, 1000);
+			
+			
+		});
+
+		this.addToOffLoad(() => {
+			asset.unloadAsset();
+		});
+
+		this.assets.push(asset);
+	}
+}
 
 //----------------------------------------------------------------
 // Plugin Manager
@@ -125,15 +475,35 @@ DataManager.waitTillDatabaseLoaded = function () {
 //----------------------------------------------------------------
 /**
  * @description the main mod manager that handles loading and unloading all mods
+ * @extends PluginManager
  */
 class ModManager {
 	constructor(path) {
+		// extend plugin manager
 		Object.assign(this, PluginManager);
+
+		/**
+		 * @description the current path that the mod loader is looking at
+		 * @type {string}
+		 * */
 		this._path = path;
-		this._realMods = [];
-		this._mods = [];
+
+		/**
+		 * @description a dictionary of all mods
+		 * @type {Object.<string, Mod>}
+		 * */
 		this._modsDict = {};
+
+		/**
+		 * @description a control variable for whether the engine will force modded saves to be used or not
+		 * @default false
+		 */
 		this.forceModdedSaves = false;
+
+		/**
+		 * @description a control variable for whether the engine will force vanilla saves to be used or not
+		 * @default false
+		 */
 		this.forceVanillaSaves = false;
 	}
 
@@ -259,7 +629,8 @@ class ModManager {
 			});
 		}
 		if (modInfo.name) {
-			this.addModEntry(modInfo.name, this.getModActive(modInfo.name), modInfo.danger, modInfo.parameters);
+			modInfo.status = this.getModActive(modInfo.name);
+			this.addModEntry(modInfo.name, modInfo);
 		} else {
 			this.addModEntry(modName);
 		}
@@ -280,10 +651,18 @@ class ModManager {
 
 	getModActive(modName) {
 		modName = modName.replace('.json', '');
-		const userDataMod = MATTIE.DataManager.global.get(`${modName}_Active`);
-		const path = this.getPath();
-		const dataInfo = this.getModInfo(path, modName);
-		return typeof userDataMod !== 'undefined' ? userDataMod : dataInfo.status;
+
+		try {
+			let userDataMod = MATTIE.DataManager.global.get(`${modName}_Active`);
+			if (typeof userDataMod === 'undefined') {
+				const path = this.getPath();
+				const dataInfo = this.getModInfo(path, modName);
+				userDataMod = dataInfo.status;
+			}
+			return userDataMod;
+		} catch (error) {
+			return true;
+		}
 	}
 
 	setModActive(modName, bool) {
@@ -292,7 +671,7 @@ class ModManager {
 	}
 
 	/**
-     * @description get a list of all mods, not including preReqs
+     * @description get a list of all mods, not including preReqs from file system
      * @returns {array} mod info array
     */
 	getActiveRealMods() {
@@ -375,7 +754,7 @@ class ModManager {
 		const keys = Object.keys(this._modsDict);
 		for (let index = 0; index < keys.length; index++) {
 			const mod = this._modsDict[keys[index]];
-			if (mod.status != mod.lastStatus) {
+			if (mod.statusHasChanged()) {
 				return true;
 			}
 		}
@@ -402,8 +781,7 @@ class ModManager {
      * @param {boolean} bool whether to set the mod as enabled or disabled
      */
 	setEnabled(modName, bool) {
-		this._modsDict[modName].lastStatus = this._modsDict[modName].status;
-		this._modsDict[modName].status = bool;
+		this._modsDict[modName].setStatus(bool);
 		if (!modName.includes('.json')) modName += '.json';
 
 		if (!bool) { // if a mod is being disabled call its offload script
@@ -444,6 +822,10 @@ class ModManager {
 		}
 	}
 
+	/**
+	 *
+	 * @returns all mods
+	 */
 	getAllMods() {
 		const fs = require('fs');
 		const arr = [];
@@ -464,25 +846,28 @@ class ModManager {
 	/**
      * @description add a mod entry to the list of mods
      * @param {*} name the name of the mod
-     * @param {*} status whether the mod is enabled
-     * @param {*} danger is the mod dangerous
-     * @param {*} params any params of the mod
+     * @param {*} args any other args that this mod might have
      */
-	addModEntry(name, status = true, danger = false, params = {}) {
-		const mod = {};
-		mod.status = status;
-		mod.lastStatus = status;
-		mod.name = name;
-		mod.parameters = params;
-		mod.danger = danger;
-		this._mods.push(mod);
+	addModEntry(name, args = {}) {
+		// create default values if the user did not provide them
+		let isDependency = false;
+		if (args == {}) isDependency = true;
+		if (typeof args.status === 'undefined') args.status = true;
+		if (typeof args.danger === 'undefined') args.danger = false;
+		if (typeof args.params === 'undefined') args.params = {};
+		const mod = new Mod(name, isDependency);
+		mod.loadFromObj(args);
 		this._modsDict[mod.name] = mod;
+
+		this.setEnabled(mod.name, args.status);
 	}
 
 	findModIndexByName(name) {
 		const index = -1;
-		for (let i = 0; i < this._mods.length; i++) {
-			const mod = this._mods[i];
+		const keys = Object.keys(this._modsDict);
+		for (let i = 0; i < keys.length; i++) {
+			const key = keys[i];
+			const mod = this._modsDict[key];
 			if (mod.name === name) return i;
 		}
 		return index;
@@ -490,20 +875,20 @@ class ModManager {
 
 	/**
      * @description add a offload script that will be called when a mod is deactivated to a mod
-     * @param {*} name
-     * @param {*} cb
+     * @param {String} name the name of the mod
+     * @param {Function} cb the call back to be called
      */
 	addOffloadScriptToMod(name, cb) {
-		this._modsDict[name].offloadScript = cb;
+		this._modsDict[name].addToOffLoad(cb);
 	}
 
 	/**
      * @description add a offload script that will be called when a mod is activated to a mod
-     * @param {*} name
-     * @param {*} cb
+     * @param {String} name
+     * @param {Function} cb
      */
 	addOnloadScriptToMod(name, cb) {
-		this._modsDict[name].onloadScript = cb;
+		this._modsDict[name].addToOnLoad(cb);
 	}
 
 	/**
@@ -540,63 +925,35 @@ class ModManager {
 				throw new Error(`an error occurred while loading the mod:\n${error}`);
 			}
 		});
-		return this._mods;
+		return this.getModArr();
 	}
 
 	/**
+	 * @description convert the mods dict into an arr and return
+	 * @returns {Mod[]}
+	 */
+	getModArr() {
+		return Object.values(this._modsDict);
+	}
+
+	/**
+	 * @deprecated we just use the inherited method setup from plugin manager see top of file
      * @description load all mods from a list that are not already loaded
      * @extends PluginManager.prototype.loadScript
-     * @param {*} mods a list of mods to load
+     * @param {Mod[]} mods a list of mods to load
      * @returns a promise that will resolve once all scripts are loaded
      */
-	setup(mods) {
+	setupMods(mods) {
 		const promises = [];
 		mods.forEach((mod) => {
-			if (this.getModActive(mod.name) && !this._mods.contains(mod.name)) {
+			if (this.getModActive(mod.name) && !Object.keys(this._modsDict).contains(mod.name)) {
 				this.setParameters(mod.name, mod.parameters);
 				promises.push(this.loadScript(mod.name));
-				this._mods.push(mod.name);
 			}
 		});
 		return Promise.all(promises);
 	}
 }
-
-/**
- * @description load the mod manager
- */
-MATTIE_ModManager.init = async function () {
-	await DataManager.loadDatabase();
-	await PluginManager.setup($plugins);
-
-	const defaultPath = PluginManager._path;
-	const path = 'mods/';
-	const commonLibsPath = `${path}commonLibs/`;
-	const modManager = new ModManager(path);
-	MATTIE_ModManager.modManager = modManager;
-	modManager.generateDefaultJsonForModsWithoutJsons();
-	const commonModManager = new ModManager(commonLibsPath);
-	const commonMods = modManager.parseMods(commonLibsPath);
-
-	new Promise((res) => {
-		PluginManager._path = commonLibsPath;
-		commonModManager.setup(commonMods).then(() => {
-			// common mods loaded
-			PluginManager._path = defaultPath;
-			MATTIE.static.update();
-			res();
-		});
-	}).then(() => {
-		PluginManager._path = path;
-		const mods = modManager.parseMods(path); // fs is in a different root dir so it needs this.
-		console.info(mods);
-		modManager.setup(mods).then(() => { // all mods loaded after plugins
-			SceneManager.goto(Scene_Title);
-			MATTIE.msgAPI.footerMsg('Mod loader successfully initialized');
-			PluginManager._path = defaultPath;
-		});
-	});
-};
 
 //----------------------------------------------------------------
 // Error Handling
@@ -644,6 +1001,11 @@ Graphics._updateErrorPrinter = function () {
 };
 
 MATTIE.suppressingAllErrors = false;
+/**
+ * @global
+ * @description the global method that handles all exceptions
+ * @param {Error} e the error that was thrown
+ */
 MATTIE.onError = function (e) {
 	if (!e.message.includes('greenworks-win32')) {
 		if (!MATTIE.suppressingAllErrors) {

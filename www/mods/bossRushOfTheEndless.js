@@ -25,8 +25,8 @@ MATTIE.bossRush = MATTIE.bossRush || {};
 		alert('boss rush mod uninstalled');
 	};
 
-	MATTIE_ModManager.modManager.addOffloadScriptToMod(bossRushName, MATTIE.bossRush.offload);
-	MATTIE_ModManager.modManager.addOnloadScriptToMod(bossRushName, MATTIE.bossRush.onLoad);
+	// MATTIE_ModManager.modManager.addOffloadScriptToMod(bossRushName, MATTIE.bossRush.offload);
+	// MATTIE_ModManager.modManager.addOnloadScriptToMod(bossRushName, MATTIE.bossRush.onLoad);
 	MATTIE.bossRush.onLoad();
 
 	/** @description an array of the ids of fights */
@@ -43,11 +43,11 @@ MATTIE.bossRush = MATTIE.bossRush || {};
 		[MATTIE.static.troops.gorothId, MATTIE.static.troops.sylvianId, MATTIE.static.troops.griffithId, MATTIE.static.troops.GOFAHID],
 	];
 
-	MATTIE.bossRush.currentFightIndex = 0;
+	MATTIE.bossRush.currentFightIndex = 8;
 
 	/** @description the method to handle the boss rush functionality */
 	function rush() {
-		MATTIE.bossRush.currentFightIndex = 0; // reset rush
+		MATTIE.bossRush.currentFightIndex = 8; // reset rush
 		if (!$gameParty.leader().isDead() && !(SceneManager._scene instanceof Scene_Gameover)) {
 			startNextFight(() => {
 				$gameMessage.clear();

@@ -18,6 +18,7 @@
     },
     
     "opts": {
+        "destination": "./out/",  
         "template": "node_modules/tui-jsdoc-template",
         "encoding": "utf8",
         "recurse": true,
