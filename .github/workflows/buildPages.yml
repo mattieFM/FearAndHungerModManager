@@ -1,6 +1,8 @@
 name: Compile Documenation
 permissions:
-  contents: write
+    contents: read
+    pages: write
+    id-token: write
 
 on:
   push:
@@ -10,7 +12,10 @@ on:
       - main
 
 jobs:
-  deploy:
+  build:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -25,9 +30,20 @@ jobs:
           config_file: ./www/dev/conf.json
           template: tui-jsdoc-template
           front_page: README.md
-
-      - name: Deploy
+      - name: deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
           deploy_key: ${{secrets.ACTIONS_DEPLOY_KEY}}
           publish_dir: ./www/dev/DevDocs
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Pages
+        uses: actions/configure-pages@v3
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v2
+        with:
+          # Upload entire repository
+          path: '.'
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2
