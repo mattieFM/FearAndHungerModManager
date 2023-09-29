@@ -4,10 +4,7 @@ permissions:
     pages: write
     id-token: write
 
-on:
-  push:
-    branches:
-      - **
+on: [push]
 
 jobs:
   build:
