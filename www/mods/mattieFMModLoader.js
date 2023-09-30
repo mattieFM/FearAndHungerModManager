@@ -58,21 +58,21 @@ class Asset {
 		 * @description the name of the file within the path including extension
 		 * @type {string}
 		 */
-		this.fileName = fileName;
+		this.fileName = fileName || '';
 
 		/**
 		 * @description The path of the source file of the asset.
 		 * note that this is the path from within the www/ folder
 		 * @type {string}
 		 */
-		this.sourcePath = sourcePath;
+		this.sourcePath = sourcePath || '';
 
 		/**
 		 * @description The path that the source file will be copied to
 		 * note that this is the path from within the www/ folder
 		 * @type {string}
 		 */
-		this.destinationPath = destinationPath;
+		this.destinationPath = destinationPath || '';
 
 		/**
 		 * @description whether to override any existing files automatically
@@ -118,6 +118,83 @@ class Asset {
 		}
 	}
 
+	assignOrReplace(element1, element2) {
+		// console.log(`e1${typeof element1}`);
+		// console.log(`e2${typeof element2}`);
+		if (typeof element2 === 'object' && element2 != null) { // null is an object in javascript
+			// console.log(`assigned e2:${JSON.stringify(element2)}`);
+			// console.log(`with e1:${JSON.stringify(element1)}`);
+			element2 = Object.assign(element2, element1);
+			// console.log(`to get:${JSON.stringify(element2)}`);
+		} else {
+			// console.log(`replaced e2:${element2}`);
+			// console.log(`with e1:${element1}`);
+			element2 = element1;
+		}
+	}
+
+	replaceData(obj1, obj2) {
+		const keys = Object.keys(obj1);
+		for (let index = 0; index < keys.length; index++) {
+			const key = keys[index];
+			const element = obj1[key];
+
+			if (element) {
+				if (element.id && isNaN(parseInt(key, 10))) {
+					const keys2 = Object.keys(obj2);
+					for (let x = 0; x < keys2.length; x++) {
+						const key2 = keys2[x];
+						const element2 = obj2[key2];
+						// if element has id
+						if (element2) {
+							if (element2.id === element.id) {
+								this.assignOrReplace(element, obj2[key]);
+							} else if (typeof element === 'object') {
+								this.replaceData(element, element2);
+							}
+						}
+					}
+				} else {
+					this.assignOrReplace(element, obj2[key]);
+				}
+			} else {
+				this.assignOrReplace(element, obj2[key]);
+			}
+		}
+	}
+
+	loadDataFolder() {
+		const fs = require('fs');
+		const sourcePath = fs.realpathSync(`./www/${this.sourcePath}${this.fileName}`);
+		const files = fs.readdirSync(sourcePath);
+		for (let index = 0; index < files.length; index++) {
+			const file = files[index];
+			this.fileName = file;
+			this.loadData();
+		}
+	}
+
+	/**
+	 * @description load this asset as a data file
+	 * @param {boolean} partial whether to treat this as a partial data file or not.
+	 */
+	loadData(partial = true) {
+		const fs = require('fs');
+		if (partial) {
+			// backup and load
+			const sourcePath = fs.realpathSync(`./www/${this.sourcePath}${this.fileName}`);
+			const sourceObj = JSON.parse(fs.readFileSync(sourcePath));
+
+			const destPath = fs.realpathSync(`./www/data/${this.fileName}`);
+			const targetObj = JSON.parse(fs.readFileSync(destPath));
+			this.replaceData(sourceObj, targetObj);
+
+			fs.writeFileSync(destPath, JSON.stringify(targetObj));
+		} else {
+			// backup and overwrite
+		}
+	}
+
 	/**
 	 * @description Create a backup for an existing image.
 	 */
@@ -147,7 +224,10 @@ class Asset {
 
 			break;
 		case Asset.TYPES.DATA:
-
+			this.loadData();
+			break;
+		case Asset.TYPES.DATA_FOLDER:
+			this.loadDataFolder();
 			break;
 
 		default:
@@ -173,6 +253,9 @@ class Asset {
 			case Asset.TYPES.DATA:
 
 				break;
+			case Asset.TYPES.DATA_FOLDER:
+
+				break;
 
 			default:
 				break;
@@ -185,6 +268,7 @@ class Asset {
 
 Asset.TYPES = {
 	DATA: 'data',
+	DATA_FOLDER: 'dataFolder',
 	IMG: 'img',
 	JS: 'js',
 	AUDIO: 'audio',

@@ -1,5 +1,11 @@
 var MATTIE = MATTIE || {};
 /**
+ * @namespace MATTIE.global
+ * @description the name space for all global variables and methods mostly used for version handling
+ *
+*/
+MATTIE.global = MATTIE.global || {};
+/**
  * @namespace MATTIE.DataManager
  * @description The manager that handles all interactions with filesystem
  */
@@ -23,11 +29,6 @@ MATTIE.ignoredPlugins = (() => {
 //----------------------------------------------
 // Global Data
 //----------------------------------------------
-/**
- * @namespace MATTIE.global
- * @description the name space for all global variables and methods mostly used for version handling
- *
-*/
 
 /** @description whether the version has been loaded and is valid */
 MATTIE.global.hasLoadedOnce = false;
