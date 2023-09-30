@@ -2,6 +2,9 @@ First add me on discord @MattieFM.
 Then read the dev onboarding page on the wiki: https://mattiefm.github.io/FearAndHungerModManager/tutorial-devSetup.html.
 Msg me with any questions, if I have time I will set up a time to meet with out and help bring you up to speed.
 
+To contribute make a fork of this repo, make your changes, validate your changes and then open a PR from your fork to main.
+
+#Guidelines
 -Maintain quality code.
 -Ensure you are following the eslint style declared, to check for issues with your code run npm lint:mods or configure your ide to lint on save. Your ide should show errros anywhere you ar violating lint rules.
 -Good documentation. Follow JSDoc standards for documenation.
