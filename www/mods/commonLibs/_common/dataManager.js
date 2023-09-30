@@ -108,7 +108,7 @@ MATTIE.DataManager.createDir = function (path = null) {
 	if (path) path = MATTIE.DataManager.localFileDirectoryPath() + path;
 	if (!path) path = MATTIE.DataManager.localFileDirectoryPath();
 	if (!fs.existsSync(path)) {
-		fs.mkdir(path);
+		fs.mkdirSync(path);
 	}
 };
 
@@ -302,6 +302,23 @@ MATTIE.DataManager.makeSavefileInfo = function (data) {
 	info.playtime = data.$gameSystem.playtimeText();
 	info.timestamp = Date.now();
 	return info;
+};
+
+/**
+ * @description get the map data from a map id
+ * @param {*} mapId
+ * @returns {rm.types.map} the json object of the map requested
+ */
+MATTIE.DataManager.getMapData = function (mapId) {
+	const thisMapData = null;
+	if (mapId > 0) {
+		var filename = 'Map%1.json'.format(mapId.padZero(3));
+		this._mapLoader = ResourceHandler.createLoader(`data/${filename}`, this.loadDataFile.bind(this, '$dataMap', filename));
+		this.loadDataFile('thisMapData', filename);
+	} else {
+		this.makeEmptyMap();
+	}
+	return thisMapData;
 };
 
 MATTIE.DataManager.saveGameFromObj = function (savefileId, obj) {
