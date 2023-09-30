@@ -11,6 +11,10 @@
       "dest": "SYSTEM",
       "name": "IconSet",
       "type":"img"
+    },
+    {
+      "source": "/mods/_bossRushOfTheEndless/data/",
+      "type":"dataFolder"
     }
   ]
 }
