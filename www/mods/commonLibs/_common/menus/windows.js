@@ -150,6 +150,7 @@ MATTIE.windows.list.prototype.addItem = function (text) {
 /**
  * A window to display text
  * @extends MATTIE.windows.textDisplay
+ * @class
  */
 MATTIE.windows.textInput = function () {
 	this.initialize.apply(this, arguments);

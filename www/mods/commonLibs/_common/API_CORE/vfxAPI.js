@@ -46,6 +46,13 @@ MATTIE.fxAPI.startScreenShake = function (intensity, speed, duration) {
 	$gameScreen.startShake(intensity, speed, duration);
 };
 
+/**
+ * @description displays www/data/imgs/picture/name
+ * @param {string} name name of file in www/data/imgs/picture to display
+ * @param {int} id the id of the picture to create (this is like the layer number of the layer in photoshop)
+ * @param {int} x the x to show the image at
+ * @param {int} y
+ */
 MATTIE.fxAPI.showImage = function (name, id, x, y) {
 	$gameScreen.showPicture(id, name, 0, x, y, 100, 100, 255, 0);
 };
