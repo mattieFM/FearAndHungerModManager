@@ -1,8 +1,10 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Namespace: skills | Namespace: skills</title>
+    <title>Source: _common/API_CORE/infoAPI.js | Source: _common/API_CORE/infoAPI.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -30,7 +32,7 @@
         
     </div>
     <div class="title">
-        <h1><a href="index.html" class="link">Namespace: skills</a></h1>
+        <h1><a href="index.html" class="link">Source: _common/API_CORE/infoAPI.js</a></h1>
         
             <span class="version">v1.2.4</span>
         
@@ -58,89 +60,29 @@
 
 
 
-
-<section>
-
-<header>
     
-        <h2>
-            <span class="ancestors"><a href="MATTIE.html">MATTIE</a><a href="MATTIE.static.html">.static</a>.</span>skills</h2>
-        
-    
-</header>
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>// an api for getting general info
+/**
+ * @namespace MATTIE.infoAPI
+ */
 
-<article>
-    
-        <div class="container-overview">
-        
-            
-                <div class="description"><p>This name space contains all static skills values</p></div>
-            
+MATTIE.infoAPI = {};
 
-            
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-            
-        
-        </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</article>
-
-</section>
+/**
+ * @description Get the current name of the location.
+ * @returns the display name of the map the player is currently on.
+ */
+MATTIE.infoAPI.getCurrentLocationName = function () {
+	const mapId = $gameMap.mapId();
+	const mapData = MATTIE.DataManager.getMapData(mapId);
+	const mapName = mapData.displayName;
+	return mapName;
+};
+</code></pre>
+        </article>
+    </section>
 
 
 
@@ -157,7 +99,7 @@
 <script src="scripts/linenumber.js"></script>
 
     <script>
-        var id = 'MATTIE.static.skills_sub'.replace(/"/g, '_');
+        var id = '_sub'.replace(/"/g, '_');
         var selectedApi = document.getElementById(id); // do not use jquery selector
         var $selectedApi = $(selectedApi);
 
