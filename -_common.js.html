@@ -114,13 +114,13 @@ MATTIE.GameInfo.isHardMode = (data = $gameSwitches) => data._data[2190] === true
 MATTIE.GameInfo.isTerrorAndStarvation = (data = $gameSwitches) => (!data._data[2190] &amp;&amp; data._data[3153] === true);
 
 // --UTIL--
-function updateKeys(keys, name = '') {
+function updateKeys(keys) {
 	Object.keys(keys).forEach((key) => {
 		Input.keyMapper[key.toUpperCase().charCodeAt(0)] = key; // add our key to the list of watched keys
 	});
 }
 
-function updateKey(key, name = '') {
+function updateKey(key) {
 	if (key.includes('&amp;')) {
 		const keys = key.split('&amp;');
 		keys.forEach((element) => {
@@ -165,6 +165,25 @@ Input.checkScope = function (scope) {
 
 const keys = {};
 let i = 128;
+
+MATTIE_RPG.commandWasd = Scene_KeyConfig.prototype.commandWasd;
+Scene_KeyConfig.prototype.commandWasd = function () {
+	MATTIE_RPG.commandWasd.call(this);
+	Object.keys(keys).forEach((name) => {
+		const keyObj = keys[name];
+		if (keyObj.wasdDefualt) { keyObj.key = keyObj.wasdDefualt; }
+	});
+};
+
+MATTIE_RPG.commandDefualt = Scene_KeyConfig.prototype.commandDefault;
+Scene_KeyConfig.prototype.commandDefault = function () {
+	MATTIE_RPG.commandDefualt.call(this);
+	Object.keys(keys).forEach((name) => {
+		const keyObj = keys[name];
+		if (keyObj.defaultKey) { keyObj.key = keyObj.defaultKey; }
+	});
+};
+
 /**
  *
  * @param {string} key (optional) always bind to this key on boot
@@ -178,7 +197,13 @@ Input.addKeyBind = function (key, cb, name = '', scope = 0, wasdDefualt = null, 
 	if (typeof key === 'number') key = String.fromCharCode(key);
 
 	if (typeof defaultKey === 'number') key = String.fromCharCode(defaultKey);
-	if (!key) key = String.fromCharCode(i);
+	if (!key) {
+		if (defaultKey &amp;&amp; !Input.keyMapper[defaultKey.toUpperCase().charCodeAt(0)]) {
+			key = defaultKey;
+		} else {
+			key = String.fromCharCode(i);
+		}
+	}
 
 	// setup default keybinds
 	if (wasdDefualt) {
@@ -213,6 +238,8 @@ Input.addKeyBind = function (key, cb, name = '', scope = 0, wasdDefualt = null, 
 	i++;
 
 	keys[name] = {
+		wasdDefualt,
+		defaultKey,
 		key,
 		cb: () => { if (Input.checkScope(scope))cb(); },
 	};
@@ -223,8 +250,9 @@ Input.update = function () {
 	MATTIE.Prev_Input_Update.call(this);
 	Object.keys(keys).forEach((name) => {
 		const obj = keys[name];
-		const { key } = obj;
-		const { cb } = obj;
+		let key = obj.key;
+		const cb = obj.cb;
+		if (typeof key === 'number') key = String.fromCharCode(key);
 		if (key.contains('&amp;')) {
 			/** @type {any[]} */
 			const combinedKeys = key.split('&amp;');
