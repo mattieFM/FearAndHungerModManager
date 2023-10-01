@@ -40,7 +40,8 @@ Most mods will work for both F&H1 and F&H2. But if they are not working properly
 
 # Install  
 
-   -First Decompile Fear and Hunger.  
+   -First Decrypt Fear and Hunger files, this can be done with any RPGMaker MV decrypter, but the one me and Frap use is linked below:
+    https://bitbucket.org/SilicaAndPina/rpgmv-decryptor/downloads/
    -Download this repo.  
    -add the mods folder to your game's www/ folder.  
    -replace your game's index.html file with mine.  

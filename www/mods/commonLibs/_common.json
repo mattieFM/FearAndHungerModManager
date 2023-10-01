@@ -3,6 +3,7 @@
     "status":true,
     "parameters":{},
     "dependencies": [
+        "_common/yanflyChecker",
         "_common/betterPhysAtkAnim",
         
         "_common/systemEvents",
@@ -15,22 +16,23 @@
         "_common/compatibility",
         "_common/menus/cheatMenu",
         "_common/static",
-        "_common/items",
-        "_common/optimisations",
-        "_common/heSoBBGirlAPI",
 
-    
+        "_common/optimisations",
+        "_common/menus/devMenu",
+        "_common/clipboard",
+
+
         "_common/optimizedTarraxLighting",
 
 
-        "_common/menus/devMenu",
-        "_common/clipboard",
-        "_common/vfxAPI",
-        "_common/actorAPI",
-        "_common/eventAPI",
-        "_common/troopAPI",
-        "_common/eventWrapper",
-        "_common/msgAPI",
+        "_common/API_CORE/heSoBBGirlAPI",
+        "_common/API_CORE/itemAPI",
+        "_common/API_CORE/vfxAPI",
+        "_common/API_CORE/actorAPI",
+        "_common/API_CORE/eventAPI",
+        "_common/API_CORE/troopAPI",
+        "_common/API_CORE/eventWrapper",
+        "_common/API_CORE/msgAPI",
         "_common/supporters",
         "_common/util",
         

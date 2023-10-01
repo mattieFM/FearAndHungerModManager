@@ -1,0 +1,61 @@
+{
+    "plugins": ["plugins/markdown"],
+    "markdown": {
+        "parser": "gfm",
+        "hardwrap": true
+    },
+    "recurseDepth": 50,
+    "source": {
+        "include": [
+            "./www/mods/commonLibs",
+            "README.md"
+        ],
+        "includePattern": ".+\\.js(doc|x)?$"
+    },
+    "sourceType": "module",
+    "tags": {
+        "allowUnknownTags": true,
+        "dictionaries": ["jsdoc","closure"]
+    },
+    
+    "opts": {
+        "destination": "./out/",  
+        "template": "node_modules/tui-jsdoc-template",
+        "encoding": "utf8",
+        "recurse": true,
+        "package": "package.json",
+        "tutorials": "www/dev/tutorials"
+      },
+
+      "templates": {
+        "tabNames": {
+            "api": "API",
+            "tutorials": "Help"
+        },
+
+        
+        "default": {
+            "staticFiles":{
+                "include": [
+                    "www/dev/static/"
+                ]
+            }
+        },
+
+
+
+        "cleverLinks": false,
+        "monospaceLinks": false,
+        "logo": {
+            "url": "https://github.com/mattieFM/FearAndHungerModManager/blob/main/www/mods/commonLibs/_common/images/logo.png?raw=true",
+            "width": "150px",
+            "height": "150px",
+            "link": "./index.html"
+        },
+
+        "css": [
+            "./api.css"
+        ]
+        
+    }
+}
