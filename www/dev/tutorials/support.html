@@ -1,0 +1,63 @@
+You can find all the ways to support the project below: <br>
+You can always choose to pay money for any of my mods, they are free, but if you want to support the project feel free to donate.
+<br>
+
+<script>
+    
+    let addEntry = function(linkUrl, imageUrl, btnText, header,  body, target="_blank"){
+        let div = document.createElement('div');
+        div.innerHTML = `
+        <div style="background-color: #c4c1b1; width: 552; height: 167; position: relative;">
+            <form action="${linkUrl}" method="get" target=${target}>
+                    <div style="width:180; height:143; float:left;">
+                        <img width="180" height="143" style="border: 1px solid #FFF; margin: 14px; float:left;" src="${imageUrl}">
+                    </div>
+        
+                    <div style="margin-left: 206px; height: 100%; width:1px; background-color: #FFF;"></div>
+                    <div style="float:left;">
+                        <div style="position: absolute; top: 14; margin-left: 214; font-size: 28px; font-weight: 550;">
+                            ${header}
+                        </div>
+                        <div style="position: absolute; top: 42; margin-left: 214;">
+                            ${body}
+                        </div>
+                        <div style="position: absolute; bottom: 14; margin-left: 214;">
+                            <button type="submit" style="margin-top: 123px;  width: 125px; height: 35; background-color: red; color: white; border: 0px; font-family: Lato, Arial, Helvetica, sans-serif;">${btnText}</button>
+                            
+                        </div>
+                    </div>
+        
+                   
+                
+        
+             </form>
+            
+        </div>`
+        document.body.appendChild(div);
+    }
+</script>
+
+<iframe frameborder="0" src="https://itch.io/embed/2282472?bg_color=c4c1b1" width="552" height="167"><a href="https://mattiefm.itch.io/fear-and-hunger-multiplayer-mod">Fear And Hunger Multiplayer Mod by Mattie</a></iframe>
+<iframe frameborder="0" src="https://itch.io/embed/2226321?bg_color=c4c1b1" width="552" height="167"><a href="https://mattiefm.itch.io/fear-and-hunger-mod-loader">Fear And Hunger Multiplayer Mod by Mattie</a></iframe>
+
+<script>
+    addEntry(
+    "https://patreon.com/MattieFM?popup=1",
+    "https://github.com/mattieFM/FearAndHungerModManager/blob/main/www/mods/commonLibs/_common/images/mattieLogoSmall.png?raw=true",
+    "Join The Patreon",
+    "Patreon",
+    `by Mattie
+    Get updates and DevLogs a bit earlier. Get your name in the support's list and a role in this discord.
+    <br>
+    <b>$1.0.0 USD</b> or more, monthly`)
+
+    addEntry(
+    "devSetup.html",
+    "https://github.com/mattieFM/FearAndHungerModManager/blob/main/www/mods/commonLibs/_common/images/devlogo.png?raw=true",
+    "Help With Development",
+    "Dev Setup",
+    `Join the "team" of developers and help out with the development work. Most of the engine is built by me solely, but the whole project is open source so feel free to help out.`,
+    "_self")
+</script>
+    
+
