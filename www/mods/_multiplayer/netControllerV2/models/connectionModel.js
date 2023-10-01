@@ -1,5 +1,5 @@
 class ConnectionModel {
-    constructor(conn) {
-        this.conn = conn;
-    }
+	constructor(conn) {
+		this.conn = conn;
+	}
 }

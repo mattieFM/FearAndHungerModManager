@@ -5,14 +5,14 @@
  * width
  * @class
  */
-MATTIE.windows.horizontalBtns = function () {
+MATTIE.windows.HorizontalBtns = function () {
 	this.initialize.apply(this, arguments);
 };
 
-MATTIE.windows.horizontalBtns.prototype = Object.create(Window_HorzCommand.prototype);
-MATTIE.windows.horizontalBtns.prototype.constructor = MATTIE.windows.horizontalBtns;
+MATTIE.windows.HorizontalBtns.prototype = Object.create(Window_HorzCommand.prototype);
+MATTIE.windows.HorizontalBtns.prototype.constructor = MATTIE.windows.HorizontalBtns;
 
-MATTIE.windows.horizontalBtns.prototype.initialize = function (y, btns, width, enabled = null) {
+MATTIE.windows.HorizontalBtns.prototype.initialize = function (y, btns, width, enabled = null) {
 	this._mattieBtns = btns;
 	this._mattieMaxCols = width;
 	this.enabled = enabled;
@@ -20,23 +20,23 @@ MATTIE.windows.horizontalBtns.prototype.initialize = function (y, btns, width, e
 	this.updatePlacement(y);
 };
 
-MATTIE.windows.horizontalBtns.prototype.updateWidth = function (width) {
+MATTIE.windows.HorizontalBtns.prototype.updateWidth = function (width) {
 	this.width = width;
 	this.refresh();
 	this.select(0);
 	this.activate();
 };
 
-MATTIE.windows.horizontalBtns.prototype.windowWidth = function () {
+MATTIE.windows.HorizontalBtns.prototype.windowWidth = function () {
 	return this.width || 240;
 };
 
-MATTIE.windows.horizontalBtns.prototype.updatePlacement = function (y) {
+MATTIE.windows.HorizontalBtns.prototype.updatePlacement = function (y) {
 	this.x = (Graphics.boxWidth - this.width) / 2;
 	this.y = y;
 };
 
-MATTIE.windows.horizontalBtns.prototype.maxCols = function () {
+MATTIE.windows.HorizontalBtns.prototype.maxCols = function () {
 	return this._mattieMaxCols;
 };
 
@@ -44,7 +44,7 @@ MATTIE.windows.horizontalBtns.prototype.maxCols = function () {
  *
  * @param {dict} btns a key pair value {displayname:commandname}
  */
-MATTIE.windows.horizontalBtns.prototype.makeCommandList = function () {
+MATTIE.windows.HorizontalBtns.prototype.makeCommandList = function () {
 	Object.keys(this._mattieBtns).forEach((key) => {
 		let added = false;
 		if (this.enabled) {
@@ -63,14 +63,14 @@ MATTIE.windows.horizontalBtns.prototype.makeCommandList = function () {
  * @extends Window_Base
  * @class
  */
-MATTIE.windows.textDisplay = function () {
+MATTIE.windows.TextDisplay = function () {
 	this.initialize.apply(this, arguments);
 };
 
-MATTIE.windows.textDisplay.prototype = Object.create(Window_Base.prototype);
-MATTIE.windows.textDisplay.prototype.constructor = MATTIE.windows.textDisplay;
+MATTIE.windows.TextDisplay.prototype = Object.create(Window_Base.prototype);
+MATTIE.windows.TextDisplay.prototype.constructor = MATTIE.windows.TextDisplay;
 
-MATTIE.windows.textDisplay.prototype.initialize = function (x, y, width, height, text) {
+MATTIE.windows.TextDisplay.prototype.initialize = function (x, y, width, height, text) {
 	Window_Base.prototype.initialize.call(this, x, y, width, height);
 	this.mattieWidth = width;
 	this.resetTextColor();
@@ -83,12 +83,12 @@ MATTIE.windows.textDisplay.prototype.initialize = function (x, y, width, height,
  * @param {*} xOffset how much to offset x by
  * @param {*} yOffset how much to offset y by
  */
-MATTIE.windows.textDisplay.prototype.updatePlacement = function (xOffset = 0, yOffset = 0) {
+MATTIE.windows.TextDisplay.prototype.updatePlacement = function (xOffset = 0, yOffset = 0) {
 	this.x = ((Graphics.boxWidth - this.width)) / 2 + xOffset;
 	this.y = ((Graphics.boxHeight - this.height)) / 2 + yOffset;
 };
 
-MATTIE.windows.textDisplay.prototype.updateText = function (text) {
+MATTIE.windows.TextDisplay.prototype.updateText = function (text) {
 	this.contents.clear();
 	if (typeof text === typeof 'string') {
 		text += '\n';
@@ -101,7 +101,7 @@ MATTIE.windows.textDisplay.prototype.updateText = function (text) {
 	});
 };
 
-MATTIE.windows.textDisplay.prototype.windowWidth = function () {
+MATTIE.windows.TextDisplay.prototype.windowWidth = function () {
 	return this.mattieWidth;
 };
 
@@ -110,21 +110,21 @@ MATTIE.windows.textDisplay.prototype.windowWidth = function () {
  * @extends Window_Base
  * @class
  */
-MATTIE.windows.list = function () {
+MATTIE.windows.List = function () {
 	this.initialize.apply(this, arguments);
 };
 
-MATTIE.windows.list.prototype = Object.create(MATTIE.windows.textDisplay.prototype);
-MATTIE.windows.list.prototype.constructor = MATTIE.windows.list;
+MATTIE.windows.List.prototype = Object.create(MATTIE.windows.TextDisplay.prototype);
+MATTIE.windows.List.prototype.constructor = MATTIE.windows.List;
 
-MATTIE.windows.list.prototype.initialize = function (x, y, width, height, header) {
+MATTIE.windows.List.prototype.initialize = function (x, y, width, height, header) {
 	this._items = [];
 	this._index = 0;
 	this._header = header;
-	MATTIE.windows.textDisplay.prototype.initialize.call(this, x, y, width, height);
+	MATTIE.windows.TextDisplay.prototype.initialize.call(this, x, y, width, height);
 };
 
-MATTIE.windows.list.prototype.updateText = function (text) {
+MATTIE.windows.List.prototype.updateText = function (text) {
 	if (typeof text === typeof 'string') {
 		text += '\n';
 		text = text.split('\n');
@@ -142,35 +142,35 @@ MATTIE.windows.list.prototype.updateText = function (text) {
 	});
 };
 
-MATTIE.windows.list.prototype.addItem = function (text) {
+MATTIE.windows.List.prototype.addItem = function (text) {
 	this.drawText(text, 0, 25 * this._index, 0);
 	this._index++;
 };
 
 /**
  * A window to display text
- * @extends MATTIE.windows.textDisplay
+ * @extends MATTIE.windows.TextDisplay
  * @class
  */
-MATTIE.windows.textInput = function () {
+MATTIE.windows.TextInput = function () {
 	this.initialize.apply(this, arguments);
 };
 
-MATTIE.windows.textInput.prototype = Object.create(MATTIE.windows.textDisplay.prototype);
-MATTIE.windows.textInput.prototype.constructor = MATTIE.windows.textInput;
+MATTIE.windows.TextInput.prototype = Object.create(MATTIE.windows.TextDisplay.prototype);
+MATTIE.windows.TextInput.prototype.constructor = MATTIE.windows.TextInput;
 
-MATTIE.windows.textInput.prototype.initialize = function (x, y, width, height, header) {
+MATTIE.windows.TextInput.prototype.initialize = function (x, y, width, height, header) {
 	this._text = '';
 	this._header = header;
-	MATTIE.windows.textDisplay.prototype.initialize.call(this, x, y, width, height, '');
+	MATTIE.windows.TextDisplay.prototype.initialize.call(this, x, y, width, height, '');
 	this.updatePlacement();
 	this.initEventHandler();
 };
-MATTIE.windows.textInput.prototype.close = function () {
-	MATTIE.windows.textDisplay.prototype.close.call(this);
+MATTIE.windows.TextInput.prototype.close = function () {
+	MATTIE.windows.TextDisplay.prototype.close.call(this);
 	document.removeEventListener('keydown', this._listenFunc, false);
 };
-MATTIE.windows.textInput.prototype.initEventHandler = function () {
+MATTIE.windows.TextInput.prototype.initEventHandler = function () {
 	let lastKey = '';
 	this._listenFunc = (event) => {
 		console.log(event.key);
@@ -227,10 +227,10 @@ MATTIE.windows.textInput.prototype.initEventHandler = function () {
 	}, 50000);
 };
 
-MATTIE.windows.textInput.prototype.getInput = function () {
+MATTIE.windows.TextInput.prototype.getInput = function () {
 	return this._text;
 };
-MATTIE.windows.textInput.prototype.updateText = function (text = this._text) {
+MATTIE.windows.TextInput.prototype.updateText = function (text = this._text) {
 	if (text != this._text) {
 		this._text = text;
 	}

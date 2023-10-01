@@ -133,7 +133,6 @@ Window_EquipItem.prototype.includes = function (item) {
 	return this._actor.canEquip(item);
 };
 
-
 /**
  * @override we override this method to return an empty bit map if one does not exist, that way if something calls this before the bit map is initialized
  * it won't error and give time for this to init hopefully.
@@ -143,11 +142,11 @@ Window_EquipItem.prototype.includes = function (item) {
  * @type Bitmap
  */
 Object.defineProperty(Window.prototype, 'contents', {
-    get: function() {
-        return this._windowContentsSprite ? this._windowContentsSprite.bitmap : ImageManager.loadEmptyBitmap();
-    },
-    set: function(value) {
-        if(this._windowContentsSprite) this._windowContentsSprite.bitmap = value;
-    },
-    configurable: true
+	get() {
+		return this._windowContentsSprite ? this._windowContentsSprite.bitmap : ImageManager.loadEmptyBitmap();
+	},
+	set(value) {
+		if (this._windowContentsSprite) this._windowContentsSprite.bitmap = value;
+	},
+	configurable: true,
 });
