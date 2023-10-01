@@ -139,6 +139,29 @@ class MapEvent {
 	}
 
 	/**
+     * Set the default event conditions for a page of actions.
+     */
+	setDefaultConditions() {
+		return {
+			actorId: 1,
+			actorValid: false,
+			itemId: 1,
+			itemValid: false,
+			selfSwitchCh: 'A',
+			selfSwitchValid: false,
+			switch1Id: 1,
+			switch1Valid: false,
+			switch2Id: 1,
+			switch2Valid: false,
+			switch3Id: 1,
+			switch3Valid: false,
+			switch4Id: 1,
+			switch4Valid: false,
+			variableValue: 0,
+		};
+	}
+
+	/**
      * @description add a wait command to a page
      * @param {*} pageId the page id to add the command to
      * @param {*} frames the number of frames to wait
