@@ -92,6 +92,12 @@ class Asset {
 		 */
 		this.imgType = null;
 
+		/**
+		 * @description assigned by the folder loader methods -- the real path to the source folder
+		 * @type {string};
+		 */
+		this.folderPath = '';
+
 		if (this.type === Asset.TYPES.IMG) {
 			this.imgType = Asset.IMG_FOLDERS[this.destinationPath];
 			if (!this.imgType) this.imgType = Asset.IMG_FOLDERS.PICTURES;
@@ -107,17 +113,11 @@ class Asset {
 	}
 
 	/**
-	 * @description Load an image asset into game files
-	 * @param {boolean} force whether to force overwrite the img
+	 * @description use Object.assign to assign members of element1 to element2 if both are obj
+	 * if not assign element2 to equal element1
+	 * @param {Object|any} element1 first element
+	 * @param {Object|any} element2 first element
 	 */
-	loadImage(force = false) {
-		const fileExists = MATTIE.DataManager.addFileToImgFolder(this.sourcePath, `/${this.imgType}/`, this.fileName, this.fileName, force);
-		if (fileExists && !force) {
-			this.backupImage();
-			this.loadImage(true);
-		}
-	}
-
 	assignOrReplace(element1, element2) {
 		// console.log(`e1${typeof element1}`);
 		// console.log(`e2${typeof element2}`);
@@ -133,6 +133,12 @@ class Asset {
 		}
 	}
 
+	/**
+	 * @description replace any matching keys within obj2 recursively with obj1's values
+	 * @param {object} obj1 source object
+	 * @param {object} obj2 target object
+	 * note: null is an object technically, so keep that in mind as if you are working on this function you need to know that.
+	 */
 	replaceData(obj1, obj2) {
 		const keys = Object.keys(obj1);
 		for (let index = 0; index < keys.length; index++) {
@@ -163,10 +169,13 @@ class Asset {
 		}
 	}
 
+	/**
+	 * @description loop through a folder with a matching file structure to /data and load all files
+	 */
 	loadDataFolder() {
 		const fs = require('fs');
-		const sourcePath = fs.realpathSync(`./www/${this.sourcePath}${this.fileName}`);
-		const files = fs.readdirSync(sourcePath);
+		this.folderPath = fs.realpathSync(`./www/${this.sourcePath}${this.fileName}`);
+		const files = fs.readdirSync(this.folderPath);
 		for (let index = 0; index < files.length; index++) {
 			const file = files[index];
 			this.fileName = file;
@@ -196,6 +205,87 @@ class Asset {
 	}
 
 	/**
+	 * @description loop through a folder with a matching file structure to /imgs/ and load all files
+	 * @param {string} path, the path to the folder to load
+	 */
+	loadImgFolder(endOfPath = '') {
+		const fs = require('fs');
+		let files;
+		let path;
+		if (endOfPath === '') {
+			this.folderPath = fs.realpathSync(`./www/${this.sourcePath}${this.fileName}`);
+			this.baseSourcePath = this.sourcePath;
+			files = fs.readdirSync(this.folderPath);
+			path = this.folderPath;
+		} else {
+			path = `${this.folderPath}/${endOfPath}`;
+			files = fs.readdirSync(path);
+		}
+
+		for (let index = 0; index < files.length; index++) {
+			const file = files[index];
+			const filePath = `${path}/${file}`;
+			const newEnding = `${endOfPath}/${file}`;
+			if (!fs.statSync(filePath).isDirectory()) {
+				this.sourcePath = `${this.baseSourcePath}/${endOfPath}/`;
+				const splitPath = this.sourcePath.split('/');
+				const type = splitPath[splitPath.length - 3];
+				this.imgType = type;
+				this.fileName = file;
+				this.loadImage();
+			} else {
+				this.loadImgFolder(`${newEnding}/`);
+			}
+		}
+	}
+
+	/**
+	 * @description loop through a folder with a matching file structure to /imgs/ and load all files
+	 */
+	unloadImgFolder(endOfPath = '') {
+		const fs = require('fs');
+		let files;
+		let path;
+		if (endOfPath === '') {
+			files = fs.readdirSync(this.folderPath);
+			path = this.folderPath;
+		} else {
+			path = `${this.folderPath}/${endOfPath}`;
+			files = fs.readdirSync(path);
+		}
+
+		for (let index = 0; index < files.length; index++) {
+			const file = files[index];
+			const filePath = `${path}/${file}`;
+			const newEnding = `${endOfPath}/${file}`;
+			if (!fs.statSync(filePath).isDirectory()) {
+				this.sourcePath = `${this.baseSourcePath}/${endOfPath}/`;
+				const splitPath = this.sourcePath.split('/');
+				const type = splitPath[splitPath.length - 3];
+				this.imgType = type;
+				this.fileName = file;
+				this.restoreBackup();
+			} else {
+				this.unloadImgFolder(`${newEnding}/`);
+			}
+		}
+	}
+
+	/**
+	 * @description Load an image asset into game files
+	 * @param {boolean} force whether to force overwrite the img
+	 */
+	loadImage(force = false) {
+		console.log(this.sourcePath);
+		console.log(this.fileName);
+		const fileExists = MATTIE.DataManager.addFileToImgFolder(this.sourcePath, `/${this.imgType}/`, this.fileName, this.fileName, force);
+		if (fileExists && !force) {
+			this.backupImage();
+			this.loadImage(true);
+		}
+	}
+
+	/**
 	 * @description Create a backup for an existing image.
 	 */
 	backupImage() {
@@ -216,6 +306,9 @@ class Asset {
 		switch (this.type) {
 		case Asset.TYPES.IMG:
 			this.loadImage();
+			break;
+		case Asset.TYPES.IMG_FOLDER:
+			this.loadImgFolder();
 			break;
 		case Asset.TYPES.AUDIO:
 
@@ -244,6 +337,9 @@ class Asset {
 			case Asset.TYPES.IMG:
 				this.restoreBackup();
 				break;
+			case Asset.TYPES.IMG_FOLDER:
+				this.unloadImgFolder();
+				break;
 			case Asset.TYPES.AUDIO:
 
 				break;
@@ -251,9 +347,6 @@ class Asset {
 
 				break;
 			case Asset.TYPES.DATA:
-
-				break;
-			case Asset.TYPES.DATA_FOLDER:
 
 				break;
 
@@ -269,6 +362,7 @@ class Asset {
 Asset.TYPES = {
 	DATA: 'data',
 	DATA_FOLDER: 'dataFolder',
+	IMG_FOLDER: 'imgFolder',
 	IMG: 'img',
 	JS: 'js',
 	AUDIO: 'audio',

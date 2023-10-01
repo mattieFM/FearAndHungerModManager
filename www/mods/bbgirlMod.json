@@ -1,1 +1,12 @@
-{"name":"bbgirlMod","status":false,"parameters":{},"danger":false}
+{
+    "name": "bbgirlMod",
+    "status": false,
+    "parameters": {},
+    "danger": false,
+				"assets": [
+					{
+							"source": "/mods/commonLibs/_common/images/imageAssets/",
+							"type":"imgFolder"
+					}
+			]
+}
