@@ -17,41 +17,8 @@ jobs:
     - name: Print NSIS version
       run: makensis ./installer/installer.nsi
 
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Upload artifact
+      uses: actions/upload-artifact@v1.0.0
       with:
-        tag_name: V${{ github.run_number }}
-        release_name: Release ${{ github.run_number }}
-        draft: false
-        prerelease: false
-        
-    - name: upload linux artifact
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.ACTIONS_DEPLOY_KEY}}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./installer/RPGModManagerInstall.exe
-        asset_name: RPGModManagerInstall.exe
-        asset_content_type: application/exe
-    - name: upload darwin artifact
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.ACTIONS_DEPLOY_KEY }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./installers/RPGModManagerInstall.exe
-        asset_name: RPGModManagerInstall.exe
-        asset_content_type: application/gzip
-    - name: upload windows artifact
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.ACTIONS_DEPLOY_KEY }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./installer/RPGModManagerInstall.exe
-        asset_name: RPGModManagerInstall.exe
-        asset_content_type: application/zip
+        name: nsisInstallers
+        path: ./installer/
