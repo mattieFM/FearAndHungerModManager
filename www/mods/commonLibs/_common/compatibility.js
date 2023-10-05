@@ -65,7 +65,7 @@ ImageManager.loadBitmap = function (folder, filename, hue, smooth, forceNoDecryp
  * @description we override this such that it will not return an undefined result ever. Even if another mod fucks up
  * @todo I don't like this way of fixing this bug but does work.
  * @param unsafe, if true does not add anything
- * @returns the datamap event obj
+ * @returns {Game_Map} the datamap event obj
  */
 MATTIE_RPG.Game_Event_Event = Game_Event.prototype.event;
 Game_Event.prototype.event = function () {
@@ -134,7 +134,9 @@ Window_EquipItem.prototype.includes = function (item) {
 };
 
 /**
- * @override we override this method to return an empty bit map if one does not exist, that way if something calls this before the bit map is initialized
+ * @override
+ * @description
+ * we override this method to return an empty bit map if one does not exist, that way if something calls this before the bit map is initialized
  * it won't error and give time for this to init hopefully.
  * The bitmap used for the window contents.
  *
