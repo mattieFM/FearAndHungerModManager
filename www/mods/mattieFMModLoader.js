@@ -213,10 +213,15 @@ class Asset {
 		let files;
 		let path;
 		if (endOfPath === '') {
-			this.folderPath = fs.realpathSync(`./www/${this.sourcePath}${this.fileName}`);
-			this.baseSourcePath = this.sourcePath;
-			files = fs.readdirSync(this.folderPath);
-			path = this.folderPath;
+			if (!this.baseSourcePath) {
+				this.baseSourcePath = this.sourcePath;
+				this.folderPath = fs.realpathSync(`./www/${this.sourcePath}${this.fileName}`);
+				files = fs.readdirSync(this.folderPath);
+				path = this.folderPath;
+			} else {
+				files = fs.readdirSync(this.folderPath);
+				path = this.folderPath;
+			}
 		} else {
 			path = `${this.folderPath}/${endOfPath}`;
 			files = fs.readdirSync(path);
@@ -276,8 +281,6 @@ class Asset {
 	 * @param {boolean} force whether to force overwrite the img
 	 */
 	loadImage(force = false) {
-		console.log(this.sourcePath);
-		console.log(this.fileName);
 		const fileExists = MATTIE.DataManager.addFileToImgFolder(this.sourcePath, `/${this.imgType}/`, this.fileName, this.fileName, force);
 		if (fileExists && !force) {
 			this.backupImage();
@@ -1266,7 +1269,6 @@ MATTIE_ModManager.init = async function () {
 		setTimeout(() => {
 			PluginManager._path = path;
 			const mods = modManager.parseMods(path); // fs is in a different root dir so it needs this.
-			console.info(mods);
 			modManager.setup(mods).then(() => { // all mods loaded after plugins
 				SceneManager.goto(Scene_Title);
 				MATTIE.msgAPI.footerMsg('Mod loader successfully initialized');

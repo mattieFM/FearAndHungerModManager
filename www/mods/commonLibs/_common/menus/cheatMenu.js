@@ -465,3 +465,28 @@ MATTIE.windows.Window_AllStatus.prototype.reserveFaceImages = function () {
 		if (actor) { ImageManager.reserveFace(actor.faceName()); }
 	}, this);
 };
+
+/**
+ * Scene_Info
+ * @description a scene to show all info that might be useful
+ * @extends Scene_MenuBase
+ * @class
+ */
+MATTIE.scenes.Scene_Info = function () {
+	this.initialize.apply(this, arguments);
+};
+
+MATTIE.scenes.Scene_Info.prototype = Object.create(Scene_MenuBase.prototype);
+MATTIE.scenes.Scene_Info.prototype.constructor = MATTIE.scenes.Scene_Info;
+
+MATTIE.scenes.Scene_Info.prototype.initialize = function () {
+	Scene_MenuBase.prototype.initialize.call(this);
+};
+
+MATTIE.scenes.Scene_Info.prototype.create = function () {
+	Scene_MenuBase.prototype.create.call(this);
+	this._infoList = new MATTIE.windows.MenuSelectableBase(0, 0);
+	this._infoList.setItemList([{ name: 'test1' }, { name: 'test2' }]);
+	this.addWindow(this._infoList);
+	this._infoList.activate();
+};

@@ -410,3 +410,67 @@ MATTIE.windows.ModListWin.prototype.setItemWindow = function (itemWindow) {
 	this._itemWindow = itemWindow;
 	this.update();
 };
+
+/**
+ * @description a window used for the base of a selectable window
+ */
+MATTIE.windows.MenuSelectableBase = function () {
+	this.initialize.apply(this, arguments);
+};
+
+MATTIE.windows.MenuSelectableBase.prototype = Object.create(Window_Selectable.prototype);
+MATTIE.windows.MenuSelectableBase.prototype.constructor = MATTIE.windows.menuSelectableBase;
+
+MATTIE.windows.MenuSelectableBase.prototype.initialize = function (x, y) {
+	this._data = [];
+	this._itemList = [];
+	var width = this.windowWidth();
+	var height = this.windowHeight();
+	Window_Selectable.prototype.initialize.call(this, x, y, width, height);
+	this._formationMode = false;
+	this._pendingIndex = -1;
+	this.select(0);
+	this.refresh();
+};
+
+MATTIE.windows.MenuSelectableBase.prototype.windowWidth = function () {
+	return Graphics.boxWidth - 240;
+};
+
+MATTIE.windows.MenuSelectableBase.prototype.windowHeight = function () {
+	return Graphics.boxHeight;
+};
+
+MATTIE.windows.MenuSelectableBase.prototype.maxItems = function () {
+	return 10;
+};
+
+MATTIE.windows.MenuSelectableBase.prototype.numVisibleRows = function () {
+	return 4;
+};
+
+MATTIE.windows.MenuSelectableBase.prototype.item = function () {
+	return ['test', 'test2'][this.index()];
+};
+MATTIE.windows.MenuSelectableBase.prototype.drawItem = function (index) {
+	var data = this._data[index];
+	if (data) {
+		var rect = this.itemRect(index);
+		rect.width -= this.textPadding();
+		this.drawItemName(data, rect.x, rect.y, rect.width);
+	}
+};
+MATTIE.windows.MenuSelectableBase.prototype.setItemList = function (list) {
+	this._itemList = list;
+	this.refresh();
+};
+
+MATTIE.windows.MenuSelectableBase.prototype.makeItemList = function () {
+	this._data = this._itemList;
+};
+
+MATTIE.windows.MenuSelectableBase.prototype.refresh = function () {
+	this.makeItemList();
+	this.createContents();
+	this.drawAllItems();
+};

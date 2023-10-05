@@ -10,6 +10,10 @@ TextManager.SkillCheatTab = 'Skills';
 MATTIE.CmdManager.SkillCheatTab = 'MATTIE_Skill_CHEAT';
 TextManager.ActorCheatTab = 'Actors';
 MATTIE.CmdManager.ActorCheatTab = 'MATTIE_ACTORS_CHEAT';
+TextManager.debugCheatTab = 'Debug';
+MATTIE.CmdManager.debugCheatTab = 'MATTIE_DEBUG_CHEAT';
+TextManager.infoCheatTab = 'Info';
+MATTIE.CmdManager.infoCheatTab = 'MATTIE_INFO_CHEAT';
 TextManager.test = 'Test';
 MATTIE.CmdManager.test = 'test';
 
@@ -40,6 +44,8 @@ MATTIE.scenes.Scene_Dev.prototype.createCommandWindow = function () {
 	this._commandWindow.setHandler(MATTIE.CmdManager.ItemCheatTab, MATTIE.scenes.Scene_Dev.prototype.onItemCheatTab.bind(this));
 	this._commandWindow.setHandler(MATTIE.CmdManager.SkillCheatTab, MATTIE.scenes.Scene_Dev.prototype.onSkillCheatTab.bind(this));
 	this._commandWindow.setHandler(MATTIE.CmdManager.ActorCheatTab, MATTIE.scenes.Scene_Dev.prototype.onActorCheatTab.bind(this));
+	this._commandWindow.setHandler(MATTIE.CmdManager.debugCheatTab, MATTIE.scenes.Scene_Dev.prototype.onDebugCheatTab.bind(this));
+	this._commandWindow.setHandler(MATTIE.CmdManager.infoCheatTab, MATTIE.scenes.Scene_Dev.prototype.onInfoCheatTab.bind(this));
 	this._commandWindow.setHandler('cancel', () => SceneManager.pop());
 	this.addWindow(this._commandWindow);
 };
@@ -50,6 +56,14 @@ MATTIE.scenes.Scene_Dev.prototype.onItemCheatTab = function () {
 };
 MATTIE.scenes.Scene_Dev.prototype.onSkillCheatTab = function () {
 	SceneManager.push(MATTIE.scenes.Scene_DevSkill);
+};
+
+MATTIE.scenes.Scene_Dev.prototype.onDebugCheatTab = function () {
+	SceneManager.push(Scene_Debug);
+};
+
+MATTIE.scenes.Scene_Dev.prototype.onInfoCheatTab = function () {
+	SceneManager.push(MATTIE.scenes.Scene_Info);
 };
 
 MATTIE.scenes.Scene_Dev.prototype.onActorCheatTab = function () {
@@ -84,4 +98,6 @@ MATTIE.windows.Window_DevMenuCommand.prototype.makeCommandList = function () {
 	this.addCommand(TextManager.ItemCheatTab, MATTIE.CmdManager.ItemCheatTab, true);
 	this.addCommand(TextManager.SkillCheatTab, MATTIE.CmdManager.SkillCheatTab, true);
 	this.addCommand(TextManager.ActorCheatTab, MATTIE.CmdManager.ActorCheatTab, true);
+	this.addCommand(TextManager.debugCheatTab, MATTIE.CmdManager.debugCheatTab, true);
+	this.addCommand(TextManager.infoCheatTab, MATTIE.CmdManager.infoCheatTab, true);
 };

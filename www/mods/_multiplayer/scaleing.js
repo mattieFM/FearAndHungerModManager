@@ -125,7 +125,7 @@ MATTIE.multiplayer.scaling.scaleHp = false;
  * @description this is multiplied by the max hp of all enemies
  * @default 1
  */
-MATTIE.multiplayer.scaling.hpScaler = 1;
+MATTIE.multiplayer.scaling.hpScaler = 50;
 
 /**
  * @description when there are more than one player in combat with an enemy,
@@ -172,6 +172,22 @@ Game_Map.prototype.checkPassage = function (x, y, bit) {
 MATTIE_RPG.Game_Enemy_Setup = Game_Enemy.prototype.setup;
 Game_Enemy.prototype.setup = function (enemyId, x, y) {
 	MATTIE_RPG.Game_Enemy_Setup.call(this, enemyId, x, y);
-	this.mhp *= MATTIE.multiplayer.scaling.hpScaling();
+
+	const baseHp = this.mhp;
+	const baseParam = this.param;
+	console.log(this.mhp);
+
+	this.param = function (paramId) {
+		if (paramId === 0) {
+			// max HP
+			return baseHp * MATTIE.multiplayer.scaling.hpScaling();
+		}
+		return baseParam.call(this, paramId);
+	};
+
+	setTimeout(() => {
+		console.log(this.mhp);
+	}, 500);
+
 	this.recoverAll();
 };

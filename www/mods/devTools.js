@@ -39,10 +39,17 @@ MATTIE.devTools = MATTIE.devTools || {};
 	}, 'Spawn Cat (DEV)', -2);
 
 	Input.addKeyBind('', () => {
-		const sex = MATTIE.eventAPI.marriageAPI.displaySex(1, i, $gamePlayer.x, $gamePlayer.y, false);
-		sex.data.pages[0].image.characterName = '$caharSect';
-		sex.spawn($gamePlayer.x, $gamePlayer.y);
-	}, 'Spawn CaharSex (DEV)', -2);
+		const arr = ['$CaharaXCahara', '$DarceXCaharaBottom', '$DarceXDarce', '$enkiXenki', '$RagXRag', '$DarceXEnki'];
+		let i = -(Math.ceil(arr.length / 2) + 1);
+		for (let index = 0; index < arr.length; index++) {
+			const element = arr[index];
+			const sex = MATTIE.eventAPI.marriageAPI.displayMarriage(1, 1, false, $gamePlayer.x, $gamePlayer.y, false);
+			sex.data.pages[0].image.characterName = element;
+			sex.data.pages[1].image.characterName = element;
+			sex.spawn($gamePlayer.x + i, $gamePlayer.y + 2);
+			i += 2;
+		}
+	}, 'Spawn bad things (DEV)', -2);
 
 	Input.addKeyBind('', () => {
 		const caharahSitting = new MapEvent();

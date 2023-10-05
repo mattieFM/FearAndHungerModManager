@@ -16,10 +16,12 @@
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.28.1",
     "jsdoc": "^4.0.2",
+    "makensis": "^2.0.8",
     "taffydb": "^2.7.3",
     "tui-jsdoc-template": "^1.2.2"
   },
   "scripts": {
+    "build:installer:prod": "makensis ./installer/installer.nsi",
     "build:docs:prod": "jsdoc -c ./www/dev/prodConf.json -r",
     "build:docs:dev": "jsdoc -c ./www/dev/devConf.json -r",
     "build:prod": "npm run lint:mods && npm run build:docs:prod",

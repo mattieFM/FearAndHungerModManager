@@ -83,12 +83,16 @@ MATTIE.static.events.images = MATTIE.static.events.images || {};
 
 // commandIds
 MATTIE.static.commands.transferId = 201;
+MATTIE.static.commands.battleProcessingId = 301;
 MATTIE.static.commands.ifWin = 601;
 MATTIE.static.commands.selfSwitch = 123;
+MATTIE.static.commands.commonEventid = 117;
 
 // maps
 
 MATTIE.static.maps.menuMaps = [];
+/** @description maps that the player will get fully stuck on if they enter */
+MATTIE.static.maps.blockingMaps = [];
 MATTIE.static.maps.charCreationMap = 0;
 MATTIE.static.maps.startMap = 0;
 MATTIE.static.maps.fortress = 74;
@@ -281,6 +285,11 @@ MATTIE.static.update = function () {
 			61, // unused hexen map
 			64, // unused test map
 
+		];
+
+		MATTIE.static.blockingMaps = [
+			156,
+			64,
 		];
 		MATTIE.static.maps.charCreationMap = 2;
 		MATTIE.static.maps.startMap = 10;
