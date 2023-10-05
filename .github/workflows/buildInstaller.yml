@@ -17,24 +17,30 @@ jobs:
     - name: Print NSIS version
       run: makensis ./installer/installer.nsi
 
-    - name: Upload artifact
-      uses: actions/upload-artifact@v1.0.0
+    - name: upload linux artifact
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.ACTIONS_DEPLOY_KEY}}
       with:
-        name: nsisInstallers
-        path: ./installer/
-    - name: deploy
-      uses: peaceiris/actions-gh-pages@v3
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./installer/RPGModManagerInstall.exe
+        asset_name: RPGModManagerInstall.exe
+        asset_content_type: application/exe
+    - name: upload darwin artifact
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.ACTIONS_DEPLOY_KEY }}
       with:
-        deploy_key: ${{secrets.ACTIONS_DEPLOY_KEY}}
-        publish_dir: ./out
-    - name: Setup Pages
-      uses: actions/configure-pages@v3
-      
-    - name: Upload artifact
-      uses: actions/upload-pages-artifact@v2
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./installers/RPGModManagerInstall.exe
+        asset_name: RPGModManagerInstall.exe
+        asset_content_type: application/gzip
+    - name: upload windows artifact
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.ACTIONS_DEPLOY_KEY }}
       with:
-        path: './installer'
-        
-    - name: Deploy to GitHub Pages
-      id: deployment
-      uses: actions/deploy-pages@v2
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./installer/RPGModManagerInstall.exe
+        asset_name: RPGModManagerInstall.exe
+        asset_content_type: application/zip
