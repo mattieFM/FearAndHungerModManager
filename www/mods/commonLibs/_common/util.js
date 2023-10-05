@@ -67,6 +67,7 @@ MATTIE.util.randSeededChance = function (chance) {
 };
 
 /**
+ *
  * @description clamp a number between a min and a max
  * @param {*} num the number
  * @param {*} min the min number
