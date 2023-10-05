@@ -10,6 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     container: debian:sid
     steps:
+    - name: Checkout Code.
+      uses: actions/checkout@v4
     - name: Install NSIS
       run: |
         bash -c 'echo "deb http://ftp.debian.org/debian unstable main contrib non-free" >> /etc/apt/sources.list.d/unstable.list'
