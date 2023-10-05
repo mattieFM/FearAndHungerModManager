@@ -20,7 +20,7 @@ RequestExecutionLevel admin
 !macroend
 
 # define name of installer
-OutFile "./RPGModManagerInstall.exe"
+OutFile "../out/RPGModManagerInstall.exe"
 
 InstType "Full Install"
 InstType "Multiplayer Only"
