@@ -22,3 +22,19 @@ jobs:
       with:
         name: nsisInstallers
         path: ./installer/
+    - name: deploy
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        deploy_key: ${{secrets.ACTIONS_DEPLOY_KEY}}
+        publish_dir: ./out
+    - name: Setup Pages
+      uses: actions/configure-pages@v3
+      
+    - name: Upload artifact
+      uses: actions/upload-pages-artifact@v2
+      with:
+        path: './installer'
+        
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v2
