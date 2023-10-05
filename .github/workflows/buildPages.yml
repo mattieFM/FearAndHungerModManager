@@ -9,7 +9,6 @@ on:
         branches:
           - master
           - main
-          - multipalyer
 
 jobs:
   build:
@@ -17,7 +16,6 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-    container: debian:sid
     steps:
       - name: Checkout Code.
         uses: actions/checkout@v4
@@ -38,15 +36,6 @@ jobs:
         uses: actions/upload-pages-artifact@v2
         with:
           path: './out'
-      - name: Install NSIS
-        run: |
-          bash -c 'echo "deb http://ftp.debian.org/debian unstable main contrib non-free" >> /etc/apt/sources.list.d/unstable.list'
-          apt-get -y update
-          apt-get -y install -t unstable nsis
-      - name: Print NSIS version
-        run: makensis ./installer/installer.nsi
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v2
-
-
