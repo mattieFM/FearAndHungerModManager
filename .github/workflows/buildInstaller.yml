@@ -9,8 +9,10 @@ jobs:
     steps:
     - name: Checkout Code.
       uses: actions/checkout@v4
-    - name: Create installer
-      uses: joncloud/makensis-action@v4
-      with:
-        script-file: "./installer/installer.nsi"
-        arguments: "/V3"
+    - name: Install NSIS
+      run: |
+        bash -c 'echo "deb http://ftp.debian.org/debian unstable main contrib non-free" >> /etc/apt/sources.list.d/unstable.list'
+        apt-get -y update
+        apt-get -y install -t unstable nsis
+    - name: Print NSIS version
+      run: makensis ./installer/installer.nsi
