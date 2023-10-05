@@ -54,6 +54,7 @@ jobs:
         with:
           script-file: "./installer/installer.nsi"
           arguments: "/V3"
+          additional-plugin-paths: ${{ github.workspace }}/NSIS_Plugins/Plugins
           
         
       - name: deploy
