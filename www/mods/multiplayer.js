@@ -176,5 +176,8 @@ MATTIE.multiplayer.getCurrentNetController = () => {
 	}, 1000);
 
 	MATTIE.static.update();
-	if (MATTIE.global.isFunger()) MATTIE.betterCrowMauler.betterCrowMaulerInit(); // setup crow mauler if not termina
+	if (MATTIE.global.isFunger()) {
+		console.log('crow init');
+		MATTIE.betterCrowMauler.betterCrowMaulerInit();
+	} // setup crow mauler if not termina
 })();

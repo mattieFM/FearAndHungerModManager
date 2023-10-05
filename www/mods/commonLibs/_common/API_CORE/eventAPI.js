@@ -271,7 +271,7 @@ MATTIE.eventAPI.marriageAPI.displaySex = function (actorId1, actorId2, x, y, spa
  * @param {int} y the y pos on the map to display the marriage
  * @returns {MapEvent} the map event that was created
  */
-MATTIE.eventAPI.marriageAPI.displayMarriage = function (actorId1, actorId2, success, x, y) {
+MATTIE.eventAPI.marriageAPI.displayMarriage = function (actorId1, actorId2, success, x, y, spawn = true) {
 	// up is failed marriage
 	// left starts to merge
 	// right is sex
@@ -314,5 +314,6 @@ MATTIE.eventAPI.marriageAPI.displayMarriage = function (actorId1, actorId2, succ
 	sexEvent.addWait(0, 35);
 	sexEvent.addCommand(0, 123, ['A', 0]); // set self switch
 
-	sexEvent.spawn(x, y);
+	if (spawn) { sexEvent.spawn(x, y); }
+	return sexEvent;
 };

@@ -14,13 +14,13 @@ MATTIE.betterCrowMauler.spawnChance = 0.03;
 
 /**
  *  @description the chance that crow mauler will follow you into the next room
- *  @default .2
+ *  @default .15
  * */
 MATTIE.betterCrowMauler.followChance = 0.15;
 
 /**
  *  @description the chance that crow mauler will despawn when you leave a room
- *  @default .05
+ *  @default .15
  * */
 MATTIE.betterCrowMauler.despawnChance = 0.15;
 
@@ -92,7 +92,7 @@ MATTIE.betterCrowMauler.CrowController = class {
 	isDead() {
 		const bool = this.self.checkSelfSwitch('A');
 		console.log(`isdead: ${bool}`);
-		return bool;
+		return bool || !this.crowCanSpawn();
 	}
 
 	/** @description a function to return the scaler, meat to be overridden if other mods need to change this */
@@ -166,7 +166,13 @@ MATTIE.betterCrowMauler.CrowController = class {
 				if (event.event()) {
 					const page = event.event().pages[event._pageIndex];
 					if (page) {
-						return page.list.map((cmd) => cmd.code).includes(MATTIE.static.commands.transferId);
+						const list = page.list.map((cmd) => cmd.code);
+						const commonEvents = page.list.filter((cmd) => cmd.code === MATTIE.static.commands.commonEventid);
+						if (commonEvents.length > 0) {
+							return list.includes(MATTIE.static.commands.transferId)
+						&& !list.includes(MATTIE.static.commands.battleProcessingId)
+						&& commonEvents.filter((cmd) => cmd.parameters[0] === 104).length > 0; // has room change common event
+						}
 					}
 					return false;
 				}
@@ -186,6 +192,8 @@ MATTIE.betterCrowMauler.CrowController = class {
 	findClosestSpawnPoint(x, y) {
 		const spawnPoints = this.getAllTransferPointsOnMap();
 		let closest = spawnPoints[0];
+		if (!closest) closest = { x: 0, y: 0 };
+		if (!closest.x) closest = { x: 0, y: 0 };
 		if (closest) {
 			let dist = MATTIE.util.getDist(x, closest.x, y, closest.y);
 			for (let index = 1; index < spawnPoints.length; index++) {
@@ -272,7 +280,7 @@ MATTIE.betterCrowMauler.CrowController = class {
 	 * */
 
 	shouldEnterCombat() {
-		return !this.isDead() && !this.onScreen && MATTIE.util.randChance(MATTIE.betterCrowMauler.combatEnterChance * this.getScaling());
+		return !this.isDead() && !this.inBattle && !this.onScreen && MATTIE.util.randChance(MATTIE.betterCrowMauler.combatEnterChance * this.getScaling());
 	}
 
 	/**
@@ -289,6 +297,7 @@ MATTIE.betterCrowMauler.CrowController = class {
 	 * @description the function called to handle spawning logic every time the player enters a new room
 	 */
 	onEnterRoom() {
+		this.inBattle = false;
 		if ($gameMap.mapId() != this.mapId) this.onScreen = false;
 		if (!this.isDead() && !this.onScreen) {
 			if (this.canFollow() && this.crowCanSpawn()) {
@@ -331,10 +340,17 @@ MATTIE.betterCrowMauler.betterCrowMaulerCleanup = function () {
 MATTIE.betterCrowMauler.multiplayerCompatPRevFunc = MATTIE.betterCrowMauler.CrowController.prototype.getScaling;
 if (MATTIE.multiplayer) {
 	MATTIE.betterCrowMauler.CrowController.prototype.getScaling = function () {
-		if (MATTIE.multiplayer.getCurrentNetController) {
-			const netCont = MATTIE.multiplayer.getCurrentNetController();
-			return 1 / Object.keys(netCont.netPlayers).length * MATTIE.betterCrowMauler.multiplayerCompatPRevFunc.call(this);
+		let val = (() => {
+			if (MATTIE.multiplayer.getCurrentNetController) {
+				const netCont = MATTIE.multiplayer.getCurrentNetController();
+				return 1 / Object.keys(netCont.netPlayers).length * MATTIE.betterCrowMauler.multiplayerCompatPRevFunc.call(this);
+			}
+
+			return MATTIE.betterCrowMauler.scaler;
+		})();
+		if (val > 50) {
+			val = 1;
 		}
-		return MATTIE.betterCrowMauler.scaler;
+		return val;
 	};
 }

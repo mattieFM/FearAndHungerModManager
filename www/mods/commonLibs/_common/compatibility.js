@@ -150,3 +150,9 @@ Object.defineProperty(Window.prototype, 'contents', {
 	},
 	configurable: true,
 });
+
+MATTIE.compat.createLayerGraphics = Spriteset_Map.prototype.createLayerGraphics;
+Spriteset_Map.prototype.createLayerGraphics = function () {
+	this.layerGraphics = this.layerGraphics || {};
+	MATTIE.compat.createLayerGraphics.call(this);
+};

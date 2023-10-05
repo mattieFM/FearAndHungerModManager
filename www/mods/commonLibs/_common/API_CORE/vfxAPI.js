@@ -36,14 +36,26 @@ Game_Screen.prototype.updateTone = function () {
 };
 
 MATTIE.fxAPI.setupTint = function (red, green, blue, gray, framesDur) {
-	const tint = [red, green,
-		blue, gray];
+	const tint = this.formatTint(red, green, blue, gray);
 	$gameScreen.startTint(tint, framesDur);
 	$gameScreen.forceTint(true);
 };
 
 MATTIE.fxAPI.startScreenShake = function (intensity, speed, duration) {
 	$gameScreen.startShake(intensity, speed, duration);
+};
+
+/**
+ * @description format a tint in rpg maker format
+ * @param {int} red
+ * @param {int} green
+ * @param {int} blue
+ * @param {int} gray
+ * @returns formatted tint obj
+ */
+MATTIE.fxAPI.formatTint = function (red, green, blue, gray) {
+	const tint = [red, green, blue, gray];
+	return tint;
 };
 
 /**

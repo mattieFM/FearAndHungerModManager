@@ -7,6 +7,7 @@ MATTIE.supporters.list = [
 	'Spooky Man',
 	'Zank',
 	'Payton',
+	'Reaper130',
 
 ];
 
@@ -27,6 +28,10 @@ MATTIE.supporters.alphaTestersList = [
 	'Moonless <3',
 ];
 
+/**
+ * @description get the name of a random supporter
+ * @returns {string} the name of a random supporter
+ */
 MATTIE.supporters.getRandomSupporter = function () {
 	const list = MATTIE.supporters.alphaTestersList.concat(MATTIE.supporters.list);
 	const name = list[MATTIE.util.randBetween(0, list.length - 1)];

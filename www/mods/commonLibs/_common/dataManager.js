@@ -169,7 +169,7 @@ MATTIE.DataManager.addFileToImgFolder = function (orgFilePath, destPath, name, n
 	const fileExists = fs.existsSync(destinationPath);
 
 	if (!fileExists || force) {
-		console.log(`created:${destinationPath}`);
+		// console.log(`created:${destinationPath}`);
 		fs.copyFileSync(orgFilePath, destinationPath);
 	}
 	if (deleteOrg) {

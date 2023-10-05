@@ -1,5 +1,7 @@
 *
 !.gitignore
+!installer/
+!installer/**
 !www/
 !www/index.html
 www/*/
