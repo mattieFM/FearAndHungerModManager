@@ -71,7 +71,7 @@ MATTIE.util.randSeededChance = function (chance) {
  * @param {*} num the number
  * @param {*} min the min number
  * @param {*} max the max number
- * @returns
+ * @returns {int} the number
  */
 MATTIE.util.clamp = (num, min, max) => Math.min(Math.max(num, min), max);
 
