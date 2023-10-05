@@ -1,9 +1,6 @@
 name: NSIS Installer Build
 
-on:
-  push:
-    branches:
-      - main
+on: [push]
 
 jobs:
   build:
