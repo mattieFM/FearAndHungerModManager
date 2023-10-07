@@ -20,12 +20,11 @@ jobs:
         apt-get -y install -t unstable nsis
     - name: Print NSIS version
       run: makensis ./installer/installer.nsi
-
-    - name: upload artifact
-      uses: actions/upload-release-asset@v1
+      
+    - name: Release with Notes
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          ./installer/installer.nsi
       env:
         GITHUB_TOKEN: ${{ github.token }}
-      with:
-        asset_path: ./installer/installer.nsi
-        asset_name: installer.exe
-        asset_content_type: application/exe
