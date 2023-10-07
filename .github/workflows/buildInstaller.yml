@@ -26,5 +26,7 @@ jobs:
       with:
         files: |
           ./installer/installer.nsi
+        generate_release_notes: true
+        
       env:
         GITHUB_TOKEN: ${{ github.token }}
