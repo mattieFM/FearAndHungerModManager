@@ -216,7 +216,8 @@ MATTIE.static.troops.griffithId = 126;
 MATTIE.static.troops.GOFAHID = 130;
 
 // actors
-MATTIE.static.actors.bloodGolemId = 0;
+/** @description the actor id of blood golem */
+MATTIE.static.actors.bloodGolemId = 10; // blood golem id is 10 in both 1 and 2
 MATTIE.static.actors.mercenaryId = 0;
 MATTIE.static.actors.girlId = 0;
 MATTIE.static.actors.knightId = 0;
@@ -260,7 +261,6 @@ MATTIE.static.update = function () {
 		MATTIE.static.switch.legardAliveSwitch = 1016;
 
 		// actors
-		MATTIE.static.actors.bloodGolemId = 10;
 		MATTIE.static.actors.emptyActorSlotId = 15;
 		MATTIE.static.actors.mercenaryId = 1;
 		MATTIE.static.actors.girlId = 2;

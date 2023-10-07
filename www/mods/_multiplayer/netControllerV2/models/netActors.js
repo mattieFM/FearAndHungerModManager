@@ -58,15 +58,18 @@ MATTIE.multiplayer.NetActors.prototype.createNewNetActor = function (baseActorId
 		this.bloodGolemInited = true;
 		this.createNewNetActor(MATTIE.static.actors.bloodGolemId);
 	}// all parties have blood golem just to make stuff easier
-	const newDataActor = JsonEx.makeDeepCopy($dataActors[baseActorId]);
-	$dataActors.push(newDataActor);
-	const dataActorId = $dataActors.length - 1;
-	$dataActors[dataActorId].peerId = this.peerId;
-	const newNetActor = new MATTIE.multiplayer.NetActor(new Game_Actor(dataActorId), dataActorId, baseActorId, this.peerId);
-	$gameActors.actor(dataActorId).peerId = this.peerId;
-	newNetActor.peerId = this.peerId;
-	console.log(newNetActor.peerId);
-	this._data.push(newNetActor);
+
+	if ($dataActors[baseActorId]) { // if actor exists
+		const newDataActor = JsonEx.makeDeepCopy($dataActors[baseActorId]);
+		$dataActors.push(newDataActor);
+		const dataActorId = $dataActors.length - 1;
+		$dataActors[dataActorId].peerId = this.peerId;
+		const newNetActor = new MATTIE.multiplayer.NetActor(new Game_Actor(dataActorId), dataActorId, baseActorId, this.peerId);
+		$gameActors.actor(dataActorId).peerId = this.peerId;
+		newNetActor.peerId = this.peerId;
+		console.log(newNetActor.peerId);
+		this._data.push(newNetActor);
+	}
 };
 
 /**
