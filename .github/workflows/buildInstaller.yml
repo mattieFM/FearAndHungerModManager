@@ -1,6 +1,10 @@
 name: NSIS Installer Build
 
-on: [push]
+on:
+  push:
+    # Sequence of patterns matched against refs/tags
+    tags:
+      - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
 
 jobs:
   build:
@@ -16,9 +20,13 @@ jobs:
         apt-get -y install -t unstable nsis
     - name: Print NSIS version
       run: makensis ./installer/installer.nsi
-
-    - name: Upload artifact
-      uses: actions/upload-artifact@v1.0.0
+      
+    - name: Release with Notes
+      uses: softprops/action-gh-release@v1
       with:
-        name: nsisInstallers
-        path: ./installers
+        files: |
+          ./installer/installer.nsi
+        generate_release_notes: true
+        
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
