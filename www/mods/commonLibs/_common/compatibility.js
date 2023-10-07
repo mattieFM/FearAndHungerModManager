@@ -153,6 +153,11 @@ Object.defineProperty(Window.prototype, 'contents', {
 	configurable: true,
 });
 
+/**
+ * @override
+ * @description override this method the hopefully fix https://itch.io/post/8679462
+ *
+ */
 MATTIE.compat.createLayerGraphics = Spriteset_Map.prototype.createLayerGraphics;
 Spriteset_Map.prototype.createLayerGraphics = function () {
 	this.layerGraphics = this.layerGraphics || {};
