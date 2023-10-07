@@ -27,7 +27,6 @@ jobs:
         files: |
           ./installer/installer.nsi
         generate_release_notes: true
-        body_path: ./releaseNotes.md
         
       env:
         GITHUB_TOKEN: ${{ github.token }}
