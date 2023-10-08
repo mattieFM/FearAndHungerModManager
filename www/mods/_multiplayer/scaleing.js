@@ -125,7 +125,7 @@ MATTIE.multiplayer.scaling.scaleHp = false;
  * @description this is multiplied by the max hp of all enemies
  * @default 1
  */
-MATTIE.multiplayer.scaling.hpScaler = 50;
+MATTIE.multiplayer.scaling.hpScaler = 1;
 
 /**
  * @description when there are more than one player in combat with an enemy,
