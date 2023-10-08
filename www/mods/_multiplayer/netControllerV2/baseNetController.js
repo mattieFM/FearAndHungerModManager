@@ -348,8 +348,10 @@ class BaseNetController extends EventEmitter {
 		const isExtraTurn = readyObj.isExtraTurn;
 		const id = senderId;
 		if (MATTIE.multiplayer.currentBattleEvent) {
-			MATTIE.multiplayer.currentBattleEvent.setReadyIfExists(id, val); // set the player as unready in combat arr @legacy
-			if (val === false)console.log('net unready recived');
+			if (MATTIE.multiplayer.currentBattleEvent.setReadyIfExists) {
+				MATTIE.multiplayer.currentBattleEvent.setReadyIfExists(id, val); // set the player as unready in combat arr @legacy
+				if (val === false)console.log('net unready recived');
+			}
 		}
 		$gameTroop.setReadyIfExists(id, val, isExtraTurn); // set the player as unready in combat arr <- this one is actually used
 

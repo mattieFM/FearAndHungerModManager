@@ -102,7 +102,7 @@ MATTIE.scenes.multiplayer.host.prototype.addOptionsBtns = function () {
 	}));
 
 	this._optionsWindow.setHandler(MATTIE.CmdManager.copy, (() => {
-		MATTIE.clipboard.put(MATTIE.multiplayer.hostController.peerId);
+		MATTIE.clipboard.put(MATTIE.multiplayer.hostController.peerId || '');
 		this._optionsWindow.activate();
 	}));
 
