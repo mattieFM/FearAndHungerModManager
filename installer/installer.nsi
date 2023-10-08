@@ -54,6 +54,7 @@ Section "RPG Maker Mod Loader (Required)"
     
     SetOutPath $INSTDIR\www\mods
     File /r ..\www\mods\commonLibs
+    File ..\www\mods\mattieFMModLoader.js
 SectionEnd
  
 Section "-Fear and Hunger Mod API" SEC_FUNGER
@@ -113,6 +114,11 @@ SectionEnd
 Section "Easy Empty Scroll" SEC_EES
   SectionIn 1
     !insertmacro modImport "easyEmptyScroll"
+SectionEnd
+
+Section "Boss Rush" SEC_BOSS
+  SectionIn 1
+    !insertmacro modImport "bossRushOfTheEndless"
 SectionEnd
 
 
