@@ -89,29 +89,29 @@ Game_Troop.prototype.initialize = function () {
 /**
  * @description wipe all game troops clear of all possible page data
  */
-Game_Troop.prototype.clearAllPages = function(){
+Game_Troop.prototype.clearAllPages = function () {
 	this.clearPages();
-	this.forEachAdditionalTroop((other)=>{other.clearPages()});
-}
+	this.forEachAdditionalTroop((other) => { other.clearPages(); });
+};
 
 /**
  * @description clear the pages of this troop excluding additional troops
  */
-Game_Troop.prototype.clearPages = function(){
+Game_Troop.prototype.clearPages = function () {
 	this.cloneData();
 	this.troop().pages = [];
-	this._interpreter.clear()
-}
+	this._interpreter.clear();
+};
 
 /**
- * @description clones the troop data of this troop and fixes its 
+ * @description clones the troop data of this troop and fixes its
  */
-Game_Troop.prototype.cloneData = function(){
-	const clonedTroop = JsonEx.makeDeepCopy( $dataTroops[this._troopId]);
-	this.troop = function() {
+Game_Troop.prototype.cloneData = function () {
+	const clonedTroop = JsonEx.makeDeepCopy($dataTroops[this._troopId]);
+	this.troop = function () {
 		return clonedTroop;
 	};
-}
+};
 
 /** @description the base function to setup a game troop */
 MATTIE_RPG.TroopApi_Game_Troop_Setup = Game_Troop.prototype.setup;
@@ -138,10 +138,11 @@ Game_Troop.prototype.setup = function (troopId, xOffset = 0, yOffset = 0, cb = (
 
 /**
  * @description start a fight arr and call a callback when fight ends
- * @param {*} the array of all troops in the fight
- * @param {*} cb the callback to call when the fight ends
+ * @param {Array} the array of all troops in the fight
+ * @param {function} cb the callback to call when the fight ends
+ * @param {function} afterSetupCb the callback that triggers when the combat is ready
  */
-Game_Troop.prototype.setupMultiCombat = function (arr, cb = () => {}) {
+Game_Troop.prototype.setupMultiCombat = function (arr, cb = () => {}, afterSetupCb = () => {}) {
 	BattleManager.setCantStartInputting(true);
 
 	if ($gameParty.leader().hasSkill(MATTIE.static.skills.enGarde.id)) {
@@ -198,6 +199,7 @@ Game_Troop.prototype.setupMultiCombat = function (arr, cb = () => {}) {
 				BattleManager.setEventCallback((n) => {
 					cb();
 				});
+				afterSetupCb();
 			}, 500);
 		}, 500);
 	}, 3000);
