@@ -5,27 +5,26 @@ MATTIE.RPG = MATTIE.RPG || {};
 MATTIE.multiplayer.moveStraight = Game_CharacterBase.prototype.moveStraight;
 Game_Event.prototype.moveStraight = function (d, callAnyways = false) {
 	if (!MATTIE.multiplayer.inBattle) {
-
-			if (MATTIE.multiplayer.isEnemyHost || callAnyways || this._moveRouteForcing) MATTIE.multiplayer.moveStraight.call(this, d);
-			if (MATTIE.multiplayer.isEnemyHost && !callAnyways && !this._moveRouteForcing) { // dont send if move route forcing
-				if (MATTIE.multiplayer.devTools.enemyMoveLogger) {
-					console.debug(`move straight: ${d}`);
-					console.debug(`event id: ${this.eventId()}`);
-				}
-				const obj = {};
-
-				obj.mapId = this._mapId;
-				obj.id = this.eventId();
-				obj.x = this._x;
-				obj.y = this._y;
-				obj.realX = this._realX;
-				obj.realY = this._realY;
-				obj.d = d;
-				// if this thing is not handled somewhere else
-				if (MATTIE.multiplayer.devTools.cmdLogger) console.debug(`Game_Event ${obj.id} has moved with data: ${JSON.stringify(obj)}`);
-				const netController = MATTIE.multiplayer.getCurrentNetController();
-				netController.emitEventMoveEvent(obj);
+		if (MATTIE.multiplayer.isEnemyHost || callAnyways || this._moveRouteForcing) MATTIE.multiplayer.moveStraight.call(this, d);
+		if (MATTIE.multiplayer.isEnemyHost && !callAnyways && !this._moveRouteForcing) { // dont send if move route forcing
+			if (MATTIE.multiplayer.devTools.enemyMoveLogger) {
+				console.debug(`move straight: ${d}`);
+				console.debug(`event id: ${this.eventId()}`);
 			}
+			const obj = {};
+
+			obj.mapId = this._mapId;
+			obj.id = this.eventId();
+			obj.x = this._x;
+			obj.y = this._y;
+			obj.realX = this._realX;
+			obj.realY = this._realY;
+			obj.d = d;
+			// if this thing is not handled somewhere else
+			if (MATTIE.multiplayer.devTools.cmdLogger) console.debug(`Game_Event ${obj.id} has moved with data: ${JSON.stringify(obj)}`);
+			const netController = MATTIE.multiplayer.getCurrentNetController();
+			netController.emitEventMoveEvent(obj);
+		}
 	}
 };
 
