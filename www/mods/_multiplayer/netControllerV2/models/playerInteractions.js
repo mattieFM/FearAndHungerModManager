@@ -79,7 +79,8 @@ MATTIE.multiplayer.Conversations.prototype.talkOptionsCb = function (n) {
 		this.greeting();
 		break;
 	case 1: // Trade
-		this.nameSpeak('Mattie', "That feature isn't implemented. \nYou can drop items to trade.");
+		SceneManager.push(Scene_Menu);
+		SceneManager.push(MATTIE.scenes.Scene_DropItem);
 		break;
 	case 2: // Resurrect
 		this.resurrect();

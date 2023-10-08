@@ -170,6 +170,11 @@
 //= ============================================================================
 //  ps.. if my code looks funky, i'm an old guy..
 // object orientated programming bugs the hell out of me.
+
+function Lightmask() {
+	this.initialize.apply(this, arguments);
+}
+
 if (typeof Terrax_tint_speed === 'undefined') {
 	var Imported = Imported || {};
 	Imported.TerraxLighting = true;
@@ -672,10 +677,6 @@ if (typeof Terrax_tint_speed === 'undefined') {
 				this._lightmask = new Lightmask();
 				this.addChild(this._lightmask);
 			};
-
-			function Lightmask() {
-				this.initialize.apply(this, arguments);
-			}
 
 			Lightmask.prototype = Object.create(PIXI.DisplayObjectContainer.prototype);
 			Lightmask.prototype.constructor = Lightmask;

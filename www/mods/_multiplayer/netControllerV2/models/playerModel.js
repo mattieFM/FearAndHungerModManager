@@ -271,6 +271,7 @@ MATTIE.multiplayer.Secondary_Player.prototype.initialize = function (netActors) 
 	this.ctrlDir4 = 0; // start standing still
 	this.$netActors = netActors;
 	Game_Player.prototype.initialize.call(this);
+	MATTIE.fxAPI.addLightObject(() => this, () => true);
 };
 
 // override init members to use netfollowers instead of followers
