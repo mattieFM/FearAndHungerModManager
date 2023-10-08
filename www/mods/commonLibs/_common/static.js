@@ -572,6 +572,7 @@ MATTIE.static.update = function () {
 			//--------------------------------------------------------------------------
 			//          Event Switches / Blocking Switches
 			//--------------------------------------------------------------------------
+			2187, // throne scene --autorun
 			'2970-2972', // rat buckman scene
 			800, // return from mehabre after using passages
 			41, // disabled //unable to move --quit breathing
