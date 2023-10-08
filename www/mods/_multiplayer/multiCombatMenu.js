@@ -28,8 +28,11 @@ TextManager.multiplayer = 'multiplayer';
 TextManager.viewNextParty = 'view next party';
 
 Scene_Battle.prototype.createAllWindows = function () {
+	const that = this;
 	MATTIE.multiplayer.multiCombat.netPlayerOffset = 0; // reset the offset anytime we create a new scene
+	MATTIE.windows.multicombat_SceneBattleOrg.call(this);
 
+	
 	if (MATTIE.multiplayer.config.showAlliesMenu) {
 		this._textWindow = new MATTIE.windows.multiplayer.multiCombat.AllyCount(0, 0, 155, 75);
 		this.addWindow(this._textWindow);
@@ -39,7 +42,38 @@ Scene_Battle.prototype.createAllWindows = function () {
 		this._partyDisplay = new MATTIE.windows.TextDisplay(155, 0, 400, 75, 'Viewing: Self');
 		this.addWindow(this._partyDisplay);
 	}
-	MATTIE.windows.multicombat_SceneBattleOrg.call(this);
+
+	//make windows not overlap
+	function show(){
+		if (typeof that._textWindow != 'undefined') that._textWindow.show();
+		if (typeof that._partyDisplay != 'undefined') that._partyDisplay.show();
+	}
+	function hide(){
+		if (typeof that._textWindow != 'undefined') that._textWindow.hide();
+		if (typeof that._partyDisplay != 'undefined') that._partyDisplay.hide();
+	}
+	const oldWinMsgShow = Window_Help.prototype.show;
+	Window_Message.prototype.show = function(){
+		hide();
+		oldWinMsgShow.call(this);
+	}
+	const oldWinMsgHide = Window_Help.prototype.hide;
+	Window_Message.prototype.show = function(){
+		show();
+		oldWinMsgHide.call(this);
+	}
+	const oldWinHelpActivate = Window_Help.prototype.show;
+	Window_Help.prototype.show = function(){
+		hide();
+		oldWinHelpActivate.call(this);
+	}
+
+	const oldWinHelpDeactivate = Window_Help.prototype.hide;
+	Window_Help.prototype.hide = function(){
+		show();
+		oldWinHelpDeactivate.call(this);
+	}
+
 
 	this._statusWindow.setHandler('cancel', BattleManager.unready.bind(this));
 	MATTIE.multiplayer.BattleController.addListener('ready', () => {
