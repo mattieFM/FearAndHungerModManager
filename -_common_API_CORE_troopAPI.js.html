@@ -86,6 +86,33 @@ Game_Troop.prototype.initialize = function () {
 	if (!this._additionalTroops) this._additionalTroops = {};
 };
 
+/**
+ * @description wipe all game troops clear of all possible page data
+ */
+Game_Troop.prototype.clearAllPages = function(){
+	this.clearPages();
+	this.forEachAdditionalTroop((other)=>{other.clearPages()});
+}
+
+/**
+ * @description clear the pages of this troop excluding additional troops
+ */
+Game_Troop.prototype.clearPages = function(){
+	this.cloneData();
+	this.troop().pages = [];
+	this._interpreter.clear()
+}
+
+/**
+ * @description clones the troop data of this troop and fixes its 
+ */
+Game_Troop.prototype.cloneData = function(){
+	const clonedTroop = JsonEx.makeDeepCopy( $dataTroops[this._troopId]);
+	this.troop = function() {
+		return clonedTroop;
+	};
+}
+
 /** @description the base function to setup a game troop */
 MATTIE_RPG.TroopApi_Game_Troop_Setup = Game_Troop.prototype.setup;
 /**
