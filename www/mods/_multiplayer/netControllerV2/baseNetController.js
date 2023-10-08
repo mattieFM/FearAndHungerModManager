@@ -1150,6 +1150,7 @@ class BaseNetController extends EventEmitter {
 	onEventSpawn(data, id) {
 		const event = new MapEvent();
 		event.data = data;
+		event.setPersist(true);
 		try {
 			event.spawn(data.x, data.y, true);
 		} catch (error) {

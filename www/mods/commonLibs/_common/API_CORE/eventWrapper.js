@@ -41,7 +41,7 @@ class MapEvent {
 			y: 0,
 			meta: {},
 			mapId: $gameMap.mapId(),
-			persist: true,
+			persist: false,
 		};
 
 		this.addPage();
