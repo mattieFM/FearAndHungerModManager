@@ -31,11 +31,16 @@ Scene_Battle.prototype.createAllWindows = function () {
 	MATTIE.multiplayer.multiCombat.netPlayerOffset = 0; // reset the offset anytime we create a new scene
 	MATTIE.windows.multicombat_SceneBattleOrg.call(this);
 
-	this._textWindow = new MATTIE.windows.multiplayer.multiCombat.AllyCount(0, 0, 155, 75);
-	this.addWindow(this._textWindow);
+	if (MATTIE.multiplayer.config.showAlliesMenu) {
+		this._textWindow = new MATTIE.windows.multiplayer.multiCombat.AllyCount(0, 0, 155, 75);
+		this.addWindow(this._textWindow);
+	}
 
-	this._partyDisplay = new MATTIE.windows.TextDisplay(155, 0, 400, 75, 'Viewing: Self');
-	this.addWindow(this._partyDisplay);
+	if (MATTIE.multiplayer.config.showViewingMenu) {
+		this._partyDisplay = new MATTIE.windows.TextDisplay(155, 0, 400, 75, 'Viewing: Self');
+		this.addWindow(this._partyDisplay);
+	}
+
 	this._statusWindow.setHandler('cancel', BattleManager.unready.bind(this));
 	MATTIE.multiplayer.BattleController.addListener('ready', () => {
 		this._statusWindow.activate();
@@ -334,7 +339,7 @@ Window_ActorCommand.prototype.addMultiplayerCommand = function () {
 	this.addCommand(TextManager.multiplayer, 'multiplayer');
 };
 Scene_Battle.prototype.resetParty = function () {
-	this._partyDisplay.updateText('Viewing: Self');
+	if (MATTIE.multiplayer.config.showViewingMenu) this._partyDisplay.updateText('Viewing: Self');
 	this._actorWindow.setGameParty(null);
 	this._statusWindow.setGameParty(null);
 	this._actorWindow.currentid = 0;
@@ -345,7 +350,7 @@ Scene_Battle.prototype.viewNetParty = function (n) {
 	const netCont = MATTIE.multiplayer.getCurrentNetController();
 	this._actorWindow.setGameParty(netCont.netPlayers[playersIds[n]]);
 	this._statusWindow.setGameParty(netCont.netPlayers[playersIds[n]]);
-	this._partyDisplay.updateText(`Viewing: ${netCont.netPlayers[playersIds[n]].name}`);
+	if (MATTIE.multiplayer.config.showViewingMenu) this._partyDisplay.updateText(`Viewing: ${netCont.netPlayers[playersIds[n]].name}`);
 };
 
 Scene_Battle.prototype.refreshParties = function () {

@@ -191,3 +191,21 @@ Game_Enemy.prototype.setup = function (enemyId, x, y) {
 
 	this.recoverAll();
 };
+
+/**
+ * @namespace MATTIE.multiplayer.config
+ * @description holds configs
+ */
+MATTIE.multiplayer.config = MATTIE.multiplayer.config || {};
+
+/**
+ * @description whether the menu to display what party the player is currently viewing should display
+ * @default false
+ */
+MATTIE.multiplayer.config.showViewingMenu = false;
+
+/**
+ * @description whether the menu to display number of allies in the current fight should display
+ * @default false
+ */
+MATTIE.multiplayer.config.showAlliesMenu = true;
