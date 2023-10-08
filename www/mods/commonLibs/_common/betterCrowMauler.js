@@ -70,6 +70,7 @@ MATTIE.betterCrowMauler.CrowController = class {
 		 * @type {MapEvent}
 		 * */
 		this.self = new MapEvent();
+		this.self.setPersist(true);
 
 		const prevFunc = Game_Player.prototype.performTransfer;
 		const that = this;

@@ -22,6 +22,7 @@ MATTIE.eventAPI.addItemDropToCurrentMap = function (item) {
 	else if (item.isWeapon()) event.addCommand(0, 127, [itemObj.id, 0, 0, 1]); // give weapon
 	else event.addCommand(0, 126, [itemObj.id, 0, 0, 1]); // give item
 	event.addCommand(0, 123, ['A', 0]);// set self switch
+	event.setPersist(true);
 	event.spawn($gamePlayer.x, $gamePlayer.y);
 };
 
@@ -191,6 +192,7 @@ MATTIE.eventAPI.createEnemyFromExisting = function (mapId, eventId, alivePageId,
 	enemy.data.pages[1] = deadPage;
 	enemy.data.pages[1].conditions = enemy.setDefaultConditions();
 	enemy.data.pages[1].conditions.selfSwitchValid = true;
+	enemy.setPersist(true);
 	return enemy;
 };
 
