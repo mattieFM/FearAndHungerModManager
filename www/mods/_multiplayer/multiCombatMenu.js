@@ -29,7 +29,6 @@ TextManager.viewNextParty = 'view next party';
 
 Scene_Battle.prototype.createAllWindows = function () {
 	MATTIE.multiplayer.multiCombat.netPlayerOffset = 0; // reset the offset anytime we create a new scene
-	MATTIE.windows.multicombat_SceneBattleOrg.call(this);
 
 	if (MATTIE.multiplayer.config.showAlliesMenu) {
 		this._textWindow = new MATTIE.windows.multiplayer.multiCombat.AllyCount(0, 0, 155, 75);
@@ -40,6 +39,7 @@ Scene_Battle.prototype.createAllWindows = function () {
 		this._partyDisplay = new MATTIE.windows.TextDisplay(155, 0, 400, 75, 'Viewing: Self');
 		this.addWindow(this._partyDisplay);
 	}
+	MATTIE.windows.multicombat_SceneBattleOrg.call(this);
 
 	this._statusWindow.setHandler('cancel', BattleManager.unready.bind(this));
 	MATTIE.multiplayer.BattleController.addListener('ready', () => {
