@@ -266,6 +266,7 @@ MATTIE.static.maps.onCharCreateMap = () => MATTIE.static.maps.charCreationMap ==
 MATTIE.static.update = function () {
 	MATTIE.global.checkGameVersion(); // make sure version is valid
 
+	// eslint-disable-next-line no-constant-condition
 	if (MATTIE.global.isFunger() || true) { // for now just use funger 1 vars regardless
 		// static values specific to funger 1
 

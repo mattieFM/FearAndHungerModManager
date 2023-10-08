@@ -11,11 +11,11 @@ Game_Event.prototype.isCollidedWithPlayerCharacters = function (x, y) {
  * @description return the nearest player to a point
  * @param {*} x the x cord
  * @param {*} y the y cord
- * @returns 
+ * @returns
  */
 MATTIE.multiplayer.getNearestPlayer = function (x, y) {
 	const netController = MATTIE.multiplayer.getCurrentNetController();
-	var players = Object.values(netController.netPlayers).concat([netController.player])
+	var players = Object.values(netController.netPlayers).concat([netController.player]);
 	let nearest = 0;
 	let nearTotal = Infinity;
 	for (key in players) {
@@ -50,7 +50,7 @@ Game_Event.prototype.updateChaseMovement = function () {
 			var direction = this.findDirectionTo(nearestPlayer.x, nearestPlayer.y);
 			if (direction > 0) {
 				var x = this._x;
-        		var y = this._y;
+				var y = this._y;
 				this.moveStraight(direction);
 				if (x === this._x && y === this._y) this._staggerCount = 20;
 			}
@@ -62,6 +62,7 @@ Game_Event.prototype.updateChaseMovement = function () {
 			Yanfly.ECP.Game_Event_updateSelfMovement.call(this);
 		}
 	}
+	return 0;
 };
 
 Game_Event.prototype.chaseConditions = function (dis) {
