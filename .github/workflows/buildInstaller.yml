@@ -25,7 +25,7 @@ jobs:
       uses: softprops/action-gh-release@v1
       with:
         files: |
-          ./installer/installer.nsi
+          ./installer/RPGModManagerInstall.exe
         generate_release_notes: true
         
       env:
