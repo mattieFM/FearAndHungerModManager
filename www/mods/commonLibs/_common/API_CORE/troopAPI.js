@@ -73,9 +73,9 @@ Game_Troop.prototype.setup = function (troopId, xOffset = 0, yOffset = 0, cb = (
 
 /**
  * @description start a fight arr and call a callback when fight ends
- * @param {[]} the array of all troops in the fight
- * @param {Function} cb the callback to call when the fight ends
- * @param {Function} afterSetupCb the callback that triggers when the combat is ready
+ * @param {Array} the array of all troops in the fight
+ * @param {function} cb the callback to call when the fight ends
+ * @param {function} afterSetupCb the callback that triggers when the combat is ready
  */
 Game_Troop.prototype.setupMultiCombat = function (arr, cb = () => {}, afterSetupCb = () => {}) {
 	BattleManager.setCantStartInputting(true);
