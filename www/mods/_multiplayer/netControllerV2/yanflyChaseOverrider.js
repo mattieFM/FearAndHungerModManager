@@ -7,15 +7,15 @@ Game_Event.prototype.isCollidedWithPlayerCharacters = function (x, y) {
 	return this.isNormalPriority() && nearestPlayer.isCollided(x, y);
 };
 
+/**
+ * @description return the nearest player to a point
+ * @param {*} x the x cord
+ * @param {*} y the y cord
+ * @returns 
+ */
 MATTIE.multiplayer.getNearestPlayer = function (x, y) {
 	const netController = MATTIE.multiplayer.getCurrentNetController();
-	var players = [];
-	for (key in netController.netPlayers) {
-		if (key) {
-			players.push(netController.netPlayers[key]);
-		}
-	}
-	players.push(netController.player);
+	var players = Object.values(netController.netPlayers).concat([netController.player])
 	let nearest = 0;
 	let nearTotal = Infinity;
 	for (key in players) {
@@ -41,11 +41,19 @@ MATTIE.multiplayer.getNearestPlayer = function (x, y) {
 // override yanfly's chase event to find the nearest player rather than just using game player
 
 Game_Event.prototype.updateChaseMovement = function () {
+	if (this._staggerCount > 0) {
+		return this._staggerCount--;
+	}
 	if (!this._locked) {
 		if (this._stopCount > 0 && this._chasePlayer) {
 			var nearestPlayer = MATTIE.multiplayer.getNearestPlayer(this.x, this.y);
 			var direction = this.findDirectionTo(nearestPlayer.x, nearestPlayer.y);
-			if (direction > 0) this.moveStraight(direction);
+			if (direction > 0) {
+				var x = this._x;
+        		var y = this._y;
+				this.moveStraight(direction);
+				if (x === this._x && y === this._y) this._staggerCount = 20;
+			}
 		} else if (this._stopCount > 0 && this._fleePlayer) {
 			this.updateFleeMovement();
 		} else if (this._returnPhase) {

@@ -3,9 +3,9 @@ MATTIE.multiplayer = MATTIE.multiplayer || {};
 MATTIE.RPG = MATTIE.RPG || {};
 
 MATTIE.multiplayer.moveStraight = Game_CharacterBase.prototype.moveStraight;
-Game_CharacterBase.prototype.moveStraight = function (d, callAnyways = false) {
+Game_Event.prototype.moveStraight = function (d, callAnyways = false) {
 	if (!MATTIE.multiplayer.inBattle) {
-		if (this instanceof Game_Event && !this._locked) {
+
 			if (MATTIE.multiplayer.isEnemyHost || callAnyways || this._moveRouteForcing) MATTIE.multiplayer.moveStraight.call(this, d);
 			if (MATTIE.multiplayer.isEnemyHost && !callAnyways && !this._moveRouteForcing) { // dont send if move route forcing
 				if (MATTIE.multiplayer.devTools.enemyMoveLogger) {
@@ -26,9 +26,6 @@ Game_CharacterBase.prototype.moveStraight = function (d, callAnyways = false) {
 				const netController = MATTIE.multiplayer.getCurrentNetController();
 				netController.emitEventMoveEvent(obj);
 			}
-		} else {
-			MATTIE.multiplayer.moveStraight.call(this, d);
-		}
 	}
 };
 
