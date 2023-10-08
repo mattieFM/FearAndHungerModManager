@@ -297,9 +297,29 @@ MATTIE.static.actors.emptyActorSlotId = 0;
 
 // events
 MATTIE.static.events.crowMauler = null;
+
 // images
 MATTIE.static.events.images.shiny = {};
 MATTIE.static.events.images.coin = MATTIE.static.events.images.shiny;
+
+// skills
+MATTIE.static.skills.bloodportal = $dataSkills[148];
+MATTIE.static.skills.hurting = $dataSkills[12];
+MATTIE.static.skills.bloodGolem = $dataSkills[51];
+MATTIE.static.skills.greaterBloodGolem = $dataSkills[103];
+MATTIE.static.skills.healingWhispers = $dataSkills[151];
+MATTIE.static.skills.run = $dataSkills[40];
+MATTIE.static.skills.enGarde = $dataSkills[146];
+
+// common events
+MATTIE.static.commonEvents.bloodportal = $dataCommonEvents[152];
+MATTIE.static.commonEvents.credits = $dataCommonEvents[310];
+
+MATTIE.static.events.crowMauler = (() => MATTIE.eventAPI.getEventOnMap(287, 11));
+
+// states
+MATTIE.static.states.knockout = 0;
+MATTIE.static.states.blind = 49;
 
 // Functions
 /** @description check if the player is on a menu map */
@@ -384,25 +404,6 @@ MATTIE.static.update = function () {
 			[10, 1, 'A'],
 		];
 		MATTIE.static.switch.ignoredSelfSwitches = MATTIE.static.switch.ignoredSelfSwitches.map((arr) => JSON.stringify(arr));
-
-		// skills
-		MATTIE.static.skills.bloodportal = $dataSkills[148];
-		MATTIE.static.skills.hurting = $dataSkills[12];
-		MATTIE.static.skills.bloodGolem = $dataSkills[51];
-		MATTIE.static.skills.greaterBloodGolem = $dataSkills[103];
-		MATTIE.static.skills.healingWhispers = $dataSkills[151];
-		MATTIE.static.skills.run = $dataSkills[40];
-		MATTIE.static.skills.enGarde = $dataSkills[146];
-
-		// common events
-		MATTIE.static.commonEvents.bloodportal = $dataCommonEvents[152];
-		MATTIE.static.commonEvents.credits = $dataCommonEvents[310];
-
-		MATTIE.static.events.crowMauler = (() => MATTIE.eventAPI.getEventOnMap(287, 11));
-
-		// states
-		MATTIE.static.states.knockout = 0;
-		MATTIE.static.states.blind = 49;
 
 		// switches
 		MATTIE.static.switch.ignoredSwitches = [
