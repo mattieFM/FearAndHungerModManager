@@ -206,6 +206,6 @@ MATTIE.multiplayer.config.showViewingMenu = false;
 
 /**
  * @description whether the menu to display number of allies in the current fight should display
- * @default false
+ * @default true
  */
 MATTIE.multiplayer.config.showAlliesMenu = true;
