@@ -1,1 +1,8 @@
-{"name":"randomiser","status":false,"parameters":{"seed":"random"},"danger":true}
+{
+    "name": "randomiser",
+    "status": false,
+    "parameters": {
+        "seed": "random"
+    },
+    "danger": true
+}

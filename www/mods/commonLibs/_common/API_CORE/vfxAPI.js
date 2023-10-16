@@ -139,7 +139,6 @@ Lightmask.prototype._updateMask = function () {
 	MATTIE.prevLightMask.call(this);
 	for (let index = 0; index < MATTIE.fxAPI.trackedLights.length; index++) {
 		const element = MATTIE.fxAPI.trackedLights[index];
-		console.log(element);
 		if (element.active()) {
 			MATTIE.fxAPI.drawCircleMap(
 				element.getContent()._realX,

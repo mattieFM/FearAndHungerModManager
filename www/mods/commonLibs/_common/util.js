@@ -80,3 +80,43 @@ MATTIE.util.clamp = (num, min, max) => Math.min(Math.max(num, min), max);
 	// setup the default seed
 	MATTIE.util.setSeed('default');
 })();
+
+// // eslint-disable-next-line no-extend-native, consistent-return
+// Object.prototype.removeItem = function (key) {
+// 	// eslint-disable-next-line no-prototype-builtins
+// 	if (!this.hasOwnProperty(key)) {
+// 		return null;
+// 	}
+// 	if (isNaN(parseInt(key, 10)) || !(this instanceof Array)) { delete this[key]; } else { this.splice(key, 1); }
+// };
+
+/**
+ * @description sprial out from a point calling a callback on each point
+ * @param {int} X
+ * @param {int} Y
+ * @param {int} max how far out should we spiral
+ * @param {function} cb the callback to call
+ */
+MATTIE.util.spiral = function (X, Y, dist, cb) {
+	const max = (Math.max(X, Y) ** 2);
+
+	let x = 0;
+	let y = 0;
+	let dx = 0;
+	let t = 0;
+	let dy = -1;
+	for (let index = 0; index < max; index++) {
+		console.log(index);
+		if ((-X / 2 < x <= X / 2) && (-Y / 2 < y <= Y / 2)) {
+			cb(x, y);
+			console.log('here');
+		}
+		if (x == y || (x < 0 && x == -y) || (x > 0 && x == 1 - y)) {
+			t = dx;
+			dx = -dy;
+			dy = t;
+		}
+		x += dx;
+		y += dy;
+	}
+};

@@ -4,7 +4,7 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 
 // eslint-disable-next-line import/no-extraneous-dependencies
-const { dialog } = require('electron');
+// const { dialog } = require('electron');
 const fs = require('fs');
 const { promisify } = require('util');
 const { resolve } = require('path');
@@ -86,6 +86,26 @@ async function differenceObj(obj1, obj2) {
 			obj[key1] = member1;
 		}
 	}
+
+	// // convert to array if keys are all numbers
+	// keys1 = Object.keys(obj);
+	// if (keys1.length > 0 && keys1.every((key) => !isNaN(parseInt(key, 10)))) {
+	// 	let tmpObj = obj;
+	// 	obj = [];
+	// 	let tmpKeys = Object.keys(tmpObj);
+	// 	tmpKeys.forEach((key) => {
+	// 		obj[parseInt(key, 10)] = tmpObj[key];
+	// 	});
+	// 	const result = [];
+	// 	console.log(obj.length);
+	// 	for (let i = 0; i < obj.length; ++i) {
+	// 		if (!(i in obj)) result.push('MGS_UN_DEF'); // fill empty spots with string "undefined"
+	// 		else result.push(obj[i]);
+	// 	}
+	// 	obj = result;
+	// }
+
+	// if (typeof obj === 'object' && obj != null) { if (Object.keys(obj).length < 1) obj = 'MGS_UN_DEF'; }
 	return obj;
 }
 
@@ -129,9 +149,10 @@ async function getEnabledFiles(path) {
 }
 
 async function writeDifferences(data, fileName) {
+	console.log(`WritingTo:${fs.realpathSync(defaultOutFolder)}\\${fileName}`);
 	const path = `${fs.realpathSync(defaultOutFolder)}\\${fileName}`;
 
-	if (Object.keys(data).length > 0) {
+	if (Object.keys(data).length > 0 && data != 'MGS_UN_DEF') {
 		fs.writeFileSync(path, JSON.stringify(data));
 	}
 }
@@ -157,6 +178,7 @@ async function compareFolders(moddedFolder, orgFolder) {
 			// console.log(difLines);
 		} else {
 			filesWithoutConflict.push(moddedPath);
+			writeDifferences(fs.readFileSync(moddedPath), modFileName);
 			// nothing to compare --no conflict
 		}
 	});

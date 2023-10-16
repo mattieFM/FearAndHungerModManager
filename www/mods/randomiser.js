@@ -4,6 +4,70 @@
  * @namespace MATTIE.randomiser
  * */
 MATTIE.randomiser = MATTIE.randomiser || {};
+
+MATTIE.randomiser.config = {};
+
+/**
+ * @description whether to include dungeon knights maps for map randomization
+ * @default false
+ */
+MATTIE.randomiser.config.includeDungeonKnights = false;
+
+/** @description whether to randomize troops or not */
+MATTIE.randomiser.config.randomizeTroops = true;
+
+/** @description whether to randomize items or not */
+MATTIE.randomiser.config.randomizeItems = true;
+
+/** @description whether to randomize armors or not */
+MATTIE.randomiser.config.randomizeArmors = true;
+
+/** @description whether to randomize weapons or not */
+MATTIE.randomiser.config.randomizeWeapons = true;
+
+/**
+ * @description whether to randomize enemies or not. Note that this means randomizing the limbs
+ * that troops are composed of.
+ * !!Danger!! this will make the game quite incomprehensible but it shouldn't actually crash
+ * @default false
+*/
+MATTIE.randomiser.config.randomizeEnemies = false;
+
+/** @description whether to randomize skills or not */
+MATTIE.randomiser.config.randomizeSkills = true;
+
+/**
+ * @description whether to randomize classes or not
+ * !!DANGER!! tends to break things --if class gets switched with nashrah or test or... then it will break etc...
+ * @default false
+ */
+MATTIE.randomiser.config.randomizeClasses = false;
+
+/** @description whether to randomize classes or not */
+MATTIE.randomiser.config.randomizeAnimations = true;
+
+/**
+ * @description whether to randomize maps or not
+ * @default true
+ * Works as long as you can use the books in your inventory to recover from softlocks
+ * Ex Altiora lets you use the airship to get un stuck
+ * and The Seven Lamps of Arcitecture lets you teleport to a new room (sometimes) if you got stuck.
+ *  */
+MATTIE.randomiser.config.randomizeMaps = true;
+
+/** @description whether to randomize animations or not */
+MATTIE.randomiser.config.randomizeAnimations = true;
+
+/** @description whether to randomize states or not */
+MATTIE.randomiser.config.randomizeStates = true;
+
+/**
+ * @description whether to randomize common events or not
+ * !!DANGER!! This will crash the game. Its funny but it is not safe and will blow up.
+ * @default false
+ * */
+MATTIE.randomiser.config.commonEvents = false;
+
 MATTIE.static = MATTIE.static || {};
 
 // eslint-disable-next-line import/no-unresolved
@@ -14,7 +78,6 @@ const params = PluginManager.parameters(randomizerName);
 // setup the seed for the rng
 if (params.seed === 'random') {
 	// if random string randomize the seed
-	console.log('random seed');
 	MATTIE.util.setSeed(MATTIE.supporters.getRandomSupporter());
 } else {
 	// else use provided
@@ -54,33 +117,37 @@ MATTIE.randomiser.shuffle = function (arr, attrib = 'name', cb = () => {}, filte
 		filterCb = (e) => this.baseShuffleFilter(e, attrib);
 	}
 	const realArr = arr.filter(filterCb);
-	console.log(realArr);
 
 	realArr.sort(() => MATTIE.util.seedRandom() - 0.5);
 
 	let j = 0;
 	let i = 0;
 	arr.map((e) => {
-		if (e != null) {
+		if (filterCb(e) && typeof realArr[i] != 'undefined') {
 			if (typeof e[attrib] != 'undefined') {
 				if (e[attrib] != '') {
 					arr[j] = realArr[i];
+					i++;
 				}
 			} else {
-				console.log('here');
 				arr[j] = realArr[i];
+				i++;
 			}
-			i++;
 		}
 		j++;
 		return null;
 	});
+
 	for (let index = 0; index < arr.length; index++) {
 		const element = arr[index];
 		cb(element, index);
-		if (element) { if (element.id) { element.id = index; } }
+		if (element) {
+			if (element.id) {
+				arr[index].id = index;
+			}
+		}
 	}
-	console.log(arr);
+
 	return arr;
 };
 
@@ -172,20 +239,25 @@ MATTIE.randomiser.shuffleCommonEvents = function () {
  * @description shuffle the mapsinfo array and fix ids.
  */
 MATTIE.randomiser.shuffleMapInfo = function () {
-	let excludedMapIds = [];
+	let excludedMapIds = [0, 78, 19, 60];
 	excludedMapIds = excludedMapIds.concat(MATTIE.static.maps.menuMaps); // exclude menus
 	excludedMapIds = excludedMapIds.concat(MATTIE.static.blockingMaps);
+	if (!MATTIE.randomiser.config.includeDungeonKnights) excludedMapIds = excludedMapIds.concat(MATTIE.static.dungeonKnights);
 	this.shuffle($dataMapInfos, 'name', (element, index) => {
-		if (element) { if (element.id) element.orgId = element.id; }
+		// if (element) { if (element.id) };
 	}, (e) => {
 		const baseFilterRes = this.baseShuffleFilter(e, 'name');
-		let passes = true;
+		let passes = false;
 		if (e) {
 			if (e.id) {
-				passes = !excludedMapIds.includes(e.id);
+				passes = !excludedMapIds.includes(e.id) && !excludedMapIds.includes(parseInt(e.id, 10));
+
+				if (passes)	{
+					e.orgId = e.id;
+				}
 			}
 		}
-		return baseFilterRes && passes;
+		return (baseFilterRes && passes);
 	});
 };
 
@@ -196,27 +268,114 @@ MATTIE.randomiser.shuffleMaps = function () {
 	const that = this;
 	this.shuffleMapInfo();
 	this.idMappings = {};
+	this.doorMappings = {};
 	for (let index = 0; index < $dataMapInfos.length; index++) {
 		const e = $dataMapInfos[index];
 		if (e) {
-			this.idMappings[e.orgId] = e.id;
+			if (e.orgId) {
+				this.idMappings[e.orgId] = e.id;
+			}
 		}
 	}
 
 	if (!this.mapsCmdInited) {
 		const lastFunc = Game_Player.prototype.reserveTransfer;
-		Game_Player.prototype.reserveTransfer = function (baseMapId, x, y, d, fadeType) {
-			let mapId = that.idMappings[baseMapId];
+		Game_Player.prototype.reserveTransfer = function (baseMapId, x, y, d, fadeType, letBase = false) {
+			let mapId = false;
+			that.oldMapId = $gameMap.mapId();
+			that.oldX = $gamePlayer.x;
+			that.oldY = $gamePlayer.y;
+			that.baseMapId = baseMapId;
+			if (!letBase) {
+				mapId = that.idMappings[baseMapId];
+			}
+
 			if (!mapId) mapId = baseMapId;
+			if (!that.doorMappings[that.oldMapId]) that.doorMappings[that.oldMapId] = {};
+			if (!that.doorMappings[that.oldMapId][that.oldX]) that.doorMappings[that.oldMapId][that.oldX] = {};
+			if (!that.doorMappings[that.oldMapId][that.oldX][that.oldY]) that.doorMappings[that.oldMapId][that.oldX][that.oldY] = {};
 			return lastFunc.call(this, mapId, x, y, d, fadeType);
+		};
+
+		Game_Interpreter.prototype.command201 = function () {
+			if (!$gameParty.inBattle() && !$gameMessage.isBusy()) {
+				var mapId; var x; var
+					y;
+				if (this._params[0] === 0) { // Direct designation
+					mapId = this._params[1];
+					x = this._params[2];
+					y = this._params[3];
+				} else { // Designation with variables
+					mapId = $gameVariables.value(this._params[1]);
+					x = $gameVariables.value(this._params[2]);
+					y = $gameVariables.value(this._params[3]);
+				}
+				$gamePlayer.reserveTransfer(mapId, x, y, this._params[4], this._params[5], this._params[6]);
+				this.setWaitMode('transfer');
+				this._index++;
+			}
+			return false;
 		};
 
 		const lastPerform = Game_Player.prototype.performTransfer;
 		Game_Player.prototype.performTransfer = function () {
+			console.log(`mapid:${this._newMapId}\nx:${this._newX}\ny:${this._newY}`);
+			$gamePlayer.setTransparent(false);
+			const oldMap = $gameMap.mapId();
+			const x = $gamePlayer.x;
+			const y = $gamePlayer.y;
 			lastPerform.call(this);
 			setTimeout(() => {
-				const spot = MATTIE.betterCrowMauler.CrowController.prototype.findClosestSpawnPoint(this._newX, this._newY);
-				$gamePlayer.locate(spot.x, spot.y);
+				let realSpot;
+				if (Object.keys(that.doorMappings[that.oldMapId][that.oldX][that.oldY]).length <= 0) {
+					const spots = MATTIE.betterCrowMauler.CrowController.prototype.getAllTransferPointsOnMap();
+					const spot = spots[MATTIE.util.randBetween(0, spots.length - 1)];
+					if (spot) {
+						realSpot = MATTIE.betterCrowMauler.CrowController.prototype.findNearestPassablePoint(50, 50, spot.x, spot.y);
+					} else {
+						// eslint-disable-next-line max-len
+						realSpot = MATTIE.betterCrowMauler.CrowController.prototype.findNearestPassablePoint(50, 50, $gameMap.width() / 2, $gameMap.height() / 2);
+					}
+					realSpot.mapId = this._newMapId;
+					that.doorMappings[that.oldMapId][that.oldX][that.oldY] = realSpot;
+				} else {
+					realSpot = that.doorMappings[that.oldMapId][that.oldX][that.oldY];
+					this._newMapId = realSpot.mapId;
+				}
+
+				$gamePlayer.locate(realSpot.x, realSpot.y);
+				for (let x1 = -3; x1 < 3; x1++) {
+					for (let y1 = -3; y1 < 3; y1++) {
+						const events = $gameMap.eventsXy(realSpot.x + x1, realSpot.y + y1);
+						events.forEach((event) => {
+							if (event && event.list) {
+								event.event().pages.forEach((page) => {
+									page.list.forEach((cmd) => {
+										if (cmd.code === MATTIE.static.commands.transferId) {
+											const obj = {};
+											obj.x = x;
+											obj.y = y;
+											obj.mapId = $gameMap.lastMapId();
+											cmd.parameters[1] = $gameMap.lastMapId();
+											cmd.parameters[2] = x;
+											cmd.parameters[3] = y;
+											cmd.parameters[6] = true;
+											if (!that.doorMappings[$gameMap.mapId()]) that.doorMappings[$gameMap.mapId()] = {};
+											// eslint-disable-next-line max-len
+											if (!that.doorMappings[$gameMap.mapId()][realSpot.x + x1]) that.doorMappings[$gameMap.mapId()][realSpot.x + x1] = {};
+											// eslint-disable-next-line max-len
+											if (!that.doorMappings[$gameMap.mapId()][realSpot.x + x1][realSpot.y + y1]) { that.doorMappings[$gameMap.mapId()][realSpot.x + x1][realSpot.y + y1] = {}; }
+											that.doorMappings[$gameMap.mapId()][realSpot.x + x1][realSpot.y + y1] = obj;
+										// mapId = this._params[1];
+										// x = this._params[2];
+										// y = this._params[3];
+										}
+									});
+								});
+							}
+						});
+					}
+				}
 			}, 500);
 		};
 	}
@@ -268,7 +427,19 @@ MATTIE.randomiser.shuffleMaps = function () {
  * Note: This will break things given the knockout state and resist death state will be shuffled, they will need to be hardcoded to stay put.
  */
 MATTIE.randomiser.shuffleStates = function () {
-	this.shuffle($dataStates);
+	const excludedStates = [1, 13, 36];
+	this.shuffle($dataMapInfos, 'name', (element, index) => {
+		// if (element) { if (element.id) };
+	}, (e) => {
+		const baseFilterRes = this.baseShuffleFilter(e, 'name');
+		let passes = false;
+		if (e) {
+			if (e.id) {
+				passes = !excludedStates.includes(e.id) && !excludedStates.includes(parseInt(e.id, 10));
+			}
+		}
+		return (baseFilterRes && passes);
+	});
 };
 
 /**
@@ -283,12 +454,71 @@ MATTIE.randomiser.shuffleTilesets = function () {
  * @description only randomize in places where it will not cause major issues.
  */
 MATTIE.randomiser.safeShuffle = function () {
-	this.shuffleAnimations();
-	this.shuffleArmors();
-	this.shuffleClasses();
-	this.shuffleItems();
-	this.shuffleTroops();
-	this.shuffleWeapons();
+	const that = this;
+	if (MATTIE.randomiser.config.randomizeStates) this.shuffleStates();
+	if (MATTIE.randomiser.config.randomizeAnimations) this.shuffleAnimations();
+	if (MATTIE.randomiser.config.randomizeArmors) this.shuffleArmors();
+	if (MATTIE.randomiser.config.randomizeClasses) this.shuffleClasses();
+	if (MATTIE.randomiser.config.randomizeEnemies) this.shuffleEnemies();
+	if (MATTIE.randomiser.config.randomizeItems) this.shuffleItems();
+	if (MATTIE.randomiser.config.commonEvents) this.shuffleCommonEvents();
+	if (MATTIE.randomiser.config.randomizeMaps) {
+		this.shuffleMaps();
+		const bookOfLamps = new MATTIE.itemAPI.RunTimeItem();
+		bookOfLamps.addRecipe([11, 87, 98], 98);
+		bookOfLamps.addRecipeUnlock(11);
+		bookOfLamps.addRecipeUnlock(87);
+		bookOfLamps.setIconIndex(261);
+		bookOfLamps.setName('The Seven Lamps of Architecture');
+		bookOfLamps.setDescription('A book that emits the feeling of walls pressing in around you.\nWhen used in moderation can shift reality.');
+		bookOfLamps.setItemType(2); // set book
+		bookOfLamps.setCallback(() => {
+			SceneManager.goto(Scene_Map);
+			setTimeout(() => {
+				MATTIE.fxAPI.startScreenShake(10, 10, 5);
+				MATTIE.fxAPI.startScreenShake(10, 10, 50);
+				MATTIE.fxAPI.setupTint(100, 255, 100, 200, 10);
+				const keys = Object.keys(that.idMappings);
+
+				const mapId = that.idMappings[keys[MATTIE.util.randBetween(0, keys.length - 1)]];
+				$gamePlayer.reserveTransfer(mapId, $gameMap.width() / 2, $gameMap.height() / 2);
+				setTimeout(() => {
+					$gamePlayer.performTransfer();
+				}, 500);
+			}, 200);
+		});
+		bookOfLamps.spawn();
+		const exAltiora = new MATTIE.itemAPI.RunTimeItem();
+		exAltiora.addRecipe([11, 87, 98], 98);
+		exAltiora.addRecipeUnlock(11);
+		exAltiora.addRecipeUnlock(87);
+		exAltiora.setIconIndex(261);
+		exAltiora.setName('Ex Altiora');
+		exAltiora.setDescription('A virgil-style poem intermixed with intricate wood carvings of mountains.\nThe book evokes feelings of vertigo.');
+		exAltiora.setItemType(2); // set book
+		exAltiora.setCallback(() => {
+			SceneManager.goto(Scene_Map);
+			setTimeout(() => {
+				var vehicle = $gameMap.vehicle('airship');
+				if (vehicle) {
+					vehicle.setLocation($gameMap.mapId(), $gamePlayer.x, $gamePlayer.y);
+				}
+				$gamePlayer.getOnOffVehicle();
+			}, 500);
+		});
+		exAltiora.spawn();
+		const mapInit = Game_Map.prototype.initialize;
+		Game_Map.prototype.initialize = function () {
+			mapInit.call(this);
+			setTimeout(() => {
+				$gameParty.gainItem(bookOfLamps._data, 1, false);
+				$gameParty.gainItem(exAltiora._data, 1, false);
+			}, 500);
+		};
+	}
+	if (MATTIE.randomiser.config.randomizeSkills) this.shuffleSkills();
+	if (MATTIE.randomiser.config.randomizeTroops) this.shuffleTroops();
+	if (MATTIE.randomiser.config.randomizeWeapons) this.shuffleWeapons();
 };
 
 MATTIE.randomiser.randomise = function () {

@@ -165,17 +165,21 @@ MATTIE.betterCrowMauler.CrowController = class {
 		if ($gameMap) {
 			arr = $gameMap.events().filter((event) => {
 				if (event.event()) {
-					const page = event.event().pages[event._pageIndex];
-					if (page) {
-						const list = page.list.map((cmd) => cmd.code);
-						const commonEvents = page.list.filter((cmd) => cmd.code === MATTIE.static.commands.commonEventid);
-						if (commonEvents.length > 0) {
-							return list.includes(MATTIE.static.commands.transferId)
-						&& !list.includes(MATTIE.static.commands.battleProcessingId)
-						&& commonEvents.filter((cmd) => cmd.parameters[0] === 104).length > 0; // has room change common event
+					return event.event().pages.some((page) => {
+						if (page) {
+							const list = page.list.map((cmd) => cmd.code);
+							const commonEvents = page.list.filter((cmd) => cmd.code === MATTIE.static.commands.commonEventid);
+							const hasPhaseStep = page.list.some((cmd) => (cmd.code == 121 && cmd.parameters[0] == MATTIE.static.switch.phaseStep));
+							console.log(`PhaseStep${hasPhaseStep}`);
+							if (hasPhaseStep) return false;
+							if (commonEvents.length > 0) {
+								return list.includes(MATTIE.static.commands.transferId)
+							&& !list.includes(MATTIE.static.commands.battleProcessingId)
+							&& commonEvents.filter((cmd) => cmd.parameters[0] === 104).length > 0; // has room change common event
+							}
 						}
-					}
-					return false;
+						return false;
+					});
 				}
 				return false;
 			});
@@ -202,14 +206,45 @@ MATTIE.betterCrowMauler.CrowController = class {
 				const element = spawnPoints[index];
 				const thisDist = MATTIE.util.getDist(x, element.x, y, element.y);
 				if (thisDist < dist) {
-					if (MATTIE.isPassableAnyDir(element)) {
-						dist = thisDist;
-						closest = element;
+					for (let x1 = -2; x1 < 2; x1++) {
+						for (let y1 = -2; y1 < 2; y1++) {
+							if (MATTIE.isPassableAnyDir(element)) {
+								dist = thisDist;
+								closest = element;
+							}
+						}
 					}
 				}
 			}
 		}
 		return closest;
+	}
+
+	findNearestPassablePoint(X, Y, centerX, centerY, dist = 5) {
+		const max = (Math.max(X, Y) ** 2);
+
+		let x = 0;
+		let y = 0;
+		let dx = 0;
+		let t = 0;
+		let dy = -1;
+		for (let index = 0; index < max; index++) {
+			// console.log(index);
+			if ((-X / 2 < x <= X / 2) && (-Y / 2 < y <= Y / 2)) {
+				const obj = {};
+				obj.x = x + centerX;
+				obj.y = y + centerY;
+				if (MATTIE.isPassableAnyDir(obj)) return obj;
+			}
+			if (x == y || (x < 0 && x == -y) || (x > 0 && x == 1 - y)) {
+				t = dx;
+				dx = -dy;
+				dy = t;
+			}
+			x += dx;
+			y += dy;
+		}
+		return { x: X, y: Y };
 	}
 
 	/**
@@ -236,7 +271,8 @@ MATTIE.betterCrowMauler.CrowController = class {
 		this.timeElapsed = 0;
 		if (!this.hasSpawned && !this.isDead() && !$gameParty.inBattle()) {
 			this.onScreen = true;
-			const spot = this.findClosestSpawnPoint($gamePlayer.x, $gamePlayer.y);
+			const s = this.findClosestSpawnPoint($gamePlayer.x, $gamePlayer.y);
+			const spot = this.findNearestPassablePoint(15, 15, s.x, s.y);
 			if (spot) {
 				this.self = this.createCrowObj();
 				this.self.spawn(spot.x, spot.y);

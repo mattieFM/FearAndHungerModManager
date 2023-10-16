@@ -133,6 +133,8 @@ MATTIE.static.switch.ignoredSwitches = [];
 MATTIE.static.switch.syncedSwitches = [];
 MATTIE.static.switch.godAffinitySwitches = [];
 
+/** @description the id of phase step switch */
+MATTIE.static.switch.phaseStep = 2844;
 /** @description true if the player has been to the mines or thicket */
 MATTIE.static.switch.crowMaulerCanSpawn = 0;
 /** @description true if the crow mauler is dead */
@@ -141,15 +143,17 @@ MATTIE.static.switch.crowMaulerDead = 0;
 MATTIE.static.switch.crowMaulerDisabled = 0;
 
 /** @description the switch that handles most coin flip instant kill / grab attack */
-MATTIE.static.switch.neckBreak = 0;
+MATTIE.static.switch.neckBreak = 16;
 
 /** @description the switch tht handles en garde extra turn */
-MATTIE.static.switch.backstab = 0;
+MATTIE.static.switch.backstab = 1045;
 
 MATTIE.static.switch.justGuard = 1281;
 
 /** @description the switch that handles changing enemy health in harder mods */
-MATTIE.static.switch.toughEnemyMode = 0;
+MATTIE.static.switch.toughEnemyMode = 3155;
+/** @description the switch for when the player is talking */
+MATTIE.static.switch.talk = 52;
 
 // selfSwitch ids
 MATTIE.static.switch.syncedSelfSwitches = [];
@@ -161,8 +165,8 @@ MATTIE.static.states.knockout = 0;
 /** @description block teh enemy from acting for one round */
 MATTIE.static.states.cantDoShitOnce = 36;
 
-/** @description block teh enemy from acting for ever round */
-MATTIE.static.states.cantDoShitOnce = 13;
+/** @description block teh enemy from acting for every round */
+MATTIE.static.states.cantDoShit = 13;
 
 /** @description state that makes host not die */
 MATTIE.static.states.resistDeath = 91;
@@ -187,6 +191,9 @@ MATTIE.static.troops.greaterBlightId = 191;
 MATTIE.static.troops.blightId = 185;
 MATTIE.static.troops.moldedId = 178;
 MATTIE.static.troops.torturerId = 17;
+MATTIE.static.troops.nightLurch = 149;
+MATTIE.static.troops.infectedNightLurch = 187;
+MATTIE.static.troops.greaterMumbler = 193;
 MATTIE.static.troops.moonlessGaurdId = 117;
 MATTIE.static.troops.isayahId = 138;
 MATTIE.static.troops.seymor = 205;
@@ -201,6 +208,8 @@ MATTIE.static.troops.ragnId = 120;
 MATTIE.static.troops.oldKnightId = 21;
 MATTIE.static.troops.whiteAngelId = 100;
 MATTIE.static.troops.doubleHeadedCrowId = 135;
+MATTIE.static.troops.butterFlyId = 9;
+MATTIE.static.troops.tripleCrow = 27;
 MATTIE.static.troops.crowMaulerId = 51;
 MATTIE.static.troops.secretId = 0; // enki marraige
 MATTIE.static.troops.namelessId = 97;
@@ -210,7 +219,7 @@ MATTIE.static.troops.skinGrannyId = 109;
 MATTIE.static.troops.fancoisId = 115;
 MATTIE.static.troops.chambaraId = 75;
 MATTIE.static.troops.valteilId = 110;
-MATTIE.static.troops.gorothId = 170;
+MATTIE.static.troops.gorothId = 169;
 MATTIE.static.troops.sylvianId = 210;
 MATTIE.static.troops.griffithId = 126;
 MATTIE.static.troops.GOFAHID = 130;
@@ -272,9 +281,7 @@ MATTIE.static.update = function () {
 
 		MATTIE.static.switch.crowMaulerCanSpawn = 786;
 		MATTIE.static.switch.crowMaulerDead = 771;
-		MATTIE.static.switch.neckBreak = 16;
-		MATTIE.static.switch.backstab = 1045;
-		MATTIE.static.switch.toughEnemyMode = 3155;
+
 		MATTIE.static.switch.crowMaulerDisabled = 2953;
 
 		MATTIE.static.switch.legardAliveSwitch = 1016;
@@ -303,12 +310,91 @@ MATTIE.static.update = function () {
 			130, // dungoen knights
 			61, // unused hexen map
 			64, // unused test map
+			170,
+			161, // dungeon menu
+			33,
+			181,
 
 		];
 
 		MATTIE.static.blockingMaps = [
+			132,
+			122,
+			131,
+			153,
+			160,
+			185,
+			40,
+			10,
+			86,
+			139,
+			129,
+			147,
+			98,
+			14,
+			130,
+			88,
+			89,
+			62,
+			15,
+			137,
+			66,
+			124,
 			156,
 			64,
+			161,
+			1,
+			162,
+			104,
+			170,
+			168,
+			138,
+			137,
+			54,
+			32,
+			7,
+			9,
+			13,
+			25,
+			140,
+			152,
+			144,
+			28,
+			12,
+			186,
+			163,
+			159,
+			91,
+			15,
+			50,
+			72,
+			94,
+
+		];
+
+		MATTIE.static.dungeonKnights = [
+			161,
+			158,
+			165,
+			166,
+			167,
+			162,
+			168,
+			169,
+			176,
+			177,
+			170,
+			171,
+			172,
+
+			174,
+			175,
+			178,
+			179,
+			173,
+			180,
+			181,
+
 		];
 		MATTIE.static.maps.charCreationMap = 2;
 		MATTIE.static.maps.startMap = 10;

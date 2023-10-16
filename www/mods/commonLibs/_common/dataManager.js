@@ -157,8 +157,8 @@ MATTIE.DataManager.global.get = function (key) {
  * @returns {bool} if there is already a file at the dest location
  */
 MATTIE.DataManager.addFileToImgFolder = function (orgFilePath, destPath, name, name2 = null, force = false, deleteOrg = false) {
-	if (!name.endsWith('.png'))name += '.png';
-	if (name2) if (!name2.endsWith('.png')) name2 += '.png';
+	if (!name.endsWith('.png') && !name.endsWith('.PNG'))name += '.png';
+	if (name2) if (!name2.endsWith('.png') && !name2.endsWith('.PNG')) name2 += '.png';
 	const fs = require('fs');
 	const path = require('path');
 	const src = path.dirname(process.mainModule.filename);
