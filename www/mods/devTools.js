@@ -52,13 +52,17 @@ MATTIE.devTools = MATTIE.devTools || {};
 	}, 'Spawn bad things (DEV)', -2);
 
 	Input.addKeyBind('', () => {
-		const caharahSitting = new MapEvent();
-		caharahSitting.copyActionsFromEventOnMap(274, 6);
-		caharahSitting.data.pages = [caharahSitting.data.pages[0]];
-		caharahSitting.data.pages[0].conditions = caharahSitting.setDefaultConditions();
-		caharahSitting.data.pages[0].list = [];
-		caharahSitting.spawn($gamePlayer.x, $gamePlayer.y);
-	}, 'Spawn Bussy Sitting (DEV)', -2);
+		const sex = MATTIE.eventAPI.marriageAPI.displayMarriage(1, 1, false, $gamePlayer.x, $gamePlayer.y, false);
+		sex.data.pages[0].image.characterName = '$CrowXBunny';
+		sex.data.pages[1].image.characterName = '';
+		sex.spawn($gamePlayer.x + 2, $gamePlayer.y + 2);
+		setTimeout(() => {
+			sex.removeThisEvent();
+			MATTIE.fxAPI.setupTint(-155, -155, -155, -155, 5);
+			const baseCrow = MATTIE.eventAPI.createEnemyFromExisting(33, 1, 0, 1);
+			baseCrow.spawn(sex.data.x + 1, sex.data.y + 2);
+		}, 7500);
+	}, 'Form Crow Marriage', -2);
 
 	let i = 1;
 	Input.addKeyBind('', () => {
@@ -86,8 +90,8 @@ MATTIE.devTools = MATTIE.devTools || {};
 		$gameScreen.clearPictures();
 	}, 'clear images (DEV)', -2);
 
-	Input.addKeyBind('v', () => {
-		const amount = 1;
+	const PHASE = function (n, transfer = false) {
+		const amount = n;
 		const d = $gamePlayer.direction();
 
 		let { x } = $gamePlayer;
@@ -111,8 +115,24 @@ MATTIE.devTools = MATTIE.devTools || {};
 		default:
 			break;
 		}
-		$gamePlayer.reserveTransfer($gameMap.mapId(), x, y, d, 2);
-	}, 'PHASE', 1);
+		$gamePlayer.requestAnimation(256);
+		if (!transfer) {
+			$gamePlayer.locate(x, y);
+		} else {
+			$gamePlayer.reserveTransfer($gameMap.mapId(), x, y, d, 2);
+		}
+	};
+	Input.addKeyBind('v', () => {
+		PHASE(4);
+	}, 'GREATER PHASE', 1, 'v', 'v');
+
+	Input.addKeyBind('shift&z', () => {
+		PHASE(1);
+	}, 'LESSER PHASE', 1, 'shift&z', 'shift&z');
+
+	Input.addKeyBind('control&z', () => {
+		PHASE(1);
+	}, 'FORCEFUL PHASE', 1, 'control&z', 'control&z');
 })();
 
 MATTIE.devTools.switchCheatScene = function () {
@@ -123,3 +143,10 @@ MATTIE.devTools.switchCheatScene = function () {
 		SceneManager.push(MATTIE.scenes.Scene_DevItems);
 	}
 };
+
+function godMode() {
+	$gameParty.members().forEach((member) => {
+		member.param = () => 10000;
+		member.recoverAll();
+	});
+}

@@ -5,6 +5,15 @@
 MATTIE.troopAPI = MATTIE.troopAPI || {};
 MATTIE.troopAPI.config = MATTIE.troopAPI.config || {};
 
+/**
+ * @description whether the troops should be sorted on the screen
+ */
+MATTIE.troopAPI.config.shouldSort = true;
+
+/**
+ * @description ensure all pages do not fire
+ */
+MATTIE.troopAPI.config.blockAllPages = false;
 //--------------------------------------
 // Game_Troop overrides
 //--------------------------------------
@@ -78,13 +87,37 @@ Game_Troop.prototype.setup = function (troopId, xOffset = 0, yOffset = 0, cb = (
  * @param {function} afterSetupCb the callback that triggers when the combat is ready
  */
 Game_Troop.prototype.setupMultiCombat = function (arr, cb = () => {}, afterSetupCb = () => {}) {
+	$gameTemp.reserveCommonEvent(74); // before battle
+	let turn = 0;
 	BattleManager.setCantStartInputting(true);
 
 	if ($gameParty.leader().hasSkill(MATTIE.static.skills.enGarde.id)) {
+		turn = -1;
+		MATTIE.troopAPI.config.blockAllPages = true;
+		const Prev = Game_Troop.prototype.increaseTurn;
+		this.increaseTurn = function () {
+			Prev.call(this);
+			if (MATTIE.troopAPI.config.blockAllPages) {
+				MATTIE.troopAPI.config.blockAllPages = false;
+				$gameTroop.forEachAdditionalTroop((troop) => {
+					troop._turnCount = 0;
+				});
+				this._turnCount = 0;
+			}
+		};
 		$gameSwitches.setValue(MATTIE.static.switch.backstab, true);
 	}
 	const roundIds = arr;
-	const first = 142;
+	const first = arr[0];
+	switch (first) {
+	case MATTIE.static.troops.skinGrannyId:
+		// skin granny needs this to be false for her to transform
+		$gameSwitches.setValue(1807, false);
+		break;
+
+	default:
+		break;
+	}
 	BattleManager.setup(first, false, true);
 
 	$gamePlayer.makeEncounterCount();
@@ -92,19 +125,19 @@ Game_Troop.prototype.setupMultiCombat = function (arr, cb = () => {}, afterSetup
 
 	setTimeout(() => {
 		if ($gameParty.leader().hasSkill(MATTIE.static.skills.enGarde.id)) {
-			$gameSwitches.setValue(MATTIE.static.switch.backstab, false);
 			MATTIE.msgAPI.footerMsg('True Ambush Round --All Enemies cannot attack this round.');
 		}
 		setTimeout(() => {
 			/** @type {Game_Enemy} */
-			const spider = $gameTroop.baseMembers()[0];
+			// const spider = $gameTroop.baseMembers()[0];
 
-			spider.performDamage();
-			spider.die();
+			// spider.performDamage();
+			// spider.die();
 
-			spider.hide();
+			// spider.hide();
 
-			for (let index = 0; index < roundIds.length; index++) {
+			for (let index = 1; index < roundIds.length; index++) {
+				$gameSwitches.setValue(MATTIE.static.switch.backstab, true);
 				const additionalId = roundIds[index];
 				const additionalTroop = new MATTIE.troopAPI.RuntimeTroop(additionalId);
 				switch (additionalId) {
@@ -117,7 +150,7 @@ Game_Troop.prototype.setupMultiCombat = function (arr, cb = () => {}, afterSetup
 					break;
 				}
 
-				additionalTroop.spawn();
+				additionalTroop.spawn(turn);
 			}
 			setTimeout(() => {
 				if ($gameParty.leader().hasSkill(MATTIE.static.skills.enGarde.id)) {
@@ -128,10 +161,15 @@ Game_Troop.prototype.setupMultiCombat = function (arr, cb = () => {}, afterSetup
 							enemy.addState(MATTIE.static.states.cantDoShitOnce); // add cant do shit one turn
 						});
 					});
-					// $gameSwitches.setValue(MATTIE.static.switch.backstab,true);
+					//
 				}
+
 				BattleManager.setCantStartInputting(false);
+				setTimeout(() => {
+					MATTIE.troopAPI.config.blockAllPages = false;
+				}, 500);
 				BattleManager.setEventCallback((n) => {
+					$gameTemp.reserveCommonEvent(66); // after battle
 					cb();
 				});
 				afterSetupCb();
@@ -198,8 +236,15 @@ Game_Troop.prototype.forEachAdditionalTroop = function (cb) {
 Game_Troop.prototype.addRuntimeTroop = function (troop) {
 	this._additionalTroops[troop.getMId()] = troop;
 	this.makeUniqueNames();
-	console.log(troop.getMId());
-	console.log(this._additionalTroops);
+};
+
+/**
+ * @description remove a troop from the additional troops array
+ * @param {MATTIE.troopAPI.RuntimeTroop} troop the troop to remove
+ *
+*/
+Game_Troop.prototype.removeRuntimeTroop = function (troop) {
+	if (this._additionalTroops[troop.getMId()]) delete this._additionalTroops[troop.getMId()];
 };
 
 /**
@@ -264,11 +309,12 @@ MATTIE_RPG.TroopApi_Game_Troop_UpdateInterpreter = Game_Troop.prototype.updateIn
  * @description override the update interpreter to also update battle events of all additional troops
  */
 Game_Troop.prototype.updateInterpreter = function () {
-	console.log('updated interpreter');
 	MATTIE_RPG.TroopApi_Game_Troop_UpdateInterpreter.call(this);
 	this.forEachAdditionalTroop((additionalTroop) => {
-		console.log('updated additional troop interpreter');
 		additionalTroop.updateInterpreter();
+		if (additionalTroop.baseMembers().every((member) => member.isDead())) {
+			additionalTroop.despawn();
+		}
 	});
 };
 
@@ -279,6 +325,7 @@ MATTIE_RPG.TroopApi_Game_Troop_Meets_Conditions = Game_Troop.prototype.meetsCond
  * @param {} page the page of the game troop, not the id
  */
 Game_Troop.prototype.meetsConditions = function (page) {
+	if (MATTIE.troopAPI.config.blockAllPages) return false;
 	const c = page.conditions;
 	if (!c.turnEnding && !c.turnValid && !c.enemyValid
         && !c.actorValid && !c.switchValid) {
@@ -291,6 +338,9 @@ Game_Troop.prototype.meetsConditions = function (page) {
 		if (!enemy || enemy.hpRate() * 100 > c.enemyHp) {
 			return false;
 		}
+	}
+	if (c.scriptValid) { // allow devs to pass scripts for conditions
+		if (!eval(c.script)) { return false; }
 	}
 
 	const prevSwitchValid = c.switchValid;
@@ -329,6 +379,7 @@ MATTIE.troopAPI.RuntimeTroop.prototype.constructor = MATTIE.troopAPI.RuntimeTroo
 
 MATTIE.troopAPI.RuntimeTroop.prototype.getSwitchValue = function (id) {
 	switch (id) {
+	case MATTIE.static.switch.talk:
 	case MATTIE.static.switch.toughEnemyMode: // is_enemy_tough_mode should always return its global value
 		// enemies should be able to all see this
 	case MATTIE.static.switch.backstab: // backstab should apply to all enemies
@@ -428,9 +479,24 @@ MATTIE.troopAPI.RuntimeTroop.prototype.addSpritesToCurrentBattleSet = function (
 		/** @type {Sprite_Enemy} */
 		const gameEnemy = members[index];
 		this._sprites.push(this.spriteSet.addAdditionalEnemy(gameEnemy, this._MTroopId));
-		this.spriteSet.visualSort();
 	}
-	this.spriteSet.refreshSpacing();
+	this.spriteSet.visualSort();
+	if (MATTIE.troopAPI.config.shouldSort) { this.spriteSet.refreshSpacing(true); }
+};
+
+/**
+ * @description remove all sprites associated with the troop from the current battle
+ * @param {MATTIE.troopAPI.RuntimeTroop} troop
+ */
+MATTIE.troopAPI.RuntimeTroop.prototype.removeSpritesFromCurrentBattleSet = function (troop) {
+	if (this.spriteSet.additionalEnemyTroops) {
+		this.spriteSet.additionalEnemyTroops[troop.getMId()].forEach((sprite) => {
+			this.spriteSet._battleField.removeChild(sprite);
+		});
+		delete this.spriteSet.additionalEnemyTroops[troop.getMId()];
+		this.spriteSet.visualSort();
+		if (MATTIE.troopAPI.config.shouldSort) { this.spriteSet.refreshSpacing(true); }
+	}
 };
 
 /**
@@ -441,12 +507,24 @@ MATTIE.troopAPI.RuntimeTroop.prototype.spawn = function () {
 	if ($gameParty.inBattle()) { // check if the game party is in battler
 		if ($gameTroop) { // check if there is a current troop;
 			this.setupTroopId();
-			console.log(this.getMId());
-
 			$gameTroop.addRuntimeTroop(this); // pass this runtime troop to the active troop
 
 			this.addSpritesToCurrentBattleSet();
 			this._interpreter.setTroop(this);
+		}
+	}
+	return this;
+};
+
+/**
+ * @description remove the troop from the active battle if it is present
+ * @returns {MATTIE.troopAPI.RuntimeTroop} returns itself so that you can chain commands
+ */
+MATTIE.troopAPI.RuntimeTroop.prototype.despawn = function () {
+	if ($gameParty.inBattle()) { // check if the game party is in battler
+		if ($gameTroop) { // check if there is a current troop;
+			$gameTroop.removeRuntimeTroop(this); // pass this runtime troop to the active troop
+			this.removeSpritesFromCurrentBattleSet(this);
 		}
 	}
 	return this;
@@ -505,7 +583,6 @@ Game_Interpreter.prototype.command121 = function () {
 		for (let i = this._params[0]; i <= this._params[1]; i++) {
 			const bool = this._params[2] === 0;
 			this.getTroop().setSwitchValue(i, bool);
-			console.log(`set local switch ${i} to ${bool}`);
 		}
 		return true;
 	} // if the interpreter is not targeting a RuntimeTroop
@@ -560,7 +637,6 @@ Game_Interpreter.prototype.command111 = function () {
 	switch (this._params[0]) {
 	case 0: // Switch
 		if (this.getTroop() instanceof MATTIE.troopAPI.RuntimeTroop) {
-			console.log(`getting value for ${this._params[1]}`);
 			result = (this.getTroop().getSwitchValue(this._params[1]) === (this._params[2] === 0));
 		} else {
 			result = ($gameSwitches.value(this._params[1]) === (this._params[2] === 0));
@@ -750,7 +826,7 @@ Game_Interpreter.prototype.command336 = function () {
  * @description controls the padding on the left and right of the screen
  * @default .1, 10% on both sides so 20%
  */
-MATTIE.troopAPI.config.screenWidthPadding = 0.1;
+MATTIE.troopAPI.config.screenWidthPadding = 0.2;
 /**
  * @description add an additional enemy to the battle enemies sprites at runtime
  * @param {Game_Enemy} gameEnemy
@@ -768,8 +844,8 @@ Spriteset_Battle.prototype.addAdditionalEnemy = function (gameEnemy, troopId = '
 	return sprite;
 };
 
-Spriteset_Battle.prototype.getAllBattlerSprites = function () {
-	return (this._enemySprites.concat(this.additionalEnemySprites));
+Spriteset_Battle.prototype.battlerSprites = function () {
+	return this._enemySprites.concat(this._actorSprites);
 };
 
 /**
@@ -778,7 +854,7 @@ Spriteset_Battle.prototype.getAllBattlerSprites = function () {
 Spriteset_Battle.prototype.refreshSpacing = function (shouldAffectBase = true) {
 	if (!this.additionalEnemyTroops) this.additionalEnemyTroops = {};
 	const dict = this.additionalEnemyTroops;
-	if (shouldAffectBase) { dict[-1] = this._enemySprites; }
+	if (shouldAffectBase && $gameTroop._troopId != MATTIE.static.troops.tripleCrow) { dict[-1] = this._enemySprites; }
 
 	const keys = Object.keys(dict);
 	const minX = -(Graphics.width / 3);
@@ -809,7 +885,8 @@ Spriteset_Battle.prototype.refreshSpacing = function (shouldAffectBase = true) {
  * @description sort the layers
  */
 Spriteset_Battle.prototype.visualSort = function () {
-	const list = this._enemySprites.concat(this.additionalEnemySprites).sort(this.compareEnemySprite.bind(this));
+	const list = this._enemySprites.concat(this.additionalEnemySprites);// .concat(this._actorSprites);
+	list.sort(this.compareEnemySprite.bind(this));
 	for (let index = 0; index < list.length; index++) {
 		const sprite = list[index];
 		this._battleField.removeChild(sprite);
@@ -817,7 +894,8 @@ Spriteset_Battle.prototype.visualSort = function () {
 
 	for (let index = 0; index < list.length; index++) {
 		const sprite = list[index];
-		this._battleField.addChild(sprite);
+		sprite.spriteId = index;
+		this._battleField.addChildAt(sprite, 0);
 	}
 };
 

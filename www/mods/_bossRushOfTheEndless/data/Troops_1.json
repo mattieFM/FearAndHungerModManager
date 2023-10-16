@@ -1,0 +1,167 @@
+[
+    "MGS_UN_DEF",
+    "MGS_UN_DEF",
+    "MGS_UN_DEF",
+    "MGS_UN_DEF",
+    "MGS_UN_DEF",
+    "MGS_UN_DEF",
+    "MGS_UN_DEF",
+    "MGS_UN_DEF",
+    "MGS_UN_DEF",
+    "MGS_UN_DEF",
+    "MGS_UN_DEF",
+    "MGS_UN_DEF",
+    "MGS_UN_DEF",
+    "MGS_UN_DEF",
+    "MGS_UN_DEF",
+    "MGS_UN_DEF",
+    "MGS_UN_DEF",
+    "MGS_UN_DEF",
+    "MGS_UN_DEF",
+    "MGS_UN_DEF",
+    "MGS_UN_DEF",
+    "MGS_UN_DEF",
+    "MGS_UN_DEF",
+    "MGS_UN_DEF",
+    "MGS_UN_DEF",
+    "MGS_UN_DEF",
+    "MGS_UN_DEF",
+    {
+        "id": 27,
+        "pages": [
+										"MGS_UN_DEF",
+										"MGS_UN_DEF",
+										"MGS_UN_DEF",
+										"MGS_UN_DEF",
+										"MGS_UN_DEF",
+										"MGS_UN_DEF",
+										"MGS_UN_DEF",
+										"MGS_UN_DEF",
+										"MGS_UN_DEF",
+										"MGS_UN_DEF",
+													
+            {
+                "conditions": {
+                    "scriptValid": true,
+                    "script": "(this.baseMembers()[5].isStateAffected(1) && this.baseMembers()[6].isStateAffected(1) && this.baseMembers()[7].isStateAffected(1))",
+                    "actorHp": 50,
+                    "actorId": 1,
+                    "actorValid": false,
+                    "enemyHp": 100,
+                    "enemyIndex": 0,
+                    "enemyValid": true,
+                    "switchId": 1,
+                    "switchValid": false,
+                    "turnA": 0,
+                    "turnB": 0,
+                    "turnEnding": false,
+                    "turnValid": false
+                },
+                "list": [
+                    {
+                        "code": 108,
+                        "indent": 0,
+                        "parameters": [
+                            "knockout on heads killed"
+                        ]
+                    },
+                    {
+                        "code": 111,
+                        "indent": 0,
+                        "parameters": [
+                            5,
+                            5,
+                            1,
+                            1
+                        ]
+                    },
+                    {
+                        "code": 111,
+                        "indent": 1,
+                        "parameters": [
+                            5,
+                            6,
+                            1,
+                            1
+                        ]
+                    },
+                    {
+                        "code": 111,
+                        "indent": 2,
+                        "parameters": [
+                            5,
+                            7,
+                            1,
+                            1
+                        ]
+                    },
+                    {
+                        "code": 333,
+                        "indent": 3,
+                        "parameters": [
+                            0,
+                            1,
+                            91
+                        ]
+                    },
+                    {
+                        "code": 333,
+                        "indent": 3,
+                        "parameters": [
+                            -1,
+                            0,
+                            1
+                        ]
+                    },
+                    {
+                        "code": 331,
+                        "indent": 3,
+                        "parameters": [
+                            -1,
+                            1,
+                            0,
+                            9999,
+                            true
+                        ]
+                    },
+                    {
+                        "code": 0,
+                        "indent": 3,
+                        "parameters": []
+                    },
+                    {
+                        "code": 412,
+                        "indent": 2,
+                        "parameters": []
+                    },
+                    {
+                        "code": 0,
+                        "indent": 2,
+                        "parameters": []
+                    },
+                    {
+                        "code": 412,
+                        "indent": 1,
+                        "parameters": []
+                    },
+                    {
+                        "code": 0,
+                        "indent": 1,
+                        "parameters": []
+                    },
+                    {
+                        "code": 412,
+                        "indent": 0,
+                        "parameters": []
+                    },
+                    {
+                        "code": 0,
+                        "indent": 0,
+                        "parameters": []
+                    }
+                ],
+                "span": 1
+            }
+        ]
+    }
+]

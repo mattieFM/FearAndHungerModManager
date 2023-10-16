@@ -133,7 +133,8 @@ Input.addKeyBind = function (key, cb, name = '', scope = 0, wasdDefualt = null, 
 
 	if (typeof defaultKey === 'number') key = String.fromCharCode(defaultKey);
 	if (!key) {
-		if (defaultKey && !Input.keyMapper[defaultKey.toUpperCase().charCodeAt(0)]) {
+		if (defaultKey && !Input.keyMapper[defaultKey.toUpperCase().charCodeAt(0)]
+		|| (defaultKey && Input.keyMapper[defaultKey.toUpperCase().charCodeAt(0)] == defaultKey) && defaultKey != null) {
 			key = defaultKey;
 		} else {
 			key = String.fromCharCode(i);
@@ -238,7 +239,12 @@ MATTIE.isPassableAnyDir = function (event) {
 	const dirs = [2, 4, 6, 8]; // dir 4 dirsections
 	for (let index = 0; index < dirs.length; index++) {
 		const dir = dirs[index];
-		if (event.canPass(event.x, event.y, dir)) return true;
+		if (
+			$gamePlayer.canPass(event.x, event.y, dir)
+			&& $gamePlayer.isMapPassable(event.x, event.y, dir)
+			&& !$gamePlayer.isCollided(event.x, event.y)
+			&& $gameMap.isPassable(event.x, event.y, dir)
+		) return true;
 	}
 	return false;
 };

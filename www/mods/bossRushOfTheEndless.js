@@ -31,23 +31,23 @@ MATTIE.bossRush = MATTIE.bossRush || {};
 
 	/** @description an array of the ids of fights */
 	MATTIE.bossRush.fights = [
-		[MATTIE.static.troops.salmonSnakeId, MATTIE.static.troops.blackWitchId],
+		[MATTIE.static.troops.salmonSnakeId, MATTIE.static.troops.blackWitchId, MATTIE.static.troops.butterFlyId],
 		[MATTIE.static.troops.caveMotherId, MATTIE.static.troops.harvestManId, MATTIE.static.troops.bodySnatcherId],
 		[MATTIE.static.troops.redManId, MATTIE.static.troops.greaterBlightId, MATTIE.static.troops.blightId, MATTIE.static.troops.moldedId],
 		[MATTIE.static.troops.torturerId, MATTIE.static.troops.moonlessGaurdId],
-		[MATTIE.static.troops.isayahId, MATTIE.static.troops.ironShakespeareId],
+		[MATTIE.static.troops.isayahId, MATTIE.static.troops.ironShakespeareId, MATTIE.static.troops.infectedNightLurch, MATTIE.static.troops.greaterMumbler],
 		[MATTIE.static.troops.knightSpectorId, MATTIE.static.troops.gauntKnightId, MATTIE.static.troops.oldKnightId],
-		[MATTIE.static.troops.crowMaulerId, MATTIE.static.troops.doubleHeadedCrowId],
-		[MATTIE.static.troops.namelessId, MATTIE.static.troops.oldGuardianId, MATTIE.static.troops.lizardMageId],
+		[MATTIE.static.troops.tripleCrow, MATTIE.static.troops.crowMaulerId, MATTIE.static.troops.doubleHeadedCrowId],
+		[MATTIE.static.troops.namelessId, MATTIE.static.troops.oldGuardianId, MATTIE.static.troops.lizardMageId, 195],
+		[MATTIE.static.troops.enkiId, MATTIE.static.troops.caharaId, MATTIE.static.troops.darceId, MATTIE.static.troops.ragnId, MATTIE.static.troops.whiteAngelId],
 		[MATTIE.static.troops.skinGrannyId, MATTIE.static.troops.fancoisId, MATTIE.static.troops.chambaraId, MATTIE.static.troops.valteilId],
-		[MATTIE.static.troops.gorothId, MATTIE.static.troops.sylvianId, MATTIE.static.troops.griffithId, MATTIE.static.troops.GOFAHID],
+		[MATTIE.static.troops.GOFAHID, MATTIE.static.troops.gorothId, MATTIE.static.troops.sylvianId, MATTIE.static.troops.griffithId],
 	];
 
-	MATTIE.bossRush.currentFightIndex = 8;
+	MATTIE.bossRush.currentFightIndex = 0;
 
 	/** @description the method to handle the boss rush functionality */
 	function rush() {
-		MATTIE.bossRush.currentFightIndex = 8; // reset rush
 		if (!$gameParty.leader().isDead() && !(SceneManager._scene instanceof Scene_Gameover)) {
 			startNextFight(() => {
 				$gameMessage.clear();
@@ -191,6 +191,7 @@ MATTIE.bossRush = MATTIE.bossRush || {};
 							startNextFight();
 							break;
 						case 1: // read every page
+							MATTIE.bossRush.currentFightIndex = 0; // reset rush
 							rush();
 							break;
 						default:
@@ -264,8 +265,14 @@ MATTIE.bossRush = MATTIE.bossRush || {};
 	let rewardBook = new MATTIE.itemAPI.RunTimeItem();
 	rewardBook.setIconIndex(14);
 	rewardBook.setName('Book of Futility');
-	rewardBook.setDescription('A very old book, its cover displays a very faded\nsymbol of goroth, it contains one page.');
+	rewardBook.setDescription('A very old book, its cover displays a very faded\nsymbol of gol gro-goroth, it contains one page.');
 	rewardBook.setItemType(2); // set book
 	rewardBook.setCallback(onUseVictoryBook);
 	rewardBook.spawn();
+
+	MATTIE.sceneGameIOver = Scene_Gameover.prototype.initialize;
+	Scene_Gameover.prototype.initialize = function () {
+		MATTIE.sceneGameIOver.call(this);
+		MATTIE.bossRush.currentFightIndex = 0;
+	};
 })();

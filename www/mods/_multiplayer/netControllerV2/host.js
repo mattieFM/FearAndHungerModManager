@@ -141,7 +141,10 @@ class HostController extends BaseNetController {
 		const dict = {};
 		for (key in this.netPlayers) {
 			if (key != recipientId) {
-				dict[key] = this.netPlayers[key].getCoreData(); // add all but the recipient
+				if (this.netPlayers[key]) {
+					console.log(this.netPlayers[key]);
+					dict[key] = this.netPlayers[key].getCoreData();
+				} // add all but the recipient
 			}
 		}
 

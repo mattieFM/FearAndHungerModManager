@@ -119,17 +119,26 @@ class Asset {
 	 * @param {Object|any} element2 first element
 	 */
 	assignOrReplace(element1, element2) {
-		// console.log(`e1${typeof element1}`);
-		// console.log(`e2${typeof element2}`);
-		if (typeof element2 === 'object' && element2 != null) { // null is an object in javascript
-			// console.log(`assigned e2:${JSON.stringify(element2)}`);
-			// console.log(`with e1:${JSON.stringify(element1)}`);
-			element2 = Object.assign(element2, element1);
+		if (element1 != 'MGS_UN_DEF') { // if not equal to magic string UN_DEF
+			// console.log(`e1${typeof element1}`);
+			// console.log(`e2${typeof element2}`);
+			if (typeof element2 === 'object' && element2 != null) { // null is an object in javascript
+				_.mergeWith(element2, element1, (a, b) => {
+					if (a === 'MGS_UN_DEF') {
+						return b;
+					}
+					if (b === 'MGS_UN_DEF') {
+						return a;
+					}
+					return undefined;
+				});
+
 			// console.log(`to get:${JSON.stringify(element2)}`);
-		} else {
+			} else {
 			// console.log(`replaced e2:${element2}`);
 			// console.log(`with e1:${element1}`);
-			element2 = element1;
+				element2 = element1;
+			}
 		}
 	}
 
@@ -176,11 +185,13 @@ class Asset {
 		const fs = require('fs');
 		this.folderPath = fs.realpathSync(`./www/${this.sourcePath}${this.fileName}`);
 		const files = fs.readdirSync(this.folderPath);
+		const name = this.fileName;
 		for (let index = 0; index < files.length; index++) {
 			const file = files[index];
 			this.fileName = file;
 			this.loadData();
 		}
+		this.fileName = name;
 	}
 
 	/**
@@ -194,11 +205,20 @@ class Asset {
 			const sourcePath = fs.realpathSync(`./www/${this.sourcePath}${this.fileName}`);
 			const sourceObj = JSON.parse(fs.readFileSync(sourcePath));
 
-			const destPath = fs.realpathSync(`./www/data/${this.fileName}`);
-			const targetObj = JSON.parse(fs.readFileSync(destPath));
-			this.replaceData(sourceObj, targetObj);
+			const regEx = /_[0-9]{1,8}\.json/;
+			if (regEx.test(this.fileName)) { // if file ends with _number send it to normal
+				this.fileName = this.fileName.replace(regEx, '.json');
+			}
 
-			fs.writeFileSync(destPath, JSON.stringify(targetObj));
+			if (fs.existsSync(`./www/data/${this.fileName}`)) {
+				const destPath = fs.realpathSync(`./www/data/${this.fileName}`);
+
+				const targetObj = JSON.parse(fs.readFileSync(destPath));
+				this.replaceData(sourceObj, targetObj);
+				fs.writeFileSync(destPath, JSON.stringify(targetObj));
+			} else {
+				fs.writeFileSync(`./www/data/${this.fileName}`, JSON.stringify(sourceObj));
+			}
 		} else {
 			// backup and overwrite
 		}
@@ -280,11 +300,11 @@ class Asset {
 	 * @description Load an image asset into game files
 	 * @param {boolean} force whether to force overwrite the img
 	 */
-	loadImage(force = false) {
-		const fileExists = MATTIE.DataManager.addFileToImgFolder(this.sourcePath, `/${this.imgType}/`, this.fileName, this.fileName, force);
+	loadImage(force = false, path1 = this.sourcePath, path2 = this.imgType, file1 = this.fileName) {
+		const fileExists = MATTIE.DataManager.addFileToImgFolder(path1, `/${path2}/`, file1, file1, force);
 		if (fileExists && !force) {
 			this.backupImage();
-			this.loadImage(true);
+			this.loadImage(true, path1, path2, file1);
 		}
 	}
 
@@ -501,7 +521,7 @@ class Mod {
 			this.onloadScript = cb;
 		} else {
 			const oldFunc = this.onloadScript;
-			this.offloadScript = () => {
+			this.onloadScript = () => {
 				oldFunc();
 				cb();
 			};
@@ -553,6 +573,7 @@ class Mod {
 		const asset = new Asset(dataAsset.source, dataAsset.dest, dataAsset.name, dataAsset.type);
 
 		this.addToOnLoad(() => {
+			console.log(`loaded${JSON.stringify(asset)}`);
 			asset.loadAsset();
 			setTimeout(() => {
 				ImageManager._imageCache.releaseReservation(ImageManager._systemReservationId);
@@ -567,6 +588,7 @@ class Mod {
 		});
 
 		this.assets.push(asset);
+		console.log(this.assets);
 	}
 }
 

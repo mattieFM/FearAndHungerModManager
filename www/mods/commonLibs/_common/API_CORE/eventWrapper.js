@@ -206,6 +206,15 @@ class MapEvent {
 	}
 
 	/**
+     * @description change the charecter of a page
+     * @param {*} pageId
+     * @param {string} name string
+     */
+	setChar(pageId, name) {
+		this.data.pages[pageId].image.characterName = name;
+	}
+
+	/**
      *
      * @param {*} pageId
      * @param {*} command
