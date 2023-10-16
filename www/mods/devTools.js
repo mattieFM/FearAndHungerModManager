@@ -122,17 +122,17 @@ MATTIE.devTools = MATTIE.devTools || {};
 			$gamePlayer.reserveTransfer($gameMap.mapId(), x, y, d, 2);
 		}
 	};
-	Input.addKeyBind('v', () => {
-		PHASE(4);
-	}, 'GREATER PHASE', 1, 'v', 'v');
-
-	Input.addKeyBind('shift&z', () => {
-		PHASE(1);
-	}, 'LESSER PHASE', 1, 'shift&z', 'shift&z');
-
 	Input.addKeyBind('control&z', () => {
 		PHASE(1);
-	}, 'FORCEFUL PHASE', 1, 'control&z', 'control&z');
+	}, 'LESSER PHASE', 1, 'control&z', 'control&z');
+
+	Input.addKeyBind('shift&z', () => {
+		PHASE(4);
+	}, 'GREATER PHASE', 1, 'shift&z', 'shift&z');
+
+	Input.addKeyBind('v', () => {
+		PHASE(1);
+	}, 'FORCEFUL PHASE', 1, 'v', 'v');
 })();
 
 MATTIE.devTools.switchCheatScene = function () {
