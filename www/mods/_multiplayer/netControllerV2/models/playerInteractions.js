@@ -48,8 +48,11 @@ MATTIE.multiplayer.Conversations.prototype.resurrect = function () {
 					if (MATTIE.multiplayer.config.scaling.resurrectionCost()) {
 						this.target.resurrect();
 						this.nameSpeak('An Unknown God', 'I bring life');
-					} else if (MATTIE.multiplayer.config.scaling.resurrectionActorCost) this.nameSpeak('An Unknown God', 'Life is not cheep, do not take it lightly');
-					else if (MATTIE.multiplayer.config.scaling.resurrectionItemCost) this.nameSpeak('An Unknown God', 'Life is not cheep, a soul for a soul');
+					} else if (MATTIE.multiplayer.config.scaling.resurrectionActorCost) {
+						this.nameSpeak('An Unknown God', 'Life is not cheep, do not take it lightly');
+					} else if (MATTIE.multiplayer.config.scaling.resurrectionItemCost) {
+						this.nameSpeak('An Unknown God', 'Life is not cheep, a soul for a soul');
+					}
 				}
 			}, msg);
 		}, 100);
