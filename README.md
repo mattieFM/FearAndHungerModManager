@@ -1,6 +1,11 @@
 # FearAndHungerModManager  
 Welcome to MATTIE's Fear And Hunger Mod Manager. This mod manager works for both F&H 1 and 2.  
 
+# Status
+[![Documenation](https://github.com/mattieFM/FearAndHungerModManager/actions/workflows/buildPages.yml/badge.svg?branch=main)](https://github.com/mattieFM/FearAndHungerModManager/actions/workflows/buildPages.yml)
+[![Windows Installer](https://github.com/mattieFM/FearAndHungerModManager/actions/workflows/buildInstaller.yml/badge.svg)](https://github.com/mattieFM/FearAndHungerModManager/actions/workflows/buildInstaller.yml)
+[![Testcases](https://github.com/mattieFM/FearAndHungerModManager/actions/workflows/build.yml/badge.svg)](https://github.com/mattieFM/FearAndHungerModManager/actions/workflows/build.yml)
+
 ## Mod Loader Features  
 -Abiltiy to toggle on and off any and all mods you have installed.  
 ![image](https://github.com/mattieFM/FearAndHungerModManager/assets/66142165/e3012f3c-b75d-4ec4-a4d0-282b8ad24cf4)
