@@ -389,7 +389,9 @@ MATTIE.windows.ModListWin.prototype.setUpHandlers = function () {
 		}));
 
 		this.setHandler(`MATTIE_${name}_CONFIG`, (() => {
-			alert('TODO: make config editable in game');
+			const configPath = MATTIE_ModManager.modManager.getModConfigFile(name);
+			if (configPath) Graphics.displayFile(configPath);
+			else alert('mod does not provide config');
 			this.refresh();
 			this.activate();
 		}));

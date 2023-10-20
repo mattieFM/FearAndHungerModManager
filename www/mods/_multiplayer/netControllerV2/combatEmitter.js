@@ -265,7 +265,7 @@ BattleManager.clearNetActionBuffer = function () {
    */
 Game_Battler.prototype.partyIndex = function () {
 	const indexof = $gameParty.battleMembers().indexOf(this);
-	return indexof != -1 ? indexof : MATTIE.multiplayer.scaling.enemyBattleIndex(this);
+	return indexof != -1 ? indexof : MATTIE.multiplayer.config.scaling.enemyBattleIndex(this);
 };
 
 MATTIE.multiplayer.multiCombat.makeActionOrders = BattleManager.makeActionOrders;

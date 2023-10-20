@@ -9,7 +9,6 @@
  * @param modName
  * @desc the name of the mod to load
  * @text mod name
- * @type string
  * @default testMod
  */
 
@@ -94,7 +93,7 @@ class Asset {
 
 		/**
 		 * @description assigned by the folder loader methods -- the real path to the source folder
-		 * @type {string};
+		 * @type {string}
 		 */
 		this.folderPath = '';
 
@@ -719,9 +718,18 @@ class ModManager {
 		const allMods = this.getAllMods();
 		for (let index = 0; index < allMods.length; index++) {
 			const element = allMods[index];
-			if (element.name == name) return true;
+			if (element.name == name && this.getModActive(name)) return true;
 		}
 		return false;
+	}
+
+	/**
+	 * @description get the html config file for the mod
+	 * @param {string} name the name of the mod
+	 * @returns {string} the path to the html file for this mod
+	 */
+	getModConfigFile(name) {
+		return this.getModInfo(null, name).config;
 	}
 
 	/**
@@ -732,6 +740,7 @@ class ModManager {
      */
 	getModInfo(path, modName) {
 		const fs = require('fs');
+		if (path === null) path = this.getPath();
 		if (!modName.endsWith('.json')) modName += '.json';
 		const modInfoPath = path + modName;
 		const modInfoData = fs.readFileSync(modInfoPath);
@@ -1263,9 +1272,118 @@ MATTIE.onError = function (e) {
 };
 
 /**
+ * @description pause the game and display an html file in an iframe
+ */
+Graphics.displayFile = function (file) {
+	MATTIE_ModManager.updateConfigDisplay();
+	MATTIE_ModManager._configDisplay.hidden = false;
+	document.getElementById('ConfigDisplay');
+	MATTIE_ModManager._iframe.src = file;
+	SceneManager.stop();
+};
+
+/**
+ * @description hide the currently displayed Iframe image and resume the game
+ */
+Graphics.hideFile = function () {
+	MATTIE_ModManager.updateConfigDisplay();
+	MATTIE_ModManager._configDisplay.hidden = true;
+	SceneManager.resume();
+};
+
+/** @description load and render an html file into the config display */
+Graphics.renderFile = function (file) {
+	var xhr = new XMLHttpRequest();
+	xhr.open('GET', file, true);
+	xhr.onreadystatechange = function () {
+		if (this.readyState !== 4) return;
+		if (this.status !== 200) return; // or whatever error handling you want
+		document.getElementById('ConfigDisplay').innerHTML = this.responseText;
+	};
+	xhr.send();
+};
+
+/**
+ * @description open an html file in its own window
+ * @param {string} file the url to an html file
+ */
+Graphics.openFile = function (file) {
+	window.open(file, '_blank');
+};
+
+/**
+ * @description the main dom element used to render html separately from the game
+ * @type {HTMLParagraphElement}
+ */
+MATTIE_ModManager._configDisplay = document.createElement('p');
+
+MATTIE_ModManager.updateConfigDisplay = function () {
+	this._configDisplay.width = '90%';
+	this._configDisplay.height = '90%';
+	this._iframe.id = 'configIframe';
+	this._iframe.height = '85%';
+	this._iframe.width = '85%';
+	this._iframe.frameBorder = '0';
+	this._iframe.scrolling = 'yes';
+	this._iframe.style.border = 'none';
+	this._iframe.style.background = 'white';
+	this._iframe.scrollHeight = '85%';
+};
+
+/**
+ * @description set up all the UI/Iframe stuff and piping for config menus
+ */
+MATTIE_ModManager.setupConfig = function () {
+	this._configDisplay.style.textAlign = 'center';
+	this._configDisplay.style.textShadow = '1px 1px 3px #000';
+	this._configDisplay.style.fontSize = '25px';
+	this._configDisplay.style.color = 'white';
+	this._configDisplay.style.zIndex = 99;
+	this._configDisplay.hidden = true;
+	this._configDisplay.innerHTML = `
+	<button 
+			onClick="Graphics.hideFile()"
+
+			style="
+			width:50px;
+			height:50px;
+			float:left; 
+			fontSize:20px;
+			background-color: #473636;
+			border: none; 
+			color: white;"
+			text-align: center;
+			text-decoration: none;
+		
+		>
+		
+		Exit
+		</button>  
+	!!IMPORTANT!! You must hit "enter" within the inputs to save your Configs.
+	`;
+
+	/** @type {HTMLIFrameElement} */
+	this._iframe = document.createElement('iframe');
+	this.updateConfigDisplay();
+	window.addEventListener('message', (event) => {
+		console.log(event);
+		if (event.data.code === 'config') {
+			console.log('config change');
+			eval(`${event.data.name} = ${event.data.val}`);
+		}
+	});
+
+	this._configDisplay.appendChild(this._iframe);
+	Graphics.hideFile();
+	Graphics._centerElement(this._configDisplay);
+	document.body.appendChild(this._configDisplay);
+};
+
+/**
  * @description load the mod manager
  */
 MATTIE_ModManager.init = async function () {
+	this.setupConfig();
 	await DataManager.waitTillDatabaseLoaded();
 	await PluginManager.setup($plugins).then(() => {});
 	MATTIE.DataManager.onLoad();
@@ -1298,6 +1416,27 @@ MATTIE_ModManager.init = async function () {
 			}, 1000);
 		});
 	});
+};
+
+/**
+ * @description a wrapper to global data.set for config setting
+ * @param {string} name the name of the config key
+ * @param {*} val the value of the config key
+ */
+MATTIE.configSet = function (name, val) {
+	MATTIE.DataManager.global.set(name, val);
+};
+
+/**
+ * @description a wrapper to global data.get for config setting
+ * @param {string} name the name of the config key to retrieve from global data
+ * @param {*} defaultVal the defualt value to return if there is no value stored
+ * @returns {string}
+ */
+MATTIE.configGet = function (name, defaultVal = null) {
+	var val = MATTIE.DataManager.global.get(name);
+	if (typeof val === 'undefined') val = defaultVal;
+	return val;
 };
 
 MATTIE_ModManager.overrideErrorLoggers();

@@ -159,7 +159,7 @@ class PlayerModel {
 
 	/**
      * set the followers on the playermodel and the $gamePlayer
-     * @param {int array} ids the actor ids of any and all followers, -1 if not present
+     * @param {int[]} ids the actor ids of any and all followers, -1 if not present
      */
 	getFollowers() {
 		this.followerIds = [];

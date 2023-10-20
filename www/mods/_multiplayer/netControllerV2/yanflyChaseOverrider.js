@@ -11,7 +11,7 @@ Game_Event.prototype.isCollidedWithPlayerCharacters = function (x, y) {
  * @description return the nearest player to a point
  * @param {*} x the x cord
  * @param {*} y the y cord
- * @returns
+ * @returns {Game_Player} the nearest player to the point
  */
 MATTIE.multiplayer.getNearestPlayer = function (x, y) {
 	const netController = MATTIE.multiplayer.getCurrentNetController();

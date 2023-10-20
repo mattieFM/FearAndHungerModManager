@@ -8,6 +8,7 @@
 //
 var MATTIE = MATTIE || {};
 MATTIE.multiplayer = MATTIE.multiplayer || {};
+MATTIE.multiplayer.config = MATTIE.multiplayer.config || {};
 MATTIE.multiplayer.crowController = null;
 MATTIE.menus.multiplayer = MATTIE.menus.multiplayer || {};
 MATTIE.scenes.multiplayer = MATTIE.scenes.multiplayer || {};
@@ -33,6 +34,7 @@ MATTIE.multiplayer.devTools.consistentTint = '0x2bf0ec'; // set to null to enabl
 /**
  *  @description ms till enemy can move after combat. Note this time starts while menus are closing so it needs to be higher than one would think.
  *  @type {number}
+ *  @configurable
  */
 MATTIE.multiplayer.runTime = 2000;
 /** @deprecated never used */
@@ -116,7 +118,9 @@ MATTIE.multiplayer.devTools.getTint = function () {
 	return str;
 };
 
-/** @type {BaseNetController} used only for if the player hasn't joined or hosted a game yet */
+/**
+ * @type {BaseNetController}
+ * @description used only for if the player hasn't joined or hosted a game yet */
 MATTIE.multiplayer.baseController = new BaseNetController();
 /** @type {HostController} */
 MATTIE.multiplayer.hostController = new HostController();
