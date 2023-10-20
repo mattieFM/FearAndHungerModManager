@@ -2,9 +2,9 @@
 Welcome to MATTIE's Fear And Hunger Mod Manager. This mod manager works for both F&H 1 and 2.  
 
 # Status
-[![Documenation](https://github.com/mattieFM/FearAndHungerModManager/actions/workflows/buildPages.yml/badge.svg?branch=main)](https://github.com/mattieFM/FearAndHungerModManager/actions/workflows/buildPages.yml)
-[![Windows Installer](https://github.com/mattieFM/FearAndHungerModManager/actions/workflows/buildInstaller.yml/badge.svg)](https://github.com/mattieFM/FearAndHungerModManager/actions/workflows/buildInstaller.yml)
-[![Testcases](https://github.com/mattieFM/FearAndHungerModManager/actions/workflows/build.yml/badge.svg)](https://github.com/mattieFM/FearAndHungerModManager/actions/workflows/build.yml)
+[![Documenation](https://github.com/mattieFM/FearAndHungerModManager/actions/workflows/buildPages.yml/badge.svg?branch=main)](https://github.com/mattieFM/FearAndHungerModManager/actions/workflows/buildPages.yml) (Developer Documentation)
+[![Windows Installer](https://github.com/mattieFM/FearAndHungerModManager/actions/workflows/buildInstaller.yml/badge.svg)](https://github.com/mattieFM/FearAndHungerModManager/actions/workflows/buildInstaller.yml) (Windows Installer)
+[![Testcases](https://github.com/mattieFM/FearAndHungerModManager/actions/workflows/build.yml/badge.svg)](https://github.com/mattieFM/FearAndHungerModManager/actions/workflows/build.yml) (Automated Testcases & Misc)
 
 ## Mod Loader Features  
 -Abiltiy to toggle on and off any and all mods you have installed.  
