@@ -9,7 +9,8 @@ MATTIE.multiplayer.config = MATTIE.multiplayer.config || {};
 
 /**
  * @namespace MATTIE.multiplayer.config.scaling
- * @description the namespace containing all configurable options for multiplayer scaling
+ * @description The namespace containing all configurable options for multiplayer scaling / balancing. <br>
+ * While this is intended to let you customize the difficulty to your taste you can also just crank the values super high / low and do silly things
  * */
 MATTIE.multiplayer.config.scaling = MATTIE.multiplayer.config.scaling || {};
 
