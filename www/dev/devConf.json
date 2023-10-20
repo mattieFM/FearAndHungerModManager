@@ -19,8 +19,8 @@
     },
     
     "opts": {
-        "destination": "./out/",  
-        "template": "node_modules/tui-jsdoc-template",
+        "destination": "./www/mods/commonLibs/docs",  
+        "template": "./tui-jsdoc-template-mattie/",
         "encoding": "utf8",
         "recurse": true,
         "package": "package.json",

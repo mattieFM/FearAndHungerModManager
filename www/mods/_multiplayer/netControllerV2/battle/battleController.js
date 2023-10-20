@@ -75,9 +75,9 @@ class BattleController extends EventEmitter {
 		switch (skillId) {
 		case MATTIE.static.skills.healingWhispers.id:
 			if (!this.baseHealingWhispersDamageFormula) this.baseHealingWhispersDamageFormula = action.item().damage.formula;
-			if (MATTIE.multiplayer.scaling.shouldScaleHealingWhispers) {
-				action.item().damage.formula = this.baseHealingWhispersDamageFormula * MATTIE.multiplayer.scaling.getHealingWhispersScaler();
-				MATTIE.multiplayer.scaling.shouldScaleHealingWhispers = false;
+			if (MATTIE.multiplayer.config.scaling.shouldScaleHealingWhispers) {
+				action.item().damage.formula = this.baseHealingWhispersDamageFormula * MATTIE.multiplayer.config.scaling.getHealingWhispersScaler();
+				MATTIE.multiplayer.config.scaling.shouldScaleHealingWhispers = false;
 			}
 			break;
 

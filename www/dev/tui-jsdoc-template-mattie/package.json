@@ -1,0 +1,67 @@
+{
+  "_args": [
+    [
+      "tui-jsdoc-template@1.2.2",
+      "E:\\FearAndHunger\\builds\\FHDevBuild"
+    ]
+  ],
+  "_development": true,
+  "_from": "tui-jsdoc-template@1.2.2",
+  "_id": "tui-jsdoc-template@1.2.2",
+  "_inBundle": false,
+  "_integrity": "sha512-oqw0IYaot86VJ2owKBozJnilgta0Z55x8r9PeHj7vb+jDoSvJGRUQUcgs56SZh9HE20fx54Pe75p84X85/ygLA==",
+  "_location": "/tui-jsdoc-template",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "version",
+    "registry": true,
+    "raw": "tui-jsdoc-template@1.2.2",
+    "name": "tui-jsdoc-template",
+    "escapedName": "tui-jsdoc-template",
+    "rawSpec": "1.2.2",
+    "saveSpec": null,
+    "fetchSpec": "1.2.2"
+  },
+  "_requiredBy": [
+    "#DEV:/"
+  ],
+  "_resolved": "https://registry.npmjs.org/tui-jsdoc-template/-/tui-jsdoc-template-1.2.2.tgz",
+  "_spec": "1.2.2",
+  "_where": "E:\\FearAndHunger\\builds\\FHDevBuild",
+  "authors": [
+    "NHNEnt FE Development Lab <dl_javascript@nhnent.com>"
+  ],
+  "bugs": {
+    "url": "https://github.com/nhnent/tui.jsdoc-template/issues"
+  },
+  "dependencies": {
+    "cheerio": "^0.22.0"
+  },
+  "description": "Toast UI JSDoc Template",
+  "devDependencies": {
+    "del": "^2.2.2",
+    "gulp": "^3.9.1",
+    "gulp-connect": "^5.0.0",
+    "gulp-jsdoc3": "^1.0.1",
+    "jsdoc": "^3.5.3"
+  },
+  "homepage": "https://github.com/nhnent/tui.jsdoc-template#readme",
+  "keywords": [
+    "jsdoc",
+    "jsdoc3",
+    "jsdoc-template",
+    "template",
+    "tui"
+  ],
+  "license": "MIT",
+  "main": "publish.js",
+  "name": "tui-jsdoc-template",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nhnent/tui.jsdoc-template.git"
+  },
+  "scripts": {
+    "serve": "gulp serve"
+  },
+  "version": "1.2.2"
+}

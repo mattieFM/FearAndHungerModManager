@@ -1,4 +1,8 @@
 /* eslint-disable no-shadow */
+
+/**
+ * @typedef {Object.<string,number>} dict
+ */
 var MATTIE = MATTIE || {};
 MATTIE.multiplayer = MATTIE.multiplayer || {};
 MATTIE.menus.multiplayer = MATTIE.menus.multiplayer || {};
@@ -27,7 +31,7 @@ class BaseNetController extends EventEmitter {
 		this.started = false;
 		/** @description list of player models */
 		this.players = {};
-		/** @type {[PlayerModel]} */
+		/** @type {PlayerModel[]} */
 		this.netPlayers = {};
 
 		this.transferRetries = 0;
@@ -78,7 +82,7 @@ class BaseNetController extends EventEmitter {
 	clearControlVars() {
 		this.started = false;
 		this.players = {};
-		/** @type {[PlayerModel]} */
+		/** @type {Object.<string,PlayerModel>} */
 		this.netPlayers = {};
 		MATTIE.multiplayer.isClient = false;
 		MATTIE.multiplayer.isHost = false;
@@ -387,7 +391,7 @@ class BaseNetController extends EventEmitter {
 								if (targetedNetParty) action.forcedTargets.push(targetedNetParty[action._targetIndex]);
 								action._netTarget = action.netPartyId;
 							} else {
-								if (!MATTIE.multiplayer.scaling.partyActionsTargetAll) {
+								if (!MATTIE.multiplayer.config.scaling.partyActionsTargetAll) {
 									if (action.netPartyId != this.peerId) shouldAddAction = false;
 								}
 								MATTIE.multiplayer.BattleController.onPartyActionTargetingNet(action);
@@ -994,7 +998,6 @@ class BaseNetController extends EventEmitter {
 	/**
      * @hostOnly this should only be used by the host
      * @description send the local synced vars to connection
-     * @param {{id:val}[]} syncedVars an array of key pair values of variables
      * @emits randomVars
      */
 	emitUpdateSyncedVars() {
@@ -1037,7 +1040,7 @@ class BaseNetController extends EventEmitter {
 
 	/**
      * @description process the data for synced var updates
-     * @param {{id:val}[]} syncedVars an array of key pair values
+     * @param {dict[]} syncedVars an array of key pair values
      */
 	onUpdateSyncedVarsData(syncedVars) {
 		MATTIE.multiplayer.varSyncer.shouldSync = false;
@@ -1050,7 +1053,7 @@ class BaseNetController extends EventEmitter {
 
 	/**
      * @description process the data for synced var updates
-     * @param {{id:val}[]} syncedSwitch an array of key pair values
+     * @param {{dict[]} syncedSwitch an array of key pair values
      */
 	onUpdateSyncedSwitchData(syncedSwitch) {
 		MATTIE.multiplayer.varSyncer.shouldSync = false;
@@ -1243,7 +1246,7 @@ class BaseNetController extends EventEmitter {
 	}
 
 	/**
-     * @description
+     * @description additional actions that the ned controller needs to perform on specific states triggered
      * @param {int} enemyIndex the enemyIndex
      * @param {int} stateId the stateid
      * @param {bool} add true if the state should be added or removed
@@ -1473,7 +1476,7 @@ class BaseNetController extends EventEmitter {
 	}
 
 	/**
-     * @description
+     * @description trigger a damage animation (purely cosmetic)
      * @param {Game_Battler} subject the subject performing the attack
      * @param {Game_Battler[]} targets the targets to display the animation on
      * @param {int} animId

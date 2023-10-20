@@ -37,19 +37,19 @@ MATTIE.multiplayer.Conversations.prototype.resurrect = function () {
 	if (this.target.canResurrect()) {
 		setTimeout(() => {
 			// eslint-disable-next-line no-nested-ternary
-			const msg = MATTIE.multiplayer.scaling.resurrectionActorCost
+			const msg = MATTIE.multiplayer.config.scaling.resurrectionActorCost
 				? 'An Unknown God demands a sacrifice and a soul.'
-				: MATTIE.multiplayer.scaling.resurrectionItemCost
+				: MATTIE.multiplayer.config.scaling.resurrectionItemCost
 					? 'An Unknown God demands a soul in return'
 					: 'An Unknown God seems to offer some kindness, perhaps in another world, you showed it kindness.';
 
 			MATTIE.msgAPI.showChoices(['Continue', 'Cancel'], 1, 1, (n) => {
 				if (n == 0) {
-					if (MATTIE.multiplayer.scaling.resurrectionCost()) {
+					if (MATTIE.multiplayer.config.scaling.resurrectionCost()) {
 						this.target.resurrect();
 						this.nameSpeak('An Unknown God', 'I bring life');
-					} else if (MATTIE.multiplayer.scaling.resurrectionActorCost) this.nameSpeak('An Unknown God', 'Life is not cheep, do not take it lightly');
-					else if (MATTIE.multiplayer.scaling.resurrectionItemCost) this.nameSpeak('An Unknown God', 'Life is not cheep, a soul for a soul');
+					} else if (MATTIE.multiplayer.config.scaling.resurrectionActorCost) this.nameSpeak('An Unknown God', 'Life is not cheep, do not take it lightly');
+					else if (MATTIE.multiplayer.config.scaling.resurrectionItemCost) this.nameSpeak('An Unknown God', 'Life is not cheep, a soul for a soul');
 				}
 			}, msg);
 		}, 100);
