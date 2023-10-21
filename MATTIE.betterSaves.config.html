@@ -1,10 +1,8 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Source: commonLibs/_common/menus/menu.js | Source: commonLibs/_common/menus/menu.js</title>
+    <title>Namespace: config | Namespace: config</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -32,7 +30,7 @@
         
     </div>
     <div class="title">
-        <h1><a href="index.html" class="link">Source: commonLibs/_common/menus/menu.js</a></h1>
+        <h1><a href="index.html" class="link">Namespace: config</a></h1>
         
             <span class="version">v1.2.4</span>
         
@@ -60,61 +58,180 @@
 
 
 
+
+<section>
+
+<header>
     
-    <section>
-        <article>
-            <pre class="prettyprint source linenums"><code>/**
- * @namespace MATTIE.menus
- * @description a wrapper class for transitioning and switching between scenes
- */
-MATTIE.menus = MATTIE.menus || {};
+        <h2>
+            <span class="ancestors"><a href="MATTIE.html">MATTIE</a><a href="MATTIE.betterSaves.html">.betterSaves</a>.</span>config</h2>
+        
+    
+</header>
 
-/**
- * @namespace MATTIE.windows
- * @description all additional windows added by the modding api
-*/
-MATTIE.windows = MATTIE.windows || {};
+<article>
+    
+        <div class="container-overview">
+        
+            
+                <div class="description"><p>This contains all the configs for better saves</p></div>
+            
 
-/**
- * @namespace MATTIE.scenes
- * @description all additional scenes added by the modding api
-*/
-MATTIE.scenes = MATTIE.scenes || {};
-MATTIE.TextManager = MATTIE.TextManager || {};
-MATTIE.CmdManager = MATTIE.CmdManager || {};
+            
 
-/** return to main menu */
-MATTIE.menus.toMainMenu = function () {
-	SceneManager.goto(Scene_Title);
-};
 
-/** go to mod scene */
-MATTIE.menus.toModMenu = function () {
-	SceneManager.push(MATTIE.scenes.modLoader);
-};
+<dl class="details">
 
-/** go to load scene */
-MATTIE.menus.toLoadMenu = function () {
-	SceneManager.push(Scene_Load);
-};
+    
 
-/** go to new game menu */
-MATTIE.menus.toNewMenu = function () {
-	DataManager.setupNewGame();
-	SceneManager.push(Scene_Map);
-};
+    
 
-/**
- * load a save id and then go to the map
- */
-MATTIE.menus.loadGameAndGoTo = function (id) {
-	DataManager.loadGame(id);
-	$gameSystem.onAfterLoad();
-	SceneManager.goto(Scene_Map);
-};
-</code></pre>
-        </article>
-    </section>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+            
+        
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Members</h3>
+
+        <dl>
+            
+
+<dt>
+<h4 class="name" id=".numberOfSaves">
+    <span class="type-signature"><span class="icon green">static</span> </span>numberOfSaves<span class="type-signature"></span>
+    
+    <div class="container-source members">
+        <code><a href="betterSaves.js.html">betterSaves.js</a></code>,
+        <code><a href="betterSaves.js.html#line28">line 28</a></code>
+    </div>
+    
+</h4>
+
+
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>How many saves maximum can you have.</p>
+    </div>
+    
+
+    <!--
+    
+    -->
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-default">Default Value:</dt>
+    <dd class="tag-default"><ul class="dummy">
+            <li>99</li>
+        </ul></dd>
+    <dt class="tag-default">Current Value:</dt>
+    <dd class="tag-default"><ul class="dummy">
+        <input onchange="var obj = {}; obj.name ='MATTIE.betterSaves.config.numberOfSaves'; obj.code='config'; obj.val=this.value; top.postMessage(obj, '*')" id="input-MATTIE.betterSaves.config.numberOfSaves" placeholder="99" type="text"></input>
+        </ul></dd>
+    <script>
+        var input = document.getElementById("input-MATTIE.betterSaves.config.numberOfSaves");
+        var pathSplit = "MATTIE.betterSaves.config.numberOfSaves".split(".");
+        var inp = top;
+        for(var i = 0; i < pathSplit.length; i++){
+            inp = inp[pathSplit[i]]
+        }
+        input.value = inp;
+    </script>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+    
+</dd>
+
+        </dl>
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
 
 
 
@@ -131,7 +248,7 @@ MATTIE.menus.loadGameAndGoTo = function (id) {
 <script src="scripts/linenumber.js"></script>
 
     <script>
-        var id = '_sub'.replace(/"/g, '_');
+        var id = 'MATTIE.betterSaves.config_sub'.replace(/"/g, '_');
         var selectedApi = document.getElementById(id); // do not use jquery selector
         var $selectedApi = $(selectedApi);
 
