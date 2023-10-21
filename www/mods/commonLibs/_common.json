@@ -39,6 +39,7 @@
 								"_common/seedRandom",
         "_common/util",
         
+								"_common/betterDebugMenu",
         "_common/betterCrowMauler"
     
     ],
