@@ -120,3 +120,27 @@ MATTIE.util.spiral = function (X, Y, dist, cb) {
 		y += dy;
 	}
 };
+
+/**
+ * @description check if an event is autorun or not. autorun is trigger = 3;
+ * @returns {boolean} whether this event is autorun or not
+ */
+Game_Event.prototype.isAutorun = function () {
+	return this._trigger === 3;
+};
+
+/**
+ * @description
+ * @returns {Game_Event[]} an array of all autorun events on this map
+ * @param {boolean} anyPage default: false. whether to check all pages or just the active page
+ */
+MATTIE.util.getAllAutoRunEvents = function (anyPage = false) {
+	const events = $gameMap.events();
+	let autorunEvents;
+	if (!anyPage) {
+		autorunEvents = events.filter((event) => event.isAutorun()); // check if trigger === 3
+	} else {
+		autorunEvents = events.filter((event) => event.event().pages.some((page) => page.trigger === 3)); // check if trigger === 3
+	}
+	return autorunEvents;
+};

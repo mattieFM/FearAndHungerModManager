@@ -6,10 +6,6 @@ MATTIE.devTools = MATTIE.devTools || {};
 	}, 'CHEAT', 1, 'p', 'p');
 
 	Input.addKeyBind('', () => {
-		SceneManager.push(Scene_Debug);
-	}, 'DEBUG (DEV)', -2);
-
-	Input.addKeyBind('', () => {
 		SceneManager.push(MATTIE.scenes.Scene_Dev);
 	}, 'DEV MENU (DEV)', -2);
 
@@ -17,78 +13,72 @@ MATTIE.devTools = MATTIE.devTools || {};
 		SceneManager.onError(new Error('hiya im an error'));
 	}, 'THROW ERROR (DEV)', -2);
 
-	Input.addKeyBind('', () => {
-		console.log('here');
-		$gameSystem.enableMenu();
-		$gameScreen.clearPictures();
-	}, 'clear images (DEV)', -2);
+	Input.addKeyBind('', async () => {
+		SceneManager.goto(Scene_Gameover);
+	}, 'die (DEV)', -2);
 
 	Input.addKeyBind('v', () => {
 		const amount = 1;
 		const d = $gamePlayer.direction();
 	});
 
-	Input.addKeyBind('', () => {
-		SceneManager.push(MATTIE.scenes.Scene_Dev);
-	}, 'DEV MENU (DEV)', -2);
+	// Input.addKeyBind('', () => {
+	// 	const pocketCatEvent = new MapEvent();
+	// 	pocketCatEvent.copyActionsFromEventOnMap(10, 8);
+	// 	pocketCatEvent.spawn($gamePlayer.x, $gamePlayer.y);
+	// }, 'Spawn Cat (DEV)', -2);
 
-	Input.addKeyBind('', () => {
-		const pocketCatEvent = new MapEvent();
-		pocketCatEvent.copyActionsFromEventOnMap(10, 8);
-		pocketCatEvent.spawn($gamePlayer.x, $gamePlayer.y);
-	}, 'Spawn Cat (DEV)', -2);
+	// Input.addKeyBind('', () => {
+	// 	const arr = [1, 3, 4, 5];
+	// 	let i = -(Math.ceil(arr.length / 2) + 1);
+	// 	for (let index = 0; index < arr.length; index++) {
+	// 		const e1 = arr[index];
+	// 		for (let index2 = 0; index2 < arr.length; index2++) {
+	// 			const e2 = arr[index2];
+	// 			const sex = MATTIE.eventAPI.marriageAPI.displayMarriage(e1, e2, false, $gamePlayer.x + i, $gamePlayer.y + 2);
+	// 			i += 2;
+	// 		}
+	// 	}
+	// }, 'Spawn bad things (DEV)', -2);
 
-	Input.addKeyBind('', () => {
-		const arr = [1, 3, 4, 5];
-		let i = -(Math.ceil(arr.length / 2) + 1);
-		for (let index = 0; index < arr.length; index++) {
-			const e1 = arr[index];
-			for (let index2 = 0; index2 < arr.length; index2++) {
-				const e2 = arr[index2];
-				const sex = MATTIE.eventAPI.marriageAPI.displayMarriage(e1, e2, false, $gamePlayer.x + i, $gamePlayer.y + 2);
-				i += 2;
-			}
-		}
-	}, 'Spawn bad things (DEV)', -2);
+	// Input.addKeyBind('', () => {
+	// 	const sex = MATTIE.eventAPI.marriageAPI.displayMarriage(1, 1, false, $gamePlayer.x, $gamePlayer.y, false);
+	// 	sex.data.pages[0].image.characterName = '$CrowXBunny';
+	// 	sex.data.pages[1].image.characterName = '';
+	// 	sex.spawn($gamePlayer.x + 2, $gamePlayer.y + 2);
+	// 	setTimeout(() => {
+	// 		sex.removeThisEvent();
+	// 		MATTIE.fxAPI.setupTint(-155, -155, -155, -155, 5);
+	// 		const baseCrow = MATTIE.eventAPI.createEnemyFromExisting(33, 1, 0, 1);
+	// 		baseCrow.spawn(sex.data.x + 1, sex.data.y + 2);
+	// 	}, 7500);
+	// }, 'Form Crow Marriage', -2);
 
-	Input.addKeyBind('', () => {
-		const sex = MATTIE.eventAPI.marriageAPI.displayMarriage(1, 1, false, $gamePlayer.x, $gamePlayer.y, false);
-		sex.data.pages[0].image.characterName = '$CrowXBunny';
-		sex.data.pages[1].image.characterName = '';
-		sex.spawn($gamePlayer.x + 2, $gamePlayer.y + 2);
-		setTimeout(() => {
-			sex.removeThisEvent();
-			MATTIE.fxAPI.setupTint(-155, -155, -155, -155, 5);
-			const baseCrow = MATTIE.eventAPI.createEnemyFromExisting(33, 1, 0, 1);
-			baseCrow.spawn(sex.data.x + 1, sex.data.y + 2);
-		}, 7500);
-	}, 'Form Crow Marriage', -2);
+	// let i = 1;
+	// Input.addKeyBind('', () => {
+	// 	MATTIE.eventAPI.marriageAPI.displaySex(1, i, $gamePlayer.x, $gamePlayer.y);
+	// 	i++;
+	// 	if (i > 5)i = 1;
+	// }, 'Spawn Bussy Focking (DEV)', -2);
 
-	let i = 1;
-	Input.addKeyBind('', () => {
-		MATTIE.eventAPI.marriageAPI.displaySex(1, i, $gamePlayer.x, $gamePlayer.y);
-		i++;
-		if (i > 5)i = 1;
-	}, 'Spawn Bussy Focking (DEV)', -2);
+	// Input.addKeyBind('', () => {
+	// 	const caharahSitting = new MapEvent();
+	// 	caharahSitting.copyActionsFromEventOnMap(274, 6);
+	// 	caharahSitting.data.pages = [caharahSitting.data.pages[2]];
+	// 	caharahSitting.data.pages[0].list = [];
+	// 	caharahSitting.data.pages[0].conditions = caharahSitting.setDefaultConditions();
+	// 	caharahSitting.spawn($gamePlayer.x, $gamePlayer.y);
+	// }, 'Spawn Bussy standing (DEV)', -2);
 
-	Input.addKeyBind('', () => {
-		const caharahSitting = new MapEvent();
-		caharahSitting.copyActionsFromEventOnMap(274, 6);
-		caharahSitting.data.pages = [caharahSitting.data.pages[2]];
-		caharahSitting.data.pages[0].list = [];
-		caharahSitting.data.pages[0].conditions = caharahSitting.setDefaultConditions();
-		caharahSitting.spawn($gamePlayer.x, $gamePlayer.y);
-	}, 'Spawn Bussy standing (DEV)', -2);
+	// Input.addKeyBind('', () => {
+	// 	SceneManager.onError(new Error('hiya im an error'));
+	// }, 'THROW ERROR (DEV)', -2);
 
-	Input.addKeyBind('', () => {
-		SceneManager.onError(new Error('hiya im an error'));
-	}, 'THROW ERROR (DEV)', -2);
-
-	Input.addKeyBind('', () => {
-		console.log('here');
-		$gameSystem.enableMenu();
-		$gameScreen.clearPictures();
-	}, 'clear images (DEV)', -2);
+	// Input.addKeyBind('', () => {
+	// 	console.log('here');
+	// 	$gameSystem.enableMenu();
+	// 	$gameScreen.clearPictures();
+	// }, 'clear images (DEV)', -2);
 
 	const PHASE = function (n, transfer = false) {
 		const amount = n;

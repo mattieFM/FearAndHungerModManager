@@ -216,15 +216,18 @@ MATTIE.multiplayer.gamePlayer.override = function () {
 	};
 
 	/** @description the base isDashButtonPressed method for game player */
-	MATTIE_RPG.Game_Player_isDashButtonPressed = Game_Player.prototype.isDashButtonPressed;
+	MATTIE_RPG.Game_Player_updateDashing = Game_Player.prototype.updateDashing;
 	/**
 	 * @description override the update dashing method to emit the dash event when there is a change in dashing
 	 */
-	Game_Player.prototype.isDashButtonPressed = function () {
-		const val = MATTIE_RPG.Game_Player_isDashButtonPressed.call(this);
-		if (this.lastVal != val) {
+	Game_Player.prototype.updateDashing = function () {
+		MATTIE_RPG.Game_Player_updateDashing.call(this);
+		// console.log(`isDashBtnPressed:${this._dashing}`);
+		if (this.lastVal != this._dashing && this.isMoving()) {
+			// dash is always false if player is not moving thus only check if player is moving
+			// console.log(`IS DASH PRESSED CHANGED:\n -FROM:${this.lastVal}\n -TO:${this._dashing}`);
 			MATTIE.multiplayer.getCurrentNetController().emitDashEvent(this._dashing);
-			this.lastVal = val;
+			this.lastVal = this._dashing;
 		}
 	};
 
@@ -232,8 +235,10 @@ MATTIE.multiplayer.gamePlayer.override = function () {
 	MATTIE_RPG.Game_Player_SetMoveSpeed = Game_Player.prototype.setMoveSpeed;
 	/** @description override the set move speed method to emit the event as well */
 	Game_Player.prototype.setMoveSpeed = function (moveSpeed) {
+		// console.log(`moveSpeedSetTo:${moveSpeed}`);
 		if (!(this instanceof MATTIE.multiplayer.Secondary_Player)) { // if not a net player
 			if (this.lastMoveSpeed != moveSpeed) {
+				// console.log(`MOVE SPEED CHANGED:\n -FROM:${this.lastMoveSpeed}\n -TO:${moveSpeed}`);
 				MATTIE.multiplayer.getCurrentNetController().emitSpeedEvent(moveSpeed);
 				this.lastMoveSpeed = moveSpeed;
 			}

@@ -1553,9 +1553,10 @@ class BaseNetController extends EventEmitter {
 	 * @param {UUID} id the id of the original sender
 	 */
 	onDashEventData(dashData, id) {
-		const isDashing = dashData.isDashing;
+		const isDashing = dashData.val;
 		const gamePlayer = this.netPlayers[id].$gamePlayer;
-		gamePlayer.isDashButtonPressed = () => isDashing;
+		gamePlayer.isDashing = () => isDashing;
+		gamePlayer._isDashing = isDashing;
 	}
 
 	//-----------------------------------------------------

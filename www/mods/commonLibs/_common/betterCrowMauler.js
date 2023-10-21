@@ -32,15 +32,18 @@ MATTIE.betterCrowMauler.combatEnterChance = 0.005;
 
 /**
  * @description the min amount of time that must pass before crow can spawn in ms
- * @default 100 sec
+ * @default 100,000 milli seconds
  *
 */
-MATTIE.betterCrowMauler.timeToSpawnMin = 0;
+MATTIE.betterCrowMauler.timeToSpawnMin = 100000;
 
 MATTIE.betterCrowMauler.timeToSpawnMax = 10000000;
 MATTIE.betterCrowMauler.timeScaler = (t) => (0.2 + (10 * (t / MATTIE.betterCrowMauler.timeToSpawnMax)));
 
-/** @description a scaler to scale the crow's spawn chance by */
+/**
+ * @description a scaler to scale the crow's spawn chance by
+ * @default 1
+ * */
 MATTIE.betterCrowMauler.scaler = 1;
 
 /**
@@ -92,7 +95,6 @@ MATTIE.betterCrowMauler.CrowController = class {
 	/** @description whether this instance's crow mauler is dead */
 	isDead() {
 		const bool = this.self.checkSelfSwitch('A');
-		console.log(`isdead: ${bool}`);
 		return bool || !this.crowCanSpawn();
 	}
 
@@ -170,7 +172,6 @@ MATTIE.betterCrowMauler.CrowController = class {
 							const list = page.list.map((cmd) => cmd.code);
 							const commonEvents = page.list.filter((cmd) => cmd.code === MATTIE.static.commands.commonEventid);
 							const hasPhaseStep = page.list.some((cmd) => (cmd.code == 121 && cmd.parameters[0] == MATTIE.static.switch.phaseStep));
-							console.log(`PhaseStep${hasPhaseStep}`);
 							if (hasPhaseStep) return false;
 							if (commonEvents.length > 0) {
 								return list.includes(MATTIE.static.commands.transferId)
@@ -229,7 +230,6 @@ MATTIE.betterCrowMauler.CrowController = class {
 		let t = 0;
 		let dy = -1;
 		for (let index = 0; index < max; index++) {
-			// console.log(index);
 			if ((-X / 2 < x <= X / 2) && (-Y / 2 < y <= Y / 2)) {
 				const obj = {};
 				obj.x = x + centerX;
@@ -269,18 +269,13 @@ MATTIE.betterCrowMauler.CrowController = class {
 	 */
 	spawn() {
 		this.timeElapsed = 0;
-		console.log('Here');
 		if (!this.hasSpawned && !this.isDead() && !$gameParty.inBattle()) {
-			console.log('Here2');
 			this.onScreen = true;
 			const s = this.findClosestSpawnPoint($gamePlayer.x, $gamePlayer.y);
 			const spot = this.findNearestPassablePoint(15, 15, s.x, s.y);
-			console.log(s);
-			console.log(spot);
 			if (spot) {
 				this.self = this.createCrowObj();
 				this.self.spawn(spot.x, spot.y);
-				console.log(`x${spot.x}\ny${spot.y}`);
 				this.mapId = $gameMap.mapId();
 				this.hasSpawned = true;
 			}
@@ -354,9 +349,8 @@ MATTIE.betterCrowMauler.CrowController = class {
 	 * @description the update method used to spawn crow mauler
 	 */
 	update() {
-		console.log('updated');
+		console.log(`chance${MATTIE.betterCrowMauler.spawnChance * this.getScaling()}`);
 		if (MATTIE.util.randChance(MATTIE.betterCrowMauler.spawnChance * this.getScaling())) {
-			console.log('entered');
 			this.enter();
 		}
 	}
