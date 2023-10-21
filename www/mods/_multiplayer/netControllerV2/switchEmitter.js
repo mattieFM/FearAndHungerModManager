@@ -112,6 +112,7 @@ const eventAndSwitchEmitterInit = function () {
 	Game_Switches.prototype.setValue = function (id, val, skipEvent = false, silenced = false) {
 		const i = id;
 		MATTIE.RPG.gameSwitchSetVal.call(this, id, val);
+		if (!silenced) if (MATTIE.multiplayer.devTools.eventLogger) console.log(`Game Switch ${i} set to ${val}`);
 		if (!MATTIE.static.switch.ignoredSwitches.includes(id)) {
 			if (!skipEvent) {
 				if (!silenced || MATTIE.static.switch.syncedSwitches.includes(id)) {
@@ -121,7 +122,6 @@ const eventAndSwitchEmitterInit = function () {
 					obj.s = 0;
 					const netController = MATTIE.multiplayer.getCurrentNetController();
 					if (netController) { if (MATTIE.multiplayer.isActive) netController.emitSwitchEvent(obj); }
-					if (MATTIE.multiplayer.devTools.eventLogger) console.log(`Game Switch ${i} set to ${val}`);
 				}
 			}
 		}

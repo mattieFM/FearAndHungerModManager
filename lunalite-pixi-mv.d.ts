@@ -12776,6 +12776,14 @@ declare class Game_Event extends Game_Character {
 	_mapId: number;
 	_eventId: number;
 	_moveType: rm.types.MoveType;
+	/**
+	 * @description when does this event trigger:  
+	 * 0: player interaction IE: player hits "okay" on this event  
+	 * 1: touch  
+	 * 2: event touch  
+	 * 3: autorun  
+	 * 4: parellel  
+	 */
 	_trigger: rm.types.EventTrigger;
 	_starting: boolean;
 	_erased: boolean;

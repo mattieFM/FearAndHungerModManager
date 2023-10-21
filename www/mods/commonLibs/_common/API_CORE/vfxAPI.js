@@ -139,6 +139,7 @@ MATTIE.fxAPI.showPlayer = function () {
 MATTIE.fxAPI.lockPlayer = function (ms = -1) {
 	this.orgCanMove = this.orgCanMove || $gamePlayer.canMove;
 	$gamePlayer.canMove = () => false;
+	$gameSystem.disableSave();
 	$gameSystem.disableMenu();
 	if (ms > 0) {
 		setTimeout(() => {
@@ -152,6 +153,7 @@ MATTIE.fxAPI.lockPlayer = function (ms = -1) {
  */
 MATTIE.fxAPI.unlockPlayer = function () {
 	$gameSystem.enableMenu();
+	$gameSystem.enableSave();
 	if (this.orgCanMove) {
 		$gamePlayer.canMove = this.orgCanMove;
 		this.orgCanMove = undefined;
