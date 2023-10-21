@@ -1,6 +1,7 @@
 {
     "name": "randomiser",
     "status": false,
+				"config": "../www/mods/commonLibs/docs/MATTIE.randomiser.config.html",
     "parameters": {
         "seed": "random"
     },

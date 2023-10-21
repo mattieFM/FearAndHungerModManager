@@ -1,10 +1,8 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Source: _multiplayer/netControllerV2/playerRenderer.js | Source: _multiplayer/netControllerV2/playerRenderer.js</title>
+    <title>Namespace: config | Namespace: config</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -32,7 +30,7 @@
         
     </div>
     <div class="title">
-        <h1><a href="index.html" class="link">Source: _multiplayer/netControllerV2/playerRenderer.js</a></h1>
+        <h1><a href="index.html" class="link">Namespace: config</a></h1>
         
             <span class="version">v1.2.4</span>
         
@@ -60,81 +58,1142 @@
 
 
 
+
+<section>
+
+<header>
     
-    <section>
-        <article>
-            <pre class="prettyprint source linenums"><code>var MATTIE = MATTIE || {};
-MATTIE.RPG = MATTIE.RPG || {};
-MATTIE.multiplayer = MATTIE.multiplayer || {};
-MATTIE.menus.multiplayer = MATTIE.menus.multiplayer || {};
-MATTIE.scenes.multiplayer = MATTIE.scenes.multiplayer || {};
-MATTIE.windows.multiplayer = MATTIE.windows.multiplayer || {};
-MATTIE.multiplayer.renderer = MATTIE.multiplayer.renderer || {};
+        <h2>
+            <span class="ancestors"><a href="MATTIE.html">MATTIE</a><a href="MATTIE.randomiser.html">.randomiser</a>.</span>config</h2>
+        
+    
+</header>
 
-/** render all net players */
-MATTIE.multiplayer.renderer._renderNetPlayers = function (target) {
-	this.playersSprites = [];
-	let players = [];
-	if (MATTIE.multiplayer.isClient) {
-		players = MATTIE.multiplayer.clientController.netPlayers;
-	} else if (MATTIE.multiplayer.isHost) {
-		players = MATTIE.multiplayer.hostController.netPlayers;
-	}
-	for (key in players) {
-		if (key) {
-			/** @type {PlayerModel} */
-			const netPlayer = players[key];
-			if ($gameMap.mapId() === netPlayer.map) { // only render players on same map
-				netPlayer.$gamePlayer.setActor(netPlayer.actorId);
-				netPlayer.$gamePlayer.refresh();
-				const p2 = netPlayer.$gamePlayer;
-				p2.setTransparent(false);
+<article>
+    
+        <div class="container-overview">
+        
+            
+                <div class="description"><p>Contains all configuration settings for the randomizer mod.</p></div>
+            
 
-				p2.name = netPlayer.name;
-				const p2Sprite = new MATTIE.multiplayer.NetSpriteChar(p2);
-				if (MATTIE.multiplayer.devTools.shouldTint) {
-					if (!MATTIE.multiplayer.devTools.consistentTint) {
-						MATTIE.multiplayer.devTools.consistentTint = MATTIE.multiplayer.devTools.getTint();
-					}
-					p2Sprite.tint = MATTIE.multiplayer.devTools.consistentTint;
-				}
-				this.playersSprites.push(p2Sprite);
-				netPlayer.$gamePlayer.followers().forEach((follower) => {
-					if (follower.actorId) {
-						const followerSprite = new Sprite_Character(follower);
-						follower.setTransparent(false);
-						this.playersSprites.push(followerSprite);
-					}
-				});
-			}
-		}
-	}
-	for (var i = 0; i &lt; this.playersSprites.length; i++) {
-		target.addChild(this.playersSprites[i]);
-	}
-};
+            
 
-//-----------------------------------------------------------------------------
-// netSpriteChar
-//
-// The sprite for displaying a character.
 
-MATTIE.multiplayer.NetSpriteChar = function () {
-	this.initialize.apply(this, arguments);
-};
+<dl class="details">
 
-MATTIE.multiplayer.NetSpriteChar.prototype = Object.create(Sprite_Character.prototype);
-MATTIE.multiplayer.NetSpriteChar.prototype.constructor = MATTIE.multiplayer.NetSpriteChar;
+    
 
-MATTIE.multiplayer.NetSpriteChar.prototype.updateVisibility = function () {
-	Sprite_Character.prototype.updateVisibility.call(this);
-	if (!this._character.isOnMap()) {
-		this.visible = false;
-	}
-};
-</code></pre>
-        </article>
-    </section>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+            
+        
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Members</h3>
+
+        <dl>
+            
+
+<dt>
+<h4 class="name" id=".commonEvents">
+    <span class="type-signature"><span class="icon green">static</span> </span>commonEvents<span class="type-signature"></span>
+    
+    <div class="container-source members">
+        <code><a href="randomiser.js.html">randomiser.js</a></code>,
+        <code><a href="randomiser.js.html#line93">line 93</a></code>
+    </div>
+    
+</h4>
+
+
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>whether to randomize common events or not<br>
+!!DANGER!! This will crash the game. Its funny but it is not safe and will blow up.</p>
+    </div>
+    
+
+    <!--
+    
+    -->
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-default">Default Value:</dt>
+    <dd class="tag-default"><ul class="dummy">
+            <li>false</li>
+        </ul></dd>
+    <dt class="tag-default">Current Value:</dt>
+    <dd class="tag-default"><ul class="dummy">
+        <input onchange="var obj = {}; obj.name ='MATTIE.randomiser.config.commonEvents'; obj.code='config'; obj.val=this.value; top.postMessage(obj, '*')" id="input-MATTIE.randomiser.config.commonEvents" placeholder="false" type="text"></input>
+        </ul></dd>
+    <script>
+        var input = document.getElementById("input-MATTIE.randomiser.config.commonEvents");
+        var pathSplit = "MATTIE.randomiser.config.commonEvents".split(".");
+        var inp = top;
+        for(var i = 0; i < pathSplit.length; i++){
+            inp = inp[pathSplit[i]]
+        }
+        input.value = inp;
+    </script>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+    
+</dd>
+
+        
+            
+
+<dt>
+<h4 class="name" id=".includeDungeonKnights">
+    <span class="type-signature"><span class="icon green">static</span> </span>includeDungeonKnights<span class="type-signature"></span>
+    
+    <div class="container-source members">
+        <code><a href="randomiser.js.html">randomiser.js</a></code>,
+        <code><a href="randomiser.js.html#line20">line 20</a></code>
+    </div>
+    
+</h4>
+
+
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>whether to include dungeon knights maps for map randomization.<br>
+!!DANGER!! this will likely result in soft locks, but is funny when it doesn't</p>
+    </div>
+    
+
+    <!--
+    
+    -->
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-default">Default Value:</dt>
+    <dd class="tag-default"><ul class="dummy">
+            <li>false</li>
+        </ul></dd>
+    <dt class="tag-default">Current Value:</dt>
+    <dd class="tag-default"><ul class="dummy">
+        <input onchange="var obj = {}; obj.name ='MATTIE.randomiser.config.includeDungeonKnights'; obj.code='config'; obj.val=this.value; top.postMessage(obj, '*')" id="input-MATTIE.randomiser.config.includeDungeonKnights" placeholder="false" type="text"></input>
+        </ul></dd>
+    <script>
+        var input = document.getElementById("input-MATTIE.randomiser.config.includeDungeonKnights");
+        var pathSplit = "MATTIE.randomiser.config.includeDungeonKnights".split(".");
+        var inp = top;
+        for(var i = 0; i < pathSplit.length; i++){
+            inp = inp[pathSplit[i]]
+        }
+        input.value = inp;
+    </script>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+    
+</dd>
+
+        
+            
+
+<dt>
+<h4 class="name" id=".randomizeAnimations">
+    <span class="type-signature"><span class="icon green">static</span> </span>randomizeAnimations<span class="type-signature"></span>
+    
+    <div class="container-source members">
+        <code><a href="randomiser.js.html">randomiser.js</a></code>,
+        <code><a href="randomiser.js.html#line80">line 80</a></code>
+    </div>
+    
+</h4>
+
+
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>whether to randomize animations or not</p>
+    </div>
+    
+
+    <!--
+    
+    -->
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-default">Default Value:</dt>
+    <dd class="tag-default"><ul class="dummy">
+            <li>true</li>
+        </ul></dd>
+    <dt class="tag-default">Current Value:</dt>
+    <dd class="tag-default"><ul class="dummy">
+        <input onchange="var obj = {}; obj.name ='MATTIE.randomiser.config.randomizeAnimations'; obj.code='config'; obj.val=this.value; top.postMessage(obj, '*')" id="input-MATTIE.randomiser.config.randomizeAnimations" placeholder="true" type="text"></input>
+        </ul></dd>
+    <script>
+        var input = document.getElementById("input-MATTIE.randomiser.config.randomizeAnimations");
+        var pathSplit = "MATTIE.randomiser.config.randomizeAnimations".split(".");
+        var inp = top;
+        for(var i = 0; i < pathSplit.length; i++){
+            inp = inp[pathSplit[i]]
+        }
+        input.value = inp;
+    </script>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+    
+</dd>
+
+        
+            
+
+<dt>
+<h4 class="name" id=".randomizeArmors">
+    <span class="type-signature"><span class="icon green">static</span> </span>randomizeArmors<span class="type-signature"></span>
+    
+    <div class="container-source members">
+        <code><a href="randomiser.js.html">randomiser.js</a></code>,
+        <code><a href="randomiser.js.html#line38">line 38</a></code>
+    </div>
+    
+</h4>
+
+
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>whether to randomize armors or not</p>
+    </div>
+    
+
+    <!--
+    
+    -->
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-default">Default Value:</dt>
+    <dd class="tag-default"><ul class="dummy">
+            <li>true</li>
+        </ul></dd>
+    <dt class="tag-default">Current Value:</dt>
+    <dd class="tag-default"><ul class="dummy">
+        <input onchange="var obj = {}; obj.name ='MATTIE.randomiser.config.randomizeArmors'; obj.code='config'; obj.val=this.value; top.postMessage(obj, '*')" id="input-MATTIE.randomiser.config.randomizeArmors" placeholder="true" type="text"></input>
+        </ul></dd>
+    <script>
+        var input = document.getElementById("input-MATTIE.randomiser.config.randomizeArmors");
+        var pathSplit = "MATTIE.randomiser.config.randomizeArmors".split(".");
+        var inp = top;
+        for(var i = 0; i < pathSplit.length; i++){
+            inp = inp[pathSplit[i]]
+        }
+        input.value = inp;
+    </script>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+    
+</dd>
+
+        
+            
+
+<dt>
+<h4 class="name" id=".randomizeClasses">
+    <span class="type-signature"><span class="icon green">static</span> </span>randomizeClasses<span class="type-signature"></span>
+    
+    <div class="container-source members">
+        <code><a href="randomiser.js.html">randomiser.js</a></code>,
+        <code><a href="randomiser.js.html#line65">line 65</a></code>
+    </div>
+    
+</h4>
+
+
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>whether to randomize classes or not<br>
+!!DANGER!! tends to break things --if class gets switched with nashrah or test or... then it will break etc...</p>
+    </div>
+    
+
+    <!--
+    
+    -->
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-default">Default Value:</dt>
+    <dd class="tag-default"><ul class="dummy">
+            <li>false</li>
+        </ul></dd>
+    <dt class="tag-default">Current Value:</dt>
+    <dd class="tag-default"><ul class="dummy">
+        <input onchange="var obj = {}; obj.name ='MATTIE.randomiser.config.randomizeClasses'; obj.code='config'; obj.val=this.value; top.postMessage(obj, '*')" id="input-MATTIE.randomiser.config.randomizeClasses" placeholder="false" type="text"></input>
+        </ul></dd>
+    <script>
+        var input = document.getElementById("input-MATTIE.randomiser.config.randomizeClasses");
+        var pathSplit = "MATTIE.randomiser.config.randomizeClasses".split(".");
+        var inp = top;
+        for(var i = 0; i < pathSplit.length; i++){
+            inp = inp[pathSplit[i]]
+        }
+        input.value = inp;
+    </script>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+    
+</dd>
+
+        
+            
+
+<dt>
+<h4 class="name" id=".randomizeEnemies">
+    <span class="type-signature"><span class="icon green">static</span> </span>randomizeEnemies<span class="type-signature"></span>
+    
+    <div class="container-source members">
+        <code><a href="randomiser.js.html">randomiser.js</a></code>,
+        <code><a href="randomiser.js.html#line52">line 52</a></code>
+    </div>
+    
+</h4>
+
+
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>whether to randomize enemies or not. Note that this means randomizing the limbs<br>
+that troops are composed of.<br>
+!!Danger!! this will make the game quite incomprehensible but it shouldn't actually crash</p>
+    </div>
+    
+
+    <!--
+    
+    -->
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-default">Default Value:</dt>
+    <dd class="tag-default"><ul class="dummy">
+            <li>false</li>
+        </ul></dd>
+    <dt class="tag-default">Current Value:</dt>
+    <dd class="tag-default"><ul class="dummy">
+        <input onchange="var obj = {}; obj.name ='MATTIE.randomiser.config.randomizeEnemies'; obj.code='config'; obj.val=this.value; top.postMessage(obj, '*')" id="input-MATTIE.randomiser.config.randomizeEnemies" placeholder="false" type="text"></input>
+        </ul></dd>
+    <script>
+        var input = document.getElementById("input-MATTIE.randomiser.config.randomizeEnemies");
+        var pathSplit = "MATTIE.randomiser.config.randomizeEnemies".split(".");
+        var inp = top;
+        for(var i = 0; i < pathSplit.length; i++){
+            inp = inp[pathSplit[i]]
+        }
+        input.value = inp;
+    </script>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+    
+</dd>
+
+        
+            
+
+<dt>
+<h4 class="name" id=".randomizeItems">
+    <span class="type-signature"><span class="icon green">static</span> </span>randomizeItems<span class="type-signature"></span>
+    
+    <div class="container-source members">
+        <code><a href="randomiser.js.html">randomiser.js</a></code>,
+        <code><a href="randomiser.js.html#line32">line 32</a></code>
+    </div>
+    
+</h4>
+
+
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>whether to randomize items or not</p>
+    </div>
+    
+
+    <!--
+    
+    -->
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-default">Default Value:</dt>
+    <dd class="tag-default"><ul class="dummy">
+            <li>true</li>
+        </ul></dd>
+    <dt class="tag-default">Current Value:</dt>
+    <dd class="tag-default"><ul class="dummy">
+        <input onchange="var obj = {}; obj.name ='MATTIE.randomiser.config.randomizeItems'; obj.code='config'; obj.val=this.value; top.postMessage(obj, '*')" id="input-MATTIE.randomiser.config.randomizeItems" placeholder="true" type="text"></input>
+        </ul></dd>
+    <script>
+        var input = document.getElementById("input-MATTIE.randomiser.config.randomizeItems");
+        var pathSplit = "MATTIE.randomiser.config.randomizeItems".split(".");
+        var inp = top;
+        for(var i = 0; i < pathSplit.length; i++){
+            inp = inp[pathSplit[i]]
+        }
+        input.value = inp;
+    </script>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+    
+</dd>
+
+        
+            
+
+<dt>
+<h4 class="name" id=".randomizeMaps">
+    <span class="type-signature"><span class="icon green">static</span> </span>randomizeMaps<span class="type-signature"></span>
+    
+    <div class="container-source members">
+        <code><a href="randomiser.js.html">randomiser.js</a></code>,
+        <code><a href="randomiser.js.html#line74">line 74</a></code>
+    </div>
+    
+</h4>
+
+
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>whether to randomize maps or not</p>
+    </div>
+    
+
+    <!--
+    
+    -->
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-default">Default Value:</dt>
+    <dd class="tag-default"><ul class="dummy">
+            <li>trueWorks as long as you can use the books in your inventory to recover from softlocksEx Altiora lets you use the airship to get un stuckand The Seven Lamps of Arcitecture lets you teleport to a new room (sometimes) if you got stuck.</li>
+        </ul></dd>
+    <dt class="tag-default">Current Value:</dt>
+    <dd class="tag-default"><ul class="dummy">
+        <input onchange="var obj = {}; obj.name ='MATTIE.randomiser.config.randomizeMaps'; obj.code='config'; obj.val=this.value; top.postMessage(obj, '*')" id="input-MATTIE.randomiser.config.randomizeMaps" placeholder="trueWorks as long as you can use the books in your inventory to recover from softlocksEx Altiora lets you use the airship to get un stuckand The Seven Lamps of Arcitecture lets you teleport to a new room (sometimes) if you got stuck." type="text"></input>
+        </ul></dd>
+    <script>
+        var input = document.getElementById("input-MATTIE.randomiser.config.randomizeMaps");
+        var pathSplit = "MATTIE.randomiser.config.randomizeMaps".split(".");
+        var inp = top;
+        for(var i = 0; i < pathSplit.length; i++){
+            inp = inp[pathSplit[i]]
+        }
+        input.value = inp;
+    </script>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+    
+</dd>
+
+        
+            
+
+<dt>
+<h4 class="name" id=".randomizeSkills">
+    <span class="type-signature"><span class="icon green">static</span> </span>randomizeSkills<span class="type-signature"></span>
+    
+    <div class="container-source members">
+        <code><a href="randomiser.js.html">randomiser.js</a></code>,
+        <code><a href="randomiser.js.html#line58">line 58</a></code>
+    </div>
+    
+</h4>
+
+
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>whether to randomize skills or not</p>
+    </div>
+    
+
+    <!--
+    
+    -->
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-default">Default Value:</dt>
+    <dd class="tag-default"><ul class="dummy">
+            <li>true</li>
+        </ul></dd>
+    <dt class="tag-default">Current Value:</dt>
+    <dd class="tag-default"><ul class="dummy">
+        <input onchange="var obj = {}; obj.name ='MATTIE.randomiser.config.randomizeSkills'; obj.code='config'; obj.val=this.value; top.postMessage(obj, '*')" id="input-MATTIE.randomiser.config.randomizeSkills" placeholder="true" type="text"></input>
+        </ul></dd>
+    <script>
+        var input = document.getElementById("input-MATTIE.randomiser.config.randomizeSkills");
+        var pathSplit = "MATTIE.randomiser.config.randomizeSkills".split(".");
+        var inp = top;
+        for(var i = 0; i < pathSplit.length; i++){
+            inp = inp[pathSplit[i]]
+        }
+        input.value = inp;
+    </script>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+    
+</dd>
+
+        
+            
+
+<dt>
+<h4 class="name" id=".randomizeStates">
+    <span class="type-signature"><span class="icon green">static</span> </span>randomizeStates<span class="type-signature"></span>
+    
+    <div class="container-source members">
+        <code><a href="randomiser.js.html">randomiser.js</a></code>,
+        <code><a href="randomiser.js.html#line86">line 86</a></code>
+    </div>
+    
+</h4>
+
+
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>whether to randomize states or not</p>
+    </div>
+    
+
+    <!--
+    
+    -->
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-default">Default Value:</dt>
+    <dd class="tag-default"><ul class="dummy">
+            <li>true</li>
+        </ul></dd>
+    <dt class="tag-default">Current Value:</dt>
+    <dd class="tag-default"><ul class="dummy">
+        <input onchange="var obj = {}; obj.name ='MATTIE.randomiser.config.randomizeStates'; obj.code='config'; obj.val=this.value; top.postMessage(obj, '*')" id="input-MATTIE.randomiser.config.randomizeStates" placeholder="true" type="text"></input>
+        </ul></dd>
+    <script>
+        var input = document.getElementById("input-MATTIE.randomiser.config.randomizeStates");
+        var pathSplit = "MATTIE.randomiser.config.randomizeStates".split(".");
+        var inp = top;
+        for(var i = 0; i < pathSplit.length; i++){
+            inp = inp[pathSplit[i]]
+        }
+        input.value = inp;
+    </script>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+    
+</dd>
+
+        
+            
+
+<dt>
+<h4 class="name" id=".randomizeTroops">
+    <span class="type-signature"><span class="icon green">static</span> </span>randomizeTroops<span class="type-signature"></span>
+    
+    <div class="container-source members">
+        <code><a href="randomiser.js.html">randomiser.js</a></code>,
+        <code><a href="randomiser.js.html#line26">line 26</a></code>
+    </div>
+    
+</h4>
+
+
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>whether to randomize troops or not</p>
+    </div>
+    
+
+    <!--
+    
+    -->
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-default">Default Value:</dt>
+    <dd class="tag-default"><ul class="dummy">
+            <li>true</li>
+        </ul></dd>
+    <dt class="tag-default">Current Value:</dt>
+    <dd class="tag-default"><ul class="dummy">
+        <input onchange="var obj = {}; obj.name ='MATTIE.randomiser.config.randomizeTroops'; obj.code='config'; obj.val=this.value; top.postMessage(obj, '*')" id="input-MATTIE.randomiser.config.randomizeTroops" placeholder="true" type="text"></input>
+        </ul></dd>
+    <script>
+        var input = document.getElementById("input-MATTIE.randomiser.config.randomizeTroops");
+        var pathSplit = "MATTIE.randomiser.config.randomizeTroops".split(".");
+        var inp = top;
+        for(var i = 0; i < pathSplit.length; i++){
+            inp = inp[pathSplit[i]]
+        }
+        input.value = inp;
+    </script>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+    
+</dd>
+
+        
+            
+
+<dt>
+<h4 class="name" id=".randomizeWeapons">
+    <span class="type-signature"><span class="icon green">static</span> </span>randomizeWeapons<span class="type-signature"></span>
+    
+    <div class="container-source members">
+        <code><a href="randomiser.js.html">randomiser.js</a></code>,
+        <code><a href="randomiser.js.html#line44">line 44</a></code>
+    </div>
+    
+</h4>
+
+
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>whether to randomize weapons or not</p>
+    </div>
+    
+
+    <!--
+    
+    -->
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-default">Default Value:</dt>
+    <dd class="tag-default"><ul class="dummy">
+            <li>true</li>
+        </ul></dd>
+    <dt class="tag-default">Current Value:</dt>
+    <dd class="tag-default"><ul class="dummy">
+        <input onchange="var obj = {}; obj.name ='MATTIE.randomiser.config.randomizeWeapons'; obj.code='config'; obj.val=this.value; top.postMessage(obj, '*')" id="input-MATTIE.randomiser.config.randomizeWeapons" placeholder="true" type="text"></input>
+        </ul></dd>
+    <script>
+        var input = document.getElementById("input-MATTIE.randomiser.config.randomizeWeapons");
+        var pathSplit = "MATTIE.randomiser.config.randomizeWeapons".split(".");
+        var inp = top;
+        for(var i = 0; i < pathSplit.length; i++){
+            inp = inp[pathSplit[i]]
+        }
+        input.value = inp;
+    </script>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+    
+</dd>
+
+        </dl>
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
 
 
 
@@ -151,7 +1210,7 @@ MATTIE.multiplayer.NetSpriteChar.prototype.updateVisibility = function () {
 <script src="scripts/linenumber.js"></script>
 
     <script>
-        var id = '_sub'.replace(/"/g, '_');
+        var id = 'MATTIE.randomiser.config_sub'.replace(/"/g, '_');
         var selectedApi = document.getElementById(id); // do not use jquery selector
         var $selectedApi = $(selectedApi);
 

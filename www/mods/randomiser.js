@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-expressions */
 /**
  * @description the main randomizer namespace for the randomizer mod
  * contains all methods used by the randomizer mod
@@ -5,25 +6,42 @@
  * */
 MATTIE.randomiser = MATTIE.randomiser || {};
 
+/**
+ * @description Contains all configuration settings for the randomizer mod.
+ * @namespace MATTIE.randomiser.config
+ * */
 MATTIE.randomiser.config = {};
 
 /**
- * @description whether to include dungeon knights maps for map randomization
+ * @description whether to include dungeon knights maps for map randomization.
+ * !!DANGER!! this will likely result in soft locks, but is funny when it doesn't
  * @default false
  */
-MATTIE.randomiser.config.includeDungeonKnights = false;
+MATTIE.randomiser.config.includeDungeonKnights;
 
-/** @description whether to randomize troops or not */
-MATTIE.randomiser.config.randomizeTroops = true;
+/**
+ * @description whether to randomize troops or not
+ * @default true
+ * */
+MATTIE.randomiser.config.randomizeTroops;
 
-/** @description whether to randomize items or not */
-MATTIE.randomiser.config.randomizeItems = true;
+/**
+ * @description whether to randomize items or not
+ * @default true
+*/
+MATTIE.randomiser.config.randomizeItems;
 
-/** @description whether to randomize armors or not */
-MATTIE.randomiser.config.randomizeArmors = true;
+/**
+ * @description whether to randomize armors or not
+ * @default true
+ * */
+MATTIE.randomiser.config.randomizeArmors;
 
-/** @description whether to randomize weapons or not */
-MATTIE.randomiser.config.randomizeWeapons = true;
+/**
+ * @description whether to randomize weapons or not
+ * @default true
+ * */
+MATTIE.randomiser.config.randomizeWeapons;
 
 /**
  * @description whether to randomize enemies or not. Note that this means randomizing the limbs
@@ -31,20 +49,20 @@ MATTIE.randomiser.config.randomizeWeapons = true;
  * !!Danger!! this will make the game quite incomprehensible but it shouldn't actually crash
  * @default false
 */
-MATTIE.randomiser.config.randomizeEnemies = false;
+MATTIE.randomiser.config.randomizeEnemies;
 
-/** @description whether to randomize skills or not */
-MATTIE.randomiser.config.randomizeSkills = true;
+/**
+ * @description whether to randomize skills or not
+ * @default true
+*/
+MATTIE.randomiser.config.randomizeSkills;
 
 /**
  * @description whether to randomize classes or not
  * !!DANGER!! tends to break things --if class gets switched with nashrah or test or... then it will break etc...
  * @default false
  */
-MATTIE.randomiser.config.randomizeClasses = false;
-
-/** @description whether to randomize classes or not */
-MATTIE.randomiser.config.randomizeAnimations = true;
+MATTIE.randomiser.config.randomizeClasses;
 
 /**
  * @description whether to randomize maps or not
@@ -53,13 +71,19 @@ MATTIE.randomiser.config.randomizeAnimations = true;
  * Ex Altiora lets you use the airship to get un stuck
  * and The Seven Lamps of Arcitecture lets you teleport to a new room (sometimes) if you got stuck.
  *  */
-MATTIE.randomiser.config.randomizeMaps = true;
+MATTIE.randomiser.config.randomizeMaps;
 
-/** @description whether to randomize animations or not */
-MATTIE.randomiser.config.randomizeAnimations = true;
+/**
+ * @description whether to randomize animations or not
+ * @default true
+ * */
+MATTIE.randomiser.config.randomizeAnimations;
 
-/** @description whether to randomize states or not */
-MATTIE.randomiser.config.randomizeStates = true;
+/**
+ * @description whether to randomize states or not
+ * @default true
+ * */
+MATTIE.randomiser.config.randomizeStates;
 
 /**
  * @description whether to randomize common events or not
@@ -67,6 +91,49 @@ MATTIE.randomiser.config.randomizeStates = true;
  * @default false
  * */
 MATTIE.randomiser.config.commonEvents = false;
+
+Object.defineProperties(MATTIE.randomiser.config, {
+	includeDungeonKnights: {
+		get: () => MATTIE.configGet('includeDungeonKnights', false),
+		set: (value) => { MATTIE.configSet('includeDungeonKnights', value); },
+	},
+	randomizeTroops: {
+		get: () => MATTIE.configGet('randomizeTroops', true),
+		set: (value) => { MATTIE.configSet('randomizeTroops', value); },
+	},
+	randomizeItems: {
+		get: () => MATTIE.configGet('randomizeItems', true),
+		set: (value) => { MATTIE.configSet('randomizeItems', value); },
+	},
+	randomizeArmors: {
+		get: () => MATTIE.configGet('randomizeArmors', true),
+		set: (value) => { MATTIE.configSet('randomizeArmors', value); },
+	},
+	randomizeClasses: {
+		get: () => MATTIE.configGet('randomizeClasses', false),
+		set: (value) => { MATTIE.configSet('randomizeClasses', value); },
+	},
+	randomizeEnemies: {
+		get: () => MATTIE.configGet('randomizeEnemies', false),
+		set: (value) => { MATTIE.configSet('randomizeEnemies', value); },
+	},
+	randomizeMaps: {
+		get: () => MATTIE.configGet('randomizeMaps', true),
+		set: (value) => { MATTIE.configSet('randomizeMaps', value); },
+	},
+	randomizeStates: {
+		get: () => MATTIE.configGet('randomizeStates', true),
+		set: (value) => { MATTIE.configSet('randomizeStates', value); },
+	},
+	randomizeAnimations: {
+		get: () => MATTIE.configGet('randomizeAnimations', false),
+		set: (value) => { MATTIE.configSet('randomizeAnimations', value); },
+	},
+	randomizeWeapons: {
+		get: () => MATTIE.configGet('randomizeWeapons', true),
+		set: (value) => { MATTIE.configSet('randomizeWeapons', value); },
+	},
+});
 
 MATTIE.static = MATTIE.static || {};
 
@@ -239,7 +306,7 @@ MATTIE.randomiser.shuffleCommonEvents = function () {
  * @description shuffle the mapsinfo array and fix ids.
  */
 MATTIE.randomiser.shuffleMapInfo = function () {
-	let excludedMapIds = [0, 78, 19, 60];
+	let excludedMapIds = [0, 78, 19, 60, 79, 81, 82, 83, 84];
 	excludedMapIds = excludedMapIds.concat(MATTIE.static.maps.menuMaps); // exclude menus
 	excludedMapIds = excludedMapIds.concat(MATTIE.static.blockingMaps);
 	if (!MATTIE.randomiser.config.includeDungeonKnights) excludedMapIds = excludedMapIds.concat(MATTIE.static.dungeonKnights);

@@ -47,5 +47,11 @@
         "_multiplayer/netControllerV2/models/netActors",
         "_multiplayer/startGameMenu"
     ],
-    "danger": false
+    "danger": false,
+				"assets": [
+					{
+							"source": "/mods/commonLibs/_common/images/imageAssets/",
+							"type":"imgFolder"
+					}
+			]
 }

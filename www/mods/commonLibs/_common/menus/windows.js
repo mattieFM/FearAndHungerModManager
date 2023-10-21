@@ -390,8 +390,20 @@ MATTIE.windows.ModListWin.prototype.setUpHandlers = function () {
 
 		this.setHandler(`MATTIE_${name}_CONFIG`, (() => {
 			const configPath = MATTIE_ModManager.modManager.getModConfigFile(name);
-			if (configPath) Graphics.displayFile(configPath);
-			else alert('mod does not provide config');
+			if (configPath) {
+				if (MATTIE_ModManager.modManager.getModActive(name)) {
+					if (MATTIE_ModManager.modManager.checkModHasChanged(name)) {
+						alert('You seem to have just toggled on this mod, you must reload and then you may configure it.\nPress Okay to reload mods.');
+						MATTIE_ModManager.modManager.reloadGame();
+					} else {
+						Graphics.displayFile(configPath);
+					}
+				} else {
+					alert('cannot configure inactive mods');
+				}
+			} else {
+				alert('mod does not provide config');
+			}
 			this.refresh();
 			this.activate();
 		}));

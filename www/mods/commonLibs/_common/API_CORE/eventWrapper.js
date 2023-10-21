@@ -463,9 +463,11 @@ class MapEvent {
 
 		// Get all existing event ids
 		const eventIds = [];
+		const persistingIds = [];
 		Object.keys(MATTIE.eventAPI.dataEvents).forEach((key) => {
 			const event = MATTIE.eventAPI.dataEvents[key];
 			if (event) eventIds.push(event.id);
+			if (event && event.persist) persistingIds.push(event.id);
 		});
 		$dataMap.events.forEach((object) => {
 			if (object === null) { return; }
@@ -480,9 +482,13 @@ class MapEvent {
 				const mapId = Number(ids[0]);
 				const eventId = Number(ids[1]);
 
-				// if (mapId != $gameMap._mapId) { continue; }
+				// this line is someone else's code IDK IDC enough to fix it /shrug
+				// eslint-disable-next-line no-continue
+				if (mapId != $gameMap._mapId) { continue; }
 
-				if (!eventIds.contains(eventId)) { delete $gameSelfSwitches._data[key]; }
+				if (!eventIds.contains(eventId) && !persistingIds.contains(eventId)) {
+					delete $gameSelfSwitches._data[key];
+				}
 			}
 		}
 	};

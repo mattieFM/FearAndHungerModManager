@@ -217,6 +217,18 @@ class BaseNetController extends EventEmitter {
 		if (data.pvpEvent) {
 			this.onPvpEventData(data.pvpEvent, data.id);
 		}
+		if (data.transparentEvent) {
+			this.onSetTransparentEventData(data.transparentEvent, data.id);
+		}
+		if (data.setCharImgEvent) {
+			this.onSetCharacterImageEventData(data.setCharImgEvent, data.id);
+		}
+		if (data.dashEvent) {
+			this.onDashEventData(data.dashEvent, data.id);
+		}
+		if (data.moveSpeedEvent) {
+			this.onSpeedEventData(data.moveSpeedEvent, data.id);
+		}
 	}
 
 	//-----------------------------------------------------
@@ -1422,6 +1434,153 @@ class BaseNetController extends EventEmitter {
 		} else {
 			MATTIE.multiplayer.pvp.PvpController.onCombatantLeave(senderId, targetedPlayer);
 		}
+	}
+
+	//-----------------------------------------------------
+	// Set Transparent event
+	//-----------------------------------------------------
+
+	/**
+	 * @description emit the set transparent event to the connected peers
+	 * @param {boolean} bool whether the player is transparent or visible
+	 * @emits transparentEvent
+	 */
+	emitSetTransparentEvent(bool) {
+		const obj = { transparentEvent: {} };
+		obj.transparentEvent.val = bool;
+		this.emit('transparentEvent');
+		this.sendViaMainRoute(obj);
+	}
+
+	/**
+	 * @description process and act upon the set transparent event when received.
+	 * @param {Object} transparentEventData see emitSetTransparent event defined above for what this object looks like
+	 * @param {UUID} id the id of the original sender
+	 */
+	onSetTransparentEventData(transparentEventData, id) {
+		if (this.netPlayers[id]) { this.netPlayers[id].$gamePlayer.setTransparent(transparentEventData.val, true); }
+	}
+
+	//-----------------------------------------------------
+	// Set CharecterImage event IE: outfit changes
+	//-----------------------------------------------------
+
+	/**
+	 * @description emit the set charecter image event to the connected peers
+	 * @param {string} characterName the name of the charsheet (the file within www/imgs/charecters excluding .png)
+	 * @param {int} characterIndex the index within that sprite sheet
+	 * @param {int} actorId the id of the actor this is occurring to
+	 * @emits setCharImgEvent
+	 */
+	emitSetCharacterImageEvent(characterName, characterIndex, actorId) {
+		const obj = { setCharImgEvent: {} };
+		obj.setCharImgEvent.characterIndex = characterIndex;
+		obj.setCharImgEvent.characterName = characterName;
+		obj.setCharImgEvent.actorId = actorId;
+		this.emit('setCharImgEvent');
+		this.sendViaMainRoute(obj);
+	}
+
+	/**
+	 * @description process and act upon the charecter image change event
+	 * @param {Object} outfitChangeData the data object defined in the emitter above
+	 * @param {UUID} id the id of the original sender
+	 */
+	onSetCharacterImageEventData(outfitChangeData, id) {
+		console.log('outfit Aread');
+		console.log(outfitChangeData);
+		const charName = outfitChangeData.characterName;
+		const charIndex = outfitChangeData.characterIndex;
+		const actorId = outfitChangeData.actorId;
+
+		const netPlayer = this.netPlayers[id];
+		const netActors = netPlayer.$netActors;
+		const actor = netActors.baseActor(actorId);
+
+		console.log(netActors);
+		console.log(actor);
+		if (actor) {
+			actor.setCharacterImage(charName, charIndex);
+			actor.refresh(); // this likely does nothing, but its good practice to call here as the engine tends to do similarly
+			netPlayer.$gamePlayer.refresh(); // this updates the actual display sprite
+		}
+		this.additionalOutfitActions(outfitChangeData, id);
+	}
+
+	/**
+	 * @description additional actions separate to the actual forwarding of the outfit change event that also get run alongside it
+	 * @param {Object} outfitChangeData the data object defined in the emitter above
+	 * @param {UUID} id the id of the original sender
+	 */
+	additionalOutfitActions(outfitChangeData, id) {
+		const charName = outfitChangeData.characterName;
+		const charIndex = outfitChangeData.characterIndex;
+		const actorId = outfitChangeData.actorId;
+		const netPlayer = this.netPlayers[id];
+		const netActors = netPlayer.$netActors;
+		const actor = netActors.baseActor(actorId);
+
+		// handle torch logic
+		if (actorId === netPlayer.actorId) { // we only care about the main char for torches
+			if (charName.toLowerCase().contains('torch')) {
+				console.log('PLAYER HAS TORCH');
+				netPlayer.$gamePlayer.setTorch(true);
+			} else {
+				console.log('PLAYER HAS NO TORCH :( *cries');
+				netPlayer.$gamePlayer.setTorch(false);
+			}
+		}
+	}
+
+	//-----------------------------------------------------
+	// Dash event
+	//-----------------------------------------------------
+
+	/**
+	 * @description emit the dash event to clients
+	 * @param {boolean} isDashing is this player dashing or not
+	 * @emits dashEvent
+	 */
+	emitDashEvent(isDashing) {
+		const obj = { dashEvent: { val: isDashing } };
+		this.emit('dashEvent');
+		this.sendViaMainRoute(obj);
+	}
+
+	/**
+	 * @description process and perform actions when a dash event is received
+	 * @param {Object} dashData the dash event net object defined in the method above
+	 * @param {UUID} id the id of the original sender
+	 */
+	onDashEventData(dashData, id) {
+		const isDashing = dashData.isDashing;
+		const gamePlayer = this.netPlayers[id].$gamePlayer;
+		gamePlayer.isDashButtonPressed = () => isDashing;
+	}
+
+	//-----------------------------------------------------
+	// Move speed change event
+	//-----------------------------------------------------
+	/**
+	 * @description emit the event for a move speed change to clients
+	 * @param {number} moveSpeed the new movespeed
+	 * @emits "moveSpeedEvent"
+	 */
+	emitSpeedEvent(moveSpeed) {
+		const obj = { moveSpeedEvent: { val: moveSpeed } };
+		this.emit('moveSpeedEvent');
+		this.sendViaMainRoute(obj);
+	}
+
+	/**
+	 * @description process the move speed change event
+	 * @param {Object} moveSpeedData see method above
+	 * @param {Object} id the id of the original sender
+	 */
+	onSpeedEventData(moveSpeedData, id) {
+		const newMoveSpeed = moveSpeedData.val;
+		const gamePlayer = this.netPlayers[id].$gamePlayer;
+		gamePlayer.setMoveSpeed(newMoveSpeed);
 	}
 
 	//-----------------------------------------------------

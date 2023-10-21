@@ -60,6 +60,19 @@ MATTIE.multiplayer.Conversations.prototype.resurrect = function () {
 		this.speak('I am not dead.');
 	}
 };
+/**
+ * @description form a marriage with the target player or display they are not willing if they don't concent
+ * @param {*} otherPlayerIsWilling whether the other player concents or not.
+ */
+MATTIE.multiplayer.Conversations.prototype.marry = function (otherPlayerIsWilling) {
+	if (otherPlayerIsWilling) {
+		MATTIE.fxAPI.hidePlayer(8000);
+		MATTIE.fxAPI.lockPlayer(8000);
+		MATTIE.eventAPI.marriageAPI.displayMarriage($gameParty.leader().actorId(), this.target.$gamePlayer.actorId, true, $gamePlayer.x, $gamePlayer.y);
+	} else {
+		MATTIE.msgAPI.displayMsg(`${this.targetName} is NOT willing.`);
+	}
+};
 
 MATTIE.multiplayer.Conversations.prototype.speak = function (msg) {
 	setTimeout(() => {
@@ -94,7 +107,10 @@ MATTIE.multiplayer.Conversations.prototype.talkOptionsCb = function (n) {
 		MATTIE.multiplayer.pvp.PvpController.startCombatWith(this.targetPeerId);
 		break;
 	case 4: // Show Love
-		MATTIE.eventAPI.marriageAPI.displayMarriage($gameParty.leader().actorId(), this.target.$gamePlayer.actorId, true, $gamePlayer.x, $gamePlayer.y);
+		// trigger net event for proccessing marriage concent
+		// eslint-disable-next-line no-case-declarations
+		const otherPlayerIsWilling = true;
+		this.marry(otherPlayerIsWilling);
 		break;
 	case 5: // cancel
 		break;
