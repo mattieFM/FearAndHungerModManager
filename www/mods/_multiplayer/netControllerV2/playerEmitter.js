@@ -179,4 +179,65 @@ MATTIE.multiplayer.gamePlayer.override = function () {
 			}
 		});
 	};
+
+	/** @description the base set transparent method for game player */
+	MATTIE_RPG.Game_Player_setTransparent = Game_Player.prototype.setTransparent;
+
+	/**
+	 * @description the overridden method for set transparent overridden to emit its event
+	 * @param {boolean} bool whether the player is transparent or visible
+	 * @param {boolean} doNotEmit whether to not send this event to net clients or not
+	 */
+	Game_Player.prototype.setTransparent = function (bool, doNotEmit = false) {
+		const netCont = MATTIE.multiplayer.getCurrentNetController();
+		MATTIE_RPG.Game_Player_setTransparent.call(this, bool);
+		if (!doNotEmit)netCont.emitSetTransparentEvent(bool);
+	};
+
+	/** @description the base setCharacterImage method for game actor */
+	MATTIE_RPG.Game_Actor_setCharacterImage = Game_Actor.prototype.setCharacterImage;
+	/**
+	 * @description the overridden method for set character image to handle emitting outfit changes
+	 * @param {string} characterName the name of the charsheet (the file within www/imgs/charecters excluding .png)
+	 * @param {ing} characterIndex the index within that sprite sheet
+	 */
+	Game_Actor.prototype.setCharacterImage = function (characterName, characterIndex) {
+		if (!(this instanceof MATTIE.multiplayer.NetActor)) { // only emit this event if this is a main actor and not a net actor
+			if (this._lastCharName != characterName || this._lastCharIndex != characterIndex) { // check that anything has changed
+				if ($gameParty._actors.contains(this.actorId())) { // only send if this char exists in party
+					MATTIE.multiplayer.getCurrentNetController().emitSetCharacterImageEvent(characterName, characterIndex, this.actorId());
+				}
+			}
+		}
+
+		this._lastCharName = this._characterName;
+		this._lastCharIndex = this._characterIndex;
+		MATTIE_RPG.Game_Actor_setCharacterImage.call(this, characterName, characterIndex);
+	};
+
+	/** @description the base isDashButtonPressed method for game player */
+	MATTIE_RPG.Game_Player_isDashButtonPressed = Game_Player.prototype.isDashButtonPressed;
+	/**
+	 * @description override the update dashing method to emit the dash event when there is a change in dashing
+	 */
+	Game_Player.prototype.isDashButtonPressed = function () {
+		const val = MATTIE_RPG.Game_Player_isDashButtonPressed.call(this);
+		if (this.lastVal != val) {
+			MATTIE.multiplayer.getCurrentNetController().emitDashEvent(this._dashing);
+			this.lastVal = val;
+		}
+	};
+
+	/** @description the base set move speed method */
+	MATTIE_RPG.Game_Player_SetMoveSpeed = Game_Player.prototype.setMoveSpeed;
+	/** @description override the set move speed method to emit the event as well */
+	Game_Player.prototype.setMoveSpeed = function (moveSpeed) {
+		if (!(this instanceof MATTIE.multiplayer.Secondary_Player)) { // if not a net player
+			if (this.lastMoveSpeed != moveSpeed) {
+				MATTIE.multiplayer.getCurrentNetController().emitSpeedEvent(moveSpeed);
+				this.lastMoveSpeed = moveSpeed;
+			}
+		}
+		MATTIE_RPG.Game_Player_SetMoveSpeed.call(this, moveSpeed);
+	};
 };

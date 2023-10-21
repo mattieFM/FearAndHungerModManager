@@ -974,6 +974,15 @@ class ModManager {
 	}
 
 	/**
+     * @description check if a mod have changed their status
+     * @returns {boolean}
+     * */
+	checkModHasChanged(name) {
+		const mod = this._modsDict[name];
+		return (mod.statusHasChanged());
+	}
+
+	/**
      * @description reload the game if changes were made to the mod jsons
      */
 	reloadIfChangedGame() {

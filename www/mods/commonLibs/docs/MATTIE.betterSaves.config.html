@@ -1,10 +1,8 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Source: _multiplayer/netControllerV2/playerRenderer.js | Source: _multiplayer/netControllerV2/playerRenderer.js</title>
+    <title>Namespace: config | Namespace: config</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -32,7 +30,7 @@
         
     </div>
     <div class="title">
-        <h1><a href="index.html" class="link">Source: _multiplayer/netControllerV2/playerRenderer.js</a></h1>
+        <h1><a href="index.html" class="link">Namespace: config</a></h1>
         
             <span class="version">v1.2.4</span>
         
@@ -60,81 +58,180 @@
 
 
 
+
+<section>
+
+<header>
     
-    <section>
-        <article>
-            <pre class="prettyprint source linenums"><code>var MATTIE = MATTIE || {};
-MATTIE.RPG = MATTIE.RPG || {};
-MATTIE.multiplayer = MATTIE.multiplayer || {};
-MATTIE.menus.multiplayer = MATTIE.menus.multiplayer || {};
-MATTIE.scenes.multiplayer = MATTIE.scenes.multiplayer || {};
-MATTIE.windows.multiplayer = MATTIE.windows.multiplayer || {};
-MATTIE.multiplayer.renderer = MATTIE.multiplayer.renderer || {};
+        <h2>
+            <span class="ancestors"><a href="MATTIE.html">MATTIE</a><a href="MATTIE.betterSaves.html">.betterSaves</a>.</span>config</h2>
+        
+    
+</header>
 
-/** render all net players */
-MATTIE.multiplayer.renderer._renderNetPlayers = function (target) {
-	this.playersSprites = [];
-	let players = [];
-	if (MATTIE.multiplayer.isClient) {
-		players = MATTIE.multiplayer.clientController.netPlayers;
-	} else if (MATTIE.multiplayer.isHost) {
-		players = MATTIE.multiplayer.hostController.netPlayers;
-	}
-	for (key in players) {
-		if (key) {
-			/** @type {PlayerModel} */
-			const netPlayer = players[key];
-			if ($gameMap.mapId() === netPlayer.map) { // only render players on same map
-				netPlayer.$gamePlayer.setActor(netPlayer.actorId);
-				netPlayer.$gamePlayer.refresh();
-				const p2 = netPlayer.$gamePlayer;
-				p2.setTransparent(false);
+<article>
+    
+        <div class="container-overview">
+        
+            
+                <div class="description"><p>This contains all the configs for better saves</p></div>
+            
 
-				p2.name = netPlayer.name;
-				const p2Sprite = new MATTIE.multiplayer.NetSpriteChar(p2);
-				if (MATTIE.multiplayer.devTools.shouldTint) {
-					if (!MATTIE.multiplayer.devTools.consistentTint) {
-						MATTIE.multiplayer.devTools.consistentTint = MATTIE.multiplayer.devTools.getTint();
-					}
-					p2Sprite.tint = MATTIE.multiplayer.devTools.consistentTint;
-				}
-				this.playersSprites.push(p2Sprite);
-				netPlayer.$gamePlayer.followers().forEach((follower) => {
-					if (follower.actorId) {
-						const followerSprite = new Sprite_Character(follower);
-						follower.setTransparent(false);
-						this.playersSprites.push(followerSprite);
-					}
-				});
-			}
-		}
-	}
-	for (var i = 0; i &lt; this.playersSprites.length; i++) {
-		target.addChild(this.playersSprites[i]);
-	}
-};
+            
 
-//-----------------------------------------------------------------------------
-// netSpriteChar
-//
-// The sprite for displaying a character.
 
-MATTIE.multiplayer.NetSpriteChar = function () {
-	this.initialize.apply(this, arguments);
-};
+<dl class="details">
 
-MATTIE.multiplayer.NetSpriteChar.prototype = Object.create(Sprite_Character.prototype);
-MATTIE.multiplayer.NetSpriteChar.prototype.constructor = MATTIE.multiplayer.NetSpriteChar;
+    
 
-MATTIE.multiplayer.NetSpriteChar.prototype.updateVisibility = function () {
-	Sprite_Character.prototype.updateVisibility.call(this);
-	if (!this._character.isOnMap()) {
-		this.visible = false;
-	}
-};
-</code></pre>
-        </article>
-    </section>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+            
+        
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Members</h3>
+
+        <dl>
+            
+
+<dt>
+<h4 class="name" id=".numberOfSaves">
+    <span class="type-signature"><span class="icon green">static</span> </span>numberOfSaves<span class="type-signature"></span>
+    
+    <div class="container-source members">
+        <code><a href="betterSaves.js.html">betterSaves.js</a></code>,
+        <code><a href="betterSaves.js.html#line28">line 28</a></code>
+    </div>
+    
+</h4>
+
+
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>How many saves maximum can you have.</p>
+    </div>
+    
+
+    <!--
+    
+    -->
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-default">Default Value:</dt>
+    <dd class="tag-default"><ul class="dummy">
+            <li>99</li>
+        </ul></dd>
+    <dt class="tag-default">Current Value:</dt>
+    <dd class="tag-default"><ul class="dummy">
+        <input onchange="var obj = {}; obj.name ='MATTIE.betterSaves.config.numberOfSaves'; obj.code='config'; obj.val=this.value; top.postMessage(obj, '*')" id="input-MATTIE.betterSaves.config.numberOfSaves" placeholder="99" type="text"></input>
+        </ul></dd>
+    <script>
+        var input = document.getElementById("input-MATTIE.betterSaves.config.numberOfSaves");
+        var pathSplit = "MATTIE.betterSaves.config.numberOfSaves".split(".");
+        var inp = top;
+        for(var i = 0; i < pathSplit.length; i++){
+            inp = inp[pathSplit[i]]
+        }
+        input.value = inp;
+    </script>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+    
+</dd>
+
+        </dl>
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
 
 
 
@@ -151,7 +248,7 @@ MATTIE.multiplayer.NetSpriteChar.prototype.updateVisibility = function () {
 <script src="scripts/linenumber.js"></script>
 
     <script>
-        var id = '_sub'.replace(/"/g, '_');
+        var id = 'MATTIE.betterSaves.config_sub'.replace(/"/g, '_');
         var selectedApi = document.getElementById(id); // do not use jquery selector
         var $selectedApi = $(selectedApi);
 

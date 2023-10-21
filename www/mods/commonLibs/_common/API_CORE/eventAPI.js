@@ -211,6 +211,7 @@ MATTIE.eventAPI.marriageAPI = {};
  */
 MATTIE.eventAPI.marriageAPI.displaySex = function (actorId1, actorId2, x, y, spawn = true) {
 	const marriage = new MapEvent();
+	// marriage.setPersist(false);
 	marriage.copyActionsFromEventOnMap(84, 1); // copy event from the first room ritual circle
 	/** @description a dict mapping the actor index to the page index that the game uses for this marriage */
 
@@ -220,20 +221,59 @@ MATTIE.eventAPI.marriageAPI.displaySex = function (actorId1, actorId2, x, y, spa
 	if (ghoulIds.includes(actorId2)) actorId2 = 16;
 
 	const mappings = [
-		{ id1: 1, id2: 16, pageIndex: 5 }, // merc ghoul
-		{ id1: 3, id2: 16, pageIndex: 6 }, // knight ghoul
-		{ id1: 4, id2: 16, pageIndex: 7 }, // priest ghoul
-		{ id1: 5, id2: 16, pageIndex: 8 }, // outlander ghoul
-		{ id1: 9, id2: 16, pageIndex: 10 }, // marriage ghoul
+		{
+			id1: 1, id2: 16, pageIndex: 5, characterImage: '$love_mercenary_ghoul',
+		}, // merc ghoul
+		{
+			id1: 3, id2: 16, pageIndex: 6, characterImage: '$love_knight_ghoul',
+		}, // knight ghoul
+		{
+			id1: 4, id2: 16, pageIndex: 7, characterImage: '$love_darkpriest_ghoul',
+		}, // priest ghoul
+		{
+			id1: 5, id2: 16, pageIndex: 8, characterImage: '$love_outlander_ghoul',
+		}, // outlander ghoul
+		{
+			id1: 9, id2: 16, pageIndex: 10, characterImage: '$love_marriage_ghoul',
+		}, // marriage ghoul
 
-		{ id1: 3, id2: 6, pageIndex: 11 }, // knight legarde
-		{ id1: 1, id2: 3, pageIndex: 12 }, // knight merc
-		{ id1: 5, id2: 3, pageIndex: 13 }, // outlander knight
-		{ id1: 1, id2: 5, pageIndex: 14 }, // outlander merc
-		{ id1: 1, id2: 6, pageIndex: 15 }, // legard merc
+		{
+			id1: 3, id2: 6, pageIndex: 11, characterImage: '$love_captain_knight',
+		}, // knight legarde
+		{
+			id1: 1, id2: 3, pageIndex: 12, characterImage: MATTIE.util.randChance(0.5) ? '$love_knight_mercenary' : '$love_knight_mercenary_bottom',
+		}, // knight merc
+		{
+			id1: 5, id2: 3, pageIndex: 13, characterImage: '$love_outlander_knight',
+		}, // outlander knight
+		{
+			id1: 1, id2: 5, pageIndex: 14, characterImage: '$love_outlander_mercenary',
+		}, // outlander merc
+		{
+			id1: 1, id2: 6, pageIndex: 15, characterImage: '$love_captain_mercenary',
+		}, // legard merc
 
-		{ id1: 9, id2: 1, pageIndex: 16 }, // marriage merc
-		{ id1: 1, id2: 4, pageIndex: 17 }, // marriage merc
+		{
+			id1: 9, id2: 1, pageIndex: 16, characterImage: '$love_marriage_mercenary',
+		}, // marriage merc
+		{
+			id1: 1, id2: 4, pageIndex: 17, characterImage: '$love_darkpriest_mercenary',
+		}, // dark merc
+		{
+			id1: 1, id2: 1, pageIndex: 17, characterImage: '$love_mercenary_mercenary',
+		}, // merc merc
+		{
+			id1: 4, id2: 4, pageIndex: 17, characterImage: '$love_darkpriest_darkpriest',
+		}, // dark dark
+		{
+			id1: 3, id2: 3, pageIndex: 17, characterImage: '$love_knight_knight',
+		}, // knight knight
+		{
+			id1: 5, id2: 5, pageIndex: 17, characterImage: '$love_outlander_outlander',
+		}, // outlander outlander
+		{
+			id1: 4, id2: 3, pageIndex: 17, characterImage: '$love_knight_darkpriest',
+		}, // knight darkpriest
 	];
 
 	const findMapping = function (id1, id2) {
@@ -251,6 +291,7 @@ MATTIE.eventAPI.marriageAPI.displaySex = function (actorId1, actorId2, x, y, spa
 
 	// set to only have the one page that we want
 	marriage.data.pages = [marriage.data.pages[mapping.pageIndex]];
+	marriage.setChar(0, mapping.characterImage);
 
 	marriage.data.pages[0].conditions = marriage.setDefaultConditions();
 	marriage.data.pages[0].trigger = 0;
@@ -287,7 +328,6 @@ MATTIE.eventAPI.marriageAPI.displayMarriage = function (actorId1, actorId2, succ
 	// failed marriage commands
 	if (!success) {
 		sexEvent.data.pages[1] = JsonEx.makeDeepCopy(sexEvent.data.pages[0]);
-
 		sexEvent.addSpokenText(1, 'Whheeezee....', 'Amalgam of Flesh');
 	} else {
 		sexEvent.addPage();
@@ -316,6 +356,7 @@ MATTIE.eventAPI.marriageAPI.displayMarriage = function (actorId1, actorId2, succ
 	sexEvent.addWait(0, 35);
 	sexEvent.addCommand(0, 123, ['A', 0]); // set self switch
 
+	sexEvent.setPersist(!success);
 	if (spawn) { sexEvent.spawn(x, y); }
 	return sexEvent;
 };

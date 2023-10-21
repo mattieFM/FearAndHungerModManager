@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-expressions */
 /*:
 * @plugindesc V0
 * a test mod for fear and hunger
@@ -8,10 +9,33 @@
 
 MATTIE.saves = MATTIE.saves || {};
 MATTIE.saves.suspendedRunId = 9998;
+/**
+ * @namespace MATTIE.betterSaves
+ * @description the main namespace for bettersaves mod
+ */
 MATTIE.betterSaves = {};
+
+/**
+ * @namespace MATTIE.betterSaves.config
+ * @description This contains all the configs for better saves
+ */
+MATTIE.betterSaves.config = {};
+
+/**
+ * @description How many saves maximum can you have.
+ * @default 99
+ */
+MATTIE.betterSaves.config.numberOfSaves;
 
 (() => {
 	const betterSavesName = 'betterSaves';
+	const params = PluginManager.parameters(betterSavesName);
+	Object.defineProperties(MATTIE.betterSaves.config, {
+		numberOfSaves: {
+			get: () => MATTIE.configGet('betterSaves_numberOfSaves', params.maxSaves),
+			set: (value) => { MATTIE.configSet('betterSaves_numberOfSaves', value); },
+		},
+	});
 
 	MATTIE.betterSaves.offload = function () {
 		MATTIE.DataManager.global.set('migratedSaves', false);
@@ -68,10 +92,8 @@ MATTIE.betterSaves = {};
 		() => MATTIE.saves.suspendedRunExists(),
 	);
 
-	const params = PluginManager.parameters(betterSavesName);
-
 	DataManager.maxSavefiles = function () {
-		return params.maxSaves;
+		return MATTIE.betterSaves.config.numberOfSaves;
 	};
 
 	function updateOldSaves() {

@@ -271,9 +271,25 @@ MATTIE.multiplayer.Secondary_Player.prototype.initialize = function (netActors) 
 	this.ctrlDir4 = 0; // start standing still
 	this.$netActors = netActors;
 	Game_Player.prototype.initialize.call(this);
-	MATTIE.fxAPI.addLightObject(() => this, () => true);
+	MATTIE.fxAPI.addLightObject(() => this, () => this.torchIsLit());
 };
 
+/**
+ * @description check if this player currently has a torch out
+ * @returns {boolean}
+ */
+MATTIE.multiplayer.Secondary_Player.prototype.torchIsLit = function () {
+	return this._torch || false;
+};
+
+/**
+ * @description set whether this player currently has a torch out
+ * @param {bool} bool whether the player has a torch active or not
+ * @returns void
+ */
+MATTIE.multiplayer.Secondary_Player.prototype.setTorch = function (bool) {
+	this._torch = bool;
+};
 // override init members to use netfollowers instead of followers
 MATTIE.multiplayer.Secondary_Player.prototype.initMembers = function () {
 	Game_Player.prototype.initMembers.call(this);

@@ -39,15 +39,15 @@ MATTIE.devTools = MATTIE.devTools || {};
 	}, 'Spawn Cat (DEV)', -2);
 
 	Input.addKeyBind('', () => {
-		const arr = ['$CaharaXCahara', '$DarceXCaharaBottom', '$DarceXDarce', '$enkiXenki', '$RagXRag', '$DarceXEnki'];
+		const arr = [1, 3, 4, 5];
 		let i = -(Math.ceil(arr.length / 2) + 1);
 		for (let index = 0; index < arr.length; index++) {
-			const element = arr[index];
-			const sex = MATTIE.eventAPI.marriageAPI.displayMarriage(1, 1, false, $gamePlayer.x, $gamePlayer.y, false);
-			sex.data.pages[0].image.characterName = element;
-			sex.data.pages[1].image.characterName = element;
-			sex.spawn($gamePlayer.x + i, $gamePlayer.y + 2);
-			i += 2;
+			const e1 = arr[index];
+			for (let index2 = 0; index2 < arr.length; index2++) {
+				const e2 = arr[index2];
+				const sex = MATTIE.eventAPI.marriageAPI.displayMarriage(e1, e2, false, $gamePlayer.x + i, $gamePlayer.y + 2);
+				i += 2;
+			}
 		}
 	}, 'Spawn bad things (DEV)', -2);
 

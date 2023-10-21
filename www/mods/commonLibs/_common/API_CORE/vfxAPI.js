@@ -113,6 +113,52 @@ MATTIE.fxAPI.drawCircleMap = function (x, y, lightMask, r1 = 50, r2 = 250, clr1 
 };
 
 /**
+ * @description make the player invisible for X frames or till turned back visible
+ * @param ms if provided turn the player inviable for this many milliseconds, else just leave them invisible till turned visible by something else
+ */
+MATTIE.fxAPI.hidePlayer = function (ms = -1) {
+	$gamePlayer.setTransparent(true);
+	if (ms > 0) {
+		setTimeout(() => {
+			this.showPlayer();
+		}, ms);
+	}
+};
+
+/**
+ * @description make the player visible again if they were invisible
+ */
+MATTIE.fxAPI.showPlayer = function () {
+	$gamePlayer.setTransparent(false);
+};
+
+/**
+ * @description lock player controls for x milliseconds or till turned back on
+ * @param ms if provided the player will be unable to act for this many milliseconds, else unable to act till reenabled elsewhere
+ */
+MATTIE.fxAPI.lockPlayer = function (ms = -1) {
+	this.orgCanMove = this.orgCanMove || $gamePlayer.canMove;
+	$gamePlayer.canMove = () => false;
+	$gameSystem.disableMenu();
+	if (ms > 0) {
+		setTimeout(() => {
+			this.unlockPlayer();
+		}, ms);
+	}
+};
+
+/**
+ * @description allow the player to input and stuff again
+ */
+MATTIE.fxAPI.unlockPlayer = function () {
+	$gameSystem.enableMenu();
+	if (this.orgCanMove) {
+		$gamePlayer.canMove = this.orgCanMove;
+		this.orgCanMove = undefined;
+	}
+};
+
+/**
  * @description add a game object to the list of tracked lights
  * @param {function} object any object with ._realX and realY
  * @param {function} active a function to check if the light is on or not
@@ -151,7 +197,7 @@ Lightmask.prototype._updateMask = function () {
 				element.blendMode,
 			);
 		} else {
-			console.log('not active');
+			// console.log('not active');
 		}
 	}
 };
