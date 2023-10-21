@@ -160,16 +160,19 @@ Input.addKeyBind = function (key, cb, name = '', scope = 0, wasdDefualt = null, 
 	if (name != '') {
 		const tempFunc = Window_KeyConfig.prototype.actionKey;
 		const tempFunc2 = Window_KeyAction.prototype.makeCommandList;
-		// this is so that keys can be rebound
-		Window_KeyConfig.prototype.actionKey = function (action) {
-			if (action === key || action == wasdDefualt || action == defaultKey) return name;
-			return tempFunc.call(this, action);
-		};
-		// this is so that keys can be rebound
-		Window_KeyAction.prototype.makeCommandList = function () {
-			tempFunc2.call(this);
-			this.addCommand(name, 'ok', true, key);
-		};
+
+		if (scope != -2 || MATTIE.isDev) {
+			// this is so that keys can be rebound
+			Window_KeyConfig.prototype.actionKey = function (action) {
+				if (action === key || action == wasdDefualt || action == defaultKey) return name;
+				return tempFunc.call(this, action);
+			};
+			// this is so that keys can be rebound
+			Window_KeyAction.prototype.makeCommandList = function () {
+				tempFunc2.call(this);
+				this.addCommand(name, 'ok', true, key);
+			};
+		}
 	}
 	i++;
 
