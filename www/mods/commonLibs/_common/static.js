@@ -100,6 +100,8 @@ MATTIE.static.maps.fortress = 74;
 MATTIE.static.items.emptyScroll = null;
 MATTIE.static.items.icons = {};
 MATTIE.static.items.icons.bookIcon = 0;
+/** @description the id of an item that cannot be obtained, default flashlight */
+MATTIE.static.items.unobtainable = 6;
 
 MATTIE.static.troops = MATTIE.static.troops || {};
 

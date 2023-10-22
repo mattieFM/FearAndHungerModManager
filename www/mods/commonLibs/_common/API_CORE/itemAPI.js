@@ -1,3 +1,4 @@
+/* eslint-disable max-classes-per-file */
 var MATTIE_ModManager = MATTIE_ModManager || {};
 /**
  * @namespace MATTIE.itemAPI
@@ -25,9 +26,9 @@ const EffectCodes = {
 };
 
 const ITEM_TYPES = {
-	ITEM: 'item',
-	ARMOR: 'armor',
-	WEAPON: 'weapon',
+	ITEM: 'Item',
+	ARMOR: 'Armor',
+	WEAPON: 'Weapon',
 
 };
 
@@ -158,12 +159,18 @@ Game_Item.prototype.setCb = function (cb) {
 	this.cb = cb;
 };
 
-/** @param {*} cb the callback to call when equipped */
+/**
+ * @description set a callback to be called when this item is equipped
+ * @param {function} cb a callback taking the Game_Actor object that has equipped this item
+ * */
 Game_Item.prototype.setEquipCb = function (cb) {
 	this.equipCb = cb;
 };
 
-/** @param {*} cb the callback to call when unequipped */
+/**
+ *  @description set a callback to be called when this item is unequipped
+ * @param {function} cb a callback taking the Game_Actor object that has unequipped this item
+ *  */
 Game_Item.prototype.setUnequipCb = function (cb) {
 	this.unequipCb = cb;
 };
@@ -195,10 +202,10 @@ MATTIE_RPG.Game_Actor_changeEquip = Game_Actor.prototype.changeEquip;
  * @param {rm.types.Item} item
  */
 Game_Actor.prototype.changeEquip = function (slotId, item) {
-	if (item.equipCb) item.equipCb();
+	if (item.equipCb) item.equipCb(this);
 	const otherItem = this.equips()[slotId];
 	console.log(otherItem);
-	if (otherItem) { if (otherItem.unequipCb) otherItem.unequipCb(); }
+	if (otherItem) { if (otherItem.unequipCb) otherItem.unequipCb(this); }
 	MATTIE_RPG.Game_Actor_changeEquip.call(this, slotId, item);
 };
 
@@ -361,7 +368,7 @@ MATTIE.itemAPI.RunTimeItem = class {
 		const items = itemIds.map((itemId) => (`item ${itemId}`)).join('\n');
 		const recipeString = openingTag + items + closingTag;
 
-		const recipeUnlock = `\n<Item Recipe: ${this._data.id}>\n`;
+		const recipeUnlock = `\n<${this.type} Recipe: ${this._data.id}>\n`;
 		$dataItems[unlockItemId].note += recipeUnlock;
 
 		this.addRecipeUnlock(unlockItemId);
@@ -384,7 +391,10 @@ MATTIE.itemAPI.RunTimeItem = class {
 		this._data.cb = cb;
 	}
 
-	/** @description set a callback to be called when this item is equipped */
+	/**
+	 *  @description set a callback to be called when this item is equipped
+	 *  @param {function} cb a callback taking the Game_Actor object that has equipped this item
+	*/
 	setEquipCallback(cb) {
 		Game_Item.prototype.setEquipCb.call(this, cb);
 		this._data.equipCb = cb;
@@ -412,5 +422,79 @@ MATTIE.itemAPI.RunTimeItem = class {
 		}
 
 		if (DataManager.processItemCategoriesNotetags1) DataManager.processItemCategoriesNotetags1([null, this._data]); // termina compatability
+	}
+};
+
+/**
+ *
+ * @param {string} charName the name of the character spritesheet within www/img/characters that this is a costume of (do not include .png)
+ * @param {int} startingIndex the index within that spritesheet IE: what portion of the sprite sheet to use if it contains multiple chars
+ * (0 if only one char in the sheet)
+ * @param {string} costumeName the name of the item
+ * @param {int} costumeIconId the id of the icon that this costume should have.
+ * @param {int} unlockItem the id of the item that should unlock the crafting recipe for this costume
+ * @param {int[]} craftingItems an array of the items needed to craft this item
+ * @param {boolean} spawn should this spawn the item or just return it so that you can modify it farther before spawning
+ */
+MATTIE.itemAPI.createCostume = function (
+	charName,
+	startingIndex,
+	costumeName,
+	costumeIconId,
+	unlockItem = MATTIE.static.items.unobtainable,
+	craftingItems = MATTIE.static.items.unobtainable,
+	spawn = true,
+) {
+	const costume = new MATTIE.itemAPI.RunTimeItem(ITEM_TYPES.ARMOR);
+
+	costume.setEquipCallback((actor) => {
+		/** @type {Game_Actor} */
+		const actor2 = actor;
+		actor2.setCharacterImage(charName, startingIndex);
+		actor2.baseCharNameFunc = actor2.characterName;
+		actor2.characterName = () => charName;
+	});
+	costume.setUnequipCallback((actor) => {
+		actor.characterName = actor.baseCharNameFunc;
+		actor.baseCharNameFunc = null;
+		actor.setCharacterImage(actor.characterName(), startingIndex);
+	});
+	costume.setName(costumeName);
+	costume.setIconIndex(costumeIconId);
+	costume.addRecipe(craftingItems, unlockItem);
+	if (spawn) { costume.spawn(); }
+	return costume;
+};
+
+MATTIE.itemAPI.RuntimeIcon = class {
+	constructor(file) {
+		/** @description the name of the file within www/img/system excluding .png */
+		this.file = file;
+
+		// reserve the image so it loads right away
+		setTimeout(() => {
+			ImageManager.reserveSystem(this.file);
+			ImageManager.loadSystem(this.file);
+		}, 5000);
+	}
+};
+
+/** @description the base draw icon method */
+MATTIE_RPG.Window_Base_drawIcon = Window_Base.prototype.drawIcon;
+/**
+ * @description draw icon method overridden to check if icon index is a runtime icon and load the runtime icon accordingly.
+ * */
+Window_Base.prototype.drawIcon = function (iconIndex, x, y) {
+	if (iconIndex instanceof MATTIE.itemAPI.RuntimeIcon) {
+		/** @type {MATTIE.itemAPI.RuntimeIcon} */
+		const runtimeIcon = iconIndex;
+
+		var bitmap = ImageManager.loadSystem(runtimeIcon.file);
+		console.log(bitmap);
+		var pw = Window_Base._iconWidth;
+		var ph = Window_Base._iconHeight;
+		this.contents.blt(bitmap, 0, 0, pw, ph, x, y);
+	} else {
+		MATTIE_RPG.Window_Base_drawIcon.call(this, iconIndex, x, y);
 	}
 };

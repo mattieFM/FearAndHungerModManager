@@ -7,28 +7,6 @@ MATTIE.bossRush = MATTIE.bossRush || {};
 	const bossRushName = 'bossRushOfTheEndless';
 	const params = PluginManager.parameters(bossRushName);
 
-	MATTIE.bossRush.onLoad = function () {
-		if (!MATTIE.DataManager.global.get('bossRushInstalled')) {
-			MATTIE.DataManager.addFileToImgFolder('/img/system/', '/system/', fileName, `_${fileName}`);
-			MATTIE.DataManager.addFileToImgFolder('/mods/_bossRushOfTheEndless/images/', '/pictures/', 'endingBook.png');
-			MATTIE.DataManager.addFileToImgFolder('/mods/_bossRushOfTheEndless/images/', '/pictures/', 'endingF.png');
-			MATTIE.DataManager.addFileToImgFolder('/mods/_bossRushOfTheEndless/images/', '/system/', fileName);
-			MATTIE.DataManager.global.set('bossRushInstalled', true);
-			alert('boss rush mod installed --game will need to be reloaded');
-			MATTIE_ModManager.modManager.reloadGame();
-		}
-	};
-
-	MATTIE.bossRush.offload = function () {
-		MATTIE.DataManager.global.set('bossRushInstalled', false);
-		if (MATTIE.DataManager.checkExists('/img/system/' + `_${fileName}.png`)) { MATTIE.DataManager.addFileToImgFolder('/img/system/', '/system/', `_${fileName}`, fileName); }
-		alert('boss rush mod uninstalled');
-	};
-
-	// MATTIE_ModManager.modManager.addOffloadScriptToMod(bossRushName, MATTIE.bossRush.offload);
-	// MATTIE_ModManager.modManager.addOnloadScriptToMod(bossRushName, MATTIE.bossRush.onLoad);
-	MATTIE.bossRush.onLoad();
-
 	/** @description an array of the ids of fights */
 	MATTIE.bossRush.fights = [
 		[MATTIE.static.troops.salmonSnakeId, MATTIE.static.troops.blackWitchId, MATTIE.static.troops.butterFlyId],
@@ -247,7 +225,7 @@ MATTIE.bossRush = MATTIE.bossRush || {};
 	protoBookOfFears.addRecipe([11, 87, 98], 98);
 	protoBookOfFears.addRecipeUnlock(11);
 	protoBookOfFears.addRecipeUnlock(87);
-	protoBookOfFears.setIconIndex(13);
+	protoBookOfFears.setIconIndex(new MATTIE.itemAPI.RuntimeIcon('bookOfPrimalFears'));
 	protoBookOfFears.setName('Book of Primal Fears');
 	protoBookOfFears.setDescription('A book containing 12 pages, each describing a primal fear. The \nbook bears the mark of Gol Goroth, and carries an unnatural weight');
 	protoBookOfFears.setItemType(2); // set book
@@ -255,7 +233,7 @@ MATTIE.bossRush = MATTIE.bossRush || {};
 	protoBookOfFears.spawn();
 
 	let bookOfPrimalFears = new MATTIE.itemAPI.RunTimeItem();
-	bookOfPrimalFears.setIconIndex(12);
+	bookOfPrimalFears.setIconIndex(new MATTIE.itemAPI.RuntimeIcon('spiderSilkBook'));
 	bookOfPrimalFears.setName('Spider Silk Book');
 	bookOfPrimalFears.setDescription('A book containing 12 pages. \nThe book appears to be woven from spider silk.');
 	bookOfPrimalFears.setItemType(2); // set book
@@ -263,7 +241,7 @@ MATTIE.bossRush = MATTIE.bossRush || {};
 	bookOfPrimalFears.spawn();
 
 	let rewardBook = new MATTIE.itemAPI.RunTimeItem();
-	rewardBook.setIconIndex(14);
+	rewardBook.setIconIndex(new MATTIE.itemAPI.RuntimeIcon('bookOfFutility'));
 	rewardBook.setName('Book of Futility');
 	rewardBook.setDescription('A very old book, its cover displays a very faded\nsymbol of gol gro-goroth, it contains one page.');
 	rewardBook.setItemType(2); // set book
