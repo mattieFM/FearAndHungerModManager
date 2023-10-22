@@ -185,5 +185,5 @@ MATTIE.multiplayer.getCurrentNetController = () => {
 		MATTIE.betterCrowMauler.betterCrowMaulerInit();
 	} // setup crow mauler if not termina
 
-	MATTIE.itemAPI.createCostume('$girl', 0, 'girl costume', 192, 130, [130, 8, 45, 46]);
+	MATTIE.itemAPI.createCostume('$girl', 0, 'girl costume', new MATTIE.itemAPI.RuntimeIcon('girlCostume'), 130, [130, 8, 45, 46]);
 })();

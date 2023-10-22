@@ -202,7 +202,7 @@ MATTIE_RPG.Game_Actor_changeEquip = Game_Actor.prototype.changeEquip;
  * @param {rm.types.Item} item
  */
 Game_Actor.prototype.changeEquip = function (slotId, item) {
-	if (item.equipCb) item.equipCb(this);
+	if (item) if (item.equipCb) item.equipCb(this);
 	const otherItem = this.equips()[slotId];
 	console.log(otherItem);
 	if (otherItem) { if (otherItem.unequipCb) otherItem.unequipCb(this); }
