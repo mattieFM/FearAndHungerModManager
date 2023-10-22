@@ -24,6 +24,13 @@ const EffectCodes = {
 	SPECIAL_ESCAPE: 0,
 };
 
+const ITEM_TYPES = {
+	ITEM: 'item',
+	ARMOR: 'armor',
+	WEAPON: 'weapon',
+
+};
+
 /**
  *
  * @param {EffectCodes} code what type of effect is this? refer to game action effects
@@ -64,6 +71,26 @@ DataManager.changeActivationCondition = function (obj, x) {
 DataManager.setCallbackOnItem = function (id, cb) {
 	$dataItems[id].hasCallback = true;
 	$dataItems[id].cb = cb;
+};
+
+/**
+ * @description set the callback that should be called when this item is equipped
+ * @param {*} id the item id
+ * @param {*} cb the function to call when the item is equipped
+ */
+DataManager.setOnEquipCallback = function (id, cb) {
+	$dataItems[id].hasCallback = true;
+	$dataItems[id].equipCb = cb;
+};
+
+/**
+ * @description set the callback that should be called when this item is unequipped
+ * @param {*} id the item id
+ * @param {*} cb the function to call when the item is un equipped
+ */
+DataManager.setOnUnequipCallback = function (id, cb) {
+	$dataItems[id].hasCallback = true;
+	$dataItems[id].unequipCb = cb;
 };
 
 /**
@@ -119,6 +146,8 @@ Game_Item.prototype.setObject = function (item) {
 	if (item) {
 		if (item.hasCallback) {
 			this.setCb(item.cb);
+			this.setEquipCb(item.equipCb);
+			this.setUnequipCb(item.unequipCb);
 		}
 		this.disableBase = item.disableBase;
 	}
@@ -129,8 +158,21 @@ Game_Item.prototype.setCb = function (cb) {
 	this.cb = cb;
 };
 
-Game_Item.prototype.clearCb = function () {
+/** @param {*} cb the callback to call when equipped */
+Game_Item.prototype.setEquipCb = function (cb) {
+	this.equipCb = cb;
+};
+
+/** @param {*} cb the callback to call when unequipped */
+Game_Item.prototype.setUnequipCb = function (cb) {
+	this.unequipCb = cb;
+};
+
+/** @description clear all callbacks on this item */
+Game_Item.prototype.clearCbs = function () {
 	this.cb = null;
+	this.unequipCb = null;
+	this.equipCb = null;
 };
 
 Game_Item.prototype.getCb = function () {
@@ -139,6 +181,25 @@ Game_Item.prototype.getCb = function () {
 
 Game_Item.prototype.useItem = function () {
 	if (this.cb) this.cb();
+};
+
+Game_Item.prototype.onEquip = function () {
+	if (this.equipCb) this.equipCb();
+};
+
+/** @description the base chance equip method */
+MATTIE_RPG.Game_Actor_changeEquip = Game_Actor.prototype.changeEquip;
+/**
+ * @description the overridden change equip method to also call out callbacks on equip/unequip
+ * @param {int} slotId
+ * @param {rm.types.Item} item
+ */
+Game_Actor.prototype.changeEquip = function (slotId, item) {
+	if (item.equipCb) item.equipCb();
+	const otherItem = this.equips()[slotId];
+	console.log(otherItem);
+	if (otherItem) { if (otherItem.unequipCb) otherItem.unequipCb(); }
+	MATTIE_RPG.Game_Actor_changeEquip.call(this, slotId, item);
 };
 
 // this is called anytime any battler uses a action/skill/...etc...
@@ -151,14 +212,22 @@ Game_Battler.prototype.useItem = function (item) {
 MATTIE.itemAPI.RunTimeItems = [];
 
 MATTIE.itemAPI.RunTimeItem = class {
-	constructor(params) {
+	/**
+	 * @description build a new item
+	 * @param {ITEM_TYPES} type the type of the item, default item
+	 */
+	constructor(type = ITEM_TYPES.ITEM) {
+		/** @type {ITEM_TYPES} */
+		this.type = type;
+
+		this.cb = () => {};
+
 		/**
          * @description the actual data item of this class
-         * @type {rm.types.Item}
+         * @type {rm.types.Armor}
          * */
 		this._data = this.buildDefaultParams();
 		this.setId();
-		this.cb = () => {};
 	}
 
 	/**
@@ -166,7 +235,22 @@ MATTIE.itemAPI.RunTimeItem = class {
      * @returns the default dataItem obj
      */
 	buildDefaultParams() {
-		const obj = {};
+		let obj = {};
+		if (this.type === ITEM_TYPES.ARMOR) {
+			let i = 1;
+			obj = $dataArmors[i];
+			while (!obj) {
+				obj = $dataArmors[++i];
+			}
+		}
+		if (this.type === ITEM_TYPES.WEAPON) {
+			let i = 1;
+			obj = $dataWeapons[i];
+			while (!obj) {
+				obj = $dataWeapons[++i];
+			}
+		}
+
 		obj.name = 'generic name';
 		obj.animationId = 0;
 		obj.consumable = 0;
@@ -176,6 +260,8 @@ MATTIE.itemAPI.RunTimeItem = class {
 		obj.hitType = 0;
 		obj.iconIndex = 0;
 		obj.itypeId = 1;
+		obj.atypeId = 4;
+		obj.etypeId = 4;
 		obj.meta = '';
 		obj.note = '';
 		obj.occasion = 0;
@@ -188,9 +274,30 @@ MATTIE.itemAPI.RunTimeItem = class {
 		return obj;
 	}
 
-	/** @description 1: normal, 0: weapon, 0: armor?, 2: book */
+	/** @description 1: normal, 2: book/key item */
 	setItemType(type) {
-		this._data.itypeId = type;
+		if (type > 0 && type < 2) { this._data.itypeId = type; }
+	}
+
+	/**
+	 * @description set the type of this item, refer to enum above for types
+	 * @param {ITEM_TYPES} type
+	 */
+	setType(type) {
+		this.type = type;
+	}
+
+	/**
+	 * @description set the category of the armor
+	 * 3: accessory
+	 * 4: torso
+	 * 5: shield
+	 * 6: head
+	 * @param {rm.types.Armor} atype
+	 */
+	setEquipType(atype) {
+		this._data.etypeId = atype;
+		this._data.atypeId = atype;
 	}
 
 	setIconIndex(index) {
@@ -198,7 +305,21 @@ MATTIE.itemAPI.RunTimeItem = class {
 	}
 
 	setId() {
-		this._data.id = $dataItems.length;
+		switch (this.type) {
+		case ITEM_TYPES.ITEM:
+			this._data.id = $dataItems.length;
+			break;
+		case ITEM_TYPES.ARMOR:
+			this._data.id = $dataArmors.length;
+			break;
+		case ITEM_TYPES.WEAPON:
+			this._data.id = $dataWeapons.length;
+			break;
+
+		default:
+			this._data.id = $dataItems.length;
+			break;
+		}
 	}
 
 	/**
@@ -260,12 +381,36 @@ MATTIE.itemAPI.RunTimeItem = class {
 	/** @description set a callback to be called when this item is used */
 	setCallback(cb) {
 		this.cb = cb;
+		this._data.cb = cb;
+	}
+
+	/** @description set a callback to be called when this item is equipped */
+	setEquipCallback(cb) {
+		Game_Item.prototype.setEquipCb.call(this, cb);
+		this._data.equipCb = cb;
+	}
+
+	/** @description set a callback to be called when this item is equipped */
+	setUnequipCallback(cb) {
+		Game_Item.prototype.setUnequipCb.call(this, cb);
+		this._data.unequipCb = cb;
 	}
 
 	spawn() {
 		MATTIE.itemAPI.RunTimeItems.push(this);
-		$dataItems[this._data.id] = this._data;
+		switch (this.type) {
+		case (ITEM_TYPES.ITEM):
+			$dataItems[this._data.id] = this._data;
+			DataManager.setCallbackOnItem(this._data.id, this.cb);
+			break;
+		case (ITEM_TYPES.ARMOR):
+			$dataArmors[this._data.id] = this._data;
+			break;
+		case (ITEM_TYPES.WEAPON):
+			$dataWeapons[this._data.id] = this._data;
+			break;
+		}
+
 		if (DataManager.processItemCategoriesNotetags1) DataManager.processItemCategoriesNotetags1([null, this._data]); // termina compatability
-		DataManager.setCallbackOnItem(this._data.id, this.cb);
 	}
 };

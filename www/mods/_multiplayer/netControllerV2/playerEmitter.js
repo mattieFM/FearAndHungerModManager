@@ -202,6 +202,9 @@ MATTIE.multiplayer.gamePlayer.override = function () {
 	 * @param {ing} characterIndex the index within that sprite sheet
 	 */
 	Game_Actor.prototype.setCharacterImage = function (characterName, characterIndex) {
+		this._lastCharName = this._characterName;
+		this._lastCharIndex = this._characterIndex;
+		MATTIE_RPG.Game_Actor_setCharacterImage.call(this, characterName, characterIndex);
 		if (!(this instanceof MATTIE.multiplayer.NetActor)) { // only emit this event if this is a main actor and not a net actor
 			if (this._lastCharName != characterName || this._lastCharIndex != characterIndex) { // check that anything has changed
 				if ($gameParty._actors.contains(this.actorId())) { // only send if this char exists in party
@@ -209,10 +212,6 @@ MATTIE.multiplayer.gamePlayer.override = function () {
 				}
 			}
 		}
-
-		this._lastCharName = this._characterName;
-		this._lastCharIndex = this._characterIndex;
-		MATTIE_RPG.Game_Actor_setCharacterImage.call(this, characterName, characterIndex);
 	};
 
 	/** @description the base isDashButtonPressed method for game player */
