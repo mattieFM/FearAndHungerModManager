@@ -380,12 +380,15 @@ MATTIE.itemAPI.RunTimeItem = class {
 		switch (this.type) {
 		case ITEM_TYPES.ITEM:
 			this._data.id = $dataItems.length;
+			this.typeString = '$dataItems';
 			break;
 		case ITEM_TYPES.ARMOR:
 			this._data.id = $dataArmors.length;
+			this.typeString = '$dataArmors';
 			break;
 		case ITEM_TYPES.WEAPON:
 			this._data.id = $dataWeapons.length;
+			this.typeString = '$dataWeapons';
 			break;
 
 		default:
@@ -418,7 +421,7 @@ MATTIE.itemAPI.RunTimeItem = class {
 		const openingTag = '&lt;Custom Synthesis Effect>';
 		const closingTag = '&lt;/Custom Synthesis Effect>';
 		this._data.craftingCb = cb;
-		const script = `$dataItems[${this._data.id}].craftingCb()`;
+		const script = `${this.typeString}[${this._data.id}].craftingCb()`;
 		this._data.customSynthEval = script;
 	}
 
