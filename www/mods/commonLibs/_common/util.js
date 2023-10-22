@@ -130,7 +130,7 @@ Game_Event.prototype.isAutorun = function () {
 };
 
 /**
- * @description
+ * @description get all autorun events on the current data map
  * @returns {Game_Event[]} an array of all autorun events on this map
  * @param {boolean} anyPage default: false. whether to check all pages or just the active page
  */
