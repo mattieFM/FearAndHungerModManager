@@ -185,5 +185,14 @@ MATTIE.multiplayer.getCurrentNetController = () => {
 		MATTIE.betterCrowMauler.betterCrowMaulerInit();
 	} // setup crow mauler if not termina
 
-	MATTIE.itemAPI.createCostume('$girl', 0, 'girl costume', new MATTIE.itemAPI.RuntimeIcon('girlCostume'), 130, [130, 8, 45, 46]);
+	const girlCostume = MATTIE.itemAPI.createCostume('$girl', 0, 'girl costume', new MATTIE.itemAPI.RuntimeIcon('girlCostume'), 130, [130, 8, 45, 46], false);
+	girlCostume.setCraftingCallback(() => {
+		SceneManager.goto(Scene_Map);
+		setTimeout(() => {
+			MATTIE.fxAPI.startScreenShake(1, 1, 10);
+			// eslint-disable-next-line max-len
+			MATTIE.msgAPI.displayMsg('You find yourself overcome with grief as you sow a child\'s soul\ninto fabric and deformed flesh. What have these dungeons done \nto you to make you willing to do such a thing, without reason.');
+		}, 500);
+	});
+	girlCostume.spawn();
 })();
