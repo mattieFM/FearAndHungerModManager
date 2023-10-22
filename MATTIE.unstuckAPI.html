@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Namespace: menus | Namespace: menus</title>
+    <title>Namespace: unstuckAPI | Namespace: unstuckAPI</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -30,7 +30,7 @@
         
     </div>
     <div class="title">
-        <h1><a href="index.html" class="link">Namespace: menus</a></h1>
+        <h1><a href="index.html" class="link">Namespace: unstuckAPI</a></h1>
         
             <span class="version">v1.2.4</span>
         
@@ -64,7 +64,7 @@
 <header>
     
         <h2>
-            <span class="ancestors"><a href="MATTIE.html">MATTIE</a>.</span>menus</h2>
+            <span class="ancestors"><a href="MATTIE.html">MATTIE</a>.</span>unstuckAPI</h2>
         
     
 </header>
@@ -74,7 +74,8 @@
         <div class="container-overview">
         
             
-                <div class="description"><p>a wrapper class for transitioning and switching between scenes</p></div>
+                <div class="description"><p>The api that handles everything related to providing ways to get unstuck in the event of errors<br>
+One of the biggest features is the ability to switch any currently running attorn events to be parallel instead.</p></div>
             
 
             
@@ -130,24 +131,6 @@
     
 
     
-        <h3 class="subsection-title">Namespaces</h3>
-        
-
-<dl>
-    
-        <dt>
-            <h4 class="name">
-                <a href="MATTIE.menus.mainMenu.html">mainMenu</a>
-                <div class="container-source members">
-                    <code><a href="MATTIE.menus.mainMenu.html">MATTIE.menus.mainMenu</a></code>
-                </div>
-            </h4>
-        </dt>
-        
-    
-</dl>
-
-    
 
     
 
@@ -159,14 +142,14 @@
 
 <dt>
     
-        <h4 class="name" id=".loadGameAndGoTo">
+        <h4 class="name" id=".convertRunningAutorunToNonBlockingAutorun">
             
-                <span class="type-signature"><span class="icon green">static</span> </span>loadGameAndGoTo<span class="signature">()</span><span class="type-signature"></span>
+                <span class="type-signature"><span class="icon green">static</span> </span>convertRunningAutorunToNonBlockingAutorun<span class="signature">(repairInMs, interpreter)</span><span class="type-signature"></span>
                 
             
             <div class="container-source members">
-                <code><a href="commonLibs__common_menus_menu.js.html">commonLibs/_common/menus/menu.js</a></code>,
-                <code><a href="commonLibs__common_menus_menu.js.html#line45">line 45</a></code>
+                <code><a href="commonLibs__common_API_CORE_unstuckAPI.js.html">commonLibs/_common/API_CORE/unstuckAPI.js</a></code>,
+                <code><a href="commonLibs__common_API_CORE_unstuckAPI.js.html#line65">line 65</a></code>
             </div>
             
         </h4>
@@ -178,7 +161,334 @@
 
     
     <div class="description">
-        <p>load a save id and then go to the map</p>
+        <p>convert all currently running autorun events to non-blocking autorun events, that is make them run on a different interpreter than the<br>
+main map interpreter</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>repairInMs</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">int</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>if provided after this many milliseconds, revert the changes made, repairing the map to its original state.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>interpreter</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="Game_Interpreter.html">Game_Interpreter</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>the interpreter to run these events on</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <dt class="important tag-deprecated">Deprecated:</dt><dd class="yes-def tag-deprecated"><ul class="dummy"><li>Yes</li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".convertRunningAutorunToParallel">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>convertRunningAutorunToParallel<span class="signature">(repairInMs, sequential)</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="commonLibs__common_API_CORE_unstuckAPI.js.html">commonLibs/_common/API_CORE/unstuckAPI.js</a></code>,
+                <code><a href="commonLibs__common_API_CORE_unstuckAPI.js.html#line13">line 13</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>convert all currently running autorun events to parallel events --there by breaking out of any blocking loop</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>repairInMs</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">int</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>if provided after this many milliseconds, revert the changes made, repairing the map to its original state.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>sequential</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>whether to move all of these to be parallel sequentially on the same interpreter (usually a good idea)</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+    
+        <h4 class="name" id=".unstuck">
+            
+                <span class="type-signature"><span class="icon green">static</span> </span>unstuck<span class="signature">()</span><span class="type-signature"></span>
+                
+            
+            <div class="container-source members">
+                <code><a href="commonLibs__common_API_CORE_unstuckAPI.js.html">commonLibs/_common/API_CORE/unstuckAPI.js</a></code>,
+                <code><a href="commonLibs__common_API_CORE_unstuckAPI.js.html#line108">line 108</a></code>
+            </div>
+            
+        </h4>
+
+        
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>A method that will try everything I can think of to get you unstuck, this might break some stuff, but it should get you unstuck</p>
     </div>
     
 
@@ -248,14 +558,14 @@
 
 <dt>
     
-        <h4 class="name" id=".toItemCheatMenu">
+        <h4 class="name" id=".unstuck">
             
-                <span class="type-signature"><span class="icon green">static</span> </span>toItemCheatMenu<span class="signature">()</span><span class="type-signature"></span>
+                <span class="type-signature"><span class="icon green">static</span> </span>unstuck<span class="signature">()</span><span class="type-signature"></span>
                 
             
             <div class="container-source members">
-                <code><a href="commonLibs__common_menus_cheatMenu.js.html">commonLibs/_common/menus/cheatMenu.js</a></code>,
-                <code><a href="commonLibs__common_menus_cheatMenu.js.html#line8">line 8</a></code>
+                <code><a href="commonLibs__common_API_CORE_unstuckAPI.js.html">commonLibs/_common/API_CORE/unstuckAPI.js</a></code>,
+                <code><a href="commonLibs__common_API_CORE_unstuckAPI.js.html#line120">line 120</a></code>
             </div>
             
         </h4>
@@ -267,363 +577,7 @@
 
     
     <div class="description">
-        <p>go to the item cheat menu scene</p>
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-
-</dd>
-
-            
-                
-
-<dt>
-    
-        <h4 class="name" id=".toLoadMenu">
-            
-                <span class="type-signature"><span class="icon green">static</span> </span>toLoadMenu<span class="signature">()</span><span class="type-signature"></span>
-                
-            
-            <div class="container-source members">
-                <code><a href="commonLibs__common_menus_menu.js.html">commonLibs/_common/menus/menu.js</a></code>,
-                <code><a href="commonLibs__common_menus_menu.js.html#line32">line 32</a></code>
-            </div>
-            
-        </h4>
-
-        
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>go to load scene</p>
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-
-</dd>
-
-            
-                
-
-<dt>
-    
-        <h4 class="name" id=".toMainMenu">
-            
-                <span class="type-signature"><span class="icon green">static</span> </span>toMainMenu<span class="signature">()</span><span class="type-signature"></span>
-                
-            
-            <div class="container-source members">
-                <code><a href="commonLibs__common_menus_menu.js.html">commonLibs/_common/menus/menu.js</a></code>,
-                <code><a href="commonLibs__common_menus_menu.js.html#line22">line 22</a></code>
-            </div>
-            
-        </h4>
-
-        
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>return to main menu</p>
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-
-</dd>
-
-            
-                
-
-<dt>
-    
-        <h4 class="name" id=".toModMenu">
-            
-                <span class="type-signature"><span class="icon green">static</span> </span>toModMenu<span class="signature">()</span><span class="type-signature"></span>
-                
-            
-            <div class="container-source members">
-                <code><a href="commonLibs__common_menus_menu.js.html">commonLibs/_common/menus/menu.js</a></code>,
-                <code><a href="commonLibs__common_menus_menu.js.html#line27">line 27</a></code>
-            </div>
-            
-        </h4>
-
-        
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>go to mod scene</p>
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-
-</dd>
-
-            
-                
-
-<dt>
-    
-        <h4 class="name" id=".toNewMenu">
-            
-                <span class="type-signature"><span class="icon green">static</span> </span>toNewMenu<span class="signature">()</span><span class="type-signature"></span>
-                
-            
-            <div class="container-source members">
-                <code><a href="commonLibs__common_menus_menu.js.html">commonLibs/_common/menus/menu.js</a></code>,
-                <code><a href="commonLibs__common_menus_menu.js.html#line37">line 37</a></code>
-            </div>
-            
-        </h4>
-
-        
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>go to new game menu</p>
+        <p>an alias of MATTIE.unstuckAPI.unstuck meant for being called from console</p>
     </div>
     
 
@@ -713,7 +667,7 @@
 <script src="scripts/linenumber.js"></script>
 
     <script>
-        var id = 'MATTIE.menus_sub'.replace(/"/g, '_');
+        var id = 'MATTIE.unstuckAPI_sub'.replace(/"/g, '_');
         var selectedApi = document.getElementById(id); // do not use jquery selector
         var $selectedApi = $(selectedApi);
 
