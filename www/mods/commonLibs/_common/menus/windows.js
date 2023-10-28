@@ -328,12 +328,16 @@ MATTIE.windows.ModListWin.prototype.makeCommandList = function () {
 	MATTIE_ModManager.modManager.getAllMods().forEach((mod) => {
 		const { name } = mod;
 		const status = MATTIE_ModManager.modManager.getModActive(name);
-		TextManager[`MATTIE_${name}`] = name;
-		this.addCommand(TextManager[`MATTIE_${name}`], `MATTIE_${name}`, status);
-		// TextManager["MATTIE_"+name+"_STATUS"] = (status? "active": "not active");
-		// this.addCommand(TextManager["MATTIE_"+name+"_STATUS"], "MATTIE_"+name, status);
-		TextManager[`MATTIE_${name}_CONFIG`] = 'Config';
-		this.addCommand(TextManager[`MATTIE_${name}_CONFIG`], `MATTIE_${name}_CONFIG`, status);
+		const modInfo = MATTIE_ModManager.modManager.getModInfo(MATTIE_ModManager.modManager.getPath(), name);
+
+		if (!modInfo.hidden || MATTIE.isDev) {
+			TextManager[`MATTIE_${name}`] = name;
+			this.addCommand(TextManager[`MATTIE_${name}`], `MATTIE_${name}`, status);
+			// TextManager["MATTIE_"+name+"_STATUS"] = (status? "active": "not active");
+			// this.addCommand(TextManager["MATTIE_"+name+"_STATUS"], "MATTIE_"+name, status);
+			TextManager[`MATTIE_${name}_CONFIG`] = 'Config';
+			this.addCommand(TextManager[`MATTIE_${name}_CONFIG`], `MATTIE_${name}_CONFIG`, status);
+		}
 	});
 	TextManager['MATTIE_' + 'Apply Changes'] = 'Apply Changes';
 	TextManager['MATTIE_' + 'Toggle Dev'] = 'Toggle Dev';
@@ -435,10 +439,10 @@ MATTIE.windows.MenuSelectableBase = function () {
 MATTIE.windows.MenuSelectableBase.prototype = Object.create(Window_Selectable.prototype);
 MATTIE.windows.MenuSelectableBase.prototype.constructor = MATTIE.windows.menuSelectableBase;
 
-MATTIE.windows.MenuSelectableBase.prototype.initialize = function (x, y) {
+MATTIE.windows.MenuSelectableBase.prototype.initialize = function (x, y, width = null) {
 	this._data = [];
-	this._itemList = [];
-	var width = this.windowWidth();
+	this._itemList = ['test', 'test2'];
+	width = width || this.windowWidth();
 	var height = this.windowHeight();
 	Window_Selectable.prototype.initialize.call(this, x, y, width, height);
 	this._formationMode = false;
@@ -464,7 +468,7 @@ MATTIE.windows.MenuSelectableBase.prototype.numVisibleRows = function () {
 };
 
 MATTIE.windows.MenuSelectableBase.prototype.item = function () {
-	return ['test', 'test2'][this.index()];
+	return this._itemList[this.index()];
 };
 MATTIE.windows.MenuSelectableBase.prototype.drawItem = function (index) {
 	var data = this._data[index];
@@ -487,4 +491,63 @@ MATTIE.windows.MenuSelectableBase.prototype.refresh = function () {
 	this.makeItemList();
 	this.createContents();
 	this.drawAllItems();
+};
+
+//-----------------------------------------------------------------------------
+// Window_DebugSpecific
+//----------------------------------------------------------------------------
+
+/**
+ * @description the window used for displaying specific switches/variables in a long list to the player
+ */
+
+MATTIE.windows.Window_DebugSpecific = function () {
+	this.initialize.apply(this, arguments);
+};
+
+MATTIE.windows.Window_DebugSpecific.prototype = Object.create(Window_DebugEdit.prototype);
+MATTIE.windows.Window_DebugSpecific.prototype.constructor = MATTIE.windows.Window_DebugSpecific;
+
+MATTIE.windows.Window_DebugSpecific.prototype.initialize = function (x, y, width) {
+	this._itemList = [1];
+	Window_DebugEdit.prototype.initialize.call(this, x, y, width);
+};
+
+MATTIE.windows.Window_DebugSpecific.prototype.maxItems = function () {
+	return 100;
+};
+MATTIE.windows.Window_DebugSpecific.prototype.setItemList = function (list) {
+	this._itemList = list;
+	this.refresh();
+};
+
+MATTIE.windows.Window_DebugSpecific.prototype.drawItem = function (index) {
+	var dataId = this._itemList[index] || null;
+	var name;
+	this.isBtn = false;
+	if (typeof dataId == 'object' && dataId != null) {
+		const temp = dataId;
+		dataId = temp.id;
+		name = temp.name;
+		if (temp.btn) {
+			this.isBtn = true;
+		}
+	} else {
+		name = dataId != null ? this.itemName(dataId) : '';
+	}
+	var idText = dataId != null ? `${dataId.padZero(4)}:` : '';
+	var idWidth = this.textWidth(idText);
+	var statusWidth = this.textWidth('-00000000');
+	var status = dataId != null ? this.itemStatus(dataId) : '';
+	var rect = this.itemRectForText(index);
+	this.resetTextColor();
+	this.drawText(idText, rect.x, rect.y, rect.width);
+	rect.x += idWidth;
+	rect.width -= idWidth + statusWidth;
+	this.drawText(name, rect.x, rect.y, rect.width);
+	this.drawText(status, rect.x + rect.width, rect.y, statusWidth, 'right');
+};
+
+MATTIE.windows.Window_DebugSpecific.prototype.currentId = function () {
+	return this._itemList[this.index()].id || this._itemList[this.index()];
 };

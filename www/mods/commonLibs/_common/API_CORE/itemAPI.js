@@ -235,6 +235,9 @@ MATTIE.itemAPI.RunTimeItem = class {
          * */
 		this._data = this.buildDefaultParams();
 		this.setId();
+
+		/** @description whether this item is spawned or not */
+		this.isSpawned = false;
 	}
 
 	/**
@@ -257,6 +260,7 @@ MATTIE.itemAPI.RunTimeItem = class {
 				obj = $dataWeapons[++i];
 			}
 		}
+		obj = JsonEx.makeDeepCopy(obj);
 
 		obj.name = 'generic name';
 		obj.animationId = 0;
@@ -283,7 +287,7 @@ MATTIE.itemAPI.RunTimeItem = class {
 
 	/** @description 1: normal, 2: book/key item */
 	setItemType(type) {
-		if (type > 0 && type < 2) { this._data.itypeId = type; }
+		if (type > 0 && type <= 2) { this._data.itypeId = type; } // in range (0-2]
 	}
 
 	/**
@@ -410,6 +414,7 @@ MATTIE.itemAPI.RunTimeItem = class {
 	}
 
 	spawn() {
+		this.spawned = true;
 		MATTIE.itemAPI.RunTimeItems.push(this);
 		switch (this.type) {
 		case (ITEM_TYPES.ITEM):

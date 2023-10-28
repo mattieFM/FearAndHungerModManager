@@ -87,7 +87,14 @@ MATTIE.static.commands.battleProcessingId = 301;
 MATTIE.static.commands.ifWin = 601;
 MATTIE.static.commands.selfSwitch = 123;
 MATTIE.static.commands.commonEventid = 117;
-
+/** @description the id of the show choices command */
+MATTIE.static.commands.showChoices = 102;
+/** @description the id of the comment command */
+MATTIE.static.commands.commentId = 108;
+/** @description the id of the when command */
+MATTIE.static.commands.when = 402;
+/** @description the id of the script command */
+MATTIE.static.commands.script = 355;
 // maps
 
 MATTIE.static.maps.menuMaps = [];
@@ -96,6 +103,27 @@ MATTIE.static.maps.blockingMaps = [];
 MATTIE.static.maps.charCreationMap = 0;
 MATTIE.static.maps.startMap = 0;
 MATTIE.static.maps.fortress = 74;
+MATTIE.static.maps.levelOneEntranceA = 1;
+MATTIE.static.maps.levelOneEntranceB = 29;
+MATTIE.static.maps.levelOneEntranceC = 51;
+MATTIE.static.maps.levelOneInnerHallA = 3;
+MATTIE.static.maps.levelOneInnerHallB = 31;
+MATTIE.static.maps.levelOneInnerHallC = 53;
+MATTIE.static.maps.levelOneBackyard = 9;
+MATTIE.static.maps.levelTwoBloodPitA = 5;
+MATTIE.static.maps.levelThreePrisonsA = 6;
+MATTIE.static.maps.levelThreePrisonsB = 37;
+MATTIE.static.maps.levelThreePrisonsC = 59;
+MATTIE.static.maps.levelFiveThicketsC = 68;
+MATTIE.static.maps.levelFiveThicketsB = 46;
+MATTIE.static.maps.levelFiveThicketsA = 21;
+MATTIE.static.maps.levelSevenDungeons = 24;
+MATTIE.static.maps.levelSixMines = 16;
+MATTIE.static.maps.villageHutsInsides = 22;
+MATTIE.static.maps.levelFiveMinesA = 11;
+MATTIE.static.maps.levelFiveMinesB = 39;
+MATTIE.static.maps.levelFiveMinesC = 184;
+
 // items
 MATTIE.static.items.emptyScroll = null;
 MATTIE.static.items.icons = {};
@@ -130,8 +158,16 @@ MATTIE.static.variable.secondarySyncedVars = [];
 /** @description a list of all variables that govern god affinity */
 MATTIE.static.variable.godAffinityAndPrayerVars = [];
 
+/** @description used by the cheat menu to teleport to key points */
+MATTIE.static.teleports = [];
 // switchids
 MATTIE.static.switch.ignoredSwitches = [];
+/** @description an array that contains all switches a user might want to change mid game */
+MATTIE.static.switch.cheatSwitches = [];
+/** @description an array that contains all switches for player limbs */
+MATTIE.static.switch.characterLimbs = [];
+MATTIE.static.switch.logical = [];
+MATTIE.static.switch.kill = [];
 MATTIE.static.switch.syncedSwitches = [];
 MATTIE.static.switch.godAffinitySwitches = [];
 
@@ -156,6 +192,9 @@ MATTIE.static.switch.justGuard = 1281;
 MATTIE.static.switch.toughEnemyMode = 3155;
 /** @description the switch for when the player is talking */
 MATTIE.static.switch.talk = 52;
+
+/** @description the switch that holds whether the torch timer is active or not */
+MATTIE.static.switch.torchTimer = 3151;
 
 // selfSwitch ids
 MATTIE.static.switch.syncedSelfSwitches = [];
@@ -280,6 +319,73 @@ MATTIE.static.update = function () {
 	// eslint-disable-next-line no-constant-condition
 	if (MATTIE.global.isFunger() || true) { // for now just use funger 1 vars regardless
 		// static values specific to funger 1
+
+		MATTIE.static.teleports = [
+			{
+				id: 0, name: 'Spawn', cmd: () => MATTIE.tpAPI.fortressSpawn(), bool: () => true, btn: true,
+			},
+			{
+				id: 1, name: 'Level 1 - Dungeon Entrance', cmd: () => MATTIE.tpAPI.levelOneEntrance(), bool: () => true, btn: true,
+			},
+			{
+				id: 2, name: 'Level 1 - Inner Halls', cmd: () => MATTIE.tpAPI.levelOneInnerHall(), bool: () => true, btn: true,
+			},
+			{
+				id: 3, name: 'Level 2 - Blood Pit', cmd: () => MATTIE.tpAPI.levelTwoBloodPit(), bool: () => true, btn: true,
+			},
+			{
+				id: 4, name: 'Level 3 - Prisons', cmd: () => MATTIE.tpAPI.levelThreePrisons(), bool: () => true, btn: true,
+			},
+			{
+				id: 5, name: 'Level 5 - Mines', cmd: () => MATTIE.tpAPI.levelFiveMines(), bool: () => true, btn: true,
+			},
+			{
+				id: 6, name: 'Level 5 - Thickets', cmd: () => MATTIE.tpAPI.levelFiveThickets(), bool: () => true, btn: true,
+			},
+			{
+				id: 7, name: 'Level 6 - Cave Dweller Village', cmd: () => MATTIE.tpAPI.levelSixCaveVillage(), bool: () => true, btn: true,
+			},
+			{
+				id: 8, name: 'Level 6 - Cube Of The Depths', cmd: () => MATTIE.tpAPI.levelSixCaveVillageCOD(), bool: () => true, btn: true,
+			},
+			{
+				id: 9, name: 'Level 6 - Dar\'ce', cmd: () => MATTIE.tpAPI.levelSixCaveVillageDarkie(), bool: () => true, btn: true,
+			},
+			{
+				id: 10, name: 'Level 7 - LeGarde', cmd: () => MATTIE.tpAPI.levelSevenLegard(), bool: () => true, btn: true,
+			},
+
+		];
+
+		// cheat menu switches
+		MATTIE.static.switch.characterLimbs = [
+			'696-699', // moonless dismemberment
+			'270-272', // also moonless dismemberment, likely one of these is enemy moonless
+			'36-39', // mercenary dismemberment
+			'248-251', // knight dismemberment
+			'252-255', // enki dismemberment
+			'256-259', // outlander dismemberment
+			'261-264', // legard dismemberment
+			'376-379', // blood golem dismemberment
+			'381-384', // demon kid dismemberment
+			'385-388', // marrige dismemberment
+			'390-393', // fusion dismemberment
+			'841-852', // skelleton dismemberment
+		];
+
+		/** @description a set of switches for the cheat menu covering game logic */
+		MATTIE.static.switch.logical = [
+			{ id: 198, name: 'Cahara sacrifice TTOT' },
+			{ id: 3115, name: 'Finish Trotur Quest' },
+			{ id: 2190, name: 'HARD MODE' },
+			{ id: 3155, name: 'HARD ENEMY MODE' },
+			{ id: 81, name: 'Girl Freed' },
+			{ id: 117, name: 'Elevator' },
+			{ id: 786, name: 'Crow Can Spawn' },
+			{ id: 1560, name: 'Gauntlet Entrance Open' },
+		];
+
+		MATTIE.static.switch.characterLimbs = MATTIE.static.rangeParser(MATTIE.static.switch.characterLimbs);
 
 		MATTIE.static.switch.crowMaulerCanSpawn = 786;
 		MATTIE.static.switch.crowMaulerDead = 771;

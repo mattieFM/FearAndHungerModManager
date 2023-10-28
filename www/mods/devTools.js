@@ -134,9 +134,146 @@ MATTIE.devTools.switchCheatScene = function () {
 	}
 };
 
+/**
+ * @description set all character parameters to 10,000
+ */
 function godMode() {
 	$gameParty.members().forEach((member) => {
+		if (!member.prevParam) member.prevParam = member.param;
 		member.param = () => 10000;
 		member.recoverAll();
 	});
+}
+/**
+ * @description undo god mode and set params back to normal
+ */
+function restoreGodMode() {
+	$gameParty.members().forEach((member) => {
+		if (member.prevParam) {
+			member.param = member.prevParam;
+			member.prevParam = undefined;
+			member.recoverAll();
+		}
+	});
+}
+
+/**
+ * @description a generic toggle prop method that applies to all
+ * @param {string} propName the name of the property to chance
+ * @param {string} systemSwitchName the name of the key in $gameSystem to store the bool of this toggle in
+ * @param {function} newFunc the func to replace the prop with
+ * @param {function} onCb
+ * @param {function} offCb
+ */
+function toggleMemberProp(propName, systemSwitchName, newFunc = () => {}, onCb = () => {}, offCb = () => {}) {
+	$gameParty.members().forEach((member) => {
+		if (!member[`prev${propName}`]) {
+			member[`prev${propName}`] = member[propName];
+			member[propName] = () => {
+				const newFuncRet = newFunc(member);
+				if (newFuncRet) return newFuncRet;
+				return member[`prev${propName}`]();
+			};
+			$gameSystem[systemSwitchName] = true;
+			onCb(member);
+		} else {
+			member[propName] = member[`prev${propName}`];
+			member[`prev${propName}`] = undefined;
+			$gameSystem[systemSwitchName] = false;
+			offCb(member);
+		}
+	});
+}
+
+function toggleGodMode() {
+	toggleMemberProp('param', 'godMode', () => 10000, (member) => member.recoverAll(), (member) => member.recoverAll());
+}
+
+/**
+ * @description toggle on/off party health loss
+ */
+function toggleHunger() {
+	toggleMemberProp('changeExp', 'hungerDisabled', (member) => member.expForLevel());
+}
+
+/**
+ * @description toggle on/off health loss for party
+ */
+function toggleHealthLoss() {
+	toggleMemberProp('setHp', 'healthDisabled', (member) => member.mhp);
+}
+
+/**
+ * @description toggle on/off mana loss for party
+ */
+function toggleManaLoss() {
+	toggleMemberProp('setMp', 'manaDisabled', (member) => member.mmp);
+}
+
+/**
+ * @description toggle on/off force dash for party
+ */
+function toggleForceDash() {
+	if (!$gamePlayer.prevSpeed) {
+		$gamePlayer.prevSpeed = $gamePlayer.realMoveSpeed;
+		$gamePlayer.realMoveSpeed = () => 5;
+		$gameSystem.forceDash = true;
+		$gameSystem.hyperSpeed = false;
+	} else {
+		$gamePlayer.realMoveSpeed = $gamePlayer.prevSpeed;
+		$gamePlayer.prevSpeed = undefined;
+		$gameSystem.forceDash = false;
+		$gameSystem.hyperSpeed = false;
+	}
+}
+
+/**
+ * @description toggle on/off force dash for party
+ */
+function toggleHyperSpeed() {
+	if (!$gamePlayer.prevSpeed) {
+		$gamePlayer.prevSpeed = $gamePlayer.realMoveSpeed;
+		$gamePlayer.realMoveSpeed = () => 10;
+		$gameSystem.hyperSpeed = true;
+		$gameSystem.forceDash = false;
+	} else {
+		$gamePlayer.realMoveSpeed = $gamePlayer.prevSpeed;
+		$gamePlayer.prevSpeed = undefined;
+		$gameSystem.hyperSpeed = false;
+		$gameSystem.forceDash = false;
+	}
+}
+
+/**
+ * @description toggle on/off toggleFreeExtraTurn for party
+ */
+function toggleFreeExtraTurn() {
+	// eslint-disable-next-line consistent-return
+	toggleMemberProp('param', 'freeExtraTurn', (id) => {
+		if (id === 6) { // agi index
+			return 100;
+		}
+	});
+}
+
+// on load
+MATTIE.devTools.once = false;
+MATTIE.devTools.prevonMapLoaded = Scene_Map.prototype.onMapLoaded;
+Scene_Map.prototype.onMapLoaded = function () {
+	if (!MATTIE.devTools.once) {
+		if ($gameSystem.godMode) {
+			toggleGodMode();
+		}
+		MATTIE.devTools.once = true;
+	}
+
+	MATTIE.devTools.prevonMapLoaded.call(this);
+};
+
+function toggleTas() {
+	if (!$gameSystem.tas) {
+		enableTas();
+	} else {
+		disableTas();
+	}
 }

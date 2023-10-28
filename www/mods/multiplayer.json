@@ -45,7 +45,8 @@
         "_multiplayer/saveEmitter",
         "_multiplayer/spectateScene",
         "_multiplayer/netControllerV2/models/netActors",
-        "_multiplayer/startGameMenu"
+        "_multiplayer/startGameMenu",
+								"_multiplayer/items"
     ],
     "danger": false,
 				"assets": [

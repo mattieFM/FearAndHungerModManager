@@ -433,7 +433,7 @@ class MapEvent {
      */
 	addCommandAfterIndex(pageIndex, index, command) {
 		const page = this.data.pages[pageIndex];
-		const secondHalf = page.list.slice(index + 2);
+		const secondHalf = page.list.slice(index + 1);
 		page.list = page.list.slice(0, index + 1);
 		page.list.push(command);
 		page.list = page.list.concat(secondHalf);
@@ -488,6 +488,7 @@ class MapEvent {
 
 				if (!eventIds.contains(eventId) && !persistingIds.contains(eventId)) {
 					delete $gameSelfSwitches._data[key];
+					console.log('cleaned up switch');
 				}
 			}
 		}

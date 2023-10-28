@@ -306,7 +306,7 @@ MATTIE.randomiser.shuffleCommonEvents = function () {
  * @description shuffle the mapsinfo array and fix ids.
  */
 MATTIE.randomiser.shuffleMapInfo = function () {
-	let excludedMapIds = [0, 78, 19, 60, 79, 81, 82, 83, 84];
+	let excludedMapIds = [0, 78, 19, 60, 79, 81, 82, 83, 84, 74, 183];
 	excludedMapIds = excludedMapIds.concat(MATTIE.static.maps.menuMaps); // exclude menus
 	excludedMapIds = excludedMapIds.concat(MATTIE.static.blockingMaps);
 	if (!MATTIE.randomiser.config.includeDungeonKnights) excludedMapIds = excludedMapIds.concat(MATTIE.static.dungeonKnights);
@@ -398,8 +398,11 @@ MATTIE.randomiser.shuffleMaps = function () {
 					const spots = MATTIE.betterCrowMauler.CrowController.prototype.getAllTransferPointsOnMap();
 					const spot = spots[MATTIE.util.randBetween(0, spots.length - 1)];
 					if (spot) {
+						console.log('tp to spot:');
+						console.log(spot);
 						realSpot = MATTIE.betterCrowMauler.CrowController.prototype.findNearestPassablePoint(50, 50, spot.x, spot.y);
 					} else {
+						console.log('middle of map tp');
 						// eslint-disable-next-line max-len
 						realSpot = MATTIE.betterCrowMauler.CrowController.prototype.findNearestPassablePoint(50, 50, $gameMap.width() / 2, $gameMap.height() / 2);
 					}
@@ -593,3 +596,24 @@ MATTIE.randomiser.randomise = function () {
 };
 
 MATTIE.randomiser.randomise();
+
+// supress audio warning
+WebAudio.prototype._load = function (url) {
+	try {
+		if (WebAudio._context) {
+			var xhr = new XMLHttpRequest();
+			if (Decrypter.hasEncryptedAudio) url = Decrypter.extToEncryptExt(url);
+			xhr.open('GET', url);
+			xhr.responseType = 'arraybuffer';
+			xhr.onload = function () {
+				if (xhr.status < 400) {
+					this._onXhrLoad(xhr);
+				}
+			}.bind(this);
+			// xhr.onerror = this._loader || function () { this._hasError = true; }.bind(this);
+			xhr.send();
+		}
+	} catch (error) {
+		//
+	}
+};

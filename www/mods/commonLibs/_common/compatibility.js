@@ -163,3 +163,27 @@ Spriteset_Map.prototype.createLayerGraphics = function () {
 	this.layerGraphics = this.layerGraphics || {};
 	MATTIE.compat.createLayerGraphics.call(this);
 };
+// FIX non existant items from loading other mods
+Game_Party.prototype.items = function () {
+	var list = [];
+	for (var id in this._items) {
+		if ($dataItems[id]) { list.push($dataItems[id]); }
+	}
+	return list;
+};
+
+Game_Party.prototype.weapons = function () {
+	var list = [];
+	for (var id in this._weapons) {
+		if ($dataWeapons[id]) list.push($dataWeapons[id]);
+	}
+	return list;
+};
+
+Game_Party.prototype.armors = function () {
+	var list = [];
+	for (var id in this._armors) {
+		if ($dataArmors[id]) list.push($dataArmors[id]);
+	}
+	return list;
+};
