@@ -140,8 +140,8 @@ MATTIE.menus.difficultyMenu.addDifficultyChoice = function (title, choiceMsg, cb
 
 				const int = setInterval(() => {
 					if ($gameMessage.isChoice()) {
-						$gameMessage._choiceMessages[i] = choiceMsg;
-						$gameMessage._choiceHelps[i] = helpMsg;
+						$gameMessage._choiceMessages[i] = `<WordWrap>${choiceMsg}`;
+						$gameMessage._choiceHelps[i] = `<WordWrap>${helpMsg}`;
 						clearInterval(int);
 					}
 				}, 50);

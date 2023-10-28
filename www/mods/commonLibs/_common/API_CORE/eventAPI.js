@@ -10,7 +10,7 @@ MATTIE.eventAPI.blankEvent = {};
  *
  * @param {Game_Item} item
  */
-MATTIE.eventAPI.addItemDropToCurrentMap = function (item) {
+MATTIE.eventAPI.addItemDropToCurrentMap = function (item, spawn = true) {
 	const event = new MapEvent();
 	const itemObj = item.object();
 	event.addPage();
@@ -23,7 +23,8 @@ MATTIE.eventAPI.addItemDropToCurrentMap = function (item) {
 	else event.addCommand(0, 126, [itemObj.id, 0, 0, 1]); // give item
 	event.addCommand(0, 123, ['A', 0]);// set self switch
 	event.setPersist(true);
-	event.spawn($gamePlayer.x, $gamePlayer.y);
+	if (spawn) { event.spawn($gamePlayer.x, $gamePlayer.y); }
+	return event;
 };
 
 /**

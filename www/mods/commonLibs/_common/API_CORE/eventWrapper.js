@@ -338,6 +338,7 @@ class MapEvent {
      *
      * @param id (int)
      * @param mapId (int)
+	 * @returns self for cmd chaining
      */
 	copyActionsFromEventOnMap(id, mapId) {
 		const url = 'data/Map%1.json'.format(mapId.padZero(3));
@@ -363,6 +364,7 @@ class MapEvent {
 		};
 
 		xhr.send();
+		return this;
 	}
 
 	/**

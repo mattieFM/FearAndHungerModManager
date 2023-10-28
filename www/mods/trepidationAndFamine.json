@@ -6,5 +6,11 @@
 				"config": "../www/mods/commonLibs/docs/MATTIE.TaF.config.html",
 				"dependencies": [
 					"_trepidationAndFamine/config"
-				]
+				],
+				"assets": [
+					{
+							"source": "/mods/_trepidationAndFamine/img/",
+							"type":"imgFolder"
+					}
+			]
 }
