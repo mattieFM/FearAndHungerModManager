@@ -178,11 +178,15 @@ Scene_Menu.prototype.createCommandWindow = function () {
 	this._commandWindow.setHandler('MATTIE_DROP', () => {
 		SceneManager.push(MATTIE.scenes.Scene_DropItem);
 	});
+	this._commandWindow.setHandler('MATTIE_HELP', () => {
+		SceneManager.push(MATTIE.scenes.Scene_Misc);
+	});
 };
 MATTIE_RPG.addMainCommands = Window_MenuCommand.prototype.addMainCommands;
 Window_MenuCommand.prototype.addMainCommands = function () {
 	MATTIE_RPG.addMainCommands.call(this);
 	this.addCommand('Drop', 'MATTIE_DROP', true);
+	this.addCommand('Help', 'MATTIE_HELP', true);
 };
 
 // MATTIE.eventAPI.addItemDropToCurrentMap(new Game_Item(MATTIE.static.items.emptyScroll));

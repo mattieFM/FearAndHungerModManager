@@ -1,3 +1,4 @@
+/* eslint-disable no-trailing-spaces */
 MATTIE.util = MATTIE.util || {};
 
 /**
@@ -143,4 +144,60 @@ MATTIE.util.getAllAutoRunEvents = function (anyPage = false) {
 		autorunEvents = events.filter((event) => event.event().pages.some((page) => page.trigger === 3)); // check if trigger === 3
 	}
 	return autorunEvents;
+};
+
+/**
+ * @description check if the player has a torch active
+ * @returns {bool} whether the player has a torch active or not
+ */
+MATTIE.util.hasTorchActive = function () {
+	return $gameSwitches.value(MATTIE.static.switch.torchTimer);
+};
+
+/**
+ * @description get the map variant of the current world
+ * @param x the index of the rand var you want IE:  
+ * 0, // level1_1  
+	1, // level1_2  
+	2, // level1_3  
+	3, // level1_4  
+	4, // level2  
+	5, // level3  
+	6, // level4  
+	7, // level5  
+	8, // level6  
+	9, // level6_2  
+	10, // level7  
+	11, // thicket1  
+	12, // thicket2  
+	13, // thicket3  
+	14, // mahabre1  
+ * returns a, b or c or z if null
+ */
+MATTIE.util.getMapVariant = function (x = 0) {
+	const randVars = [
+		121, // level1_1
+		122, // level1_2
+		123, // level1_3
+		124, // level1_4
+		125, // level2
+		126, // level3
+		127, // level4
+		128, // level5
+		129, // level6
+		130, // level6_2
+		131, // level7
+		132, // thicket1
+		133, // thicket2
+		134, // thicket3
+		135, // mahabre1
+	];
+	const vars = [
+		'z',
+		'a',
+		'b',
+		'c',
+	];
+
+	return vars[$gameVariables.value(randVars[x])];
 };

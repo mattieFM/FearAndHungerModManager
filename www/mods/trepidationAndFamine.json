@@ -1,0 +1,10 @@
+{
+    "name": "trepidationAndFamine",
+    "status": false,
+    "parameters": {},
+    "danger": true,
+				"config": "../www/mods/commonLibs/docs/MATTIE.TaF.config.html",
+				"dependencies": [
+					"_trepidationAndFamine/config"
+				]
+}

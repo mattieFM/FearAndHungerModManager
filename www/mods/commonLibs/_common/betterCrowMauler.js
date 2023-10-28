@@ -186,6 +186,7 @@ MATTIE.betterCrowMauler.CrowController = class {
 			});
 		}
 
+		console.log(arr);
 		return arr;
 	}
 
@@ -234,7 +235,7 @@ MATTIE.betterCrowMauler.CrowController = class {
 				const obj = {};
 				obj.x = x + centerX;
 				obj.y = y + centerY;
-				if (MATTIE.isPassableAnyDir(obj)) return obj;
+				if (MATTIE.isPassableXDirs(obj, 2)) return obj;
 			}
 			if (x == y || (x < 0 && x == -y) || (x > 0 && x == 1 - y)) {
 				t = dx;
@@ -244,6 +245,7 @@ MATTIE.betterCrowMauler.CrowController = class {
 			x += dx;
 			y += dy;
 		}
+		console.log('returned default');
 		return { x: X, y: Y };
 	}
 

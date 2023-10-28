@@ -78,6 +78,7 @@ function updateKey(key) {
  * 1 = on scene_map
  * 2 = on scene_battle
  * 3 = on scene_menu
+ * 4 = not on scene_map
  */
 Input.checkScope = function (scope) {
 	switch (scope) {
@@ -91,6 +92,8 @@ Input.checkScope = function (scope) {
 		return SceneManager._scene instanceof Scene_Battle;
 	case 3:
 		return SceneManager._scene instanceof Scene_Menu;
+	case 4:
+		return !(SceneManager._scene instanceof Scene_Map);
 	case -2:
 		return MATTIE.isDev;
 	default:
@@ -233,6 +236,8 @@ MATTIE.menus.mainMenu.addBtnToMainMenu(
 MATTIE_RPG.Game_Player_PerformTransfer = Game_Player.prototype.performTransfer;
 Game_Player.prototype.performTransfer = function () {
 	$gameMap._lastMapId = $gameMap.mapId();
+	$gameMap._lastX = $gamePlayer.x;
+	$gameMap._lastY = $gamePlayer.y;
 	MATTIE_RPG.Game_Player_PerformTransfer.call(this);
 };
 
@@ -250,6 +255,25 @@ MATTIE.isPassableAnyDir = function (event) {
 		) return true;
 	}
 	return false;
+};
+
+/** @description check if the spot is passible in any direction
+ * @param {Game_Event} event
+ * @param {int} x how many directions must this is passable in to return true
+*/
+MATTIE.isPassableXDirs = function (event, x) {
+	let count = 0;
+	const dirs = [2, 4, 6, 8]; // dir 4 dirsections
+	for (let index = 0; index < dirs.length; index++) {
+		const dir = dirs[index];
+		if (
+			$gamePlayer.canPass(event.x, event.y, dir)
+			&& $gamePlayer.isMapPassable(event.x, event.y, dir)
+			&& !$gamePlayer.isCollided(event.x, event.y)
+			&& $gameMap.isPassable(event.x, event.y, dir)
+		) count++;
+	}
+	return count >= x;
 };
 
 /**

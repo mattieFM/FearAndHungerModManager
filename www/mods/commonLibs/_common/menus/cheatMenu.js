@@ -467,26 +467,298 @@ MATTIE.windows.Window_AllStatus.prototype.reserveFaceImages = function () {
 };
 
 /**
- * Scene_Info
+ * Scene_Misc
  * @description a scene to show all info that might be useful
  * @extends Scene_MenuBase
  * @class
  */
-MATTIE.scenes.Scene_Info = function () {
+MATTIE.scenes.Scene_Misc = function () {
 	this.initialize.apply(this, arguments);
 };
 
-MATTIE.scenes.Scene_Info.prototype = Object.create(Scene_MenuBase.prototype);
-MATTIE.scenes.Scene_Info.prototype.constructor = MATTIE.scenes.Scene_Info;
+MATTIE.scenes.Scene_Misc.baseList = {
 
-MATTIE.scenes.Scene_Info.prototype.initialize = function () {
-	Scene_MenuBase.prototype.initialize.call(this);
 };
 
-MATTIE.scenes.Scene_Info.prototype.create = function () {
+setTimeout(() => {
+	if (MATTIE_ModManager.modManager.checkMod('multiplayer')) 	{ MATTIE.scenes.Scene_Misc.baseList.MULTIPLAYER = 'multiplayer'; }
+	if (MATTIE_ModManager.modManager.checkMod('devTools')) 	{
+		// is dev tool enabled
+		MATTIE.scenes.Scene_Misc.baseList.LIMBS = 'limbs';
+		MATTIE.scenes.Scene_Misc.baseList.CHEATS = 'cheats';
+		MATTIE.scenes.Scene_Misc.baseList.LOGIC = 'logical';
+		MATTIE.scenes.Scene_Misc.baseList.TELEPORTS = 'TELEPORT';
+	}
+	if (MATTIE.isDev) 	{
+		// is dev mode
+		MATTIE.scenes.Scene_Misc.baseList.TAS = 'tas';
+	}
+}, 5000);
+
+MATTIE.scenes.Scene_Misc.prototype = Object.create(Scene_MenuBase.prototype);
+MATTIE.scenes.Scene_Misc.prototype.constructor = MATTIE.scenes.Scene_Misc;
+
+MATTIE.scenes.Scene_Misc.prototype.initialize = function () {
+	Scene_MenuBase.prototype.initialize.call(this);
+	this.mode = 'switch';
+};
+
+/**
+ * @description set the mode of the help menu to switch, false for var
+ */
+MATTIE.scenes.Scene_Misc.prototype.setModeSwitch = function (bool) {
+	this.mode = bool ? 'switch' : 'var';
+};
+
+MATTIE.scenes.Scene_Misc.prototype.create = function () {
 	Scene_MenuBase.prototype.create.call(this);
-	this._infoList = new MATTIE.windows.MenuSelectableBase(0, 0);
-	this._infoList.setItemList([{ name: 'test1' }, { name: 'test2' }]);
+	this.tabDisplays = [];
+	this._infoList = new MATTIE.windows.MenuSelectableBase(0, 0, 200);
+	this._infoList.setItemList(Object.keys(MATTIE.scenes.Scene_Misc.baseList).map((e) => ({ name: MATTIE.scenes.Scene_Misc.baseList[e] })));
 	this.addWindow(this._infoList);
+	this.createEditWindow();
+	this.createDebugHelpWindow();
+	this.createCheatOptionsMenu();
+	const that = this;
+	this._infoList.select = function (index) {
+		Window_Selectable.prototype.select.call(this, index);
+		that.onTabSelect();
+		that.refreshHelpWindow();
+	};
+
+	this._infoList.setHandler('cancel', () => SceneManager.pop());
+	this._infoList.setHandler('ok', () => this.onTabSelect());
 	this._infoList.activate();
+};
+
+MATTIE.scenes.Scene_Misc.prototype.onTabSelect = function () {
+	const item = this._infoList.item();
+	this.tabDisplays.forEach((tab) => {
+		tab.deactivate();
+		tab.hide();
+	});
+	if (item) {
+		switch (item.name) {
+		case MATTIE.scenes.Scene_Misc.baseList.LIMBS:
+			console.log('limbs select');
+			this._editWindow.setItemList(MATTIE.static.switch.characterLimbs);
+			this._editWindow.select(this.last || 1);
+			this._editWindow.show();
+			this._debugHelpWindow.show();
+			this._editWindow.activate();
+
+			break;
+		case MATTIE.scenes.Scene_Misc.baseList.CHEATS:
+			this._editCheatWindow.setItemList(MATTIE.scenes.Scene_Misc.CHEATS);
+			this._editCheatWindow.select(1);
+			this._editCheatWindow.show();
+			this._editCheatWindow.activate();
+			this._editCheatWindow.refresh();
+			break;
+		case MATTIE.scenes.Scene_Misc.baseList.TAS:
+			this._editCheatWindow.setItemList(MATTIE.scenes.Scene_Misc.TAS);
+			this._editCheatWindow.select(1);
+			this._editCheatWindow.show();
+			this._editCheatWindow.activate();
+			this._editCheatWindow.refresh();
+			break;
+		case MATTIE.scenes.Scene_Misc.baseList.LOGIC:
+			this._editWindow.setItemList(MATTIE.static.switch.logical);
+			this._editWindow.select(this.last || 1);
+			this._editWindow.show();
+			this._debugHelpWindow.show();
+			this._editWindow.activate();
+			break;
+		case MATTIE.scenes.Scene_Misc.baseList.MULTIPLAYER:
+			this._editCheatWindow.setItemList(MATTIE.scenes.Scene_Misc.MULTIPLAYER);
+			this._editCheatWindow.select(1);
+			this._editCheatWindow.show();
+			this._editCheatWindow.activate();
+			this._editCheatWindow.refresh();
+			break;
+		case MATTIE.scenes.Scene_Misc.baseList.TELEPORTS:
+			this._editCheatWindow.setItemList(MATTIE.static.teleports);
+			this._editCheatWindow.select(1);
+			this._editCheatWindow.show();
+			this._editCheatWindow.activate();
+			this._editCheatWindow.refresh();
+			break;
+		default:
+			break;
+		}
+	}
+};
+
+MATTIE.scenes.Scene_Misc.prototype.onEditCancel = function () {
+	this._infoList.activate();
+	this._editWindow.hide();
+	this._debugHelpWindow.hide();
+	this.refreshHelpWindow();
+};
+
+MATTIE.scenes.Scene_Misc.prototype.createEditWindow = function () {
+	this._editWindow = new MATTIE.windows.Window_DebugSpecific(this._infoList.width, 0, Graphics.width - this._infoList.width);
+	this._editWindow.hide();
+	this._editWindow.setHandler('cancel', this.onEditCancel.bind(this));
+	this.addWindow(this._editWindow);
+	this.tabDisplays.push(this._editWindow);
+};
+
+MATTIE.scenes.Scene_Misc.CHEATS = [
+	{
+		id: 0, name: 'god mode', cmd: () => toggleGodMode(), bool: () => $gameSystem.godMode,
+	},
+	{
+		id: 1, name: 'no hunger', cmd: () => toggleHunger(), bool: () => $gameSystem.hungerDisabled,
+	},
+	{
+		id: 2, name: 'no health loss', cmd: () => toggleHealthLoss(), bool: () => $gameSystem.healthDisabled,
+	},
+	{
+		id: 3, name: 'no mana loss', cmd: () => toggleManaLoss(), bool: () => $gameSystem.manaDisabled,
+	},
+	{
+		id: 4, name: 'force dash', cmd: () => toggleForceDash(), bool: () => $gameSystem.forceDash,
+	},
+	{
+		id: 5, name: 'hyper speed', cmd: () => toggleHyperSpeed(), bool: () => $gameSystem.hyperSpeed,
+	},
+
+];
+
+MATTIE.scenes.Scene_Misc.MULTIPLAYER = [
+	{
+		id: 0,
+		name: 'request resync (client)',
+		btn: true,
+		cmd: () => {
+			if (MATTIE.multiplayer.isClient) { MATTIE.multiplayer.getCurrentNetController().emitRequestedVarSync(); }
+			this.requestedSync = true;
+		},
+		bool: () => this.requestedSync,
+	},
+	{
+		id: 1,
+		name: 'send resync (host)',
+		btn: true,
+		cmd: () => {
+			if (MATTIE.multiplayer.isHost) { MATTIE.multiplayer.getCurrentNetController().emitUpdateSyncedVars(); }
+			this.sync = true;
+		},
+		bool: () => this.sync,
+	},
+	{
+		id: 2,
+		name: 'get unstuck',
+		btn: true,
+		cmd: () => {
+			unstuck();
+		},
+		bool: () => this.sync,
+	},
+	{
+		id: 3,
+		name: 'TP to spawn (safe)',
+		btn: true,
+		cmd: () => {
+			MATTIE.multiplayer.keybinds.tpToSpawn();
+		},
+		bool: () => this.sync,
+	},
+	{
+		id: 4,
+		name: 'blood portal (safe)',
+		btn: true,
+		cmd: () => {
+			SceneManager.goto(Scene_Map);
+			setTimeout(() => {
+				$gameTemp.reserveCommonEvent(152);
+			}, 1000);
+		},
+		bool: () => this.sync,
+	},
+	{
+		id: 5,
+		name: 'TP to next player (unsafe)',
+		btn: true,
+		cmd: () => {
+			MATTIE.multiplayer.keybinds.tp();
+		},
+		bool: () => this.sync,
+	},
+	{
+		id: 6,
+		name: 'TP to last location (unsafe)',
+		btn: true,
+		cmd: () => {
+			MATTIE.multiplayer.keybinds.tpLast();
+		},
+		bool: () => this.sync,
+	},
+
+];
+
+MATTIE.scenes.Scene_Misc.TAS = [
+	{
+		id: 0, name: 'enableTas', cmd: () => toggleTas(), bool: () => $gameSystem.tas,
+	},
+
+];
+
+MATTIE.scenes.Scene_Misc.prototype.createCheatOptionsMenu = function () {
+	const that = this;
+	this._editCheatWindow = new MATTIE.windows.Window_DebugSpecific(this._infoList.width, 0, Graphics.width - this._infoList.width);
+	this._editCheatWindow.hide();
+	const prevFunc = this._editCheatWindow.select;
+	this._editCheatWindow.setItemList(MATTIE.scenes.Scene_Misc.CHEATS);
+	this._editCheatWindow.updateSwitch = function () {
+		if (Input.isRepeated('ok')) {
+			const index = that._editCheatWindow.index();
+			that._editCheatWindow._itemList[index].cmd();
+			// that._editCheatWindow._itemList[index].bool =  !that._editCheatWindow._itemList[index].bool;
+			this.redrawCurrentItem();
+			setTimeout(() => {
+				this.redrawItem(index);
+			}, 750);
+		}
+	};
+
+	this._editCheatWindow.itemStatus = function (dataId) {
+		if (this.isBtn) {
+			return Input.isTriggered('ok') ? '[Processing]' : '[Not Active]';
+		}
+		return that._editCheatWindow._itemList[dataId].bool() ? '[ON]' : '[OFF]';
+	};
+	this._editCheatWindow.hide();
+	this._editCheatWindow.setHandler('cancel', this.onEditCancel.bind(this));
+	this.addWindow(this._editCheatWindow);
+	this.tabDisplays.push(this._editCheatWindow);
+	this._editCheatWindow.refresh();
+};
+
+MATTIE.scenes.Scene_Misc.prototype.createDebugHelpWindow = function () {
+	var wx = this._editWindow.x;
+	var wy = this._editWindow.height;
+	var ww = this._editWindow.width;
+	var wh = Graphics.boxHeight - wy;
+	this._debugHelpWindow = new Window_Base(wx, wy, ww, wh);
+	this.addWindow(this._debugHelpWindow);
+	this.tabDisplays.push(this._debugHelpWindow);
+};
+
+MATTIE.scenes.Scene_Misc.prototype.helpText = function () {
+	if (this.mode === 'switch') {
+		return 'Enter : ON / OFF';
+	}
+	return ('Left     :  -1\n'
+                + 'Right    :  +1\n'
+                + 'Pageup   : -10\n'
+                + 'Pagedown : +10');
+};
+
+MATTIE.scenes.Scene_Misc.prototype.refreshHelpWindow = function () {
+	this._debugHelpWindow.contents.clear();
+	if (this._editWindow.active) {
+		this._debugHelpWindow.drawTextEx(this.helpText(), 4, 0);
+	}
 };

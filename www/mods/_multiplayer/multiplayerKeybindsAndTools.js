@@ -4,8 +4,29 @@ MATTIE.multiplayer = MATTIE.multiplayer || {};
 MATTIE.multiplayer.keybinds = MATTIE.multiplayer.keybinds || {};
 MATTIE.multiplayer.keybinds.currentIndex = 0;
 
-Input.addKeyBind('n', () => {
+MATTIE.multiplayer.keybinds.tpToSpawn = function () {
+	// teleport the player to the fortress
+	SceneManager.goto(Scene_Map);
+	$gamePlayer.reserveTransfer(MATTIE.static.maps.fortress, 15, 11, 0, 2);
+	setTimeout(() => {
+		$gamePlayer.performTransfer();
+	}, 1000);
+};
+
+MATTIE.multiplayer.keybinds.tpLast = function () {
+	// teleport the player to the fortress
+	SceneManager.goto(Scene_Map);
+	if ($gameMap._lastMapId && $gameMap._lastX && $gameMap._lastY) {
+		$gamePlayer.reserveTransfer($gameMap._lastMapId, $gameMap._lastX, $gameMap._lastY, 0, 2);
+		setTimeout(() => {
+			$gamePlayer.performTransfer();
+		}, 500);
+	}
+};
+
+MATTIE.multiplayer.keybinds.tp = function () {
 	try {
+		SceneManager.goto(Scene_Map);
 		const netPlayers = MATTIE.multiplayer.getCurrentNetController().netPlayers;
 		const netPlayerIds = Object.keys(netPlayers);
 
@@ -26,18 +47,18 @@ Input.addKeyBind('n', () => {
 		$gamePlayer.reserveTransfer(mapId, x, y, 0, 2);
 		setTimeout(() => {
 			$gamePlayer.performTransfer();
-		}, 250);
+		}, 500);
 	} catch (error) {
 		console.error(error);
 	}
+};
+
+Input.addKeyBind('n', () => {
+	MATTIE.multiplayer.keybinds.tp();
 }, 'TP', 0);
 
 Input.addKeyBind('', () => {
-	// teleport the player to the fortress
-	$gamePlayer.reserveTransfer(MATTIE.static.maps.fortress, 15, 11, 0, 2);
-	setTimeout(() => {
-		$gamePlayer.performTransfer();
-	}, 250);
+	MATTIE.multiplayer.keybinds.tpToSpawn();
 }, 'TP TO SPAWN', 0);
 
 Input.addKeyBind('m', () => {

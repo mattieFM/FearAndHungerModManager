@@ -35,12 +35,17 @@
         "_common/API_CORE/eventWrapper",
         "_common/API_CORE/msgAPI",
 								"_common/API_CORE/unstuckAPI",
+								"_common/API_CORE/teleportsAPI",
         "_common/supporters",
 								"_common/seedRandom",
         "_common/util",
         
 								"_common/betterDebugMenu",
-        "_common/betterCrowMauler"
+								
+        "_common/betterCrowMauler",
+								"_common/commonitems/costumes",
+								"_common/gameEmitter",
+								"_common/tas"
     
     ],
     "danger": false
