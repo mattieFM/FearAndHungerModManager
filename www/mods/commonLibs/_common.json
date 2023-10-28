@@ -36,6 +36,7 @@
         "_common/API_CORE/msgAPI",
 								"_common/API_CORE/unstuckAPI",
 								"_common/API_CORE/teleportsAPI",
+								"_common/API_CORE/miscAPI",
         "_common/supporters",
 								"_common/seedRandom",
         "_common/util",

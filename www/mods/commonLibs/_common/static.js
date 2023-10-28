@@ -44,6 +44,18 @@ MATTIE.static.rpg = MATTIE.static.rpg || {};
  */
 MATTIE.static.commonEvents = MATTIE.static.commonEvents || {};
 
+/** @description common event id for small food */
+MATTIE.static.commonEvents.smallFood = 31;
+
+/** @description common event id for Mediumm food */
+MATTIE.static.commonEvents.medFood = 32;
+
+/** @description common event id for Mediumm food */
+MATTIE.static.commonEvents.largeFood = 33;
+
+/** @description an array containing all common event food ids */
+MATTIE.static.commonEvents.foods = [MATTIE.static.commonEvents.smallFood, MATTIE.static.commonEvents.medFood, MATTIE.static.commonEvents.largeFood];
+
 /**
  * @namespace MATTIE.static.variable
  * @description contains game variables
@@ -55,6 +67,9 @@ MATTIE.static.variable = MATTIE.static.variable || {};
  * @description contains game switches
  */
 MATTIE.static.switch = MATTIE.static.switch || {};
+
+/** @description the switch for terror and starvation dif */
+MATTIE.static.switch.STARVATION = 3153;
 
 /**
  * @namespace MATTIE.static.commands
@@ -269,6 +284,7 @@ MATTIE.static.troops.GOFAHID = 130;
 /** @description the actor id of blood golem */
 MATTIE.static.actors.bloodGolemId = 10; // blood golem id is 10 in both 1 and 2
 MATTIE.static.actors.mercenaryId = 0;
+MATTIE.static.actors.moonlessId = 7;
 MATTIE.static.actors.girlId = 0;
 MATTIE.static.actors.knightId = 0;
 MATTIE.static.actors.darkPriestId = 0;
@@ -511,6 +527,7 @@ MATTIE.static.update = function () {
 
 		// items
 		MATTIE.static.items.emptyScroll = $dataItems[88];
+		MATTIE.static.items.silverCoin = $dataItems[59];
 		MATTIE.static.items.icons.bookIcon = 121;
 
 		// selfSwitch ids

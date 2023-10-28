@@ -92,6 +92,12 @@ MATTIE.randomiser.config.randomizeStates;
  * */
 MATTIE.randomiser.config.commonEvents = false;
 
+/**
+ * @description whether to make it so every door you walk through will always lead to a new location instead of having a memory and a set layout of the dungeon.
+ * @default false
+ */
+MATTIE.randomiser.config.noFloorMemory = false;
+
 Object.defineProperties(MATTIE.randomiser.config, {
 	includeDungeonKnights: {
 		get: () => MATTIE.configGet('includeDungeonKnights', false),
@@ -126,12 +132,22 @@ Object.defineProperties(MATTIE.randomiser.config, {
 		set: (value) => { MATTIE.configSet('randomizeStates', value); },
 	},
 	randomizeAnimations: {
-		get: () => MATTIE.configGet('randomizeAnimations', false),
+		get: () => MATTIE.configGet('randomizeAnimations', true),
 		set: (value) => { MATTIE.configSet('randomizeAnimations', value); },
 	},
 	randomizeWeapons: {
 		get: () => MATTIE.configGet('randomizeWeapons', true),
 		set: (value) => { MATTIE.configSet('randomizeWeapons', value); },
+	},
+
+	noFloorMemory: {
+		get: () => MATTIE.configGet('noFloorMemory', false),
+		set: (value) => { MATTIE.configSet('noFloorMemory', value); },
+	},
+
+	randomizeSkills: {
+		get: () => MATTIE.configGet('randomizeSkills', true),
+		set: (value) => { MATTIE.configSet('randomizeSkills', value); },
 	},
 });
 
@@ -365,6 +381,7 @@ MATTIE.randomiser.shuffleMaps = function () {
 		};
 
 		Game_Interpreter.prototype.command201 = function () {
+			if (MATTIE.randomiser.config.noFloorMemory) MATTIE.randomiser.shuffleMaps();
 			if (!$gameParty.inBattle() && !$gameMessage.isBusy()) {
 				var mapId; var x; var
 					y;
@@ -557,6 +574,7 @@ MATTIE.randomiser.safeShuffle = function () {
 				}, 500);
 			}, 200);
 		});
+		Input.addKeyBind('', bookOfLamps.cb, 'Seven Lamps', 0);
 		bookOfLamps.spawn();
 		const exAltiora = new MATTIE.itemAPI.RunTimeItem();
 		exAltiora.addRecipe([11, 87, 98], 98);
@@ -576,6 +594,7 @@ MATTIE.randomiser.safeShuffle = function () {
 				$gamePlayer.getOnOffVehicle();
 			}, 500);
 		});
+		Input.addKeyBind('', exAltiora.cb, 'Ex Altiora', 0);
 		exAltiora.spawn();
 		const mapInit = Game_Map.prototype.initialize;
 		Game_Map.prototype.initialize = function () {
