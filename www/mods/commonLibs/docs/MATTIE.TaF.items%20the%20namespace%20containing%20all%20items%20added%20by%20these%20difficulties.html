@@ -1,10 +1,8 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Source: _multiplayer/lobby.js | Source: _multiplayer/lobby.js</title>
+    <title>Namespace: items the namespace containing all items added by these difficulties | Namespace: items the namespace containing all items added by these difficulties</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -32,7 +30,7 @@
         
     </div>
     <div class="title">
-        <h1><a href="index.html" class="link">Source: _multiplayer/lobby.js</a></h1>
+        <h1><a href="index.html" class="link">Namespace: items the namespace containing all items added by these difficulties</a></h1>
         
             <span class="version">v1.2.4</span>
         
@@ -60,92 +58,86 @@
 
 
 
+
+<section>
+
+<header>
     
-    <section>
-        <article>
-            <pre class="prettyprint source linenums"><code>var MATTIE = MATTIE || {};
-MATTIE.menus.multiplayer = MATTIE.menus.multiplayer || {};
-MATTIE.scenes.multiplayer = MATTIE.scenes.multiplayer || {};
-MATTIE.windows.multiplayer = MATTIE.windows.multiplayer || {};
-MATTIE.TextManager = MATTIE.TextManager || {};
-MATTIE.CmdManager = MATTIE.CmdManager || {};
-MATTIE.TextManager.disconnect = 'Disconnect';
-MATTIE.CmdManager.disconnect = 'MATTIE_Deconnect';
-MATTIE.TextManager.forceStart = 'Join Mid Game';
-MATTIE.CmdManager.forceStart = 'MATTIE_Force_start';
-/**
- * @description The scene for hosting a multiplayer game
- * @extends MATTIE.scenes.multiplayer.base
- */
-MATTIE.scenes.multiplayer.lobby = function () {
-	this.initialize.apply(this, arguments);
-};
-MATTIE.scenes.multiplayer.lobby.prototype = Object.create(MATTIE.scenes.multiplayer.base.prototype); // extend Scene_Base
-MATTIE.scenes.multiplayer.lobby.prototype.constructor = MATTIE.scenes.multiplayer.lobby; // use constructor
+        <h2>items the namespace containing all items added by these difficulties</h2>
+        
+    
+</header>
 
-MATTIE.scenes.multiplayer.lobby.prototype.create = function () {
-	MATTIE.scenes.multiplayer.base.prototype.create.call(this);
-	this.createWindowLayer();
-	MATTIE.multiplayer.clientController.open();
-	if (!MATTIE.multiplayer.clientController.self) {
-		MATTIE.multiplayer.clientController.self.on('open', () => {
-			this.addPlayerListWindow();
-			this.initListController();
-		});
-	} else {
-		this.addPlayerListWindow();
-		this.initListController();
-	}
-	const btns = {};
-	btns[MATTIE.TextManager.disconnect] = MATTIE.CmdManager.disconnect;
-	btns[MATTIE.TextManager.forceStart] = MATTIE.CmdManager.forceStart;
-	this._optionsWindow = new MATTIE.windows.HorizontalBtns(175 + 300 + 10, btns, 2);
-	this._optionsWindow.setHandler(MATTIE.CmdManager.disconnect, (() => {
-		MATTIE.multiplayer.clientController.disconnectAllConns();
-		MATTIE.menus.multiplayer.openMultiplayer();
-	}));
+<article>
+    
+        <div class="container-overview">
+        
+            
 
-	this._optionsWindow.setHandler(MATTIE.CmdManager.forceStart, (() => {
-		MATTIE.multiplayer.clientController.emit('startGame');
-	}));
+            
 
-	this.addWindow(this._optionsWindow);
-	this._optionsWindow.updateWidth(600);
-	this._optionsWindow.updatePlacement(175 + 300 + 10);
-};
 
-MATTIE.scenes.multiplayer.lobby.prototype.addPlayerListWindow = function () {
-	this._playerWindow = new MATTIE.windows.List(0, 0, 600, 300, 'Connected Players:');
-	this._playerWindow.updatePlacement(0, 15);
-	this.addWindow(this._playerWindow);
-};
+<dl class="details">
 
-MATTIE.scenes.multiplayer.lobby.prototype.initListController = function () {
-	var clientController = MATTIE.multiplayer.clientController;
-	clientController.addListener('updateNetPlayers', (netPlayers) => {
-		this.updateList(netPlayers);
-	});
+    
 
-	clientController.addListener('startGame', () => {
-		MATTIE.menus.multiplayer.openGame();
-	});
+    
 
-	this.updateList(clientController.netPlayers);
-};
-MATTIE.scenes.multiplayer.lobby.prototype.updateList = function (list) {
-	const arr = [];
-	for (key in list) {
-		if (key) {
-			const netPlayer = list[key];
-			arr.push(netPlayer.name);
-		}
-	}
-	arr.push(MATTIE.multiplayer.clientController.player.name);
-	this._playerWindow.updateText(arr);
-};
-</code></pre>
-        </article>
-    </section>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+            
+        
+        </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
 
 
 
@@ -162,7 +154,7 @@ MATTIE.scenes.multiplayer.lobby.prototype.updateList = function (list) {
 <script src="scripts/linenumber.js"></script>
 
     <script>
-        var id = '_sub'.replace(/"/g, '_');
+        var id = 'MATTIE.TaF.items the namespace containing all items added by these difficulties_sub'.replace(/"/g, '_');
         var selectedApi = document.getElementById(id); // do not use jquery selector
         var $selectedApi = $(selectedApi);
 

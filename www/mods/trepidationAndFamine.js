@@ -573,181 +573,181 @@ MATTIE.TaF.sillyTick = function () {
 		}
 	}
 
-	if (!$gameParty.inBattle() && SceneManager._scene instanceof Scene_Map && false) { // overworld trolls
-		if (this.tick & 1100 == 0) {
-			if (MATTIE.util.randChance(0.2)) {
-				MATTIE.miscAPI.spawnBearTrapsAround($gamePlayer, 8, 14);
-			} else if (MATTIE.util.randChance(0.6)) {
-				MATTIE.miscAPI.spawnRustyNailsAround($gamePlayer, 15, 26);
-			} else {
-				MATTIE.miscAPI.spawnGhoulsAround($gamePlayer, 2, 4);
-			}
-		}
+	// if (!$gameParty.inBattle() && SceneManager._scene instanceof Scene_Map && false) { // overworld trolls
+	// 	if (this.tick & 1100 == 0) {
+	// 		if (MATTIE.util.randChance(0.2)) {
+	// 			MATTIE.miscAPI.spawnBearTrapsAround($gamePlayer, 8, 14);
+	// 		} else if (MATTIE.util.randChance(0.6)) {
+	// 			MATTIE.miscAPI.spawnRustyNailsAround($gamePlayer, 15, 26);
+	// 		} else {
+	// 			MATTIE.miscAPI.spawnGhoulsAround($gamePlayer, 2, 4);
+	// 		}
+	// 	}
 
-		if (this.tick % 435 == 0) {
-			if (MATTIE.util.randChance(0.5)) {
-				MATTIE.msgAPI.displayMsg('I flipped your controls');
-				MATTIE.fxAPI.startScreenShake(100, 1, 100);
-				MATTIE.miscAPI.flipControls();
-			}
-		}
+	// 	if (this.tick % 435 == 0) {
+	// 		if (MATTIE.util.randChance(0.5)) {
+	// 			MATTIE.msgAPI.displayMsg('I flipped your controls');
+	// 			MATTIE.fxAPI.startScreenShake(100, 1, 100);
+	// 			MATTIE.miscAPI.flipControls();
+	// 		}
+	// 	}
 
-		// visual trolls
-		if (this.tick % 75 == 0) { // very constant
-			if (MATTIE.util.randChance(0.2)) {
-				MATTIE.msgAPI.displayMsg('Hah, I hope you like closing messages');
-			} else if (MATTIE.util.randChance(0.1)) {
-				MATTIE.msgAPI.displayMsg('RED MODE');
-				MATTIE.fxAPI.setupTint(155, 0, 0, 0, 500);
-			} else if (MATTIE.util.randChance(0.13)) {
-				MATTIE.msgAPI.displayMsg('GREEN MODE');
-				MATTIE.fxAPI.setupTint(0, 155, 0, 0, 500);
-			} else if (MATTIE.util.randChance(0.26)) {
-				MATTIE.msgAPI.displayMsg('BLUE MODE (FOREVER)');
-				MATTIE.fxAPI.setupTint(0, 0, 155, 0, 5000);
-			} else if (MATTIE.util.randChance(0.19)) {
-				MATTIE.fxAPI.startScreenShake(100, 1, 100);
-			} else if (MATTIE.util.randChance(0.11)) {
-				MATTIE.msgAPI.displayMsg('BLUE MODE');
-				MATTIE.fxAPI.setupTint(0, 0, 155, 0, 500);
-			} else if (MATTIE.util.randChance(0.21)) {
-				for (let index = 0; index < 50; index++) {
-					MATTIE.msgAPI.displayMsg('Hah, I hope you like closing messages');
-				}
-			} else if (MATTIE.util.randChance(0.75)) {
-				MATTIE.msgAPI.displayMsg('I drew you a doggie.');
-				MATTIE.fxAPI.showImage('doggie' + `${MATTIE.util.randBetween(1, 2)}`, 10, 0, 0);
-				setTimeout(() => {
-					MATTIE.fxAPI.deleteImage(10);
-				}, 25000);
-			} else {
-				MATTIE.msgAPI.displayMsg('╭∩╮ʕ•ᴥ•ʔ╭∩╮');
-				if (MATTIE.util.randChance(0.5)) {
-					MATTIE.miscAPI.tripAndFall(1);
-				} else {
-					MATTIE.miscAPI.spawnBearTrapsAround($gamePlayer, 1, 3);
-				}
-			}
-		}
+	// 	// visual trolls
+	// 	if (this.tick % 75 == 0) { // very constant
+	// 		if (MATTIE.util.randChance(0.2)) {
+	// 			MATTIE.msgAPI.displayMsg('Hah, I hope you like closing messages');
+	// 		} else if (MATTIE.util.randChance(0.1)) {
+	// 			MATTIE.msgAPI.displayMsg('RED MODE');
+	// 			MATTIE.fxAPI.setupTint(155, 0, 0, 0, 500);
+	// 		} else if (MATTIE.util.randChance(0.13)) {
+	// 			MATTIE.msgAPI.displayMsg('GREEN MODE');
+	// 			MATTIE.fxAPI.setupTint(0, 155, 0, 0, 500);
+	// 		} else if (MATTIE.util.randChance(0.26)) {
+	// 			MATTIE.msgAPI.displayMsg('BLUE MODE (FOREVER)');
+	// 			MATTIE.fxAPI.setupTint(0, 0, 155, 0, 5000);
+	// 		} else if (MATTIE.util.randChance(0.19)) {
+	// 			MATTIE.fxAPI.startScreenShake(100, 1, 100);
+	// 		} else if (MATTIE.util.randChance(0.11)) {
+	// 			MATTIE.msgAPI.displayMsg('BLUE MODE');
+	// 			MATTIE.fxAPI.setupTint(0, 0, 155, 0, 500);
+	// 		} else if (MATTIE.util.randChance(0.21)) {
+	// 			for (let index = 0; index < 50; index++) {
+	// 				MATTIE.msgAPI.displayMsg('Hah, I hope you like closing messages');
+	// 			}
+	// 		} else if (MATTIE.util.randChance(0.75)) {
+	// 			MATTIE.msgAPI.displayMsg('I drew you a doggie.');
+	// 			MATTIE.fxAPI.showImage('doggie' + `${MATTIE.util.randBetween(1, 2)}`, 10, 0, 0);
+	// 			setTimeout(() => {
+	// 				MATTIE.fxAPI.deleteImage(10);
+	// 			}, 25000);
+	// 		} else {
+	// 			MATTIE.msgAPI.displayMsg('╭∩╮ʕ•ᴥ•ʔ╭∩╮');
+	// 			if (MATTIE.util.randChance(0.5)) {
+	// 				MATTIE.miscAPI.tripAndFall(1);
+	// 			} else {
+	// 				MATTIE.miscAPI.spawnBearTrapsAround($gamePlayer, 1, 3);
+	// 			}
+	// 		}
+	// 	}
 
-		// minor trolls
-		if (this.tick % 500 == 0) { // every 500 ticks (100 seconds)
-			if (MATTIE.util.randChance(0.5)) {
-				MATTIE.msgAPI.footerMsg('I stole all money btw.');
-				$gameParty.loseItem(MATTIE.static.items.silverCoin, 10);
-			} else if (MATTIE.util.randChance(0.25)) {
-				MATTIE.msgAPI.footerMsg('Hey shanty.....');
-				MATTIE.msgAPI.footerMsg('I stole all your food');
-				MATTIE.miscAPI.stealAllFood();
-			} else {
-				MATTIE.miscAPI.spawnBearTrapsAround($gamePlayer, 1, 3);
-			}
-		}
-		if (this.tick % 50 === 0) {
-			if (!this.green && !this.purple && MATTIE.util.randChance(0.03)) {
-				this.purple = true;
-				MATTIE.msgAPI.footerMsg('Fuck you, you\'re purple now');
-				MATTIE.fxAPI.addLightObject(() => $gamePlayer, () => MATTIE.util.hasTorchActive(), 50, 250, '#f20aa9', 'black');
-			} else if (!this.green && !this.purple && MATTIE.util.randChance(0.04)) {
-				this.green = true;
-				MATTIE.msgAPI.footerMsg('Fuck you, you\'re green now');
-				MATTIE.fxAPI.addLightObject(() => $gamePlayer, () => MATTIE.util.hasTorchActive(), 50, 250, '#2fff00', 'black');
-			}
-		}
-		if (this.tick % 400 == 0) {
-			if (MATTIE.util.randChance(0.4)) {
-				// trip and drop a few items
-				MATTIE.miscAPI.tripAndFall(7);
-			} else if (MATTIE.util.randChance(0.75)) {
-				MATTIE.miscAPI.spawnRustyNailsAround($gamePlayer, 2, 2);
-			} else if (MATTIE.util.randChance(0.76)) {
-				MATTIE.miscAPI.spawnRustyNailsAround($gamePlayer, 15, 26);
-			} else {
-				MATTIE.miscAPI.spawnGhoulsAround($gamePlayer, 8, 16);
-			}
-		}
-		if (this.tick % 350 == 0) {
-			if (MATTIE.util.randChance(0.04)) {
-				// trip and drop so many items
-				MATTIE.miscAPI.tripAndFall(75);
-			} else if (MATTIE.util.randChance(0.43)) {
-				MATTIE.miscAPI.spawnGhoulsAround($gamePlayer, 1, 1);
-			} else if (MATTIE.util.randChance(0.23)) {
-				MATTIE.miscAPI.spawnGaurdsAround($gamePlayer, 1, 1);
-			}
-		}
+	// 	// minor trolls
+	// 	if (this.tick % 500 == 0) { // every 500 ticks (100 seconds)
+	// 		if (MATTIE.util.randChance(0.5)) {
+	// 			MATTIE.msgAPI.footerMsg('I stole all money btw.');
+	// 			$gameParty.loseItem(MATTIE.static.items.silverCoin, 10);
+	// 		} else if (MATTIE.util.randChance(0.25)) {
+	// 			MATTIE.msgAPI.footerMsg('Hey shanty.....');
+	// 			MATTIE.msgAPI.footerMsg('I stole all your food');
+	// 			MATTIE.miscAPI.stealAllFood();
+	// 		} else {
+	// 			MATTIE.miscAPI.spawnBearTrapsAround($gamePlayer, 1, 3);
+	// 		}
+	// 	}
+	// 	if (this.tick % 50 === 0) {
+	// 		if (!this.green && !this.purple && MATTIE.util.randChance(0.03)) {
+	// 			this.purple = true;
+	// 			MATTIE.msgAPI.footerMsg('Fuck you, you\'re purple now');
+	// 			MATTIE.fxAPI.addLightObject(() => $gamePlayer, () => MATTIE.util.hasTorchActive(), 50, 250, '#f20aa9', 'black');
+	// 		} else if (!this.green && !this.purple && MATTIE.util.randChance(0.04)) {
+	// 			this.green = true;
+	// 			MATTIE.msgAPI.footerMsg('Fuck you, you\'re green now');
+	// 			MATTIE.fxAPI.addLightObject(() => $gamePlayer, () => MATTIE.util.hasTorchActive(), 50, 250, '#2fff00', 'black');
+	// 		}
+	// 	}
+	// 	if (this.tick % 400 == 0) {
+	// 		if (MATTIE.util.randChance(0.4)) {
+	// 			// trip and drop a few items
+	// 			MATTIE.miscAPI.tripAndFall(7);
+	// 		} else if (MATTIE.util.randChance(0.75)) {
+	// 			MATTIE.miscAPI.spawnRustyNailsAround($gamePlayer, 2, 2);
+	// 		} else if (MATTIE.util.randChance(0.76)) {
+	// 			MATTIE.miscAPI.spawnRustyNailsAround($gamePlayer, 15, 26);
+	// 		} else {
+	// 			MATTIE.miscAPI.spawnGhoulsAround($gamePlayer, 8, 16);
+	// 		}
+	// 	}
+	// 	if (this.tick % 350 == 0) {
+	// 		if (MATTIE.util.randChance(0.04)) {
+	// 			// trip and drop so many items
+	// 			MATTIE.miscAPI.tripAndFall(75);
+	// 		} else if (MATTIE.util.randChance(0.43)) {
+	// 			MATTIE.miscAPI.spawnGhoulsAround($gamePlayer, 1, 1);
+	// 		} else if (MATTIE.util.randChance(0.23)) {
+	// 			MATTIE.miscAPI.spawnGaurdsAround($gamePlayer, 1, 1);
+	// 		}
+	// 	}
 
-		if (this.tick % 200 == 0) {
-			if (MATTIE.util.randChance(0.05)) {
-				MATTIE.msgAPI.footerMsg('I fucked up your god affinity');
-				const vars = MATTIE.static.variable.godAffinityAndPrayerVars;
-				vars.forEach((v) => {
-					const value = MATTIE.util.clamp(($gameVariables.value(v) - MATTIE.util.randBetween(0, 1)), 0, 4);
-					$gameVariables.setValue(v, value);
-				});
-			}
-		}
+	// 	if (this.tick % 200 == 0) {
+	// 		if (MATTIE.util.randChance(0.05)) {
+	// 			MATTIE.msgAPI.footerMsg('I fucked up your god affinity');
+	// 			const vars = MATTIE.static.variable.godAffinityAndPrayerVars;
+	// 			vars.forEach((v) => {
+	// 				const value = MATTIE.util.clamp(($gameVariables.value(v) - MATTIE.util.randBetween(0, 1)), 0, 4);
+	// 				$gameVariables.setValue(v, value);
+	// 			});
+	// 		}
+	// 	}
 
-		// major trolls
-		if (this.tick % 1000 == 0) { // every 200 seconds
-			if (MATTIE.util.randChance(0.50)) { // 25% chance
-				MATTIE.msgAPI.footerMsg('Hey girly.....');
-				MATTIE.msgAPI.footerMsg('Im going to spawn bear traps around you soon.');
-				setTimeout(() => {
-					MATTIE.miscAPI.spawnBearTrapsAround($gamePlayer, 1, MATTIE.util.randBetween(7, 20));
-				}, MATTIE.util.randBetween(5000, 25000));
-			} else if (MATTIE.util.randChance(0.55)) {
-				MATTIE.msgAPI.footerMsg('Hey burlycop.....');
-				MATTIE.msgAPI.footerMsg('I think you need to slow down for a while');
-				MATTIE.msgAPI.displayMsg('!!!!SLOW DOWN!!!!', 1, 1);
-				const lastSpeed = $gamePlayer.realMoveSpeed;
-				$gamePlayer.realMoveSpeed = () => 1;
-				setTimeout(() => {
-					$gamePlayer.realMoveSpeed = lastSpeed;
-				}, MATTIE.util.randBetween(10000, 50000));
-			} else {
-				MATTIE.miscAPI.spawnBearTrapsAround($gamePlayer, 2, 4);
-			}
-		}
+	// 	// major trolls
+	// 	if (this.tick % 1000 == 0) { // every 200 seconds
+	// 		if (MATTIE.util.randChance(0.50)) { // 25% chance
+	// 			MATTIE.msgAPI.footerMsg('Hey girly.....');
+	// 			MATTIE.msgAPI.footerMsg('Im going to spawn bear traps around you soon.');
+	// 			setTimeout(() => {
+	// 				MATTIE.miscAPI.spawnBearTrapsAround($gamePlayer, 1, MATTIE.util.randBetween(7, 20));
+	// 			}, MATTIE.util.randBetween(5000, 25000));
+	// 		} else if (MATTIE.util.randChance(0.55)) {
+	// 			MATTIE.msgAPI.footerMsg('Hey burlycop.....');
+	// 			MATTIE.msgAPI.footerMsg('I think you need to slow down for a while');
+	// 			MATTIE.msgAPI.displayMsg('!!!!SLOW DOWN!!!!', 1, 1);
+	// 			const lastSpeed = $gamePlayer.realMoveSpeed;
+	// 			$gamePlayer.realMoveSpeed = () => 1;
+	// 			setTimeout(() => {
+	// 				$gamePlayer.realMoveSpeed = lastSpeed;
+	// 			}, MATTIE.util.randBetween(10000, 50000));
+	// 		} else {
+	// 			MATTIE.miscAPI.spawnBearTrapsAround($gamePlayer, 2, 4);
+	// 		}
+	// 	}
 
-		if (this.tick % 700 == 0) {
-			if (MATTIE.util.randChance(0.15)) { // spawn moonless
-				MATTIE.msgAPI.displayMsg('I brought you a doggo', 1, 1);
-				MATTIE.miscAPI.spawnMoonless($gamePlayer);
-			} else if (MATTIE.util.randChance(0.75)) { // spawn moonless
-				MATTIE.msgAPI.showChoices(
-					['she fear on my hung till I unger', 'she ung on my fear till i fun', '/kill @e[type=entity]', 'I want a gift'],
-					0,
-					1,
-					(n) => {
-						switch (n) {
-						case 0:
-							MATTIE.fxAPI.showImage('endingsS_mercenary', 10, 0, 0);
-							setTimeout(() => {
-								MATTIE.fxAPI.deleteImage(10);
-							}, 5000);
-							break;
-						case 1:
-							MATTIE.fxAPI.showImage('endingsS_knight', 10, 0, 0);
-							setTimeout(() => {
-								MATTIE.fxAPI.deleteImage(10);
-							}, 5000);
-							break;
-						case 2:
-							MATTIE.msgAPI.displayMsg('okay I mean you asked for it');
-							$gameParty.removeActor($gameParty.leader().actorId());
-							break;
-						case 3:
-							MATTIE.msgAPI.displayMsg('Okay I took all your food and gifted it to a puppy.');
-							MATTIE.miscAPI.stealAllFood();
-							$gameParty.addActor(MATTIE.static.actors.moonlessId);
-							break;
-						}
-					},
-				);
-			}
-		}
-	}
+	// 	if (this.tick % 700 == 0) {
+	// 		if (MATTIE.util.randChance(0.15)) { // spawn moonless
+	// 			MATTIE.msgAPI.displayMsg('I brought you a doggo', 1, 1);
+	// 			MATTIE.miscAPI.spawnMoonless($gamePlayer);
+	// 		} else if (MATTIE.util.randChance(0.75)) { // spawn moonless
+	// 			MATTIE.msgAPI.showChoices(
+	// 				['she fear on my hung till I unger', 'she ung on my fear till i fun', '/kill @e[type=entity]', 'I want a gift'],
+	// 				0,
+	// 				1,
+	// 				(n) => {
+	// 					switch (n) {
+	// 					case 0:
+	// 						MATTIE.fxAPI.showImage('endingsS_mercenary', 10, 0, 0);
+	// 						setTimeout(() => {
+	// 							MATTIE.fxAPI.deleteImage(10);
+	// 						}, 5000);
+	// 						break;
+	// 					case 1:
+	// 						MATTIE.fxAPI.showImage('endingsS_knight', 10, 0, 0);
+	// 						setTimeout(() => {
+	// 							MATTIE.fxAPI.deleteImage(10);
+	// 						}, 5000);
+	// 						break;
+	// 					case 2:
+	// 						MATTIE.msgAPI.displayMsg('okay I mean you asked for it');
+	// 						$gameParty.removeActor($gameParty.leader().actorId());
+	// 						break;
+	// 					case 3:
+	// 						MATTIE.msgAPI.displayMsg('Okay I took all your food and gifted it to a puppy.');
+	// 						MATTIE.miscAPI.stealAllFood();
+	// 						$gameParty.addActor(MATTIE.static.actors.moonlessId);
+	// 						break;
+	// 					}
+	// 				},
+	// 			);
+	// 		}
+	// 	}
+	// }
 };
 
 MATTIE.TaF.tick = 0;
