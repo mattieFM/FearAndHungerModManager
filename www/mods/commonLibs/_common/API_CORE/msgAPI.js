@@ -25,6 +25,7 @@ MATTIE.msgAPI.doOnceNotBusy = function (cb) {
 		if (!$gameMessage.isBusy()) {
 			clearInterval(int);
 			cb();
+			$gameMap._interpreter.setWaitMode('message');
 		}
 	}, 50);
 };
