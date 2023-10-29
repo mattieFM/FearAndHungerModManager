@@ -10,7 +10,7 @@ const { promisify } = require('util');
 const { resolve } = require('path');
 
 let pathToOriginalFiles = 'E:/FearAndHunger/builds/Fear & Hunger/www/';
-let pathToModdedFiles = 'E:/FearAndHunger/builds/FHDevBuild/www/';
+let pathToModdedFiles = 'E:/FearAndHunger/builds/FHTF-DataBuild/www/';
 let ModName = 'testMod';
 
 const defaultOutFolder = (`./build/${ModName}`);

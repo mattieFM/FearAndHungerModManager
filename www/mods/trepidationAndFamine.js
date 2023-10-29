@@ -96,7 +96,7 @@ MATTIE.TaF.enableSillyMode = function () {
 	MATTIE.msgAPI.footerMsg('May your fear be hungry');
 	MATTIE.msgAPI.footerMsg('May your hunger be fearful');
 	MATTIE.msgAPI.footerMsg('May your sill be y');
-	MATTIE.msgAPI.footerMsg('╭∩╮ʕ•ᴥ•ʔ╭∩╮');
+	MATTIE.msgAPI.footerMsg('╭∩╮t╭∩╮');
 	MATTIE.msgAPI.footerMsg('L');
 };
 
@@ -159,6 +159,11 @@ MATTIE.TaF.suTick = function () {
 	//
 };
 
+MATTIE.TaF.setHoney = function (x) {
+	this.honey = x;
+	this.honeyBar.setHoney(x);
+};
+
 /**
  * @description the tick for silly mode difficulty
  */
@@ -178,24 +183,59 @@ MATTIE.TaF.sillyTick = function () {
 				that.honeyScaler = MATTIE.util.clamp(bar.currentHoney() / bar.maxHoney(), 0.1, 1);
 				that.honeyAdditor = Math.ceil(MATTIE.util.lerp(5, 0, that.honeyScaler));
 			}));
+			that.honeyBar = honeyBar;
 			this.addWindow(honeyBar);
+		};
+
+		const prev117 = Game_Interpreter.prototype.command117;
+		Game_Interpreter.prototype.command117 = function () {
+			if (this._params[0] === MATTIE.static.commonEvents.randomFood && MATTIE.util.randChance(0.05)) {
+				MATTIE.TaF.items.honey.gainThisItem();
+			} else {
+				var commonEvent = $dataCommonEvents[this._params[0]];
+				if (commonEvent) {
+					var eventId = this.isOnCurrentMap() ? this._eventId : 0;
+					this.setupChild(commonEvent.list, eventId);
+				}
+			}
+
+			return true;
 		};
 
 		this.sillyTickFirst = true;
 		const prev = Game_Troop.prototype.setup;
 		this.undoSillyOverrides = () => {
 			Game_Troop.prototype.setup = prev;
+			Game_Interpreter.prototype.command117 = prev117;
 		};
 		let calledRecently = false;
 		Game_Troop.prototype.setup = function (troopId, xOffset = 0, yOffset = 0, cb = () => {}) {
 			MATTIE.troopAPI.config.shouldSort = false;
 			if (!calledRecently) {
-				if (typeof troopId != 'object') troopId = [troopId, 15];
-				else troopId.push(15);
+				setTimeout(() => {
+					const rand = Math.random();
+					if (rand < 0.25) {
+						MATTIE.msgAPI.footerMsg('Get Gnomed idot.', true);
+						new MATTIE.troopAPI.RuntimeTroop(15, 0, 0).spawn();
+					} else if (rand < 0.5) {
+						MATTIE.msgAPI.footerMsg('AHHHhhhh  Spiders! (scary)', true);
+						new MATTIE.troopAPI.RuntimeTroop(142, -150, 0).spawn();
+						new MATTIE.troopAPI.RuntimeTroop(142, 150, 0).spawn();
+						new MATTIE.troopAPI.RuntimeTroop(142, -50, 0).spawn();
+					} else if (rand < 0.75) {
+						MATTIE.msgAPI.footerMsg('whoops how did those get here?', true);
+						new MATTIE.troopAPI.RuntimeTroop(212, 0, 0).spawn();
+					} else if (rand < 0.80) {
+						MATTIE.msgAPI.footerMsg('I brought you some dogs.', true);
+						new MATTIE.troopAPI.RuntimeTroop(199, 0, 0).spawn();
+					} else if (rand < 0.81) {
+						MATTIE.msgAPI.footerMsg('Give me honey. NOW!!!', true);
+						new MATTIE.troopAPI.RuntimeTroop(159, 0, 0).spawn();
+					}
+				}, 1000);
 				calledRecently = true;
 				setTimeout(() => {
 					calledRecently = false;
-					MATTIE.troopAPI.config.shouldSort = true;
 				}, 10000);
 			}
 

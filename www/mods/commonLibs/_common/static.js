@@ -316,6 +316,56 @@ MATTIE.static.skills.enGarde = $dataSkills[146];
 MATTIE.static.commonEvents.bloodportal = $dataCommonEvents[152];
 MATTIE.static.commonEvents.credits = $dataCommonEvents[310];
 
+/** @description loot table event for scrolls */
+MATTIE.static.commonEvents.randomScroll = 149;
+
+/** @description loot table event for rare books? */
+MATTIE.static.commonEvents.randomRareBook = 178;
+
+/** @description loot table event for minor books? */
+MATTIE.static.commonEvents.randomMinorBook = 179;
+
+/** @description loot table event for Great items (just soul stone? */
+MATTIE.static.commonEvents.randomGreatItem = 200;
+
+/** @description loot table event for weapons items */
+MATTIE.static.commonEvents.randomWeapon = 238;
+
+/** @description loot table event for minor weapons items */
+MATTIE.static.commonEvents.randomMinorWeapon = 239;
+
+/** @description loot table event for likely dungoen knights */
+MATTIE.static.commonEvents.randomNightItems = 250;
+
+/** @description loot table event for minor items */
+MATTIE.static.commonEvents.randomMinorItems = 23;
+
+/** @description loot table event for minor books */
+MATTIE.static.commonEvents.randomMinorBook = 25;
+
+/** @description loot table event for rare books */
+MATTIE.static.commonEvents.randomRareBook = 26;
+
+/** @description loot table event for blood magic books */
+MATTIE.static.commonEvents.randomBloodBook = 29;
+
+/** @description loot table event for food */
+MATTIE.static.commonEvents.randomFood = 52;
+
+/** @description loot table event for rare items */
+MATTIE.static.commonEvents.randomRareItem = 58;
+
+/** @description loot table event for the achemilias */
+MATTIE.static.commonEvents.randomAlchemy = 68;
+
+/** @description loot table event for good armor */
+MATTIE.static.commonEvents.randomGoodArmor = 141;
+
+/**
+ * @description an array of all common event loot tables
+ */
+MATTIE.static.commonEvents.lootTables = [];
+
 MATTIE.static.events.crowMauler = (() => MATTIE.eventAPI.getEventOnMap(287, 11));
 
 // states
@@ -335,6 +385,8 @@ MATTIE.static.update = function () {
 	// eslint-disable-next-line no-constant-condition
 	if (MATTIE.global.isFunger() || true) { // for now just use funger 1 vars regardless
 		// static values specific to funger 1
+
+		MATTIE.static.commonEvents.lootTables = [];
 
 		MATTIE.static.teleports = [
 			{

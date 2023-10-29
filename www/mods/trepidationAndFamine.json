@@ -5,12 +5,19 @@
     "danger": true,
 				"config": "../www/mods/commonLibs/docs/MATTIE.TaF.config.html",
 				"dependencies": [
-					"_trepidationAndFamine/config"
+					"_trepidationAndFamine/config",
+					"_trepidationAndFamine/scripts/items"
 				],
 				"assets": [
 					{
 							"source": "/mods/_trepidationAndFamine/img/",
 							"type":"imgFolder"
-					}
+					},
+					{
+						"source": "/mods/_trepidationAndFamine/data/",
+						"dest": "",
+						"name": "",
+						"type":"dataFolder"
+				}
 			]
 }
