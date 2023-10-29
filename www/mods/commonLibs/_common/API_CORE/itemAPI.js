@@ -274,6 +274,24 @@ MATTIE.itemAPI.RunTimeItem = class {
 	}
 
 	/**
+	 * @description have the party gain this item and display the pickup message
+	 * @param {int} x quantity to gain
+	 * @param {boolean} display whether to display the pickup message or not
+	 */
+	gainThisItem(x = 1, display = true) {
+		if (display) { MATTIE.msgAPI.displayMsg('You find a \\c[2]Jar of Honey\\c[0]!'); }
+		$gameParty.gainItem(this._data, x);
+	}
+
+	/**
+	 * @description have the party lose this item
+	 * @param {int} x quantity to lose
+	 */
+	loseThisItem(x = 1) {
+		$gameParty.loseItem(this._data, x);
+	}
+
+	/**
      * @description create the default data item
      * @returns the default dataItem obj
      */
@@ -316,6 +334,14 @@ MATTIE.itemAPI.RunTimeItem = class {
 		obj.successRate = 100;
 		obj.tpGain = 0;
 		return obj;
+	}
+
+	/**
+	 * @description set whether this item is consumable or not
+	 * @param {bool} bool true if consumable false if not
+	 */
+	setConsumable(bool) {
+		this._data.consumable = bool;
 	}
 
 	/** @description 1: normal, 2: book/key item */
