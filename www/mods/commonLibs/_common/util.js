@@ -201,3 +201,14 @@ MATTIE.util.getMapVariant = function (x = 0) {
 
 	return vars[$gameVariables.value(randVars[x])];
 };
+
+/**
+ * linerly interpret between 2 numbers
+ * @param {number} a number 1
+ * @param {number} b number 2
+ * @param {number} alpha val between 0-1 of which number we are at
+ * @returns 
+ */
+MATTIE.util.lerp = function (a, b, alpha) {
+	return a + alpha * (b - a);
+};

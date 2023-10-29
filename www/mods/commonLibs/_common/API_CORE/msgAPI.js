@@ -17,6 +17,19 @@ MATTIE.msgAPI.displayMsgWithTitle = function (title, msg) {
 };
 
 /**
+ * @description que a callback to trigger once the gameMessage is no longer busy
+ * @param {function} cb
+ */
+MATTIE.msgAPI.doOnceNotBusy = function (cb) {
+	const int = setInterval(() => {
+		if (!$gameMessage.isBusy()) {
+			clearInterval(int);
+			cb();
+		}
+	}, 50);
+};
+
+/**
  * s
  * @param {*} msg string msg
  * @param {int} background optional
@@ -30,9 +43,11 @@ MATTIE.msgAPI.displayMsgWithTitle = function (title, msg) {
  * default is 2.
  */
 MATTIE.msgAPI.displayMsg = function (msg, background = 0, pos = 2) {
-	$gameMessage.setBackground(background);
-	$gameMessage.setPositionType(pos);
-	$gameMessage.add(msg);
+	this.doOnceNotBusy(() => {
+		$gameMessage.setBackground(background);
+		$gameMessage.setPositionType(pos);
+		$gameMessage.add(msg);
+	});
 };
 
 /** @description format a string into the form title msg, as though speaking */
@@ -49,20 +64,22 @@ MATTIE.msgAPI.formatMsgAndTitle = function (title, msg) {
  * @param {any[]|string} helps displays at top of screen
  */
 MATTIE.msgAPI.showChoices = function (choices, defaultChoice, cancelChoice, cb, msg = null, msgs = [], helps = []) {
-	let helpsArr = [];
-	if (typeof helpsArr !== typeof 'string') {
-		helpsArr = helps;
-	} else {
-		choices.forEach(() => helpsArr.push(helps));
-	}
+	this.doOnceNotBusy(() => {
+		let helpsArr = [];
+		if (typeof helpsArr !== typeof 'string') {
+			helpsArr = helps;
+		} else {
+			choices.forEach(() => helpsArr.push(helps));
+		}
 
-	MATTIE.msgAPI._dreamXCompat(helpsArr);
-	MATTIE.msgAPI._dreamXCompat(helpsArr, msgs);
+		MATTIE.msgAPI._dreamXCompat(helpsArr);
+		MATTIE.msgAPI._dreamXCompat(helpsArr, msgs);
 
-	if (msg != null) $gameMessage.add(msg);
-	$gameMessage.setChoices(choices, defaultChoice, cancelChoice);
-	$gameMessage.setChoiceCallback((n) => {
-		cb(n);
+		if (msg != null) $gameMessage.add(msg);
+		$gameMessage.setChoices(choices, defaultChoice, cancelChoice);
+		$gameMessage.setChoiceCallback((n) => {
+			cb(n);
+		});
 	});
 };
 
@@ -84,8 +101,11 @@ MATTIE.msgAPI._dreamXCompat = function (helpsArr, msgs) {
  * @param {string} msg message to display
  * @param {int} ms the milliseconds till the event is hidden
  */
-MATTIE.msgAPI.footerMsg = function (msg) {
+MATTIE.msgAPI.footerMsg = function (msg, force = false) {
 	if (typeof msg === typeof 'string') msg = [msg]; // add msg to an array if it is a string
+	if (force) {
+		Game_Interpreter.prototype.clearGab();
+	}
 	Game_Interpreter.prototype.setGabText(msg);
 	Game_Interpreter.prototype.showGab();
 };

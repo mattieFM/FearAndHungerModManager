@@ -551,3 +551,75 @@ MATTIE.windows.Window_DebugSpecific.prototype.drawItem = function (index) {
 MATTIE.windows.Window_DebugSpecific.prototype.currentId = function () {
 	return this._itemList[this.index()].id || this._itemList[this.index()];
 };
+
+//-----------------------------------------------------------------------------
+// Window_Honey
+//
+// The window for displaying the map name on the map screen.
+
+/**
+ * @description the honey window for silly mode, this can be used for any bar, just override it and do some basic work
+ */
+function Window_Honey() {
+	this.initialize.apply(this, arguments);
+}
+
+Window_Honey.prototype = Object.create(Window_Base.prototype);
+Window_Honey.prototype.constructor = Window_Honey;
+/**
+ * @param {function} cb a callback to call every time this bar decremets, passes this to it
+ * @param {int} drainRate how many seconds per honey to drain
+ */
+Window_Honey.prototype.initialize = function (drainRate = 3, honey = 80, cb = () => {}) {
+	var wight = this.windowWidth();
+	var height = this.windowHeight();
+	Window_Base.prototype.initialize.call(this, 0, 0, wight, height);
+	this.opacity = 0;
+	this.contentsOpacity = 200;
+	this._showCount = 0;
+	this.setHoney(honey);
+
+	setInterval(() => {
+		this.setHoney(this.currentHoney() - 1);
+		cb(this);
+		this.refresh();
+	}, 1000 * drainRate);
+
+	this.refresh();
+};
+
+Window_Honey.prototype.windowWidth = function () {
+	return 360;
+};
+
+Window_Honey.prototype.windowHeight = function () {
+	return this.fittingHeight(1);
+};
+
+Window_Honey.prototype.update = function () {
+	Window_Base.prototype.update.call(this);
+};
+
+Window_Honey.prototype.maxHoney = () => 80;
+
+Window_Honey.prototype.currentHoney = function () { return this._currentHoney; };
+
+Window_Honey.prototype.setHoney = function (x) { this._currentHoney = x; };
+
+Window_Honey.prototype.refresh = function () {
+	this.contents.clear();
+
+	var width = this.contentsWidth();
+	// this.drawBackground(0, 0, width, this.lineHeight());
+
+	this.contents.fillRect(0, 5, this.currentHoney(), 50, '#bd9f0d', '#bd9f0d');
+	this.drawText('Honey', 0, 0, width);
+	this.drawGauge(0, 5, 50, 1.6, '#f0e7bb', '#f2eed8');
+};
+
+Window_Honey.prototype.drawBackground = function (x, y, width, height) {
+	var color1 = this.dimColor1();
+	var color2 = this.dimColor2();
+	this.contents.gradientFillRect(x, y, width / 2, height, color2, color1);
+	this.contents.gradientFillRect(x + width / 2, y, width / 2, height, color1, color2);
+};

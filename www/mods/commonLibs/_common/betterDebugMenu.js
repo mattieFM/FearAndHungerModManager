@@ -111,7 +111,7 @@ function setupSearcher() {
 		} catch (error) {
 			console.log(error);
 		}
-	}, 'ctrl+f', 4, 'control&f', 'control&f');
+	}, 'ctrl+f', 4, 'control&f', 'control&f', true);
 
 	Input.addKeyBind('', () => {
 		// check in right scene
@@ -120,7 +120,7 @@ function setupSearcher() {
 		} catch (error) {
 			console.log(error);
 		}
-	}, 'ctrl+f back', 4, '1', '1');
+	}, 'ctrl+f back', 4, '1', '1', true);
 
 	Input.addKeyBind('', () => {
 		// check in right scene
@@ -129,7 +129,7 @@ function setupSearcher() {
 		} catch (error) {
 			console.log(error);
 		}
-	}, 'ctrl+f forward', 4, '2', '2');
+	}, 'ctrl+f forward', 4, '2', '2', true);
 
 	// Input.addKeyBind('b', () => {
 	// 	searchFor(this.lastSearch, false, this);

@@ -218,6 +218,39 @@ Game_Battler.prototype.useItem = function (item) {
 
 MATTIE.itemAPI.RunTimeItems = [];
 
+/**
+ *
+ * @param {*} name name of the book
+ * @param {*} desc description
+ * @param {*} iconName the name of the icon in the system folder
+ * @param {*} bookOpenText the text to display when the book is red
+ * @param {*} spawn whether to spawn the book or not
+ * @returns the book obj
+ */
+MATTIE.itemAPI.quickBook = function (name, desc, iconName, bookOpenText, spawn = true) {
+	const book = new MATTIE.itemAPI.RunTimeItem();
+	book.setIconIndex(new MATTIE.itemAPI.RuntimeIcon(iconName));
+	book.setName(name);
+	book.setDescription(desc);
+	book.setItemType(2); // set book
+	book.setCallback(() => {
+		SceneManager.goto(Scene_Map);
+		setTimeout(() => {
+			MATTIE.fxAPI.showImage('book_base', 1, 0, 0);
+			MATTIE.msgAPI.displayMsg(`<WordWrap>${bookOpenText}`, 1, 1);
+
+			const int = setInterval(() => {
+				if (!$gameMessage.isBusy()) {
+					clearInterval(int);
+					MATTIE.fxAPI.deleteImage(1);
+				}
+			}, 100);
+		}, 1000);
+	});
+	if (spawn) { book.spawn(); }
+	return book;
+};
+
 MATTIE.itemAPI.RunTimeItem = class {
 	/**
 	 * @description build a new item
