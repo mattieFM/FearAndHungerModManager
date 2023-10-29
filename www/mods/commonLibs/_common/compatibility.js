@@ -187,3 +187,18 @@ Game_Party.prototype.armors = function () {
 	}
 	return list;
 };
+
+//-----------------------------------------
+// fixes the gitpixel not defined bug
+//-----------------------------------------
+Window_Base.prototype.textColor = function (n) {
+	var px = 96 + (n % 8) * 12 + 6;
+	var py = 144 + Math.floor(n / 8) * 12 + 6;
+	const bitMap = this.windowskin || new Bitmap(px + 2, py + 2);
+	return bitMap.getPixel(px, py);
+};
+
+Window_Base.prototype.pendingColor = function () {
+	const bitMap = this.windowskin || new Bitmap(120 + 2, 120 + 2);
+	return bitMap.getPixel(120, 120);
+};
