@@ -40,7 +40,7 @@ MATTIE.miscAPI.tripAndFall = function (max = 10) {
 		const item = MATTIE.miscAPI.loseRandomItem();
 		if (item) {
 			const event = MATTIE.eventAPI.addItemDropToCurrentMap(new Game_Item(item), false);
-			event.spawn($gamePlayer.x + MATTIE.util.randBetween(-2, 2), $gamePlayer.y + MATTIE.util.randBetween(-2, 2));
+			event.spawn($gamePlayer.x + MATTIE.util.randBetween(-1, 1), $gamePlayer.y + MATTIE.util.randBetween(-1, 1));
 		}
 	}
 
@@ -121,7 +121,7 @@ MATTIE.miscAPI.spawnGaurdsAround = function (point, min = 1, max = 8) {
  *  @param {Game_Character} point the place to spawn moonless near
  */
 MATTIE.miscAPI.spawnMoonless = function (point) {
-	const dogoo = MATTIE.eventAPI.createEnemyFromExisting(193, 8, 0, 5);
+	const dogoo = MATTIE.eventAPI.createEnemyFromExisting(8, 193, 0, 5);
 	dogoo.setPersist(true);
 	dogoo.spawn(point.x + MATTIE.util.randBetween(-3, 3), point.y + MATTIE.util.randBetween(-3, 3));
 };
@@ -152,4 +152,30 @@ MATTIE.miscAPI.flipControls = function () {
 		const element = right[index];
 		Input.keyMapper[element] = 'left';
 	}
+};
+
+/**
+ * @description make followers move opposite to how they should
+ * @param {int} t number of ms till reverting this change
+ */
+MATTIE.miscAPI.invertFollowerDirections = function (t = 30000) {
+	$gamePlayer.followers().forEach((follower) => {
+		if (!follower.PrevMoveStraight) {
+			follower.PrevMoveStraight = follower.moveStraight;
+			follower.moveStraight = function (d) {
+				dict = {
+					2: 8,
+					8: 2,
+					4: 6,
+					6: 4,
+				};
+				follower.PrevMoveStraight.call(this, dict[d]);
+			};
+
+			setTimeout(() => {
+				if (typeof follower.PrevMoveStraight === 'function') { follower.moveStraight = follower.PrevMoveStraight; }
+				follower.PrevMoveStraight = undefined;
+			}, t);
+		}
+	});
 };

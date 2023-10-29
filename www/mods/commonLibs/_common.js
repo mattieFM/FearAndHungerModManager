@@ -131,13 +131,12 @@ Scene_KeyConfig.prototype.commandDefault = function () {
  * @param {string} wasdDefualt the default key in wasd layout
  * @param {string} defaultKey the default key in defualt layout
  */
-Input.addKeyBind = function (key, cb, name = '', scope = 0, wasdDefualt = null, defaultKey = null) {
+Input.addKeyBind = function (key, cb, name = '', scope = 0, wasdDefualt = null, defaultKey = null, hidden = false) {
 	if (typeof key === 'number') key = String.fromCharCode(key);
-
 	if (typeof defaultKey === 'number') key = String.fromCharCode(defaultKey);
 	if (!key) {
-		if (defaultKey && !Input.keyMapper[defaultKey.toUpperCase().charCodeAt(0)]
-		|| (defaultKey && Input.keyMapper[defaultKey.toUpperCase().charCodeAt(0)] == defaultKey) && defaultKey != null) {
+		if ((defaultKey && !Input.keyMapper[defaultKey.toUpperCase().charCodeAt(0)]
+		|| (defaultKey && Input.keyMapper[defaultKey.toUpperCase().charCodeAt(0)] == defaultKey) && defaultKey != null) && !defaultKey.includes('&')) {
 			key = defaultKey;
 		} else {
 			key = String.fromCharCode(i);
@@ -145,14 +144,14 @@ Input.addKeyBind = function (key, cb, name = '', scope = 0, wasdDefualt = null, 
 	}
 
 	// setup default keybinds
-	if (wasdDefualt) {
+	if (wasdDefualt && !wasdDefualt.includes('&')) {
 		if (typeof wasdDefualt !== 'number') {
 			ConfigManager.wasdMap[wasdDefualt.toUpperCase().charCodeAt(0)] = wasdDefualt;
 		} else {
 			ConfigManager.wasdMap[wasdDefualt] = String.fromCharCode(wasdDefualt);
 		}
 	}
-	if (defaultKey) {
+	if (defaultKey && !defaultKey.includes('&')) {
 		if (typeof defaultKey !== 'number') {
 			ConfigManager.defaultMap[defaultKey.toUpperCase().charCodeAt(0)] = defaultKey;
 		} else {
@@ -164,7 +163,7 @@ Input.addKeyBind = function (key, cb, name = '', scope = 0, wasdDefualt = null, 
 		const tempFunc = Window_KeyConfig.prototype.actionKey;
 		const tempFunc2 = Window_KeyAction.prototype.makeCommandList;
 
-		if (scope != -2 || MATTIE.isDev) {
+		if ((scope != -2 || MATTIE.isDev) && !hidden) {
 			// this is so that keys can be rebound
 			Window_KeyConfig.prototype.actionKey = function (action) {
 				if (action === key || action == wasdDefualt || action == defaultKey) return name;
