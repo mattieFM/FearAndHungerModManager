@@ -207,7 +207,6 @@ MATTIE.util.getMapVariant = function (x = 0) {
  * @param {number} a number 1
  * @param {number} b number 2
  * @param {number} alpha val between 0-1 of which number we are at
- * @returns 
  */
 MATTIE.util.lerp = function (a, b, alpha) {
 	return a + alpha * (b - a);
