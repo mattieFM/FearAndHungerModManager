@@ -279,7 +279,7 @@ MATTIE.itemAPI.RunTimeItem = class {
 	 * @param {boolean} display whether to display the pickup message or not
 	 */
 	gainThisItem(x = 1, display = true) {
-		if (display) { MATTIE.msgAPI.displayMsg('You find a \\c[2]Jar of Honey\\c[0]!'); }
+		if (display) { MATTIE.msgAPI.displayMsg(`You find a \\c[2]${this._data.name}\\c[0]!`); }
 		$gameParty.gainItem(this._data, x);
 	}
 

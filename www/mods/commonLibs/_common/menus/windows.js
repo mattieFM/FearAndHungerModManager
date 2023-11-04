@@ -623,3 +623,16 @@ Window_Honey.prototype.drawBackground = function (x, y, width, height) {
 	this.contents.gradientFillRect(x, y, width / 2, height, color2, color1);
 	this.contents.gradientFillRect(x + width / 2, y, width / 2, height, color1, color2);
 };
+
+/**
+ * @description select the cancel button for the choice
+ */
+Window_ChoiceList.prototype.selectCancel = function () {
+	this.select($gameMessage.choiceCancelType());
+};
+
+MATTIE.window_choiceList = Window_ChoiceList.prototype.initialize;
+Window_ChoiceList.prototype.initialize = function (messageWindow) {
+	MATTIE.window_choiceList.call(this, messageWindow);
+	this.setHandler('cancel', this.callCancelHandler);
+};

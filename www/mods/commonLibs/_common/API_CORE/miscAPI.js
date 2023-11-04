@@ -179,3 +179,22 @@ MATTIE.miscAPI.invertFollowerDirections = function (t = 30000) {
 		}
 	});
 };
+
+/**
+ * @description add an item to a drop table
+ * @param {MATTIE.itemAPI.runtimeItem} item
+ * @param {int} dropTable the id of the common event for the drop table
+ * @param {int} chance the chance between 0 and 1
+ */
+MATTIE.miscAPI.addToDropTable = function (item, dropTable, chance) {
+	const prev117 = Game_Interpreter.prototype.command117;
+	Game_Interpreter.prototype.command117 = function () {
+		if (this._params[0] === dropTable && MATTIE.util.randChance(chance)) {
+			item.gainThisItem();
+		} else {
+			prev117.call(this);
+		}
+
+		return true;
+	};
+};

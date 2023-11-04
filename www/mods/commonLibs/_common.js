@@ -144,16 +144,16 @@ Input.addKeyBind = function (key, cb, name = '', scope = 0, wasdDefualt = null, 
 	}
 
 	// setup default keybinds
-	if (wasdDefualt && !wasdDefualt.includes('&')) {
+	if (wasdDefualt) {
 		if (typeof wasdDefualt !== 'number') {
-			ConfigManager.wasdMap[wasdDefualt.toUpperCase().charCodeAt(0)] = wasdDefualt;
+			if (!wasdDefualt.includes('&')) { ConfigManager.wasdMap[wasdDefualt.toUpperCase().charCodeAt(0)] = wasdDefualt; }
 		} else {
 			ConfigManager.wasdMap[wasdDefualt] = String.fromCharCode(wasdDefualt);
 		}
 	}
-	if (defaultKey && !defaultKey.includes('&')) {
+	if (defaultKey) {
 		if (typeof defaultKey !== 'number') {
-			ConfigManager.defaultMap[defaultKey.toUpperCase().charCodeAt(0)] = defaultKey;
+			if (!defaultKey.includes('&')) { ConfigManager.defaultMap[defaultKey.toUpperCase().charCodeAt(0)] = defaultKey; }
 		} else {
 			ConfigManager.defaultMap[defaultKey] = String.fromCharCode(defaultKey);
 		}
