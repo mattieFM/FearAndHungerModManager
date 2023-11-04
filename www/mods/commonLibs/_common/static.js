@@ -172,6 +172,17 @@ MATTIE.static.variable.secondarySyncedVars = [];
 
 /** @description a list of all variables that govern god affinity */
 MATTIE.static.variable.godAffinityAndPrayerVars = [];
+/** @description the id of the grogoroth affinity var */
+MATTIE.static.variable.groGorothAffinity = 162;
+
+/** @description the id of the sylvian affinity var */
+MATTIE.static.variable.groSylvianAffinity = 163;
+
+/** @description the id of the all mer affinity var */
+MATTIE.static.variable.allMerAffinity = 164;
+
+/** @description the id of the all mer affinity var */
+MATTIE.static.variable.godOfTheDepthsAffinity = 165;
 
 /** @description used by the cheat menu to teleport to key points */
 MATTIE.static.teleports = [];
@@ -214,6 +225,9 @@ MATTIE.static.switch.torchTimer = 3151;
 // selfSwitch ids
 MATTIE.static.switch.syncedSelfSwitches = [];
 MATTIE.static.switch.ignoredSelfSwitches = [];
+
+/** @description the switch for trepidation and famine difficulty */
+MATTIE.static.switch.taf = 3118;
 
 // states
 /** this is the state that governs "death" in combat */
@@ -1205,6 +1219,7 @@ MATTIE.static.update = function () {
 			79, // god of the depths var 2
 			'162-165', // more affinities... Afinity_God
 		];
+
 		//
 		MATTIE.static.switch.godAffinitySwitches = MATTIE.static.rangeParser(MATTIE.static.switch.godAffinitySwitches);
 		MATTIE.static.variable.godAffinityAndPrayerVars = MATTIE.static.rangeParser(MATTIE.static.variable.godAffinityAndPrayerVars);

@@ -135,8 +135,11 @@ Game_Map.prototype.setupEvents = function () {
  * @param {int} mapId mapid
  * @returns {rm.types.Event}
  */
-MATTIE.eventAPI.getEventOnMap = function (id, mapId) {
+MATTIE.eventAPI.getEventOnMap = function (id, mapId, maxTime = 1000) {
 	return new Promise((res) => {
+		setTimeout(() => {
+			res();
+		}, maxTime);
 		const url = 'data/Map%1.json'.format(mapId.padZero(3));
 		const xhr = new XMLHttpRequest();
 

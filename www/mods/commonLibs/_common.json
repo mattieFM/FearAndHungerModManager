@@ -26,6 +26,7 @@
         "_common/optimizedTarraxLighting",
 
 
+								
         "_common/API_CORE/heSoBBGirlAPI",
         "_common/API_CORE/itemAPI",
         "_common/API_CORE/vfxAPI",
@@ -40,6 +41,7 @@
         "_common/supporters",
 								"_common/seedRandom",
         "_common/util",
+								"_common/API_CORE/preFabAPI",
         
 								"_common/betterDebugMenu",
 								

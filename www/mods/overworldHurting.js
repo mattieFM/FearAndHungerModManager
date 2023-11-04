@@ -32,5 +32,6 @@ DataManager.setCallbackOnObj(MATTIE.static.skills.hurting, () => {
 	}
 	const battleEvent = getFirstBattleEvent();
 	const gameTroop = $dataTroops[battleEvent.parameters[1]];
+	battleEvent.requestAnimation(11);
 	gameTroop.members[parseInt(Math.random() * gameTroop.members.length, 10)].hidden = true;
 });

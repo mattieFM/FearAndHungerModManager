@@ -135,7 +135,10 @@ MATTIE.TaF.enableSU = function () {
  * @description the tick for terror and starvation difficulty
  */
 MATTIE.TaF.tfTick = function () {
-	//
+	if (!this.tfFirstTick) {
+		this.tfFirstTick = true;
+		$gameSwitches.setValue(MATTIE.static.switch.taf, 1);
+	}
 };
 
 /**
@@ -170,6 +173,7 @@ MATTIE.TaF.setHoney = function (x) {
 MATTIE.TaF.sillyTick = function () {
 	const that = this;
 	if (!this.sillyTickFirst) {
+		MATTIE.miscAPI.addToDropTable(MATTIE.TaF.items.honey, MATTIE.static.commonEvents.randomFood, 0.1); // make honey drop more often
 		this.subtick1 = 0;
 		this.subtick2 = 0;
 		this.honeyAdditor = 0;
@@ -185,21 +189,6 @@ MATTIE.TaF.sillyTick = function () {
 			}));
 			that.honeyBar = honeyBar;
 			this.addWindow(honeyBar);
-		};
-
-		const prev117 = Game_Interpreter.prototype.command117;
-		Game_Interpreter.prototype.command117 = function () {
-			if (this._params[0] === MATTIE.static.commonEvents.randomFood && MATTIE.util.randChance(0.05)) {
-				MATTIE.TaF.items.honey.gainThisItem();
-			} else {
-				var commonEvent = $dataCommonEvents[this._params[0]];
-				if (commonEvent) {
-					var eventId = this.isOnCurrentMap() ? this._eventId : 0;
-					this.setupChild(commonEvent.list, eventId);
-				}
-			}
-
-			return true;
 		};
 
 		this.sillyTickFirst = true;
@@ -232,7 +221,7 @@ MATTIE.TaF.sillyTick = function () {
 						MATTIE.msgAPI.footerMsg('Give me honey. NOW!!!', true);
 						new MATTIE.troopAPI.RuntimeTroop(159, 0, 0).spawn();
 					}
-				}, 1000);
+				}, 5000);
 				calledRecently = true;
 				setTimeout(() => {
 					calledRecently = false;
@@ -247,6 +236,18 @@ MATTIE.TaF.sillyTick = function () {
 	this.subtick2++;
 	MATTIE.msgAPI.footerMsg('╭∩╮ʕ•ᴥ•ʔ╭∩╮');
 	if (!$gameParty.inBattle() && SceneManager._scene instanceof Scene_Map && !MATTIE.static.maps.onMenuMap()) { // overworld trolls
+		if (this.honey <= 0 && !this.spawned) {
+			this.spawned = true;
+			SceneManager.goto(Scene_Map);
+			setTimeout(() => {
+				MATTIE.msgAPI.footerMsg('Give me honey. NOW!!!', true);
+				$gameTroop.setup(159);
+				SceneManager.push(Scene_Battle);
+				setTimeout(() => {
+					MATTIE.msgAPI.footerMsg('Give me honey. NOW!!!', true);
+				}, 1500);
+			}, 1500);
+		}
 		if ((this.subtick1 > Math.ceil(200 * this.honeyScaler)) || this.minorTroll) { // once per 40 sec
 			this.subtick1 = 0;
 			this.minorTroll = false;
@@ -275,7 +276,7 @@ MATTIE.TaF.sillyTick = function () {
 				MATTIE.msgAPI.displayMsg('GREEN MODE');
 				$gameMap.events().forEach((event) => {
 					if (!this.lastMoveSpeed) { this.lastMoveSpeed = event.realMoveSpeed; }
-					event.realMoveSpeed = () => 5 + this.honeyAdditor;
+					event.realMoveSpeed = () => 2 + this.honeyAdditor;
 				});
 				setTimeout(() => {
 					$gameSystem.greenMode = false;
@@ -789,4 +790,33 @@ Scene_Gameover.prototype.initialize = function () {
 	MATTIE.TaF.addedHoneyBar = false;
 	MATTIE.TaF.sillyTickFirst = false;
 	if (MATTIE.TaF.undoSillyOverrides) { MATTIE.TaF.undoSillyOverrides(); }
+};
+
+MATTIE.TaF.spawnBloodPortal = function () {
+	SceneManager.goto(Scene_Map);
+	setTimeout(() => {
+		MATTIE.msgAPI.displayMsg('<WordWrap> The effigy of Allmer crumbles and a portal raises from its dust.');
+		MATTIE.preFabAPI.loadPrefab($gamePlayer, [35]);
+		if (!MATTIE.TaF.userDefinedPortals) MATTIE.TaF.userDefinedPortals = [];
+		const obj = {
+			name: $dataMap.displayName,
+			x: $gamePlayer.x,
+			y: $gamePlayer.y,
+			mapId: $gameMap.mapId(),
+		};
+		MATTIE.TaF.userDefinedPortals.push(obj);
+	}, 500);
+};
+
+MATTIE.TaF.showUserDefinedBloodPortals = function () {
+	names = MATTIE.TaF.userDefinedPortals.map((ev) => ev.name);
+	MATTIE.msgAPI.showChoices([...names, 'cancel'], 0, 0, (n) => {
+		if (n < names.length) {
+			const portal = MATTIE.TaF.userDefinedPortals[n];
+			$gamePlayer.reserveTransfer(portal.mapId, portal.x, portal.y, 0, 0);
+			setTimeout(() => {
+				$gamePlayer.performTransfer();
+			}, 1000);
+		}
+	}, 'Travel To:');
 };
