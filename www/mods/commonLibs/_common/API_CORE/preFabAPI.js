@@ -13,7 +13,7 @@ Game_Interpreter.prototype.pluginCommand = function (command, args) {
 /**
  * @description create a prefab given an event containing overrides and an object containing the map and the id of the event that is the prefab
  * @param {Game_Event} event
- * @param {*[]} args
+ * @param {number[]} args
  */
 MATTIE.preFabAPI.loadPrefab = async function (event, args) {
 	console.log('tried to load prefab');
