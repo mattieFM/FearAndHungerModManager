@@ -1357,7 +1357,7 @@ the number of players is divided by this number then the enemies' health is mult
 <dd>
     
     <div class="description">
-        <p>whether enemy hp should be scaled</p>
+        <p>whether enemy hp should be scaled default should be true, but currently false due to bug</p>
     </div>
     
 
@@ -1395,11 +1395,11 @@ the number of players is divided by this number then the enemies' health is mult
     
     <dt class="tag-default">Default Value:</dt>
     <dd class="tag-default"><ul class="dummy">
-            <li>true</li>
+            <li>false</li>
         </ul></dd>
     <dt class="tag-default">Current Value:</dt>
     <dd class="tag-default"><ul class="dummy">
-        <input onchange="var obj = {}; obj.name ='MATTIE.multiplayer.config.scaling.scaleHp'; obj.code='config'; obj.val=this.value; top.postMessage(obj, '*')" id="input-MATTIE.multiplayer.config.scaling.scaleHp" placeholder="true" type="text"></input>
+        <input onchange="var obj = {}; obj.name ='MATTIE.multiplayer.config.scaling.scaleHp'; obj.code='config'; obj.val=this.value; top.postMessage(obj, '*')" id="input-MATTIE.multiplayer.config.scaling.scaleHp" placeholder="false" type="text"></input>
         </ul></dd>
     <script>
         var input = document.getElementById("input-MATTIE.multiplayer.config.scaling.scaleHp");

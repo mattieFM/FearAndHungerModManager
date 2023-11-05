@@ -376,7 +376,7 @@ class BaseNetController extends EventEmitter {
 				enemy.setHp(Math.min(enemy.hp, enemyHealthArr[index]));
 				if (orgHp > 0 &amp;&amp; enemy._hp &lt;= 0 &amp;&amp; !enemy.hasState(enemy.deathStateId())) {
 					// this.performCosmeticAttack(enemy);
-
+					alert('artifical death');
 					enemy.addState(enemy.deathStateId());
 					enemy.performCollapse();
 					enemy.hide();
