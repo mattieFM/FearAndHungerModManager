@@ -62,7 +62,7 @@ let name = 'Unknown & Hidden';
 let desc = 'Beat Abhorrence & Inanition to unlock this difficulty';
 if (MATTIE.DataManager.global.get('BeatenAandI')) {
 	name = 'Extinction & Termination';
-	desc = `The god s hatred of you knows no bounds. You are an affront to life itself and must be made extinct.
+	desc = `The god s hatred of you knows no bounds. You are an affront to life itself and must be made extinct. Rid the dungeons of all life.
 (All ruleset except for silly mode & solo apply)`;
 }
 

@@ -63,7 +63,8 @@ MATTIE.scenes.multiplayer.host.prototype.showHideCode = function (hidden) {
 		'People can join using this number:',
 		hidden ? '*'.repeat(MATTIE.multiplayer.hostController.peerId.length) : MATTIE.multiplayer.hostController.peerId,
 	];
-	this._peerWindow.updateText(text);
+
+	if (this._peerWindow) this._peerWindow.updateText(text);
 };
 
 MATTIE.scenes.multiplayer.host.prototype.addPeerDisplayWindow = function () {
