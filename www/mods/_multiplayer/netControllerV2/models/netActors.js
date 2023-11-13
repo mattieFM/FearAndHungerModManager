@@ -65,10 +65,12 @@ MATTIE.multiplayer.NetActors.prototype.createNewNetActor = function (baseActorId
 		const dataActorId = $dataActors.length - 1;
 		$dataActors[dataActorId].peerId = this.peerId;
 		const newNetActor = new MATTIE.multiplayer.NetActor(new Game_Actor(dataActorId), dataActorId, baseActorId, this.peerId);
-		$gameActors.actor(dataActorId).peerId = this.peerId;
-		newNetActor.peerId = this.peerId;
-		console.log(newNetActor.peerId);
-		this._data.push(newNetActor);
+		if (newNetActor) {
+			$gameActors.actor(dataActorId).peerId = this.peerId;
+			newNetActor.peerId = this.peerId;
+			console.log(newNetActor.peerId);
+			this._data.push(newNetActor);
+		}
 	}
 };
 

@@ -468,8 +468,10 @@ class MapEvent {
 		const persistingIds = [];
 		Object.keys(MATTIE.eventAPI.dataEvents).forEach((key) => {
 			const event = MATTIE.eventAPI.dataEvents[key];
-			if (event) eventIds.push(event.id);
-			if (event && event.persist) persistingIds.push(event.id);
+			if (event.id === $gameMap.mapId()) {
+				if (event && !event.persist) eventIds.push(event.id);
+				if (event && event.persist) persistingIds.push(event.id);
+			}
 		});
 		$dataMap.events.forEach((object) => {
 			if (object === null) { return; }

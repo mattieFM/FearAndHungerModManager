@@ -82,7 +82,8 @@ MATTIE.eventAPI.setupRunTimeDataEvents = function () {
 		/** @type {rm.types.Event} */
 		const dataEvent = MATTIE.eventAPI.dataEvents[keys[index]];
 		if (dataEvent.mapId === $gameMap.mapId() && dataEvent.persist) {
-			console.log(dataEvent);
+			// console.log('persited event spawned');
+			// console.log(dataEvent);
 			$dataMap.events[dataEvent.id] = dataEvent;
 			const mapEvent = new MapEvent();
 			mapEvent.data = dataEvent;
