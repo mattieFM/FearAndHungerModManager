@@ -263,8 +263,8 @@ class BaseNetController extends EventEmitter {
 			const actorDataArr = data.actorData;
 			const actorHealthArr = actorDataArr.map((data) => data.hp);
 			const enemyStatesArr = data.enemyStates;
-			if (actorDataArr) { this.syncActorData(actorDataArr, id); }
-			if (enemyHealthArr) { this.syncEnemyHealths(enemyHealthArr); }
+			// if (actorDataArr) { this.syncActorData(actorDataArr, id); }
+			// if (enemyHealthArr) { this.syncEnemyHealths(enemyHealthArr); }
 			if (enemyStatesArr) { this.syncEnemyStates(enemyStatesArr); }
 			setTimeout(() => {
 				BattleManager.doneSyncing(); // done syncing
@@ -294,11 +294,12 @@ class BaseNetController extends EventEmitter {
 			const enemy = $gameTroop.members()[index];
 			const netStates = enemyStatesArr[index];
 			if (netStates) {
-				netStates.forEach((state) => {
+				for (let j = 0; j < netStates.length; j++) {
+					const state = netStates[j];
 					if (!enemy.isStateAffected(state)) {
 						enemy.addState(state);
 					}
-				});
+				}
 			}
 		}
 	}
@@ -307,11 +308,9 @@ class BaseNetController extends EventEmitter {
 		for (let index = 0; index < $gameTroop.members().length; index++) {
 			const enemy = $gameTroop.members()[index];
 			if (enemy) {
-				const orgHp = enemy._hp;
-				enemy.setHp(Math.min(enemy.hp, enemyHealthArr[index]));
-				if (orgHp > 0 && enemy._hp <= 0 && !enemy.hasState(enemy.deathStateId())) {
-					// this.performCosmeticAttack(enemy);
-					alert('artifical death');
+				const orgHp = enemy.hp;
+				enemy.setHp(Math.min(orgHp, enemyHealthArr[index]));
+				if (orgHp > 0 && enemy.hp <= 0 && !enemy.hasState(enemy.deathStateId())) {
 					enemy.addState(enemy.deathStateId());
 					enemy.performCollapse();
 					enemy.hide();

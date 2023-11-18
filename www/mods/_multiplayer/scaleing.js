@@ -137,7 +137,7 @@ MATTIE.multiplayer.config.scaling.resurrectionItemAmount;
 
 /**
  * @description whether enemy hp should be scaled default should be true, but currently false due to bug
- * @default false
+ * @default true
  */
 MATTIE.multiplayer.config.scaling.scaleHp;
 
@@ -192,7 +192,7 @@ Object.defineProperties(MATTIE.multiplayer.config.scaling, {
 	},
 
 	scaleHp: {
-		get: () => MATTIE.configGet('scaleHp', false),
+		get: () => MATTIE.configGet('scaleHp', true),
 		set: (value) => { MATTIE.configSet('scaleHp', value); },
 	},
 
