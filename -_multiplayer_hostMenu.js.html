@@ -94,9 +94,15 @@ MATTIE.scenes.multiplayer.host.prototype.create = function () {
 	MATTIE.multiplayer.hostController.open();
 	this.addPlayerListWindow();
 	this.addOptionsBtns();
+	this.addPeerDisplayWindow();
+	const loadingAnimInterval = setInterval(() => {
+		this.animateTick();
+	}, 500);
+
 	MATTIE.multiplayer.hostController.self.on('open', () => {
-		this.addPeerDisplayWindow();
 		this.initListController();
+		clearInterval(loadingAnimInterval);
+		this.showHideCode(true);
 	});
 };
 
@@ -132,11 +138,17 @@ MATTIE.scenes.multiplayer.host.prototype.showHideCode = function (hidden) {
 	if (this._peerWindow) this._peerWindow.updateText(text);
 };
 
+MATTIE.scenes.multiplayer.host.prototype.animateTick = function () {
+	const text = this._peerWindow.text;
+	text[1] = text[1].endsWith('...') ? text[1].replace('...', '') : `${text[1]}.`;
+
+	if (this._peerWindow) this._peerWindow.updateText(text);
+};
+
 MATTIE.scenes.multiplayer.host.prototype.addPeerDisplayWindow = function () {
 	const text = [
 		'People can join using this number:',
-		'*'.repeat(MATTIE.multiplayer.hostController.peerId.length),
-
+		'Please wait for connection to broker',
 	];
 	this._peerWindow = new MATTIE.windows.TextDisplay((Graphics.boxWidth - 600) / 2 + 100, 0, 600, 100, text);
 	this.addWindow(this._peerWindow);
