@@ -71,6 +71,7 @@ MATTIE.windows.TextDisplay.prototype = Object.create(Window_Base.prototype);
 MATTIE.windows.TextDisplay.prototype.constructor = MATTIE.windows.TextDisplay;
 
 MATTIE.windows.TextDisplay.prototype.initialize = function (x, y, width, height, text) {
+	this.text = text;
 	Window_Base.prototype.initialize.call(this, x, y, width, height);
 	this.mattieWidth = width;
 	this.resetTextColor();
@@ -90,6 +91,7 @@ MATTIE.windows.TextDisplay.prototype.updatePlacement = function (xOffset = 0, yO
 
 MATTIE.windows.TextDisplay.prototype.updateText = function (text) {
 	this.contents.clear();
+	this.text = text;
 	if (typeof text === typeof 'string') {
 		text += '\n';
 		text = text.split('\n');
