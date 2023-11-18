@@ -263,8 +263,8 @@ class BaseNetController extends EventEmitter {
 			const actorDataArr = data.actorData;
 			const actorHealthArr = actorDataArr.map((data) => data.hp);
 			const enemyStatesArr = data.enemyStates;
-			// if (actorDataArr) { this.syncActorData(actorDataArr, id); }
-			// if (enemyHealthArr) { this.syncEnemyHealths(enemyHealthArr); }
+			if (actorDataArr) { this.syncActorData(actorDataArr, id); }
+			if (enemyHealthArr) { this.syncEnemyHealths(enemyHealthArr); }
 			if (enemyStatesArr) { this.syncEnemyStates(enemyStatesArr); }
 			setTimeout(() => {
 				BattleManager.doneSyncing(); // done syncing
