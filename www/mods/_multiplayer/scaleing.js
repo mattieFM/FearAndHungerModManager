@@ -38,8 +38,9 @@ Object.defineProperties(MATTIE.multiplayer.config.scaling, {
  * !!DANGER!! don't touch this unless you know what you are doing.
  * @param {Game_Battler} battler
  */
-MATTIE.multiplayer.config.scaling.enemyBattleIndex = (battler) => ((
-	($gameParty.maxBattleMembers() / $gameTroop.totalCombatants())) * (battler.agi / 10) * MATTIE.multiplayer.config.scaling.enemyBattleIndexScaler
+MATTIE.multiplayer.config.scaling.enemyBattleIndex = (battler) => (
+	battler.forcedIndex || (
+		($gameParty.maxBattleMembers() / $gameTroop.totalCombatants())) * (battler.agi / 10) * MATTIE.multiplayer.config.scaling.enemyBattleIndexScaler
 );
 
 //---------------------------------------------------------

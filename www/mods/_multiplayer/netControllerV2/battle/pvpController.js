@@ -123,13 +123,17 @@ MATTIE.multiplayer.pvp.PvpController.setupCombat = function (actorIds) {
 			};
 			if (enemy.name().includes('head') || enemy.name().includes('torso')) {
 				enemy.addState(MATTIE.static.states.resistDeath); // make torso and head invincible
+				forceParamValue(enemy, 0, 10000); // doubly make sure by setting hp to 10,000
+				enemy.recoverAll();
 			} else {
-				enemy.setHp(30); // all limbs die in one hit
+				// set limb max hp to 750 or 400 in easy
+				forceParamValue(enemy, 0, MATTIE.GameInfo.isHardMode() || MATTIE.GameInfo.isTerrorAndStarvation() ? 750 : 400);
+				enemy.setHp(750);
 			}
 			enemy.addState(MATTIE.static.states.cantDoShit);
 		});
 		$gameTroop.clearAllPages();
-	});
+	}, true);
 };
 
 setTimeout(() => {

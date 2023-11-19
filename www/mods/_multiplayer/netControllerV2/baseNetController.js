@@ -287,6 +287,28 @@ class BaseNetController extends EventEmitter {
 			actor.setHp(newActorHealth);
 			actor.setMp(newActorMana);
 		}
+
+		// handle despawning chars for pvp
+		if (MATTIE.multiplayer.pvp.inPVP) {
+			// despawn dead chars
+			Object.keys(this.netPlayers).forEach((key) => {
+			/** @type {PlayerModel} */
+				const player = this.netPlayers[key];
+				player.battleMembers().forEach((member) => {
+					console.log(member);
+					if (member.isDead()) {
+						const netActor = player.$netActors.netActor(member.actorId());
+						const troopId = MATTIE.multiplayer.pvp.PvpController.mapActorToTroop(
+							netActor.baseActorId || member.actorId(),
+						); // get the troop for this actor
+						const troop = $gameTroop._additionalTroops[troopId];
+						console.log(troop);
+						console.log(member.actorId());
+						if (troop) { troop.despawn(); }
+					}
+				});
+			});
+		}
 	}
 
 	syncEnemyStates(enemyStatesArr) {
@@ -442,88 +464,104 @@ class BaseNetController extends EventEmitter {
      * @param {UUID} senderId id of the net user that sent these actions
      */
 	processPvpAction(actor, action, isExtraTurn, senderId) {
-		const targetActor = $gameActors.actor(action.targetActorId);
+		let targetActor = $gameActors.actor(action.targetActorId);
 		let legCut = false;
 		let armCut = false;
 		/** @type {Game_Enemy} */
-		const originalTarget = $gameTroop.members()[action._targetIndex];
+
+		const originalTargetName = action.targetName;
 		action.forcedTargets = [];
 		const netActor = this.netPlayers[senderId].$netActors.netActor(actor.actorId());
 		const troopId = MATTIE.multiplayer.pvp.PvpController.mapActorToTroop(netActor.baseActorId || actor.actorId()); // get the troop for this actor
+		// const originalTarget = $dataTroops[troopId].members.find((member) => $dataEnemies[member.enemyId].name.includes(originalTargetName))
+		// || $dataEnemies[$dataTroops[troopId].members[2].enemyId];
 		if (troopId) {
 			let targetActorIndex = 0;
 			/** @type {Game_Enemy} */
-			const battler = $gameTroop._additionalTroops[troopId].baseMembers()[2]; // just grab the first member for now
+			const i = 2;
+			const enemies = $gameTroop._additionalTroops[troopId].baseMembers();
+			let battler = enemies[i]; // just grab the first member for now
+			for (let i = 2; battler.isDead() && i < enemies.length; i++) battler = enemies[i];
 			actor.partyIndex = () => this.netPlayers[senderId].battleMembers().indexOf(actor); // just say thye go first for now to test
 			action._netTarget = false;
 
-			if (originalTarget) { // if the original target was a game troop then scale dmg appropriately
-				let atkScaler = actor.mhp / originalTarget.mhp;
-				atkScaler = MATTIE.util.clamp(atkScaler, 0, 1); // clamp the atk scaler between .5 and 1
-
-				if (originalTarget.name().toLowerCase().includes('torso')) {
-					battler.enemy().params[2] = MATTIE.util.clamp(actor.atk * atkScaler, 4, 100);// min damage 10
-				} else if (originalTarget.name().toLowerCase().includes('head')) {
-					battler.enemy().params[2] = MATTIE.util.clamp(actor.atk / 7, 4, 100);// more dmg to head
-				} else if (originalTarget.name().toLowerCase().includes('arm')) {
-					armCut = true;
-					battler.enemy().params[2] = 1;
-					targetActor.addState(MATTIE.static.states.armCut);
-				} else if (originalTarget.name().toLowerCase().includes('leg')) {
-					legCut = true;
-					battler.enemy().params[2] = 1;
-					targetActor.addState(MATTIE.static.states.legCut);
-				} else {
-					battler.enemy().params[2] = 0;
+			if (targetActor) {
+				// handle replacements
+			// that is leader can only be killed if all members have been killed first
+				if ($gameParty.leader().actorId() === targetActor.actorId() && $gameParty.battleMembers().length > 1) {
+					const battlers = $gameParty.battleMembers();
+					const oldTarget = targetActor;
+					targetActor = battlers[MATTIE.util.randBetween(1, battlers.length - 1)] || battlers[0];
+					console.log(targetActor);
+					action.cb = () => {
+						BattleManager._logWindow.displaySubstitute(targetActor, oldTarget);
+						MATTIE.msgAPI.footerMsg('Your loyal followers protect you!');
+					};
 				}
-			}
 
-			battler.setCurrentAction(action);
-			// change the damage formula to be raw damage stat.
-			/** @type {rm.types.Item} */
-			const clonedItem = JsonEx.makeDeepCopy(battler._actions[battler._actions.length - 1].item());
-			clonedItem.damage.formula = 'a.atk';
+				battler.setCurrentAction(action);
+				// change the damage formula to be raw damage stat.
+				/** @type {rm.types.Item} */
+				const clonedItem = JsonEx.makeDeepCopy(battler._actions[battler._actions.length - 1].item());
+				clonedItem.damage.formula = 'a.atk';
 
-			battler._actions[battler._actions.length - 1].item = function () {
-				return clonedItem;
-			};
+				battler._actions[battler._actions.length - 1].item = function () {
+					return clonedItem;
+				};
 
-			targetActorIndex = $gameParty._actors.indexOf(parseInt(action.targetActorId, 10));
+				targetActorIndex = $gameParty._actors.indexOf(parseInt(targetActor.actorId(), 10));
 
-			battler._actions[battler._actions.length - 1]._netTarget = false;
-			battler._actions[battler._actions.length - 1].setSubject(battler);
-			battler._actions[battler._actions.length - 1].setTarget(targetActorIndex);
+				battler._actions[battler._actions.length - 1]._netTarget = false;
+				battler._actions[battler._actions.length - 1].setSubject(battler);
+				battler._actions[battler._actions.length - 1].setTarget(targetActorIndex);
 
-			Object.keys(action.targetResults).forEach((key) => {
-				const actor = $gameActors.actor(action.targetActorId);
-				if (actor) {
-					const newKey = actor.name();
-					action.targetResults[newKey] = action.targetResults[key];
-				}
-			});
+				Object.keys(action.targetResults).forEach((key) => {
+					const actor = targetActor;
+					// handle damage
+					if (originalTargetName.toLowerCase().includes('arm') && action.isKillingBlow) {
+						armCut = true;
+						battler.enemy().params[2] = 1;
+						targetActor.addState(MATTIE.static.states.armCut);
+					} else if (originalTargetName.toLowerCase().includes('leg') && action.isKillingBlow) {
+						legCut = true;
+						battler.enemy().params[2] = 1;
+						targetActor.addState(MATTIE.static.states.legCut);
+					} else {
+						battler.enemy().params[2] = 0;
+					}
 
-			if (armCut || legCut) {
+					if (actor) {
+						action.targetResults[battler._actions[battler._actions.length - 1]
+							.makeTargetResultsId(actor, this.netPlayers[senderId].peerId)] = action.targetResults[key];
+						action.targetResults[battler._actions[battler._actions.length - 1]
+							.makeTargetResultsId(actor)] = action.targetResults[key];
+					}
+				});
+
+				if (armCut || legCut) {
 				/** @type {rm.types.Effect} */
-				const effect = {};
-				effect.code = 21;
-				effect.dataId = MATTIE.static.states.bleeding;
-				effect.value1 = 1;
-				effect.value2 = 0;
-				battler._actions[battler._actions.length - 1].item().effects.push(effect);
-				effect.code = 21;
-				effect.dataId = 3;
-				effect.value1 = 1;
-				effect.value2 = 0;
-				battler._actions[battler._actions.length - 1].item().effects.push(effect);
-				effect.code = 44;
-				effect.dataId = 240;
-				effect.value1 = 1;
-				effect.value2 = 0;
-				battler._actions[battler._actions.length - 1].item().effects.push(effect);
+					const effect = {};
+					effect.code = 21;
+					effect.dataId = MATTIE.static.states.bleeding;
+					effect.value1 = 1;
+					effect.value2 = 0;
+					battler._actions[battler._actions.length - 1].item().effects.push(effect);
+					effect.code = 21;
+					effect.dataId = 3;
+					effect.value1 = 1;
+					effect.value2 = 0;
+					battler._actions[battler._actions.length - 1].item().effects.push(effect);
+					effect.code = 44;
+					effect.dataId = 240;
+					effect.value1 = 1;
+					effect.value2 = 0;
+					battler._actions[battler._actions.length - 1].item().effects.push(effect);
+				}
+
+				battler._actions[battler._actions.length - 1].loadRng(action.targetResults);
 			}
 
-			battler._actions[battler._actions.length - 1].loadRng(action.targetResults);
-
+			battler.partyIndex = () => action.userBattlerIndex + 1;
 			BattleManager.addNetActionBattler(battler, isExtraTurn);
 		}
 	}

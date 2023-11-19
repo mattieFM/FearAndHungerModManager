@@ -135,13 +135,32 @@ MATTIE.devTools.switchCheatScene = function () {
 };
 
 /**
+ * @description force a specific prarm to be a specific value
+ * @param {Game_BattlerBase} target the target game battler
+ * @param {int} targetId the target paramid
+ * @param {int} val the value to set it to
+ */
+function forceParamValue(target, targetId, val) {
+	if (!target.prevParam) target.prevParam = target.param;
+	target.param = (id) => (id != targetId ? target.prevParam(id) : val);
+}
+
+/**
+ * @description turn on god mode for an enemy (set  parameters to 10,000)
+ * @param {Game_BattlerBase} enemy
+ */
+function targetedGodMode(enemy) {
+	if (!enemy.prevParam) enemy.prevParam = enemy.param;
+	enemy.param = () => 10000;
+	enemy.recoverAll();
+}
+
+/**
  * @description set all character parameters to 10,000
  */
 function godMode() {
 	$gameParty.members().forEach((member) => {
-		if (!member.prevParam) member.prevParam = member.param;
-		member.param = () => 10000;
-		member.recoverAll();
+		targetedGodMode(member);
 	});
 }
 /**

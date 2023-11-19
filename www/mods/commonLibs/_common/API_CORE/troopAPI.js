@@ -70,7 +70,7 @@ Game_Troop.prototype.setup = function (troopId, xOffset = 0, yOffset = 0, cb = (
      * @description an array of all additional troops
      * @type {MATTIE.troopAPI.RuntimeTroop[]}
      * */
-	this._additionalTroops = {};
+	if (!this._additionalTroops) this._additionalTroops = {};
 
 	if (typeof troopId === 'number') {
 		MATTIE_RPG.TroopApi_Game_Troop_Setup.call(this, troopId);
@@ -86,7 +86,7 @@ Game_Troop.prototype.setup = function (troopId, xOffset = 0, yOffset = 0, cb = (
  * @param {function} cb the callback to call when the fight ends
  * @param {function} afterSetupCb the callback that triggers when the combat is ready
  */
-Game_Troop.prototype.setupMultiCombat = function (arr, cb = () => {}, afterSetupCb = () => {}) {
+Game_Troop.prototype.setupMultiCombat = function (arr, cb = () => {}, afterSetupCb = () => {}, spiderMode = false) {
 	$gameTemp.reserveCommonEvent(74); // before battle
 	let turn = 0;
 	BattleManager.setCantStartInputting(true);
@@ -118,7 +118,11 @@ Game_Troop.prototype.setupMultiCombat = function (arr, cb = () => {}, afterSetup
 	default:
 		break;
 	}
-	BattleManager.setup(first, false, true);
+	if (!spiderMode) {
+		BattleManager.setup(first, false, true);
+	} else {
+		BattleManager.setup(142, false, true);
+	}
 
 	$gamePlayer.makeEncounterCount();
 	SceneManager.push(Scene_Battle);
@@ -128,15 +132,16 @@ Game_Troop.prototype.setupMultiCombat = function (arr, cb = () => {}, afterSetup
 			MATTIE.msgAPI.footerMsg('True Ambush Round --All Enemies cannot attack this round.');
 		}
 		setTimeout(() => {
-			/** @type {Game_Enemy} */
-			// const spider = $gameTroop.baseMembers()[0];
+			if (spiderMode) {
+				/** @type {Game_Enemy} */
+				const spider = $gameTroop.baseMembers()[0];
 
-			// spider.performDamage();
-			// spider.die();
+				spider.performDamage();
+				spider.die();
+				spider.hide();
+			}
 
-			// spider.hide();
-
-			for (let index = 1; index < roundIds.length; index++) {
+			for (let index = spiderMode ? 0 : 1; index < roundIds.length; index++) {
 				$gameSwitches.setValue(MATTIE.static.switch.backstab, true);
 				const additionalId = roundIds[index];
 				const additionalTroop = new MATTIE.troopAPI.RuntimeTroop(additionalId);
@@ -492,7 +497,9 @@ MATTIE.troopAPI.RuntimeTroop.prototype.removeSpritesFromCurrentBattleSet = funct
 	if (this.spriteSet.additionalEnemyTroops) {
 		this.spriteSet.additionalEnemyTroops[troop.getMId()].forEach((sprite) => {
 			this.spriteSet._battleField.removeChild(sprite);
+			this.spriteSet.additionalEnemySprites.splice(this.spriteSet.additionalEnemySprites.indexOf(sprite), 1);
 		});
+
 		delete this.spriteSet.additionalEnemyTroops[troop.getMId()];
 		this.spriteSet.visualSort();
 		if (MATTIE.troopAPI.config.shouldSort) { this.spriteSet.refreshSpacing(true); }
@@ -867,15 +874,37 @@ Spriteset_Battle.prototype.refreshSpacing = function (shouldAffectBase = true) {
 	});
 
 	for (let index = 0; index < keys.length; index++) {
-		const enemyList = dict[keys[index]]; // a list of sprites
-		const xOffset = bestX(index);
+		const key = keys[index];
+		const enemyList = dict[key]; // a list of sprites
+		const actorId = MATTIE.multiplayer.pvp.PvpController.mapTroopToActor(key);
+		let xOffset = bestX(index);
+		let yOffset = 0;
 
 		/** @type {Sprite_Battler} */
 		enemyList.forEach((sprite) => {
+			yOffset = 0;
 			if (sprite) {
 				if (!sprite.baseX) sprite.baseX = sprite._homeX;
 				if (!sprite.baseY) sprite.baseY = sprite._homeY;
-				sprite.setHome((sprite.baseX + xOffset), sprite._homeY);
+
+				// handle pvp spacing for leaders
+				if (MATTIE.multiplayer.pvp.inPVP) {
+					if (MATTIE.multiplayer.getCurrentNetController().player.pvpCombatArr.some(
+						(netKey) => {
+							const netCont = MATTIE.multiplayer.getCurrentNetController();
+
+							const player = MATTIE.multiplayer.getCurrentNetController().netPlayers[netKey];
+							if (player) return player.actorId == actorId;
+							return false;
+						},
+
+					)) {
+						yOffset -= 35;
+						xOffset = 20;
+					}
+				}
+
+				sprite.setHome((sprite.baseX + xOffset), sprite._homeY + yOffset);
 			}
 		});
 	}

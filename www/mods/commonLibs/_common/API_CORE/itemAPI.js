@@ -565,3 +565,10 @@ Window_Base.prototype.drawIcon = function (iconIndex, x, y) {
 		MATTIE_RPG.Window_Base_drawIcon.call(this, iconIndex, x, y);
 	}
 };
+
+// override actions to have callbacks
+MATTIE_RPG.GameActionApply = Game_Action.prototype.apply;
+Game_Action.prototype.apply = function (target) {
+	MATTIE_RPG.GameActionApply.call(this, target);
+	if (this.cb) this.cb();
+};

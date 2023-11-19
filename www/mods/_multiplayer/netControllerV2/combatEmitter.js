@@ -89,6 +89,7 @@ BattleManager.getAllPlayerActions = function () {
 					const targetTroopId = $gameTroop.mapMemberIndexToTroopId(action._targetIndex);
 					const targetActorId = MATTIE.multiplayer.pvp.PvpController.mapTroopToActor(targetTroopId);
 					action.targetActorId = targetActorId;
+					action.userBattlerIndex = battler.partyIndex();
 				}
 				arr.push(action);
 			}
@@ -129,6 +130,29 @@ Game_Action.prototype.preloadRng = function (targets) {
 		this.targetResults[this.makeTargetResultsId(target)].miss = this._preloadMissed;
 		this.targetResults[this.makeTargetResultsId(target)].res = (!this._preloadMissed && !this._preloadEvade);
 		this.targetResults[this.makeTargetResultsId(target)].dmg = this.makeDamageValue(target, crit);
+
+		if (MATTIE.multiplayer.pvp.inPVP) {
+			if (this.targetResults[this.makeTargetResultsId(target)].dmg >= target.hp) this.killingBlow = true;
+			this.targetName = target.name();
+			// update dmg vals for pvp
+
+			const originalTarget = target;
+			const originalTargetName = target.name();
+			const baseDmg = this.targetResults[this.makeTargetResultsId(target)].dmg;
+			atkScaler = 0.05;
+
+			// limbs only do 40% dmg
+			this.targetResults[this.makeTargetResultsId(target)].dmg = Math.ceil(MATTIE.util.clamp(baseDmg * atkScaler * 0.4, 6, 89));
+
+			if (originalTargetName.toLowerCase().includes('torso')) {
+				this.targetResults[this.makeTargetResultsId(target)].dmg = Math.ceil(MATTIE.util.clamp(baseDmg * atkScaler, 6, 89));
+				// battler.enemy().params[2] = MATTIE.util.clamp(actor.atk * atkScaler, 4, 100);// min damage 4
+			} else if (originalTargetName.toLowerCase().includes('head')) {
+				// battler.enemy().params[2] = MATTIE.util.clamp(actor.atk * atkScaler * 3, 4, 100);// 1.5x dmg to head
+				// head does 3x dmg
+				this.targetResults[this.makeTargetResultsId(target)].dmg = Math.ceil(MATTIE.util.clamp(baseDmg * atkScaler * 3, 6, 99));
+			}
+		}
 	});
 	BattleManager.targetResults = Object.assign(BattleManager.targetResults || {}, this.targetResults);
 };
@@ -313,6 +337,7 @@ Game_Battler.prototype.setCurrentAction = function (action) {
 	this.forceAction(action._item._itemId, action._targetIndex, action.forcedTargets);
 	this._actions[this._actions.length - 1]._netTarget = action._netTarget;
 	this._actions[this._actions.length - 1].loadRng(action.targetResults);
+	this._actions[this._actions.length - 1].cb = action.cb;
 
 	console.log(action.forcedTargets);
 	if (action._item._dataClass === 'item') this._actions[this._actions.length - 1].setItem(action._item._itemId);
