@@ -34,11 +34,13 @@ Scene_Battle.prototype.createAllWindows = function () {
 
 	if (MATTIE.multiplayer.config.showAlliesMenu) {
 		this._textWindow = new MATTIE.windows.multiplayer.multiCombat.AllyCount(0, 0, 155, 75);
+		this._textWindow.opacity = 100;
 		this.addWindow(this._textWindow);
 	}
 
 	if (MATTIE.multiplayer.config.showViewingMenu) {
 		this._partyDisplay = new MATTIE.windows.TextDisplay(155, 0, 400, 75, 'Viewing: Self');
+		this._partyDisplay.opacity = 100;
 		this.addWindow(this._partyDisplay);
 	}
 
@@ -183,12 +185,22 @@ Sprite_Actor.prototype.setActorHome = function (index) {
 	const colNum = index % MATTIE.multiplayer.multiCombat.maxAlliesPerRow;
 	const rowNum = Math.floor(index / MATTIE.multiplayer.multiCombat.maxAlliesPerRow);
 
-	const xOffset = (Graphics.width / MATTIE.multiplayer.multiCombat.maxAlliesPerRow) * colNum;
-	const x = colNum - MATTIE.multiplayer.multiCombat.maxAlliesPerRow / 2;
+	let effectiveCol = (MATTIE.multiplayer.multiCombat.maxAlliesPerRow / 2) - 1;
+	if (colNum % 2 == 0) {
+		effectiveCol -= Math.floor(colNum / 2);
+	} else {
+		effectiveCol += Math.ceil(colNum / 2);
+	}
+	const xOffset = (Graphics.width / MATTIE.multiplayer.multiCombat.maxAlliesPerRow) * effectiveCol;
+	const x = effectiveCol - MATTIE.multiplayer.multiCombat.maxAlliesPerRow / 2;
+	console.log(x);
+	console.log(`eff${effectiveCol}`);
+	// x needs to fill like 2,3,4,1
+
 	const y = MATTIE.multiplayer.multiCombat.ellipseGetY(x);
 	const rowOffset = (rowNum * MATTIE.multiplayer.multiCombat.rowHeight * Graphics.height);
 	const yOffset = (y * MATTIE.multiplayer.multiCombat.rowHeight * Graphics.height);
-	this.setHome(50 + xOffset, Graphics.boxHeight - MATTIE.multiplayer.multiCombat.minCharHeight - rowOffset - yOffset);
+	this.setHome(50 + xOffset, Graphics.boxHeight - MATTIE.multiplayer.multiCombat.minCharHeight - rowOffset - yOffset - 50);
 };
 
 MATTIE.windows.multiplayer.multiCombat.AllyCount = function () {
