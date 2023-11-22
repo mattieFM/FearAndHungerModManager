@@ -46,7 +46,8 @@
         "_multiplayer/spectateScene",
         "_multiplayer/netControllerV2/models/netActors",
         "_multiplayer/startGameMenu",
-								"_multiplayer/items"
+								"_multiplayer/items",
+								"_multiplayer/netControllerV2/marriageHandler"
     ],
     "danger": false,
 				"assets": [

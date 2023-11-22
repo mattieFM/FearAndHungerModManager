@@ -153,6 +153,12 @@ MATTIE.multiplayer.getCurrentNetController = () => {
 	return MATTIE.multiplayer.hostController;
 };
 
+/**
+ * @description check if this client has a net controller yet
+ * @returns {boolean}
+ */
+MATTIE.multiplayer.hasController = () => MATTIE.multiplayer.isClient || MATTIE.multiplayer.isHost;
+
 (() => {
 	MATTIE.menus.mainMenu.addBtnToMainMenu('Multiplayer', 'multiplayer', MATTIE.menus.multiplayer.openMultiplayer.bind(this));
 	// eslint-disable-next-line max-len

@@ -613,23 +613,44 @@ class BaseNetController extends EventEmitter {
 	}
 
 	/**
+	 * @description smoothly move a net player to a location
+	 * @param {*} numSteps number of steps to take
+	 * @param {*} player the game char to move
+	 * @param {*} delayPerStep the delay between each step
+	 * @param {*} location {x:x, y:y} the location obj
+	 */
+	smoothMoveNetPlayer(numSteps, player, location, delayPerStep = 150) {
+		for (let index = 0; index < numSteps; index++) {
+			setTimeout(() => {
+				player.moveTowardCharacter(location);
+			}, delayPerStep * index);
+		}
+	}
+
+	/**
      * @description move a net player 1 tile
      * @param {*} moveData which direction on the key pad the player pressed, up/down/left/right as a number 8/6/4/2
      * @param {*} id the id of the peer who's player moved
      */
 	moveNetPlayer(moveData, id) {
-		if (this.netPlayers[id].map === $gameMap.mapId()) { // only call if on same map
+		if (this.netPlayers[id].map === $gameMap.mapId() && SceneManager._scene instanceof Scene_Map) {
+			// only call if on same map and the local player is looking at scene_map IE: not in menu
 			if (moveData.x) {
 				const dist = Math.sqrt((moveData.x - $gamePlayer._x) ** 2 + (moveData.y - $gamePlayer._y) ** 2);
 				if (moveData.t) {
+					console.log('transfered char (due to request)');
 					moveData.map = $gameMap.mapId();
 					this.transferNetPlayer(moveData, id, false);
-				} else if (dist > 4) {
+				} else if (dist > 10) {
+					console.log('transfered char (due to dist)');
 					moveData.map = $gameMap.mapId();
 					this.transferNetPlayer(moveData, id, false);
 				} else {
-					this.netPlayers[id].$gamePlayer._x = moveData.x;
-					this.netPlayers[id].$gamePlayer._y = moveData.y;
+					console.log('tried to move char smoothly');
+					const deltaX = moveData.x - this.netPlayers[id].$gamePlayer._x;
+					const deltaY = moveData.y - this.netPlayers[id].$gamePlayer._y;
+					const numSteps = Math.abs(deltaX) + Math.abs(deltaY);
+					this.smoothMoveNetPlayer(numSteps, this.netPlayers[id].$gamePlayer, moveData, 75);
 				}
 			} else {
 				try {
@@ -638,7 +659,8 @@ class BaseNetController extends EventEmitter {
 					console.warn(`something went wrong when moving the character${error}`);
 				}
 			}
-		} else if (moveData.x) { // if player not on map update pos ONLY
+		} else if (moveData.x) {
+			// if player not on map or local player is in menu update pos ONLY
 			this.netPlayers[id].$gamePlayer._x = moveData.x; // update pos only
 			this.netPlayers[id].$gamePlayer._y = moveData.y; // update pos only
 		}
@@ -676,6 +698,20 @@ class BaseNetController extends EventEmitter {
      * @param {*} id the id of the peer who's player moved
      */
 	transferNetPlayer(transData, id, shouldSync = true) {
+		const map = transData.map;
+		this.netPlayers[id].setMap(map);
+
+		// if not on the map try again later
+		if (!(SceneManager._scene instanceof Scene_Map)) {
+			console.log('waiting to transfer');
+			setTimeout(() => {
+				console.log('transfering');
+				this.transferNetPlayer(transData, id, shouldSync);
+			}, 1000);
+			return;
+		}
+
+		// if on the correct scene
 		if (this.transferRetries <= this.maxTransferRetries) {
 			try {
 				const x = transData.x;
@@ -685,8 +721,21 @@ class BaseNetController extends EventEmitter {
 				try {
 					SceneManager._scene.updateCharacters();
 					try {
-						this.netPlayers[id].$gamePlayer.reserveTransfer(map, x, y, 0, 0);
-						this.netPlayers[id].$gamePlayer.performTransfer(shouldSync);
+						const deltaX = transData.x - this.netPlayers[id].$gamePlayer._x;
+						const deltaY = transData.y - this.netPlayers[id].$gamePlayer._y;
+						const numSteps = Math.abs(deltaX) + Math.abs(deltaY);
+						let delay = 0;
+
+						if (numSteps < 5) {
+							const delayBetweenStep = 150;
+							this.smoothMoveNetPlayer(numSteps, this.netPlayers[id].$gamePlayer, transData, delayBetweenStep);
+							delay = numSteps * delayBetweenStep;
+						}
+
+						setTimeout(() => {
+							this.netPlayers[id].$gamePlayer.reserveTransfer(map, x, y, 0, 0);
+							this.netPlayers[id].$gamePlayer.performTransfer(shouldSync);
+						}, delay);
 					} catch (error) {
 						console.warn('player was not on the map when transfer was called');
 					}

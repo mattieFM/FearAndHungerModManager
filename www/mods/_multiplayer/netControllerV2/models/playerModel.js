@@ -39,6 +39,9 @@ class PlayerModel {
 
 		/** @description an array of all peerId's this player is married to */
 		this.marriedTo = [];
+
+		/** @description whether marriage has been initalized or not */
+		this.marriageSetup = false;
 	}
 
 	/** @description add an id to the pvp arr if it does not already exist */
@@ -190,6 +193,7 @@ class PlayerModel {
 		const displayMembers = this.displayMembers();
 		const followers = [];
 		for (let index = 0; index < displayMembers.length; index++) {
+			/** @type {Game_Actor} */
 			const actor = displayMembers[index];
 			if (actor.actorId() != this.actorId) {
 				followers.push(actor);
@@ -261,6 +265,11 @@ class PlayerModel {
 	}
 }
 
+/** set the dir4 current control. dir4 is the direction on the arrow keys. */
+Game_Player.prototype.moveOneTile = function (dir4) {
+	this.ctrlDir4 = dir4;
+};
+
 /**
  * @description a class that represents any player that is not the one the user is actively controlling.
  * @extends Game_Player
@@ -302,10 +311,6 @@ MATTIE.multiplayer.Secondary_Player.prototype.initMembers = function () {
 	this._followers = new MATTIE.multiplayer.NetFollowers(this);
 };
 
-/** set the dir4 current control. dir4 is the direction on the arrow keys. */
-MATTIE.multiplayer.Secondary_Player.prototype.moveOneTile = function (dir4) {
-	this.ctrlDir4 = dir4;
-};
 MATTIE.multiplayer.Secondary_Player.prototype.performTransfer = function () {
 	// I dont want to full override this function so instead we can just make the game
 	// think that the new player never travels to new maps so that the $gameMap.setup() is never called

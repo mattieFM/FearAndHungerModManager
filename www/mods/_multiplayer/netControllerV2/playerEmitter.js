@@ -16,7 +16,7 @@ MATTIE.RPG = MATTIE.RPG || {};
 
 // every x moves send player x and y to move
 MATTIE.multiplayer.selfMoveCount = 0;
-MATTIE.multiplayer.selfMax = 15;
+MATTIE.multiplayer.selfMax = 5;
 // every x moves send player x and y to transfer
 MATTIE.multiplayer.selfTransMoveCount = 0;
 MATTIE.multiplayer.selfTransMax = 100;
@@ -244,4 +244,16 @@ MATTIE.multiplayer.gamePlayer.override = function () {
 		}
 		MATTIE_RPG.Game_Player_SetMoveSpeed.call(this, moveSpeed);
 	};
+
+	// setup a move event to trigger when player stops moving
+	MATTIE.inputAPI.onLongNoInput((() => {
+		if (MATTIE.multiplayer.hasController()) {
+			const netController = MATTIE.multiplayer.getCurrentNetController();
+			if (SceneManager._scene.isActive() && SceneManager._scene instanceof Scene_Map) {
+				console.log(MATTIE.multiplayer.getCurrentNetController());
+				console.log(netController.emitMoveEvent);
+				netController.emitMoveEvent(0, $gamePlayer.x, $gamePlayer.y);
+			}
+		}
+	}));
 };
