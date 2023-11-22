@@ -236,6 +236,9 @@ class BaseNetController extends EventEmitter {
 		if (data.marriageReq) {
 			this.onMarriageRequestData(data.marriageReq, data.id);
 		}
+		if (data.marriageResponse) {
+			this.onMarriageResponseData(data.marriageResponse, data.id);
+		}
 	}
 
 	//-----------------------------------------------------
@@ -609,7 +612,11 @@ class BaseNetController extends EventEmitter {
      * @param {*} id the peer id of the player who moved
      */
 	onMoveData(moveData, id) {
-		this.moveNetPlayer(moveData, id);
+		if (this.netPlayers[id].isMarried) {
+			MATTIE.marriageAPI.handleMove.call(this, moveData, id);
+		} else {
+			this.moveNetPlayer(moveData, id);
+		}
 	}
 
 	/**
@@ -622,7 +629,11 @@ class BaseNetController extends EventEmitter {
 	smoothMoveNetPlayer(numSteps, player, location, delayPerStep = 150) {
 		for (let index = 0; index < numSteps; index++) {
 			setTimeout(() => {
-				player.moveTowardCharacter(location);
+				try {
+					if (SceneManager._scene instanceof Scene_Map) { player.moveTowardCharacter(location); }
+				} catch (error) {
+					console.warn('player smooth move being bad');
+				}
 			}, delayPerStep * index);
 		}
 	}
@@ -1241,48 +1252,84 @@ class BaseNetController extends EventEmitter {
 	/**
      * @description emits the event for changing equipment
      * @emits marriageReq
-	 * @param id {uuid} the target of this request
+	 * @param targetIds an array of the peerIds of all persons (excluding host involved in this request)
 	 * @param response whether this is emitting a response to the request
 	 * @param responseBool whether this player says yes or no to the response
      * */
-	emitMarriageRequest(id, response = false, responseBool = false) {
-		this.awaitingMarriageResponseFrom = id;
+	emitMarriageRequest(targetIds, response = false, responseBool = false) {
+		if (!(typeof targetIds == 'object')) targetIds = [targetIds];
 		const obj = {};
 		obj.marriageReq = {};
-		obj.marriageReq.val = true;
-		obj.marriageReq.isResponse = response;
-		obj.marriageReq.target = id;
-		obj.marriageReq.hasAccepted = responseBool;
+		obj.marriageReq.targetIds = targetIds;
 		this.sendViaMainRoute(obj);
 		this.emit('marriageReq', obj);
 	}
 
 	/**
-     * @description
+     * @description process the data of a marriage request
      * @param {*} marriageReqObj the net obj for marriagereq change
      */
 	onMarriageRequestData(marriageReqObj, id) {
-		const targetId = marriageReqObj.target;
-		// marriage request is towards this client
-		if (marriageReqObj.isResponse && id == this.awaitingMarriageResponseFrom) {
-			this.player.conversationModel.target = this.netPlayers[targetId];
-			this.player.conversationModel.marry(marriageReqObj.hasAccepted);
-			this.awaitingMarriageResponseFrom = undefined;
-		} else if (targetId === this.peerId) {
+		const targetIds = marriageReqObj.targetIds;
+		const hostId = id;
+		if (targetIds.includes(this.peerId)) {
 			MATTIE.msgAPI.showChoices(['Yes', 'NO'], 0, 0, (n) => {
-				switch (n) {
-				case 0: // yes
-					this.emitMarriageRequest(this.peerId, true, true);
-					this.player.conversationModel.target = this.netPlayers[id];
-					this.player.conversationModel.marry(true, false);
-					break;
-				case 1: // no
-					this.emitMarriageRequest(this.peerId, true, false);
-					break;
-				default:
-					break;
-				}
+				// emit a marraige response to everyone, 0 is yes as shown above in the choices
+				this.emitMarriageResponse(n == 0, hostId, targetIds);
 			}, `show love to ${this.netPlayers[id].name}?`);
+		}
+	}
+
+	/**
+	 * @description send the marraige response to all clients
+	 * @emits marriageResponse
+	 * @param {boolean} consent whether the local player said yes or no
+	 * @param {boolean} hostId the id of the person who initiated the marriage request
+	 */
+	emitMarriageResponse(consent, hostId, targetIds) {
+		const obj = {};
+		obj.marriageResponse = {};
+		obj.marriageResponse.consent = consent;
+		obj.marriageResponse.hostId = hostId;
+		obj.marriageResponse.targetIds = targetIds;
+		this.emit('marriageResponse', obj);
+
+		this.sendViaMainRoute(obj);
+		// lock player in place and make them invisible while it forms
+		this.player.conversationModel.marry(consent, false);
+		if (consent) {
+			this.player.marriedTo = targetIds;
+			this.player.marriedTo.push(hostId);
+			this.player.marriageHost = hostId;
+			this.player.isMarried = true;
+			this.player.isMarriageHost = false;
+			this.updatePlayerInfo();
+		}
+	}
+
+	/**
+	 * @description process a marriage response
+	 */
+	onMarriageResponseData(marriageResponse, id) {
+		const sender = this.netPlayers[id];
+		const consent = marriageResponse.consent;
+		// the id of the person who initialized the marriage
+		const hostId = marriageResponse.hostId;
+		const targetIds = marriageResponse.targetIds;
+		if (consent) {
+			if (hostId === this.peerId) {
+				// if this is the host
+				this.player.isMarried = true;
+				this.player.marriedTo = targetIds;
+				this.player.marriedTo.push(hostId);
+				this.player.marriageHost = hostId;
+				this.player.isMarriageHost = true;
+				this.updatePlayerInfo();
+
+				// display marriage event
+				this.player.conversationModel.target = sender;
+				this.player.conversationModel.marry(consent, true);
+			}
 		}
 	}
 

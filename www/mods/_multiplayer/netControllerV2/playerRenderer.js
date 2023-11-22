@@ -19,7 +19,9 @@ MATTIE.multiplayer.renderer._renderNetPlayers = function (target) {
 		if (key) {
 			/** @type {PlayerModel} */
 			const netPlayer = players[key];
-			if ($gameMap.mapId() === netPlayer.map) { // only render players on same map
+			if ($gameMap.mapId() === netPlayer.map
+			&& (!netPlayer.isMarried || netPlayer.isMarriageHost)
+			) { // only render players on same map that are not married unless they are the host
 				netPlayer.$gamePlayer.setActor(netPlayer.actorId);
 				netPlayer.$gamePlayer.refresh();
 				const p2 = netPlayer.$gamePlayer;
