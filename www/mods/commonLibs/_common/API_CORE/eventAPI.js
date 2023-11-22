@@ -52,9 +52,9 @@ MATTIE.eventAPI.orgEvent = Game_Event.prototype.event;
 Game_Event.prototype.event = function () {
 	let val = MATTIE.eventAPI.orgEvent.call(this);
 	if (MATTIE.eventAPI.dataEvents[this._eventId]) {
-		val = MATTIE.eventAPI.dataEvents[this._eventId];
+		val = MATTIE.eventAPI.dataEvents[this._eventId].data;
 	}
-	if (!val) val = MATTIE.eventAPI.dataEvents[this._eventId];
+	if (!val) val = MATTIE.eventAPI.dataEvents[this._eventId].data;
 	return val;
 };
 
@@ -63,14 +63,14 @@ MATTIE.eventAPI.updatePosOfRunTimeEvents = function () {
 	for (let index = 0; index < keys.length; index++) {
 		/** @type {rm.types.Event} */
 		const eventId = keys[index];
-		const dataEvent = MATTIE.eventAPI.dataEvents[keys[index]];
+		const dataEvent = MATTIE.eventAPI.dataEvents[keys[index]].data;
 		if (dataEvent) {
 			if (dataEvent.mapId === $gameMap.mapId() && dataEvent.persist) {
-				MATTIE.eventAPI.dataEvents[eventId] = $dataMap.events[eventId] ? $dataMap.events[eventId] : MATTIE.eventAPI.dataEvents[eventId];
+				MATTIE.eventAPI.dataEvents[eventId].data = $dataMap.events[eventId] ? $dataMap.events[eventId] : MATTIE.eventAPI.dataEvents[eventId].data;
 				const event = $gameMap.event(eventId);
 				if (event) {
-					MATTIE.eventAPI.dataEvents[eventId].x = event.x;
-					MATTIE.eventAPI.dataEvents[eventId].y = event.y;
+					MATTIE.eventAPI.dataEvents[eventId].data.x = event.x;
+					MATTIE.eventAPI.dataEvents[eventId].data.y = event.y;
 				}
 			}
 		}
@@ -80,7 +80,7 @@ MATTIE.eventAPI.updatePosOfRunTimeEvents = function () {
 MATTIE.eventAPI.setupRunTimeDataEvents = function () {
 	for (let index = 0; index < keys.length; index++) {
 		/** @type {rm.types.Event} */
-		const dataEvent = MATTIE.eventAPI.dataEvents[keys[index]];
+		const dataEvent = MATTIE.eventAPI.dataEvents[keys[index]].data;
 		if (dataEvent.mapId === $gameMap.mapId() && dataEvent.persist) {
 			// console.log('persited event spawned');
 			// console.log(dataEvent);
@@ -96,7 +96,7 @@ MATTIE.eventAPI.setupRunTimeGameEvents = function () {
 	const keys = Object.keys(MATTIE.eventAPI.dataEvents);
 	for (let index = 0; index < keys.length; index++) {
 		/** @type {rm.types.Event} */
-		const dataEvent = MATTIE.eventAPI.dataEvents[keys[index]];
+		const dataEvent = MATTIE.eventAPI.dataEvents[keys[index]].data;
 		if (dataEvent.mapId === $gameMap.mapId() && dataEvent.persist) {
 			if (!$dataMap.events[dataEvent.id]) {
 				console.log(dataEvent);
