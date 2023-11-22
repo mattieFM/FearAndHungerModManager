@@ -5,6 +5,7 @@ Welcome to MATTIE's Fear And Hunger Mod Manager. This mod manager works for both
 [![Documenation](https://github.com/mattieFM/FearAndHungerModManager/actions/workflows/buildPages.yml/badge.svg?branch=main)](https://github.com/mattieFM/FearAndHungerModManager/actions/workflows/buildPages.yml)  
 [![Windows Installer](https://github.com/mattieFM/FearAndHungerModManager/actions/workflows/buildInstaller.yml/badge.svg)](https://github.com/mattieFM/FearAndHungerModManager/actions/workflows/buildInstaller.yml)  
 [![Testcases](https://github.com/mattieFM/FearAndHungerModManager/actions/workflows/build.yml/badge.svg)](https://github.com/mattieFM/FearAndHungerModManager/actions/workflows/build.yml)  
+Currently we rely on peerjs broker servers, so these must also be up: https://status.peerjs.com/ib0l
 
 ## Mod Loader Features  
 -Abiltiy to toggle on and off any and all mods you have installed.  
