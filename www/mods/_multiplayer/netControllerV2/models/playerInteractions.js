@@ -74,11 +74,25 @@ MATTIE.multiplayer.Conversations.prototype.marry = function (otherPlayerIsWillin
 			// eslint-disable-next-line max-len
 			MATTIE.eventAPI.marriageAPI.displayMarriage($gameParty.leader().actorId(), this.target.$gamePlayer.actorId, true, $gamePlayer.x, $gamePlayer.y);
 		}
-		const localPlayer = MATTIE.multiplayer.getCurrentNetController().player;
+		const netCont = MATTIE.multiplayer.getCurrentNetController();
+		const localPlayer = netCont.player;
 		localPlayer.isMarried = true;
 		this.target.isMarried = true;
 		this.target.marriedTo.push(localPlayer.peerId);
 		localPlayer.marriedTo.push(this.target.peerId);
+
+		// handle marriage init / movement combination
+		localPlayer.marriedTo.forEach((playerId) => {
+			/** @type {PlayerModel} */
+			const player = netCont.netPlayers[playerId];
+			if (!player.marriageSetup) {
+				console.log('tried to set up player. move one tile');
+				player.$gamePlayer.moveOneTile = function (dir4) {
+					console.log('married player tried to move');
+					Input.forcedDir4 = dir4;
+				};
+			}
+		});
 	} else {
 		MATTIE.msgAPI.displayMsg(`${this.target.name} is NOT willing.`);
 	}
