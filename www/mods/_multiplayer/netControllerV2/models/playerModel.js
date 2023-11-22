@@ -42,6 +42,12 @@ class PlayerModel {
 
 		/** @description whether marriage has been initalized or not */
 		this.marriageSetup = false;
+
+		/** @description whether this player is the host of a marriage */
+		this.isMarriageHost = false;
+
+		/** @description the peerid of the host of this marriage */
+		this.marriageHost = null;
 	}
 
 	/** @description add an id to the pvp arr if it does not already exist */
@@ -256,6 +262,10 @@ class PlayerModel {
 		obj.actorId = this.actorId;
 		obj.peerId = this.peerId;
 		obj.followerIds = this.followerIds;
+		obj.isMarriageHost = this.isMarriageHost;
+		obj.marriageHost = this.marriageHost;
+		obj.isMarried = this.isMarried;
+		obj.marriedTo = this.marriedTo;
 		return obj;
 	}
 

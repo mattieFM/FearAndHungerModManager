@@ -63,38 +63,22 @@ MATTIE.multiplayer.Conversations.prototype.resurrect = function () {
 /**
  * @description form a marriage with the target player or display they are not willing if they don't concent
  * @param {*} otherPlayerIsWilling whether the other player concents or not.
+ * @param {boolean} isHost whether this player initiated the conversation
  * @param {boolean} spawn whether to spawn the marriage event or not
  */
-MATTIE.multiplayer.Conversations.prototype.marry = function (otherPlayerIsWilling, spawn = true) {
+MATTIE.multiplayer.Conversations.prototype.marry = function (otherPlayerIsWilling, spawn = false) {
 	if (otherPlayerIsWilling) {
-		MATTIE.msgAPI.displayMsg(`${this.target.name} is willing.`);
+		MATTIE.msgAPI.displayMsg('They are willing.');
 		MATTIE.fxAPI.hidePlayer(10000);
 		MATTIE.fxAPI.lockPlayer(10000);
 		if (spawn) {
 			// eslint-disable-next-line max-len
 			MATTIE.eventAPI.marriageAPI.displayMarriage($gameParty.leader().actorId(), this.target.$gamePlayer.actorId, true, $gamePlayer.x, $gamePlayer.y);
 		}
-		const netCont = MATTIE.multiplayer.getCurrentNetController();
-		const localPlayer = netCont.player;
-		localPlayer.isMarried = true;
-		this.target.isMarried = true;
-		this.target.marriedTo.push(localPlayer.peerId);
-		localPlayer.marriedTo.push(this.target.peerId);
 
-		// handle marriage init / movement combination
-		localPlayer.marriedTo.forEach((playerId) => {
-			/** @type {PlayerModel} */
-			const player = netCont.netPlayers[playerId];
-			if (!player.marriageSetup) {
-				console.log('tried to set up player. move one tile');
-				player.$gamePlayer.moveOneTile = function (dir4) {
-					console.log('married player tried to move');
-					Input.forcedDir4 = dir4;
-				};
-			}
-		});
+		MATTIE.actorAPI.changePartyLeader(MATTIE.static.actors.marriageId);
 	} else {
-		MATTIE.msgAPI.displayMsg(`${this.target.name} is NOT willing.`);
+		MATTIE.msgAPI.displayMsg('They are NOT willing.');
 	}
 };
 
@@ -133,7 +117,7 @@ MATTIE.multiplayer.Conversations.prototype.talkOptionsCb = function (n) {
 	case 4: // Show Love
 		// trigger net event for proccessing marriage concent
 		// eslint-disable-next-line no-case-declarations
-		MATTIE.multiplayer.getCurrentNetController().emitMarriageRequest(this.target.peerId);
+		MATTIE.multiplayer.getCurrentNetController().emitMarriageRequest([this.target.peerId]);
 		break;
 	case 5: // cancel
 		break;
