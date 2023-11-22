@@ -298,7 +298,7 @@ class MapEvent {
      */
 	createGameEvent() {
 		console.log(MATTIE.eventAPI.dataEvents[this.data.id]);
-		$dataMap.events[this.data.id] = MATTIE.eventAPI.dataEvents[this.data.id];
+		$dataMap.events[this.data.id] = this.data;
 		$gameMap._events[this.data.id] = (new Game_Event($gameMap.mapId(), this.data.id));
 		if (!$dataMap.events[this.data.id]) $dataMap.events[this.data.id] = undefined; // if data is null set it to undefined instead
 		return $gameMap.event(this.data.id);
@@ -386,7 +386,7 @@ class MapEvent {
      * @param y (int)
      */
 	spawn(x, y) {
-		MATTIE.eventAPI.dataEvents[this.data.id] = (this.data);
+		MATTIE.eventAPI.dataEvents[this.data.id] = this;
 		if (this.data.mapId === $gameMap.mapId()) {
 			this.setPosition(x, y);
 			this.refresh();
@@ -395,6 +395,10 @@ class MapEvent {
 	}
 
 	removeThisEvent() {
+		if (this.data.mapId === $gameMap.mapId()) {
+			$gameMap._events[this.data.id] = null;
+			$dataMap.events[this.data.id] = null;
+		}
 		MATTIE.eventAPI.dataEvents[this.data.id] = undefined;
 		delete MATTIE.eventAPI.dataEvents[this.data.id];
 	}
@@ -452,27 +456,39 @@ class MapEvent {
 	}
 }
 
-/**
- * Hook into original functions.
- */
 (function () {
-	// Extend the clearTransferInfo function
-	const { clearTransferInfo } = Game_Player.prototype;
+	// override the function that triggers when the scene map is fully loaded
 
-	// When a transfer is complete and info is being cleared
-	Game_Player.prototype.clearTransferInfo = function () {
-		clearTransferInfo.call(this);
+	MATTIE.eventAPI.cleanup = function () {
+		if (!$dataMap) return;
 
 		// Get all existing event ids
 		const eventIds = [];
 		const persistingIds = [];
-		Object.keys(MATTIE.eventAPI.dataEvents).forEach((key) => {
+		const eventsForDeletion = [];
+		const keys = Object.keys(MATTIE.eventAPI.dataEvents);
+		for (let index = 0; index < keys.length; index++) {
+			const key = keys[index];
 			const event = MATTIE.eventAPI.dataEvents[key];
-			if (event.id === $gameMap.mapId()) {
-				if (event && !event.persist) eventIds.push(event.id);
-				if (event && event.persist) persistingIds.push(event.id);
+			console.log(event);
+			console.log(`map = ${$gameMap.mapId()}`);
+			if (event) {
+				if (event.data.mapId == $gameMap.mapId()) {
+					console.log('event on map');
+					if (!event.data.persist) {
+						eventIds.push(event.data.id);
+						eventsForDeletion.push(event);
+					}
+					if (event.data.persist) {
+						persistingIds.push(event.data.id);
+					}
+				}
 			}
-		});
+		}
+
+		console.log('persisding ids');
+		console.log(persistingIds);
+
 		$dataMap.events.forEach((object) => {
 			if (object === null) { return; }
 
@@ -490,11 +506,22 @@ class MapEvent {
 				// eslint-disable-next-line no-continue
 				if (mapId != $gameMap._mapId) { continue; }
 
-				if (!eventIds.contains(eventId) && !persistingIds.contains(eventId)) {
+				if (eventIds.contains(eventId) && !persistingIds.contains(eventId)) {
 					delete $gameSelfSwitches._data[key];
-					console.log('cleaned up switch');
+					console.log(`cleaned up switch:${key} from event: ${eventId}`);
 				}
 			}
 		}
+
+		// remove all events qued for deletion
+		eventsForDeletion.forEach((evd) => {
+			evd.removeThisEvent();
+		});
+	};
+
+	const onMapLoaded = Scene_Map.prototype.onMapLoaded;
+	Scene_Map.prototype.onMapLoaded = function () {
+		onMapLoaded.call(this);
+		MATTIE.eventAPI.cleanup();
 	};
 }());

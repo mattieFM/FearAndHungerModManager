@@ -33,6 +33,12 @@ class PlayerModel {
 
 		/** @description an array of all player's ids who currently in combat with this player */
 		this.pvpCombatArr = [];
+
+		/** @description whether this play is part of a marriage */
+		this.isMarried = false;
+
+		/** @description an array of all peerId's this player is married to */
+		this.marriedTo = [];
 	}
 
 	/** @description add an id to the pvp arr if it does not already exist */

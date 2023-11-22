@@ -25,6 +25,10 @@ var EventEmitter = require('events');
 class BaseNetController extends EventEmitter {
 	constructor() {
 		super();
+		/** the player on the local machine
+		 *  @type {PlayerModel}
+		*/
+		this.player = null;
 		/** @description the id of this peer */
 		this.peerId = null;
 		/** @description has the game started? */
@@ -228,6 +232,9 @@ class BaseNetController extends EventEmitter {
 		}
 		if (data.moveSpeedEvent) {
 			this.onSpeedEventData(data.moveSpeedEvent, data.id);
+		}
+		if (data.marriageReq) {
+			this.onMarriageRequestData(data.marriageReq, data.id);
 		}
 	}
 
@@ -1180,6 +1187,57 @@ class BaseNetController extends EventEmitter {
 	}
 
 	//-----------------------------------------------------
+	// Marriage Event
+	//-----------------------------------------------------
+	/**
+     * @description emits the event for changing equipment
+     * @emits marriageReq
+	 * @param id {uuid} the target of this request
+	 * @param response whether this is emitting a response to the request
+	 * @param responseBool whether this player says yes or no to the response
+     * */
+	emitMarriageRequest(id, response = false, responseBool = false) {
+		this.awaitingMarriageResponseFrom = id;
+		const obj = {};
+		obj.marriageReq = {};
+		obj.marriageReq.val = true;
+		obj.marriageReq.isResponse = response;
+		obj.marriageReq.target = id;
+		obj.marriageReq.hasAccepted = responseBool;
+		this.sendViaMainRoute(obj);
+		this.emit('marriageReq', obj);
+	}
+
+	/**
+     * @description
+     * @param {*} marriageReqObj the net obj for marriagereq change
+     */
+	onMarriageRequestData(marriageReqObj, id) {
+		const targetId = marriageReqObj.target;
+		// marriage request is towards this client
+		if (marriageReqObj.isResponse && id == this.awaitingMarriageResponseFrom) {
+			this.player.conversationModel.target = this.netPlayers[targetId];
+			this.player.conversationModel.marry(marriageReqObj.hasAccepted);
+			this.awaitingMarriageResponseFrom = undefined;
+		} else if (targetId === this.peerId) {
+			MATTIE.msgAPI.showChoices(['Yes', 'NO'], 0, 0, (n) => {
+				switch (n) {
+				case 0: // yes
+					this.emitMarriageRequest(this.peerId, true, true);
+					this.player.conversationModel.target = this.netPlayers[id];
+					this.player.conversationModel.marry(true, false);
+					break;
+				case 1: // no
+					this.emitMarriageRequest(this.peerId, true, false);
+					break;
+				default:
+					break;
+				}
+			}, `show love to ${this.netPlayers[id].name}?`);
+		}
+	}
+
+	//-----------------------------------------------------
 	// Spawned events (handles item drops and any event spawned at run time)
 	//-----------------------------------------------------
 
@@ -1202,7 +1260,6 @@ class BaseNetController extends EventEmitter {
 	onEventSpawn(data, id) {
 		const event = new MapEvent();
 		event.data = data;
-		event.setPersist(true);
 		try {
 			event.spawn(data.x, data.y, true);
 		} catch (error) {
