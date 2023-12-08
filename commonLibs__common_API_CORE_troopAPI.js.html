@@ -941,7 +941,8 @@ Spriteset_Battle.prototype.refreshSpacing = function (shouldAffectBase = true) {
 	for (let index = 0; index &lt; keys.length; index++) {
 		const key = keys[index];
 		const enemyList = dict[key]; // a list of sprites
-		const actorId = MATTIE.multiplayer.pvp.PvpController.mapTroopToActor(key);
+		let actorId;
+		if (MATTIE.multiplayer.pvp) { actorId = MATTIE.multiplayer.pvp.PvpController.mapTroopToActor(key); }
 		let xOffset = bestX(index);
 		let yOffset = 0;
 
@@ -953,19 +954,21 @@ Spriteset_Battle.prototype.refreshSpacing = function (shouldAffectBase = true) {
 				if (!sprite.baseY) sprite.baseY = sprite._homeY;
 
 				// handle pvp spacing for leaders
-				if (MATTIE.multiplayer.pvp.inPVP) {
-					if (MATTIE.multiplayer.getCurrentNetController().player.pvpCombatArr.some(
-						(netKey) => {
-							const netCont = MATTIE.multiplayer.getCurrentNetController();
+				if (MATTIE.multiplayer.pvp) {
+					if (MATTIE.multiplayer.pvp.inPVP) {
+						if (MATTIE.multiplayer.getCurrentNetController().player.pvpCombatArr.some(
+							(netKey) => {
+								const netCont = MATTIE.multiplayer.getCurrentNetController();
 
-							const player = MATTIE.multiplayer.getCurrentNetController().netPlayers[netKey];
-							if (player) return player.actorId == actorId;
-							return false;
-						},
+								const player = MATTIE.multiplayer.getCurrentNetController().netPlayers[netKey];
+								if (player) return player.actorId == actorId;
+								return false;
+							},
 
-					)) {
-						yOffset -= 35;
-						xOffset = 20;
+						)) {
+							yOffset -= 35;
+							xOffset = 20;
+						}
 					}
 				}
 
