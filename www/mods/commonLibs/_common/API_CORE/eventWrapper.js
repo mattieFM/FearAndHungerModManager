@@ -23,6 +23,7 @@
  */
 
 MATTIE.eventAPI = MATTIE.eventAPI || {};
+/** @description an array storing all active map events */
 MATTIE.eventAPI.dataEvents = MATTIE.eventAPI.dataEvents || {};
 let val = 999;
 class MapEvent {
@@ -297,10 +298,8 @@ class MapEvent {
      * Create a new Game_Event object and store it in $gameMap.
      */
 	createGameEvent() {
-		console.log(MATTIE.eventAPI.dataEvents[this.data.id]);
 		$dataMap.events[this.data.id] = this.data;
 		$gameMap._events[this.data.id] = (new Game_Event($gameMap.mapId(), this.data.id));
-		if (!$dataMap.events[this.data.id]) $dataMap.events[this.data.id] = undefined; // if data is null set it to undefined instead
 		return $gameMap.event(this.data.id);
 	}
 
@@ -308,11 +307,18 @@ class MapEvent {
      * Create a new Sprite_Character and store it in the current scene's Spriteset_Map.
      *
      * @param event (Game_Event)
+	 * @returns the event or an empty event if something went wrong
      */
 	createCharacterSprite(event) {
-		SceneManager._scene._spriteset._characterSprites.push(new Sprite_Character(event));
-
-		return SceneManager._scene._spriteset._characterSprites[SceneManager._scene._spriteset._characterSprites.length - 1];
+		console.log('rendering event as sprite:');
+		console.log(event);
+		try {
+			SceneManager._scene._spriteset._characterSprites.push(new Sprite_Character(event));
+			return SceneManager._scene._spriteset._characterSprites[SceneManager._scene._spriteset._characterSprites.length - 1];
+		} catch (error) {
+			console.error(`${error}An error occured in rendering a runtime sprite`);
+			return new Sprite_Character();
+		}
 	}
 
 	/**
@@ -321,7 +327,17 @@ class MapEvent {
      * @param sprite (Sprite_Character)
      */
 	addSpriteToTilemap(sprite) {
+		if (this.oldSprite) {
+			SceneManager._scene._spriteset._tilemap.removeChild(sprite);
+		}
 		SceneManager._scene._spriteset._tilemap.addChild(sprite);
+		this.oldSprite = sprite;
+	}
+
+	removeSpriteFromTilemap() {
+		if (this.oldSprite) {
+			SceneManager._scene._spriteset._tilemap.removeChild(sprite);
+		}
 	}
 
 	/**
@@ -408,6 +424,8 @@ class MapEvent {
 			const event = this.createGameEvent();
 			const sprite = this.createCharacterSprite(event);
 			this.addSpriteToTilemap(sprite);
+			console.log('sprite created:');
+			console.log(sprite);
 		} catch (error) {
 			console.error(error);
 		}
@@ -479,9 +497,9 @@ class MapEvent {
 						eventIds.push(event.data.id);
 						eventsForDeletion.push(event);
 					}
-					if (event.data.persist) {
-						persistingIds.push(event.data.id);
-					}
+				}
+				if (event.data.persist) {
+					persistingIds.push(event.data.id);
 				}
 			}
 		}
@@ -490,9 +508,9 @@ class MapEvent {
 		console.log(persistingIds);
 
 		$dataMap.events.forEach((object) => {
-			if (object === null) { return; }
+			// if (object === null) { return; }
 
-			eventIds.push(object.id);
+			// eventIds.push(object.id);
 		});
 
 		// Clear self switches for non-existing events
@@ -514,14 +532,8 @@ class MapEvent {
 		}
 
 		// remove all events qued for deletion
-		eventsForDeletion.forEach((evd) => {
-			evd.removeThisEvent();
-		});
-	};
-
-	const onMapLoaded = Scene_Map.prototype.onMapLoaded;
-	Scene_Map.prototype.onMapLoaded = function () {
-		onMapLoaded.call(this);
-		MATTIE.eventAPI.cleanup();
+		// eventsForDeletion.forEach((evd) => {
+		// 	evd.removeThisEvent();
+		// });
 	};
 }());
