@@ -299,31 +299,45 @@ Game_Map.prototype.checkPassage = function (x, y, bit) {
 	return val;
 };
 
+// all of this is deprecated as it doesnt work properly for hpscaling
+// // MATTIE_RPG.Game_Enemy_Param = Game_Enemy.prototype.param;
+// // Game_Enemy.prototype.param = function (paramId) {
+// // 	let val = MATTIE_RPG.Game_Enemy_Param.call(this, paramId);
+// // 	if (paramId === 0) {
+// // 		// max HP
+// // 		val *= MATTIE.multiplayer.config.scaling.hpScaling();
+// // 	}
+
+// // 	return val;
+// // };
 /**
- * @description override the game enemy setup function to mutliply the hp and mp by the scaler
+ * @description edit the dataEnemies obj of a set enemy to have its scaled amount of health as determined by scaling and config above
+ * @param {*} enemyId the id of the data enemy
+ */
+function updateHpOfEnemy(enemyId) {
+	if (!$dataEnemies[enemyId].scaled) {
+		$dataEnemies[enemyId].params[0] *= MATTIE.multiplayer.config.scaling.hpScaling();
+		// // console.log(`#${enemyId} mhp:${$dataEnemies[enemyId].params[0]}`);
+		$dataEnemies[enemyId].scaled = true;
+	}
+}
+
+/**
+ * @description adjust the hp of every enemy within memory
  * !!DANGER!! don't edit this unless you know what your doing.
  */
 MATTIE_RPG.Game_Enemy_Setup = Game_Enemy.prototype.setup;
 Game_Enemy.prototype.setup = function (enemyId, x, y) {
+	updateHpOfEnemy(enemyId);
 	MATTIE_RPG.Game_Enemy_Setup.call(this, enemyId, x, y);
-
-	const baseHp = this.mhp;
-	const baseParam = this.param;
-	console.log(this.mhp);
-
-	this.param = function (paramId) {
-		if (paramId === 0) {
-			// max HP
-			return baseHp * MATTIE.multiplayer.config.scaling.hpScaling();
-		}
-		return baseParam.call(this, paramId);
-	};
-
-	setTimeout(() => {
-		console.log(this.mhp);
-	}, 500);
-
-	this.recoverAll();
+};
+/** @description the default transform cmd */
+MATTIE_RPG.Game_Enemy_TRANSFORM = Game_Enemy.prototype.transform;
+/** @description extend the transform method to do the same as above */
+Game_Enemy.prototype.transform = function (enemyId) {
+	updateHpOfEnemy(enemyId);
+	// // console.log(`#${enemyId} mhp:${$dataEnemies[enemyId].params[0]}`);
+	MATTIE_RPG.Game_Enemy_TRANSFORM.call(this, enemyId);
 };
 
 //---------------------------------------------------------

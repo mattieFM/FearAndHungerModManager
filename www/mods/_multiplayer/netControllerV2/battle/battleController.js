@@ -45,6 +45,7 @@ class BattleController extends EventEmitter {
 			MATTIE.multiplayer.getCurrentNetController().emitBattleEndEvent($gameTroop._troopId, MATTIE.multiplayer.currentBattleEnemy);
 		}
 		const enemyHps = $gameTroop.members().map((enemy) => enemy._hp);
+		// console.log($gameTroop.members());
 		const enemyStates = $gameTroop.members().map((enemy) => enemy.states().map((state) => state.id));
 		const actorData = $gameParty.battleMembers().map((actor) => {
 			const obj = {};

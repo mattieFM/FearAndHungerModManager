@@ -717,9 +717,9 @@ class BaseNetController extends EventEmitter {
 
 		// if not on the map try again later
 		if (!(SceneManager._scene instanceof Scene_Map)) {
-			console.log('waiting to transfer');
+			// console.log('waiting to transfer');
 			setTimeout(() => {
-				console.log('transfering');
+				// console.log('transfering');
 				this.transferNetPlayer(transData, id, shouldSync);
 			}, 1000);
 			return;
