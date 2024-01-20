@@ -61,7 +61,11 @@ MATTIE.multiplayer.enemyCommandEmitter.stateChange = function (enemyIndex, addSt
 	Game_Interpreter.prototype.iterateEnemyIndex(enemyIndex, (enemy) => {
 		var alreadyDead = enemy.isDead();
 		if (addState) {
+			// for the time being don't forward these states to make sure nothing too funky happens
+			// if (stateId != MATTIE.static.states.knockout
+			// 	&& stateId != MATTIE.static.states.resistDeath) {
 			enemy.addState(stateId, true);
+			// }
 		} else {
 			enemy.removeState(stateId);
 		}
