@@ -1,8 +1,10 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Namespace: items a name space containing information about additional items | Namespace: items a name space containing information about additional items</title>
+    <title>Source: OnlyBosses.js | Source: OnlyBosses.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -30,7 +32,7 @@
         
     </div>
     <div class="title">
-        <h1><a href="index.html" class="link">Namespace: items a name space containing information about additional items</a></h1>
+        <h1><a href="index.html" class="link">Source: OnlyBosses.js</a></h1>
         
             <span class="version">v1.2.4</span>
         
@@ -58,87 +60,88 @@
 
 
 
-
-<section>
-
-<header>
     
-        <h2>
-            <span class="ancestors"><a href="MATTIE.html">MATTIE</a>.</span>items a name space containing information about additional items</h2>
-        
-    
-</header>
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/* eslint-disable max-len */
+/** ==============================================
+ *
+ *INSTALL Instructions. Either use my mod loader and put this in your mods folder, or
+ *
+ *find the index.html file within your game install folder (on mac it is within the executable file (like a zip archive))
+ *copy this file into the same folder as the file labeled "index.html" (on mac this is within the executable run file (like a zip archive))
+ *then edit the index.html file, adding the line pasted below directly beneath the last line in the file that looks like "&lt;script>lorem ipsum seit de amor&lt;/script>"
+ *"&lt;script type="text/javascript" src="OnlyBosses.js">&lt;/script>"
+ *=============================================* */
 
-<article>
-    
-        <div class="container-overview">
-        
-            
+/* eslint-disable max-classes-per-file */
+/*:
+ * @plugindesc V0
+ * a mod for fear and hunger that makes all enemies bosses
+ * @author Mattie
+ */
 
-            
+(() => {
+	/** =======================
+     *
+     *     Config
+     *
+     *========================* */
+	// toggle these on or off for which bosses you want in the pool of bosses
+	const includeGrogoroth = true;
+	const includeSylvian = false;
+	const includeGriffith = false;
+	const includeGohaf = false;
 
+	// if you want to add more troops to be included put their id in here;
+	const baseIncludedTroops = [];
 
-<dl class="details">
+	if (includeGohaf) {
+		baseIncludedTroops.push(130);
+	}
+	if (includeGrogoroth) {
+		baseIncludedTroops.push(170);
+	}
+	if (includeSylvian) {
+		baseIncludedTroops.push(210);
+	}
+	if (includeGriffith) {
+		baseIncludedTroops.push(126);
+	}
 
-    
+	/** =====================================
+     *       END OF CONFIG SECTION
+     * !      Below this is code !
+     *
+     *
+     *======================================* */
+	// override battle processing cmd
+	Game_Interpreter.prototype.command301 = function () {
+		if (!$gameParty.inBattle()) {
+			var troopId = baseIncludedTroops[randBetween(0, baseIncludedTroops.length-1)];
+			troopId = BattleManager.setup(troopId, this._params[2], this._params[3]);
+			BattleManager.setEventCallback((n) => {
+				this._branch[this._indent] = n;
+			});
+			$gamePlayer.makeEncounterCount();
+			SceneManager.push(Scene_Battle);
+		}
+		return true;
+	};
 
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-            
-        
-        </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</article>
-
-</section>
+	/**
+     * @description get a random number between inclusive min and max
+     * @param {*} min inclusive min
+     * @param {*} max inclusive max
+     * @returns {int}
+     */
+	let randBetween = function (min, max) {
+		return min + Math.floor(Math.random() * (max - min + 1));
+	};
+})();
+</code></pre>
+        </article>
+    </section>
 
 
 
@@ -155,7 +158,7 @@
 <script src="scripts/linenumber.js"></script>
 
     <script>
-        var id = 'MATTIE.items a name space containing information about additional items_sub'.replace(/"/g, '_');
+        var id = '_sub'.replace(/"/g, '_');
         var selectedApi = document.getElementById(id); // do not use jquery selector
         var $selectedApi = $(selectedApi);
 

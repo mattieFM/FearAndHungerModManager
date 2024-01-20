@@ -1,8 +1,10 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Namespace: items a name space containing information about additional items | Namespace: items a name space containing information about additional items</title>
+    <title>Source: commonLibs/_common/API_CORE/eventHooks.js | Source: commonLibs/_common/API_CORE/eventHooks.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -30,7 +32,7 @@
         
     </div>
     <div class="title">
-        <h1><a href="index.html" class="link">Namespace: items a name space containing information about additional items</a></h1>
+        <h1><a href="index.html" class="link">Source: commonLibs/_common/API_CORE/eventHooks.js</a></h1>
         
             <span class="version">v1.2.4</span>
         
@@ -58,87 +60,75 @@
 
 
 
-
-<section>
-
-<header>
     
-        <h2>
-            <span class="ancestors"><a href="MATTIE.html">MATTIE</a>.</span>items a name space containing information about additional items</h2>
-        
-    
-</header>
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>MATTIE.eventAPI = MATTIE.eventAPI || {};
+/** @description an array storing all active map events */
+MATTIE.eventAPI.dataEvents = MATTIE.eventAPI.dataEvents || {};
+MATTIE.eventAPI.blankEvent = {};
 
-<article>
-    
-        <div class="container-overview">
-        
-            
+/** @description the base setup events function */
+MATTIE.eventAPI.orgSetupEvent = Game_Map.prototype.setupEvents;
+Game_Map.prototype.setupEvents = function () {
+	MATTIE.eventAPI.orgSetupEvent.call(this);
+};
 
-            
+// stop that
+var no;
 
+(() => {
+	const onMapLoaded = Scene_Map.prototype.onMapLoaded;
+	Scene_Map.prototype.onMapLoaded = function () {
+		onMapLoaded.call(this);
+		MATTIE.eventAPI.cleanup();
+		const keys = Object.keys(MATTIE.eventAPI.dataEvents);
+		keys.forEach((key) => {
+		/** @type {MapEvent} */
+			const mapEvent = MATTIE.eventAPI.dataEvents[key];
 
-<dl class="details">
+			// only refresh ones on the same map
+			if (mapEvent.data.mapId === $gameMap.mapId()) {
+				mapEvent.refresh();
+			}
+		});
+	};
+})();
 
-    
+/**
+ * @description override the setup events function to attach all runtime events as well
+ * @deprecated this would work if not for self switches
+ */
 
-    
+Game_Map.prototype.setupEventsDeprecated = function () {
+	MATTIE.eventAPI.orgSetupEvent.call(this);
 
-    
+	const keys = Object.keys(MATTIE.eventAPI.dataEvents);
+	keys.forEach((key) => {
+		/** @type {MapEvent} */
+		const mapEvent = MATTIE.eventAPI.dataEvents[key];
+		// mapEvent.removeSpriteFromTilemap();
 
-    
+		// the length of the events array after all base events loaded
+		let i = this._events.length;
 
-    
+		// if event is on the currently loaded map, if not do nothing
+		if (mapEvent.data.mapId === $gameMap.mapId()) {
+			// before we can add it as a game event we need to add it as a data event and update its id
+			mapEvent.data.id = i;
 
-    
+			$dataMap.events[i] = mapEvent.data;
 
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-            
-        
-        </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</article>
-
-</section>
+			// add the event as a new game event
+			console.log(`New event at index${i}`);
+			this._events[i] = new Game_Event(mapEvent.data.mapId, i);
+			i++;
+		}
+	});
+};
+</code></pre>
+        </article>
+    </section>
 
 
 
@@ -155,7 +145,7 @@
 <script src="scripts/linenumber.js"></script>
 
     <script>
-        var id = 'MATTIE.items a name space containing information about additional items_sub'.replace(/"/g, '_');
+        var id = '_sub'.replace(/"/g, '_');
         var selectedApi = document.getElementById(id); // do not use jquery selector
         var $selectedApi = $(selectedApi);
 
