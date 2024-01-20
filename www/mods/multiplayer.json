@@ -47,7 +47,8 @@
         "_multiplayer/netControllerV2/models/netActors",
         "_multiplayer/startGameMenu",
 								"_multiplayer/items",
-								"_multiplayer/netControllerV2/marriageHandler"
+								"_multiplayer/netControllerV2/marriageHandler",
+								"_multiplayer/netControllerV2/saveEventLocationEmitter"
     ],
     "danger": false,
 				"assets": [

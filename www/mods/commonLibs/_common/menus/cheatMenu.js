@@ -481,7 +481,9 @@ MATTIE.scenes.Scene_Misc.baseList = {
 };
 
 setTimeout(() => {
-	if (MATTIE_ModManager.modManager.checkMod('multiplayer')) 	{ MATTIE.scenes.Scene_Misc.baseList.MULTIPLAYER = 'multiplayer'; }
+	if (MATTIE_ModManager.modManager.checkMod('multiplayer')) 	{
+		MATTIE.scenes.Scene_Misc.baseList.MULTIPLAYER = 'multiplayer';
+	}
 	if (MATTIE_ModManager.modManager.checkMod('devTools')) 	{
 		// is dev tool enabled
 		MATTIE.scenes.Scene_Misc.baseList.LIMBS = 'limbs';

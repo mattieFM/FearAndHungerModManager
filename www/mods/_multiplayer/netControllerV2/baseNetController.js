@@ -239,6 +239,9 @@ class BaseNetController extends EventEmitter {
 		if (data.marriageResponse) {
 			this.onMarriageResponseData(data.marriageResponse, data.id);
 		}
+		if (data.saveEventLocationEvent) {
+			this.onSaveEventLocationEventData(data.saveEventLocationEvent, data.id);
+		}
 	}
 
 	//-----------------------------------------------------
@@ -1772,6 +1775,50 @@ class BaseNetController extends EventEmitter {
 		const newMoveSpeed = moveSpeedData.val;
 		const gamePlayer = this.netPlayers[id].$gamePlayer;
 		gamePlayer.setMoveSpeed(newMoveSpeed);
+	}
+
+	//-----------------------------------------------------
+	// SaveEventLocationEvent (yanfly plugin handling)
+	//-----------------------------------------------------
+
+	/**
+	 * @description send to all players the event location save event
+	 * @param {int} mapId the id of the map
+	 * @param {Game_Event} event the id of the event
+	 * @emits saveEventLocationEvent
+	 */
+	emitSaveEventLocationEvent(mapId, event) {
+		const obj = {};
+		obj.saveEventLocationEvent = {};
+		obj.saveEventLocationEvent.mapId = mapId;
+
+		// since we dont wanna send a shit ton of data we will only send the parts of the event that we need to
+		obj.saveEventLocationEvent.event = {};
+		obj.saveEventLocationEvent.event.eventId = event.eventId();
+		obj.saveEventLocationEvent.event.x = event.x;
+		obj.saveEventLocationEvent.event.y = event.y;
+		obj.saveEventLocationEvent.event.direction = event.direction();
+
+		this.emit('saveEventLocationEvent');
+		this.sendViaMainRoute(obj);
+	}
+
+	/**
+	 * @description handle the event
+	 * @param {*} saveEventLocationData an obj as structured in the method above
+	 * @param {uuid} id the id of the original sender
+	 */
+	onSaveEventLocationEventData(saveEventLocationData, id) {
+		const event = saveEventLocationData.event;
+		const mapId = saveEventLocationData.mapId;
+
+		// restructure our data so we can use it without editing yanfly's method
+		const _eventId = event.eventId;
+		event.eventId = () => _eventId;
+		const _direction = event.direction;
+		event.direction = () => _direction;
+
+		$gameSystem.saveEventLocation(mapId, event, true);
 	}
 
 	//-----------------------------------------------------

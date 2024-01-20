@@ -250,8 +250,8 @@ MATTIE.multiplayer.gamePlayer.override = function () {
 		if (MATTIE.multiplayer.hasController()) {
 			const netController = MATTIE.multiplayer.getCurrentNetController();
 			if (SceneManager._scene.isActive() && SceneManager._scene instanceof Scene_Map) {
-				console.log(MATTIE.multiplayer.getCurrentNetController());
-				console.log(netController.emitMoveEvent);
+				// console.log(MATTIE.multiplayer.getCurrentNetController());
+				// console.log(netController.emitMoveEvent);
 				netController.emitMoveEvent(0, $gamePlayer.x, $gamePlayer.y);
 			}
 		}

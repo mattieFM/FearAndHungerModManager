@@ -9,7 +9,7 @@ MATTIE.actorAPI = MATTIE.actorAPI || {};
 
 /**
  * @description force the first actor in the battlemembers function to always be i
- * @param {int} i actor index
+ * @param {int} i actorid
  */
 MATTIE.actorAPI.forceMainChar = function (i) {
 	const lastBattleMembers = Game_Party.prototype.battleMembers;
@@ -20,6 +20,7 @@ MATTIE.actorAPI.forceMainChar = function (i) {
 		return val;
 	};
 };
+
 /**
  *  @description A class that wraps data actor information allowing easy creation of data actors.
  * */

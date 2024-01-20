@@ -111,6 +111,9 @@ MATTIE.unstuckAPI.unstuck = function () {
 	// make sure player is visible, can move and can open menu and save
 	MATTIE.fxAPI.showPlayer();
 	MATTIE.fxAPI.unlockPlayer();
+
+	// clear images on screen
+	$gameScreen.clearPictures();
 };
 
 /**

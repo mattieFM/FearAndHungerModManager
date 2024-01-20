@@ -34,6 +34,7 @@
         "_common/API_CORE/eventAPI",
         "_common/API_CORE/troopAPI",
         "_common/API_CORE/eventWrapper",
+								"_common/API_CORE/eventHooks",
         "_common/API_CORE/msgAPI",
 								"_common/API_CORE/unstuckAPI",
 								"_common/API_CORE/teleportsAPI",
