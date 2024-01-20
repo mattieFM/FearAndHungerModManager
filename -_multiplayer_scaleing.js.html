@@ -209,7 +209,7 @@ MATTIE.multiplayer.config.scaling.scaleHp;
 
 /**
  * @description this is multiplied by the max hp of all enemies
- * @default 1
+ * @default 1.3
  */
 MATTIE.multiplayer.config.scaling.hpScaler;
 
@@ -263,7 +263,7 @@ Object.defineProperties(MATTIE.multiplayer.config.scaling, {
 	},
 
 	hpScaler: {
-		get: () => MATTIE.configGet('hpScaler', 1),
+		get: () => MATTIE.configGet('hpScaler', 1.3),
 		set: (value) => { MATTIE.configSet('hpScaler', value); },
 	},
 
@@ -391,19 +391,28 @@ function updateHpOfEnemy(enemyId) {
  * @description adjust the hp of every enemy within memory
  * !!DANGER!! don't edit this unless you know what your doing.
  */
-MATTIE_RPG.Game_Enemy_Setup = Game_Enemy.prototype.setup;
-Game_Enemy.prototype.setup = function (enemyId, x, y) {
-	updateHpOfEnemy(enemyId);
-	MATTIE_RPG.Game_Enemy_Setup.call(this, enemyId, x, y);
-};
-/** @description the default transform cmd */
-MATTIE_RPG.Game_Enemy_TRANSFORM = Game_Enemy.prototype.transform;
-/** @description extend the transform method to do the same as above */
-Game_Enemy.prototype.transform = function (enemyId) {
-	updateHpOfEnemy(enemyId);
-	// // console.log(`#${enemyId} mhp:${$dataEnemies[enemyId].params[0]}`);
-	MATTIE_RPG.Game_Enemy_TRANSFORM.call(this, enemyId);
-};
+
+setTimeout(() => {
+	$dataEnemies.forEach((enemy) => {
+		if (enemy) {
+			updateHpOfEnemy(enemy.id);
+		}
+	});
+}, 5000);
+// deprecated runtime solution.
+// // MATTIE_RPG.Game_Enemy_Setup = Game_Enemy.prototype.setup;
+// // Game_Enemy.prototype.setup = function (enemyId, x, y) {
+// // 	updateHpOfEnemy(enemyId);
+// // 	MATTIE_RPG.Game_Enemy_Setup.call(this, enemyId, x, y);
+// // };
+// // /** @description the default transform cmd */
+// // MATTIE_RPG.Game_Enemy_TRANSFORM = Game_Enemy.prototype.transform;
+// // /** @description extend the transform method to do the same as above */
+// // Game_Enemy.prototype.transform = function (enemyId) {
+// // 	updateHpOfEnemy(enemyId);
+// // 	// // console.log(`#${enemyId} mhp:${$dataEnemies[enemyId].params[0]}`);
+// // 	MATTIE_RPG.Game_Enemy_TRANSFORM.call(this, enemyId);
+// // };1
 
 //---------------------------------------------------------
 // Client Side Configs
