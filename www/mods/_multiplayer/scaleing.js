@@ -263,9 +263,9 @@ MATTIE.multiplayer.config.scaling.hpScaling = () => {
  * @description whether body blocking is enabled or not
  * @default false
  */
-MATTIE.multiplayer.config.scaling.bodyBlocking;
+MATTIE.multiplayer.config.bodyBlocking;
 
-Object.defineProperties(MATTIE.multiplayer.config.scaling, {
+Object.defineProperties(MATTIE.multiplayer.config, {
 
 	bodyBlocking: {
 		get: () => MATTIE.configGet('bodyBlocking', false),
