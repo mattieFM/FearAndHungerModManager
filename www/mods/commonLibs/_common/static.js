@@ -876,7 +876,10 @@ MATTIE.static.update = function () {
 			2839, // ragn burning?
 			// 2901, //dogs?
 			1044, // backstab scene
-			2961, // turture scene 1 (called on first encounter with turturer)
+
+			// with new event handling we actually want to send this
+			// 2961, // turture scene 1 (called on first encounter with turturer)
+
 			'2967-2969', // turture hiding/ambush event
 			'3261-3272', // fear talk events?
 			'3281-3291', // more fear scenes?
@@ -954,6 +957,9 @@ MATTIE.static.update = function () {
 		];
 		MATTIE.static.switch.ignoredSwitches = MATTIE.static.rangeParser(MATTIE.static.switch.ignoredSwitches);
 		MATTIE.static.switch.syncedSwitches = [
+			// buckman ratted finished IE: buckman rat quest has given reward.
+			147,
+
 			// skelleton switches
 			902, // thicket skeleton
 			885, // basement skeleton

@@ -48,6 +48,9 @@ class PlayerModel {
 
 		/** @description the peerid of the host of this marriage */
 		this.marriageHost = null;
+
+		/** @description the troopod this peer is currently incombat with */
+		this.troopInCombatWith = null;
 	}
 
 	/** @description add an id to the pvp arr if it does not already exist */

@@ -202,3 +202,18 @@ Window_Base.prototype.pendingColor = function () {
 	const bitMap = this.windowskin || new Bitmap(120 + 2, 120 + 2);
 	return bitMap.getPixel(120, 120);
 };
+
+Game_Character.prototype.updateRoutineMove = function () {
+	if (this._waitCount > 0) {
+		this._waitCount--;
+	} else {
+		this.setMovementSuccess(true);
+		if (this._moveRoute) {
+			var command = this._moveRoute.list[this._moveRouteIndex];
+			if (command) {
+				this.processMoveCommand(command);
+				this.advanceMoveRouteIndex();
+			}
+		}
+	}
+};

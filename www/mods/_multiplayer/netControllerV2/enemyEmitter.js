@@ -266,12 +266,6 @@ Game_CharacterBase.prototype.inCombat = function () {
 // // }
 
 // //fires very frequently
-// // MATTIE.multiplayer.enemyEmitter.command205 = Game_Interpreter.prototype.command205;
-// //     Game_Interpreter.prototype.command205 = function() {
-// //         enemyLog("command205");
-// //         return MATTIE.multiplayer.enemyEmitter.command205.call(this)
-
-// //     }
 
 // MATTIE.multiplayer.enemyEmitter.setMoveRoute = Game_Character.prototype.setMoveRoute;
 // Game_Character.prototype.setMoveRoute = function(moveRoute) {

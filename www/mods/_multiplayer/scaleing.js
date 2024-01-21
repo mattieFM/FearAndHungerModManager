@@ -365,6 +365,12 @@ MATTIE.multiplayer.config.showViewingMenu;
  */
 MATTIE.multiplayer.config.showAlliesMenu;
 
+/**
+ * @description whether players should be allowed to move during text and cut scenes
+ * @default true
+ */
+MATTIE.multiplayer.config.freeMove;
+
 Object.defineProperties(MATTIE.multiplayer.config, {
 
 	showViewingMenu: {
@@ -375,5 +381,13 @@ Object.defineProperties(MATTIE.multiplayer.config, {
 	showAlliesMenu: {
 		get: () => MATTIE.configGet('showAlliesMenu', true),
 		set: (value) => { MATTIE.configSet('showAlliesMenu', value); },
+	},
+
+	freeMove: {
+		get: () => MATTIE.configGet('freeMove', true),
+		set: (value) => {
+			MATTIE.unstuckAPI.togglePlayerFreeMove(value);
+			MATTIE.configSet('freeMove', value);
+		},
 	},
 });

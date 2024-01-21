@@ -26,7 +26,6 @@ MATTIE.RPG.Game_InterpreterExecuteCommand = Game_Interpreter.prototype.executeCo
 Game_Interpreter.prototype.executeCommand = function (skip = false) {
 	const cmd = this.currentCommand();
 
-	const returnVal = MATTIE.RPG.Game_InterpreterExecuteCommand.call(this);
 	if (!skip) {
 		if (cmd) {
 			cmd.eventId = this.eventId();
@@ -53,6 +52,8 @@ Game_Interpreter.prototype.executeCommand = function (skip = false) {
 			}
 		}
 	}
+
+	const returnVal = MATTIE.RPG.Game_InterpreterExecuteCommand.call(this);
 
 	return returnVal;
 };
