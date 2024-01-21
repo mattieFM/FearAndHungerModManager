@@ -697,6 +697,23 @@ MATTIE.scenes.Scene_Misc.MULTIPLAYER = [
 		},
 		bool: () => this.sync,
 	},
+	{
+		id: 7,
+		name: 'Toggle auto unstuck',
+		cmd: () => { MATTIE.unstuckAPI.togglePermanentUnstuck(!MATTIE.unstuckAPI.autoUnstuckOn); },
+		bool: () => MATTIE.unstuckAPI.autoUnstuckOn,
+
+	},
+
+	{
+		id: 8,
+		name: 'Toggle player freemovement',
+		cmd: () => {
+			const bool = !MATTIE.multiplayer.config.freeMove;
+			MATTIE.multiplayer.config.freeMove = bool;
+		},
+		bool: () => MATTIE.multiplayer.config.freeMove,
+	},
 
 ];
 

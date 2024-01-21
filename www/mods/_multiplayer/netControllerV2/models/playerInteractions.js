@@ -119,7 +119,10 @@ MATTIE.multiplayer.Conversations.prototype.talkOptionsCb = function (n) {
 		// eslint-disable-next-line no-case-declarations
 		MATTIE.multiplayer.getCurrentNetController().emitMarriageRequest([this.target.peerId]);
 		break;
-	case 5: // cancel
+	case 5: // assist
+		MATTIE.simpleBattleAPI.startFightWith(this.target.troopInCombatWith);
+		break;
+	case 6: // cancel
 		break;
 	default:
 		break;
@@ -136,6 +139,7 @@ MATTIE.multiplayer.Conversations.prototype.talkOptions = function () {
 			'Resurrect',
 			'Attack',
 			'Show Love',
+			'Assist',
 			'Cancel',
 		],
 		0,

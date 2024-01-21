@@ -48,7 +48,8 @@
         "_multiplayer/startGameMenu",
 								"_multiplayer/items",
 								"_multiplayer/netControllerV2/marriageHandler",
-								"_multiplayer/netControllerV2/saveEventLocationEmitter"
+								"_multiplayer/netControllerV2/saveEventLocationEmitter",
+								"_multiplayer/multiplayerCompatability"
     ],
     "danger": false,
 				"assets": [

@@ -652,15 +652,15 @@ class BaseNetController extends EventEmitter {
 			if (moveData.x) {
 				const dist = Math.sqrt((moveData.x - $gamePlayer._x) ** 2 + (moveData.y - $gamePlayer._y) ** 2);
 				if (moveData.t) {
-					console.log('transfered char (due to request)');
+					if (MATTIE.multiplayer.devTools.moveLogger)console.log('transfered char (due to request)');
 					moveData.map = $gameMap.mapId();
 					this.transferNetPlayer(moveData, id, false);
 				} else if (dist > 10) {
-					console.log('transfered char (due to dist)');
+					if (MATTIE.multiplayer.devTools.moveLogger)console.log('transfered char (due to dist)');
 					moveData.map = $gameMap.mapId();
 					this.transferNetPlayer(moveData, id, false);
 				} else {
-					console.log('tried to move char smoothly');
+					if (MATTIE.multiplayer.devTools.moveLogger) console.log('tried to move char smoothly');
 					const deltaX = moveData.x - this.netPlayers[id].$gamePlayer._x;
 					const deltaY = moveData.y - this.netPlayers[id].$gamePlayer._y;
 					const numSteps = Math.abs(deltaX) + Math.abs(deltaY);
@@ -670,7 +670,7 @@ class BaseNetController extends EventEmitter {
 				try {
 					this.netPlayers[id].$gamePlayer.moveOneTile(moveData.d);
 				} catch (error) {
-					console.warn(`something went wrong when moving the character${error}`);
+					if (MATTIE.multiplayer.devTools.moveLogger)console.warn(`something went wrong when moving the character${error}`);
 				}
 			}
 		} else if (moveData.x) {
@@ -796,6 +796,7 @@ class BaseNetController extends EventEmitter {
 
 	onBattleStartData(battleStartObj, id) { // take the battleStartObj and set that enemy as "in combat" with id
 		this.battleStartAddCombatant(battleStartObj.troopId, id);
+		this.netPlayers[id].troopInCombatWith = battleStartObj.troopId;
 
 		// handle all logic needed for the event tile
 		if (battleStartObj.mapId == $gameMap.mapId()) { // event tile tracking can only be done on same screen
@@ -920,6 +921,7 @@ class BaseNetController extends EventEmitter {
 
 	onBattleEndData(battleEndObj, id) { // take the battleEndObj and set that enemy as "out of combat" with id
 		this.battleEndRemoveCombatant(battleEndObj.troopId, id);
+		this.netPlayers[id].troopInCombatWith = null;
 
 		// handle all logic needed for the event tile
 		if (battleEndObj.mapId == $gameMap.mapId()) { // event tile tracking can only be done on same screen
@@ -1201,13 +1203,45 @@ class BaseNetController extends EventEmitter {
 			$gameMap.refreshIfNeeded();
 			const params = cmd.parameters;
 			const _character = $gameMap.event(params[0] > 0 ? params[0] : cmd.eventId);
+			console.log('character');
+			console.log(_character);
 			if (_character) {
-				console.log('forced move route');
-				_character._netMoveRouteForcing = true; // we need this so that movestright calls
-				_character.forceMoveRoute(params[1]);
-				setTimeout(() => {
-					_character._netMoveRouteForcing = false;
-				}, 8000);
+				const moveRoute = params[1];
+				const tempCanPass = _character.canPass;
+				_character.canPass = () => true;
+				_character._moveRouteForcing = true;
+				_character.setTransparent(false);
+				_character._moveRoute = _character._moveRoute || {
+					list: [
+						{
+							code: 0,
+							parameters: [],
+						},
+					],
+					repeat: true,
+					skippable: false,
+					wait: false,
+				};
+
+				const found = false;
+				// whether the move is a duplicate
+				const validMove = _character.getValidMove(moveRoute);
+
+				// if (last20Steps[0].code === list[list.length - 1].code) {
+				// 	console.log('valid by never finding start');
+				// 	validMove = true;
+				// }
+
+				console.log(`validmove${validMove}`);
+
+				if (validMove) {
+					moveRoute.list.forEach((command) => {
+						console.log(`moving with cmd;${command.code}`);
+						_character.processMoveCommand(command, true);
+					});
+					_character.canPass = tempCanPass;
+					_character._moveRouteForcing = false;
+				}
 			}
 		} catch (error) {
 			console.log(error);
