@@ -60,6 +60,7 @@ class ClientController extends BaseNetController {
 		this.conn.on('open', () => {
 			console.info('Client Connected to the host');
 			this.sendPlayerInfo();
+			this.emit('clientConnectedToHost');
 		});
 
 		this.conn.on('data', (data) => {
