@@ -4,7 +4,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Source: commonLibs/_common/gameEmitter.js | Source: commonLibs/_common/gameEmitter.js</title>
+    <title>Source: commonLibs/_common/API_CORE/simpleBattleAPI.js | Source: commonLibs/_common/API_CORE/simpleBattleAPI.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -32,7 +32,7 @@
         
     </div>
     <div class="title">
-        <h1><a href="index.html" class="link">Source: commonLibs/_common/gameEmitter.js</a></h1>
+        <h1><a href="index.html" class="link">Source: commonLibs/_common/API_CORE/simpleBattleAPI.js</a></h1>
         
             <span class="version">v1.2.4</span>
         
@@ -63,36 +63,25 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>var EventEmitter = require('events');
+            <pre class="prettyprint source linenums"><code>var MATTIE = MATTIE || {};
+
+MATTIE.simpleBattleAPI = {};
 
 /**
- * @class
- * @description This class hooks onto a ton of game events to give an event-base programming approach via event handlers and subscription models
- * @emits torchActivate the event on a player activating a torch
-*/
+ * @description a simple function to start a fight and send the user to the assosiated scene
+ * @param {*} troopId the id of the troop
+ */
+MATTIE.simpleBattleAPI.startFightWith = function (troopId) {
+	if ($dataTroops[troopId]) {
+		BattleManager.setup(troopId, true, true);
+		$gamePlayer.makeEncounterCount();
+		SceneManager.push(Scene_Battle);
 
-class GameEmitter extends EventEmitter {
-	constructor(gameVersion) {
-		super();
-		/** @description the version of funger that this emitter */
-		this.version = gameVersion;
+		if (MATTIE.multiplayer) {
+			MATTIE.multiplayer.getCurrentNetController().emitBattleStartEvent(1, $gameMap.mapId(), troopId);
+		}
 	}
-
-	/** @emits torchActivate */
-	emitTorch() {
-		this.emit('torchActivate');
-	}
-}
-
-//--------------------------------------
-// Engine overrides
-//--------------------------------------
-
-//--------------------------------------
-// -Torch Emitter-
-//--------------------------------------
-
-MATTIE.gameEmitter = new GameEmitter();
+};
 </code></pre>
         </article>
     </section>
