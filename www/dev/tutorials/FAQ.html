@@ -1,0 +1,101 @@
+<h1>Common Issues</h1>
+<p>
+    This page contains all common issues and their solutions, starting with connection issues. Please read fully and if you still need help feel free to DM me @Mattiefm or join the discord.
+</p>
+
+
+<h2>Not Connecting to server</h2>
+If you have been sent here by the game, then it is taking a while to connect and it should not take this long. Feel free to wait a little while (5 or so min any more is excessive). 
+If waiting does not resolve it please refer to the list of factors that might effect connections below:
+<h3>Broker server status</h3>
+<p>
+    Despite the mod being peer to peer we do rely on a small server for initializing connections this is called a broker server and is used to slight obscure ip adresses and make things
+    generally easier. It rarely goes down as all it needs to do is send the key and map said key to the other peers ip. once connected it does nothing. If it remains down for a while please 
+    message me and I will look into hosting one myself, but for the time being I have no need to do so. That said, first and foremost ensure it is up. if it is not wait a while. Msg me if its
+    down for more than a day or 2 consistently.
+</p>
+<iframe src="https://status.peerjs.com/ib0l" id="peerJsIFRAME" title="description" width="70%", height="20%"></iframe>
+<ol>
+    <li>Check the broker server status above</li>
+    <li>Ensure you copied the code correctly. Ensure you copied it into the "connection key" field and not the "username" field</li>
+    <li>reload/relaunch your client</li>
+    <li>reload/relaunch your server. Try switching who is hosting vs connecting. IE if you were connecting to your friend's server, try hosting and having them connect.</li>
+    <li>Ensure your PC's firewall is not blocking fear and hunger.</li>
+    <li>Enure you are not on a wifi hotspot, these tend to mess with IPs and might cause issues. if you need to use one, try using a vpn to hopefully fix the ip issues.</li>
+    <li>Ensure your router firewall is not blocking your server/connection</li>
+    <li>Enable/Disable your vpn, turn it on and off try with both, sometimes this can bypass poorly configured firewalls.</li>
+    <li>Reinstall the game.</li>
+    <li>Ask in the discord for more help.</li>
+</ol>
+
+<h1>Getting UnStuck</h1>
+<ul>
+    <li>In all recent releases of the multiplayer mod there exists a help button in your escape menu. This provides you with many options for fixing issues. Tping to spawn 
+        and blood portals to get unstuck and other stuff.
+    </li>
+    <li>the unstuck button. In the help menu there is a button titled "unstuck" and it can be bound to a keybind. This is a button designed to help break out of any blocking issues
+        If you cannot move, if you cannot interact, if you are stuck in a cutscene, press the button and try to leave and reload the area.
+    </li>
+    <li>Dev Tools. The devtools mod provides the ability to phase step, teleport to key locations, and spawn in lost items, if you are encountering too many bugs, please play with dev tools and quick saves on such that you can save frequently and fix lost progress</li>
+    <li>Most bugs can be broken out of with a combination of saving/loading or using dev tools phase step. If you get stuck try to phase step, save/load etc... In combination with the unstuck button it is rare that you cannot recover a run from a bug.</li>
+
+
+</ul>
+
+<h1>Girl costume Error </h1>
+<p>Please see this discord thread: https://discord.com/channels/1148766509406093342/1170411865759817888</p>
+
+<h1>File Decrypter link</h1>
+<p>In the readme of the discord server: https://discord.gg/PAUddX5g2x</p>
+
+
+<h1>How do I trade items</h1>
+<p>use the drop menu, drop an item and let your friend pick it up</p>
+
+<h1>How do marriages work</h1>
+<p>currently marraiges are overworld only, player's get merged and movement combined, in combat they fight seperately as though they both formed marraiges with npcs.</p>
+
+<h1>Difficulty</h1>
+<p>There is an entire tab in the config for scaling of enemies, you can configure most things that you would need for Difficulty. By default this mod increases enemy health by 1.3 1 +.2 number of players. All of this can be configured. IN THE CONFIG MENU ENSURE TO HIT ENTER AFTER EDITING A FIELD.</p>
+
+
+<h1>remove the big "allies" and "viewing" tabs from combat scene</h1>
+<p>On the first page of the config menu for this mod. just change true to false.</p>
+
+<h1>Body blocking</h1>
+<p>config option on first page of config menu</p>
+
+
+
+
+
+<h1>local CO-OP</h1>
+<a href="./install.html">Please view install instructions</a>
+
+
+
+<h1>Misc </h1>
+<p>
+    All solutions below assume you have the DevTools mod active as it provides tools that will allow you to fix a lot.
+
+    I cannot connect, ensure that you are copying the correct code, ensure you are copying the code into the connection-key field and not the username field. Make sure you are copying just the code itself and nothing else, ensure the host has sent you the current code.
+
+    I pressed 'N' and I got an error: N is a debug keybind that is sometimes useful for fixing major bugs, it tries to teleport you to another player in the server. Just try not to press it for the time being.
+    I pressed Other key and something bad happened, you probably pressed something that is a keybind for something, open your keybinds and unbind it or just don't click it.
+
+    some tiles are moving around the map when they shouldn't be. This occurs sometimes and most of the time is purely cosmetic, I know how to fix it, it is just more effort than I want to spend on a visual bug
+
+    I am on a different vairant of the map than a friend. you can try to press 'n' to teleport to the correct variant, and the vars taht control variant should sync eventually, for avoiding this in the future, just make sure the host loads into the game before anyone starts exploring the dungeons
+
+    I am stuck in an event and cannot move, try to press 'n' or 'v' if either of those free you great, if not try to have another player run around you, stepping on traps or action tiles, if taht doesn't work you will need to restart, and then please file a bug report of where this occured
+
+    There are multiple copies of an npc or an event is playing when another player triggered it IE: friend triggers legard event and it plays for both of you, just file a bug report of where it occurs
+
+    I cannot see another player, shouldn't occur much, but hitting escape will reload you onto all other players screens so if you can't see someone ask them to open and close the menu 
+
+    Coin flip is stuck on my screen, press 'v' for phase step or reload the area and it will go away
+
+    talk option for a player poped up in a menu: should not occur anymore, if you see this please tell me where it occured.
+
+    "I am stuck somewhere and cannot move." Open your keybinds and bind "tp to spawn" to a key, then  press that key, you should be teleported to the fortress spawn area, this might resolve you being stuck.
+</p>
