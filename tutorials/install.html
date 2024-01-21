@@ -10,9 +10,12 @@
     <a target="_blank" href="https://github.com/mattieFM/FearAndHungerModManager/releases">Link to Release Page</a><br>
     <a target="_blank" href="https://github.com/mattieFM/FearAndHungerModManager/releases/latest">Link to Latest Release</a><br>
     <h1>Windows Installer</h1>
-    Note: some people said this installer also works on mac and linux but I don't think it will, use at your own risk if not on windows.
     <ol>
         <li>Navigate to the release you would like to download IE: latest build. <a target="_blank" href="https://github.com/mattieFM/FearAndHungerModManager/releases">Releases</a></li>
+        <li>
+            <h3>File Decrypter alternative link</h3>
+            <p>In the readme of the discord server: https://discord.gg/PAUddX5g2x</p>
+        </li>
         <li>Expand the 'assets' dropdown.</li>
         <li>Click the "RPGModManagerInstall.exe" button.</li>
         <li>The download for the installer will begin.</li>
@@ -23,13 +26,15 @@
     </ol>
 
     <h1>Manual Install</h1>
+
+    <b>NOTE for MAC and LINUX (unix systems):</b> The game will not be a .exe file, it will likely appear to only be one executable file, rgpmaker tends to bundle distributions for mac and linux, as such to find the files referenced below open the game file as though it were an archive to view the bundled files.
     <ol>
         <li>Navigate to the release you would like to download IE: latest build. <a target="_blank" href="https://github.com/mattieFM/FearAndHungerModManager/releases">Releases</a></li>
         <li>Expand the 'assets' dropdown.</li>
         <li>Click the "Source Code (Zip)" button</li>
         <li>Wait till the file is downloaded.</li>
         <li>Extract the zip files.</li>
-        <li>Open the folder your game is stored in. This is the folder that contains the 'game.exe' file and the 'www/' folder.</li>
+        <li>Open the folder your game is stored in. This is the folder that contains the 'game.exe' file (the file that actually runs the game) and the 'www/' folder.</li>
         <li>Drag and drop the www/ folder of the downloaded files into the game folder. Choose "yes" when it asks you if you would like to replace overlapping files.</li>
         <li>Now the modloader and all my mods are installed, launch the game and toggle on or off any mods you would like</li>
     </ol>
@@ -47,6 +52,45 @@
         src="https://www.youtube.com/embed/cmiCdEyesrg">
     </iframe>
 
+    <h1>Installing alongside plugin based mods (IE bugfix or RoTNG)</h1>
+    <p>
+        when mixing overhaul mods with plugin mods heres the general process that you need to follow:<br>
+        First decrypt the game. <br>
+        install the overhaul mod. <br>
+        check if the overhaul mod edits the index.html<br>
+        -if it does edit the index.html find the index.html of the plugin based mod (or the modloader) and merge the two coping any lines that don't exist in one to the other. (KEEP THEM IN ORDER THO)<br>
+        -if it does not edit the index.html, then dont worry.<br>
+        Install the modmanager or other plugin based mod.<br>
+        For clarification, pluginbased mods are mods that hook onto the rpgmaker plugin system and behave like standard mods.<br>
+        Overhaul or Override mods are mods that do not have any loading layer inbetween them and your files and are not self contained. Any mod that have you directly replace files other than the index.html is an override mod.<br>
+    </p>
 
-    test
+    <h1>Local CO-OP/ running 2 instances</h1>
+    <p>
+        Regardless there are a lot of ways to get it working, ill detail the two easiest ways below;<br>
+        <br>
+        <b>Universal split screen + sandboxie:<br></b>
+        1: use sandboxie to launch two instances of the mod on the same pc<br>
+        2: use universal split screen to handle input splitting between the two keyboards <br>
+        <br>
+        <b>Universal splite screen + file editing:<br></b>
+        1: the reason you cannot launch two instances of funger at the same time is due to the engine thinking one is already running, this is due to the name within the package.json file. circled in the attached image. <br>
+        2: locate the package.json file within your game files.<br>
+        3: launch one copy of funger.<br>
+        4: open the package.json file<br>
+        5: edit the name field to be anything else (ensure to keep the "", so it should look something like "newName")<br>
+        6: save the file<br>
+        7: you should now be able to launch a second copy<br>
+        8: use universal split screen to handle input splitting<br>
+        9: connect via the normal method via the mp mod<br>
+        <br>
+        <b>Copying game files + universal split screen<br></b>
+        1: locate all your game files and make a copy of the folder<br>
+        2: as detailing above edit one of the package.json files to have a different name<br>
+        3: now you have two games that can launch independantly of eachother with no issues<br>
+        4: use UVSP to handle input splitting<br>
+        5: connect <br>
+
+    </p>
+
 </body>
