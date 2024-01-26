@@ -294,8 +294,8 @@ class BaseNetController extends EventEmitter {
 			const newActorHealth = actorData.hp;
 			const newActorMana = actorData.mp;
 			if (actor.hp > newActorHealth) {
-				actor.performDamage();
-				this.performCosmeticDamageAnimation($gameTroop.members()[0], [actor], 1);
+				//actor.performDamage();
+				//this.performCosmeticDamageAnimation($gameTroop.members()[0], [actor], 1);
 			}
 			actor.setHp(newActorHealth);
 			actor.setMp(newActorMana);
@@ -492,22 +492,50 @@ class BaseNetController extends EventEmitter {
 	 */
 	processNormalEnemyAction(enemy, action, isExtraTurn, senderId) {
 		action._netTarget = senderId;
-		action.cb = () =>{
+		
+		enemy.setCurrentAction(action);
+		BattleManager.addNetActionBattler(enemy, isExtraTurn);
+		$gameTroop.members()[action._subjectEnemyIndex]._actions.forEach(act=>act.subject = () => $gameTroop.members()[action._subjectEnemyIndex]);
+
+		/** @type {Game_Action} */
+		const gameAction = enemy._actions[enemy._actions.length - 1];
+		enemy._actions[enemy._actions.length - 1].cb = () =>{
 			if(action.targetResults){
 				if(Object.keys(action.targetResults).some(key=>{
 					return action.targetResults[key].dmg > 0;
 				})){
-					console.log("here")
-					console.log(action.targetResults)
 					enemy.requestEffect('whiten');
+					gameAction.makeTargets().forEach(target=>{
+						if(target instanceof Game_Actor){
+							/** @type {Game_Actor} */
+							const battler = MATTIE.multiplayer.getCurrentNetController().netPlayers[senderId].$netActors.baseActor(target.actorId());;
+							if(battler){
+								$gameParty.leader().actorId()
+								
+								if(gameAction.item()){
+									const animId = gameAction.item().animationId;
+									console.log(battler)
+									setTimeout(() => {
+										battler.startAnimation(animId);
+										setTimeout(() => {
+											battler.performDamage();
+										}, 1200);
+										
+									
+									}, 1500);
+									
+								}
+							}
+						}
+						
+						
+						
+					})
 				}
 				
 			}
 			
 		}
-		enemy.setCurrentAction(action);
-		BattleManager.addNetActionBattler(enemy, isExtraTurn);
-		$gameTroop.members()[action._subjectEnemyIndex]._actions.forEach(act=>act.subject = () => $gameTroop.members()[action._subjectEnemyIndex]);
 	}
 
 	/**
