@@ -24,7 +24,7 @@ MATTIE.multiplayer.multiCombat.ellipseGetY = function (x) {
 MATTIE.multiplayer.multiCombat.additionalStatusRows = 1;
 MATTIE.multiplayer.multiCombat.additionalCommandRows = 1;
 
-TextManager.multiplayer = 'multiplayer';
+TextManager.multiplayer = 'view allies';
 TextManager.viewNextParty = 'view next party';
 
 Scene_Battle.prototype.createAllWindows = function () {

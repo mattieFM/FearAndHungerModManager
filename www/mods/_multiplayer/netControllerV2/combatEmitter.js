@@ -79,19 +79,22 @@ BattleManager.getAllPlayerActions = function () {
 	const arr = [];
 	this.makeActionOrders();
 	this._actionBattlers.forEach((battler) => {
-		if (battler.battlerInParty() && battler.isAlive()) {
+		if (battler.isAlive()) {
 			/** @type {Game_Action} */
 			const action = battler.currentAction();
 			if (action) { // only do stuff if the action exists
-				action.setNetTarget(MATTIE.multiplayer.getCurrentNetController().peerId);
-				action.preloadRng(action.makeTargets());
-				if (MATTIE.multiplayer.pvp.inPVP) {
-					const targetTroopId = $gameTroop.mapMemberIndexToTroopId(action._targetIndex);
-					const targetActorId = MATTIE.multiplayer.pvp.PvpController.mapTroopToActor(targetTroopId);
-					action.targetActorId = targetActorId;
-					action.userBattlerIndex = battler.partyIndex();
+				if(action.item() != null){
+					action.setNetTarget(MATTIE.multiplayer.getCurrentNetController().peerId);
+					action.preloadRng(action.makeTargets());
+					if (MATTIE.multiplayer.pvp.inPVP) {
+						const targetTroopId = $gameTroop.mapMemberIndexToTroopId(action._targetIndex);
+						const targetActorId = MATTIE.multiplayer.pvp.PvpController.mapTroopToActor(targetTroopId);
+						action.targetActorId = targetActorId;
+						action.userBattlerIndex = battler.partyIndex();
+					}
+					arr.push(action);
 				}
-				arr.push(action);
+				
 			}
 		}
 	});
@@ -330,6 +333,7 @@ BattleManager.makeActionOrders = function () {
 
 		return val;
 	});
+
 	this._actionBattlers = battlers;
 };
 
