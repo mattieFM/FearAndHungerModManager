@@ -53,7 +53,7 @@
 	// override battle processing cmd
 	Game_Interpreter.prototype.command301 = function () {
 		if (!$gameParty.inBattle()) {
-			var troopId = baseIncludedTroops[randBetween(0, baseIncludedTroops.length-1)];
+			var troopId = baseIncludedTroops[randBetween(0, baseIncludedTroops.length - 1)];
 			troopId = BattleManager.setup(troopId, this._params[2], this._params[3]);
 			BattleManager.setEventCallback((n) => {
 				this._branch[this._indent] = n;
