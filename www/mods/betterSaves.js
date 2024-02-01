@@ -60,6 +60,8 @@ MATTIE.betterSaves.config.numberOfSaves;
 	};
 
 	MATTIE.saves.continueFromSuspendedRun = function () {
+		if(!Game_System._bgmOnSave)
+		Game_System._bgmOnSave = AudioManager.saveBgm();
 		MATTIE.menus.loadGameAndGoTo(MATTIE.saves.suspendedRunId);
 		MATTIE.saves.deleteSuspendedRun();
 	};
@@ -81,6 +83,7 @@ MATTIE.betterSaves.config.numberOfSaves;
 	};
 
 	Input.addKeyBind('', () => {
+		Game_System.prototype.onBeforeSave();
 		MATTIE.saves.suspendRun();
 	}, 'SuspendRun', 1);
 
