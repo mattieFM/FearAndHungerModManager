@@ -5,28 +5,28 @@ MATTIE.prevFun5325c = Game_Actor.prototype.characterName;
 (() => {
 	const fileName = '$naked_mercenary.png';
 	const bbgirlModName = 'bbgirlMod';
-	MATTIE.bbgirlMod.onLoad = function () {
-		if (!MATTIE.DataManager.global.get('bbgirlInstalled')) {
-			MATTIE.DataManager.addFileToImgFolder('/mods/_bbgirlAssets/images/', '/characters/', fileName);
-			MATTIE.DataManager.addFileToImgFolder('/img/characters/', '/characters/', fileName, `_${fileName}`);
-			MATTIE.DataManager.global.set('bbgirlInstalled', true);
-			alert('bbgirl mod installed --game will need to be reloaded');
-			MATTIE_ModManager.modManager.reloadGame();
-		}
-	};
+	// MATTIE.bbgirlMod.onLoad = function () {
+	// 	if (!MATTIE.DataManager.global.get('bbgirlInstalled')) {
+	// 		MATTIE.DataManager.addFileToImgFolder('/mods/_bbgirlAssets/images/', '/characters/', fileName);
+	// 		MATTIE.DataManager.addFileToImgFolder('/img/characters/', '/characters/', fileName, `_${fileName}`);
+	// 		MATTIE.DataManager.global.set('bbgirlInstalled', true);
+	// 		alert('bbgirl mod installed --game will need to be reloaded');
+	// 		MATTIE_ModManager.modManager.reloadGame();
+	// 	}
+	// };
 
-	MATTIE.bbgirlMod.offload = function () {
-		MATTIE.DataManager.global.set('bbgirlInstalled', false);
-		if (MATTIE.DataManager.checkExists('/img/characters/' + `_${fileName}.png`)) {
-			MATTIE.DataManager.addFileToImgFolder('/img/characters/', '/characters/', `_${fileName}`, fileName);
-		}
-		alert('bgirl mod uninstalled');
-	};
+	// MATTIE.bbgirlMod.offload = function () {
+	// 	MATTIE.DataManager.global.set('bbgirlInstalled', false);
+	// 	if (MATTIE.DataManager.checkExists('/img/characters/' + `_${fileName}.png`)) {
+	// 		MATTIE.DataManager.addFileToImgFolder('/img/characters/', '/characters/', `_${fileName}`, fileName);
+	// 	}
+	// 	alert('bgirl mod uninstalled');
+	// };
 
-	MATTIE_ModManager.modManager.addOffloadScriptToMod(bbgirlModName, MATTIE.bbgirlMod.offload);
+	// MATTIE_ModManager.modManager.addOffloadScriptToMod(bbgirlModName, MATTIE.bbgirlMod.offload);
 
-	MATTIE_ModManager.modManager.addOnloadScriptToMod(bbgirlModName, MATTIE.bbgirlMod.onLoad);
-	MATTIE.bbgirlMod.onLoad();
+	// MATTIE_ModManager.modManager.addOnloadScriptToMod(bbgirlModName, MATTIE.bbgirlMod.onLoad);
+	// MATTIE.bbgirlMod.onLoad();
 	Game_Actor.prototype.forceCharName = function (name) {
 		this.forcedName = name;
 		$dataActors[this.actorId()]._forcedName = name;
