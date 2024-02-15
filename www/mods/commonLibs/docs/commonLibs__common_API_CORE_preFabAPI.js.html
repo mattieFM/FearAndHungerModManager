@@ -124,7 +124,7 @@ MATTIE.preFabAPI.loadPrefab = async function (event, args) {
 				const startRange = commentArgs[0];
 				const endRange = commentArgs[1];
 				for (let i = startRange; i &lt; endRange; i++) {
-					/** @type {rm.types.EventPage} page of prefabCopy */
+					/** @type {rm.types.EventPage} */
 					const other = preFabCopy.data.pages[i];
 					if (other) {
 						// if this page exists in the prefab
