@@ -31,12 +31,12 @@ MATTIE.scenes.multiplayer.lobby.prototype.create = function () {
 		}
 		setTimeout(() => {
 			if (!this.connected) {
-				if(!MATTIE.helpOncePerSession){
-					//only ever open this tab once per session
-					MATTIE.helpOncePerSession=true;
+				if (!MATTIE.helpOncePerSession) {
+					// only ever open this tab once per session
+					MATTIE.helpOncePerSession = true;
 					window.open('./mods/commonLibs/docs/tutorial-connectionHelp.html', '_blank').focus();
 				}
-				
+
 				this._connectionStatusField.updateText('NOT CONNECTED!');
 			}
 		}, 10000);
