@@ -125,8 +125,7 @@ MATTIE.betterSaves.config.numberOfSaves;
 	};
 
 	MATTIE.saves.continueFromSuspendedRun = function () {
-		if(!Game_System._bgmOnSave)
-		Game_System._bgmOnSave = AudioManager.saveBgm();
+		if (!Game_System._bgmOnSave) { Game_System._bgmOnSave = AudioManager.saveBgm(); }
 		MATTIE.menus.loadGameAndGoTo(MATTIE.saves.suspendedRunId);
 		MATTIE.saves.deleteSuspendedRun();
 	};

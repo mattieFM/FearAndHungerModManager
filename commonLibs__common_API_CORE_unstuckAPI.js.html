@@ -324,11 +324,9 @@ Game_Event.prototype.updateParallel = function () {
 	const onMapLoaded = Scene_Map.prototype.onMapLoaded;
 	Scene_Map.prototype.onMapLoaded = function () {
 		onMapLoaded.call(this);
-		if(MATTIE.multiplayer){
-			if(MATTIE.multiplayer.config)
-			MATTIE.unstuckAPI.togglePlayerFreeMove(MATTIE.multiplayer.config.freeMove);
+		if (MATTIE.multiplayer) {
+			if (MATTIE.multiplayer.config) { MATTIE.unstuckAPI.togglePlayerFreeMove(MATTIE.multiplayer.config.freeMove); }
 		}
-		
 	};
 })();
 

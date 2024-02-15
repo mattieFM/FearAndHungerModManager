@@ -227,7 +227,7 @@ MATTIE.multiplayer.hasController = () => MATTIE.multiplayer.isClient || MATTIE.m
 (() => {
 	MATTIE.menus.mainMenu.addBtnToMainMenu('Multiplayer', 'multiplayer', MATTIE.menus.multiplayer.openMultiplayer.bind(this));
 	// eslint-disable-next-line max-len
-	//MATTIE.menus.mainMenu.addBtnToMainMenu('Rejoin', 'Rejoin', MATTIE.menus.multiplayer.openGame, MATTIE.multiplayer.getCurrentNetController() ? MATTIE.multiplayer.getCurrentNetController().isClient : false);
+	// MATTIE.menus.mainMenu.addBtnToMainMenu('Rejoin', 'Rejoin', MATTIE.menus.multiplayer.openGame, MATTIE.multiplayer.getCurrentNetController() ? MATTIE.multiplayer.getCurrentNetController().isClient : false);
 	MATTIE.menus.mainMenu.addBtnToMainMenu('Disable Multiplayer', 'Disable_Multiplayer', (() => {
 		MATTIE_ModManager.modManager.switchStatusOfMod('multiplayer');
 		MATTIE_ModManager.modManager.reloadGame();
