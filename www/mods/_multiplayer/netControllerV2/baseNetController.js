@@ -882,7 +882,8 @@ class BaseNetController extends EventEmitter {
 		this.emit('battleStartEvent', obj);
 		this.sendViaMainRoute(obj);
 		this.emitChangeInBattlersEvent(this.formatChangeInBattleObj(obj.eventId, obj.mapid, this.peerId));
-		$gameMap.event(obj.battleStart.eventId).addIdToCombatArr(this.peerId);
+		const event = $gameMap.event(obj.battleStart.eventId);
+		if (event) event.addIdToCombatArr(this.peerId);
 		this.battleStartAddCombatant(obj.battleStart.troopId, this.peerId);
 		MATTIE.emitTransfer(); // emit transfer event to make sure player is positioned correctly on other players screens
 	}
