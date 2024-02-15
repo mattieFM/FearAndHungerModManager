@@ -77,15 +77,15 @@ MATTIE.simpleBattleAPI.startFightWith = function (troopId) {
 		BattleManager.setEventCallback(() => {
 			$gameTemp.reserveCommonEvent(66); // after battle
 		});
-		let tempInterp = new Game_Interpreter();
+		const tempInterp = new Game_Interpreter();
 		tempInterp._params = [];
-		//driect designation of troop
+		// driect designation of troop
 		tempInterp._params[0] = 0;
-		//troop id
+		// troop id
 		tempInterp._params[1] = troopId;
-		//can lose
+		// can lose
 		tempInterp._params[2] = true;
-		//can escape
+		// can escape
 		tempInterp._params[3] = true;
 		tempInterp.command301();
 	}

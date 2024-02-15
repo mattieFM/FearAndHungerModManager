@@ -106,7 +106,7 @@ Bitmap.prototype._requestImage = function (url) {
 		that._image.addEventListener('error', that._errorListener = that._loader || Bitmap.prototype._onError.bind(that));
 	}
 	try {
-		//console.log(url);
+		// console.log(url);
 		if (!Decrypter.checkImgIgnore(url) &amp;&amp; Decrypter.hasEncryptedImages &amp;&amp; !MATTIE.compat.pauseDecrypt &amp;&amp; !url.contains(/.png/gi)) {
 			if (Utils.isNwjs()) {
 				var fs = require('fs');
