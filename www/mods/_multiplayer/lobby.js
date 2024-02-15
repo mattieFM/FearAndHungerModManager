@@ -8,6 +8,7 @@ MATTIE.TextManager.disconnect = 'Disconnect';
 MATTIE.CmdManager.disconnect = 'MATTIE_Deconnect';
 MATTIE.TextManager.forceStart = 'Join Mid Game';
 MATTIE.CmdManager.forceStart = 'MATTIE_Force_start';
+MATTIE.helpOncePerSession = false;
 /**
  * @description The scene for hosting a multiplayer game
  * @extends MATTIE.scenes.multiplayer.base
@@ -30,7 +31,12 @@ MATTIE.scenes.multiplayer.lobby.prototype.create = function () {
 		}
 		setTimeout(() => {
 			if (!this.connected) {
-				window.open('./mods/commonLibs/docs/tutorial-connectionHelp.html', '_blank').focus();
+				if(!MATTIE.helpOncePerSession){
+					//only ever open this tab once per session
+					MATTIE.helpOncePerSession=true;
+					window.open('./mods/commonLibs/docs/tutorial-connectionHelp.html', '_blank').focus();
+				}
+				
 				this._connectionStatusField.updateText('NOT CONNECTED!');
 			}
 		}, 10000);
