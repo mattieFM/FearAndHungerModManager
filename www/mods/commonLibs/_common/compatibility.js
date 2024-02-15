@@ -33,16 +33,37 @@ Bitmap.prototype._requestImage = function (url) {
 
 	this._url = url;
 	this._loadingState = 'requesting';
-
-	if (!Decrypter.checkImgIgnore(url) && Decrypter.hasEncryptedImages && !MATTIE.compat.pauseDecrypt) {
-		this._loadingState = 'decrypting';
-		Decrypter.decryptImg(url, this);
-	} else {
-		this._image.src = url;
-
-		this._image.addEventListener('load', this._loadListener = Bitmap.prototype._onLoad.bind(this));
-		this._image.addEventListener('error', this._errorListener = this._loader || Bitmap.prototype._onError.bind(this));
+	const that = this;
+	function otherLoad() {
+		url.replace(".rpgmv", ".png")
+		that._image.src = url;
+		that._image.addEventListener('load', that._loadListener = Bitmap.prototype._onLoad.bind(that));
+		that._image.addEventListener('error', that._errorListener = that._loader || Bitmap.prototype._onError.bind(that));
 	}
+	try {
+		console.log(url);
+	if (!Decrypter.checkImgIgnore(url) && Decrypter.hasEncryptedImages && !MATTIE.compat.pauseDecrypt && !url.contains(/.png/gi)) {
+		if (Utils.isNwjs()) {
+			var fs = require('fs');
+			const fileExists = fs.existsSync(url);
+			if(fileExists){
+				this._loadingState = 'decrypting';
+				Decrypter.decryptImg(url, this);
+			} else {
+				otherLoad();
+			}
+		} else {
+			this._loadingState = 'decrypting';
+			Decrypter.decryptImg(url, this);
+		}
+	} else {
+		otherLoad();
+	}
+	} catch (error) {
+		console.log("caught error:" + error)
+		otherLoad();
+	}
+	
 };
 
 ImageManager.loadBitmap = function (folder, filename, hue, smooth, forceNoDecrypt = false) {
