@@ -173,6 +173,23 @@ MATTIE.windows.TextInput.prototype.close = function () {
 	document.removeEventListener('keydown', this._listenFunc, false);
 };
 MATTIE.windows.TextInput.prototype.initEventHandler = function () {
+	/** stores all keys that are bound to okay/accept as their char values */
+	this.okayKeys = [];
+	const objKeys = Object.keys(Input.keyMapper);
+
+	//for all keyCodes in the key mapper.
+	objKeys.forEach(objKey=>{
+
+		//if a keyCode is mapped to the game command 'ok' -> ok is the accept/submit command
+		if(Input.keyMapper[objKey] === "ok"){
+			//convert the keycode to a char and check if the char is alphanumeric
+			const asciiKey = String.fromCharCode(objKey);
+			if (asciiKey.match(/^[0-9a-z]+$/gi))
+			this.okayKeys.push(asciiKey);
+		}
+	})
+	
+	
 	let lastKey = '';
 	this._listenFunc = (event) => {
 		console.log(event.key);
@@ -208,10 +225,22 @@ MATTIE.windows.TextInput.prototype.initEventHandler = function () {
 												break;
 											}
 										default:
-											this._text += key;
+											console.log(this.okayKeys.map(e=>e.toLowerCase()))
+											console.log("key:"+key.toLowerCase())
+											if(!(this.okayKeys.map(e=>e.toLowerCase()).contains(key.toLowerCase()))){
+												//if key is not an accept/submit/okay key
+												this._text += key;
+											} else {
+												console.log("okay key pressed")
+												if(lastKey === 'Control'){
+													this._text += key;
+												}
+											}
+											
 											break;
 										}
 									}
+									lastKey = key;
 								}
 							}
 						}

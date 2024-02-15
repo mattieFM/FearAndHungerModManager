@@ -43,15 +43,53 @@ class BaseNetController extends EventEmitter {
 
 		this.canTryToReconnect = false;
 	}
+	/**
+	 * @description a method ment to be overriden by client and host
+	 */
+	connect(id){
+
+	}
+
+	/**
+	 * @description if the user's accept button is a letter then when they hit accept for the connection code then it will append the letter aswell which will mess up the code.
+	 */
+	acceptBtnTypedConnectionFix(){
+		const okayKeys = [];
+		const objKeys = Object.keys(Input.keyMapper);
+
+		//for all keyCodes in the key mapper.
+		objKeys.forEach(objKey=>{
+
+			//if a keyCode is mapped to the game command 'ok' -> ok is the accept/submit command
+			if(Input.keyMapper[objKey] === "ok"){
+				//convert the keycode to a char and check if the char is alphanumeric
+				const asciiKey = String.fromCharCode(objKey);
+				if (asciiKey.match(/^[0-9a-z]+$/gi))
+				okayKeys.push(asciiKey);
+			}
+		})
+		
+		//if the hostId ends with any of the accept keys, remove it and try to connect again.
+		let endsWithBadVar = false;
+		okayKeys.forEach(okayLetterKey=>{
+			if(this.hostId.toLowerCase().endsWith(okayLetterKey.toLowerCase())) endsWithBadVar = true;
+		})
+		
+		let tempHost;
+		if(endsWithBadVar){
+			tempHost = this.hostId.slice(0, -1);
+			this.connect(tempHost, false);
+		}		
+	}
 
 	disconnectAllConns() {
 		this.canTryToReconnect = true;
 		if (this.self) {
 			this.self.disconnect();
 		}
-		// if(this.conn){
-		//     this.conn.disconnect();
-		// }
+		if(this.conn){
+		    this.conn.close();
+		}
 	}
 
 	reconnectAllConns() {
@@ -59,9 +97,6 @@ class BaseNetController extends EventEmitter {
 			if (!this.self.disconnected) { this.self.reconnect(); }
 		}
 		this.setIsClient();
-		// if(this.conn){
-		//     this.conn.reconnect();
-		// }
 	}
 
 	resetNet() {
@@ -1088,8 +1123,10 @@ class BaseNetController extends EventEmitter {
 			for (let index = 0; index < keys.length; index++) {
 				const key = keys[index];
 				const player = playerInfo[key];
-				const netPlayer = this.netPlayers[player.peerId];
-				if (netPlayer) netPlayer.setFollowers(player.followerIds);
+				if(player){
+					const netPlayer = this.netPlayers[player.peerId];
+					if (netPlayer) netPlayer.setFollowers(player.followerIds);
+				}
 			}
 		}
 	}
