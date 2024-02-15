@@ -1,0 +1,1 @@
+Please read the rich text or .docx file attached
