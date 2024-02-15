@@ -359,8 +359,8 @@ class BaseNetController extends EventEmitter {
 			const newActorHealth = actorData.hp;
 			const newActorMana = actorData.mp;
 			if (actor.hp > newActorHealth) {
-				actor.performDamage();
-				this.performCosmeticDamageAnimation($gameTroop.members()[0], [actor], 1);
+				//actor.performDamage();
+				//this.performCosmeticDamageAnimation($gameTroop.members()[0], [actor], 1);
 			}
 			actor.setHp(newActorHealth);
 			actor.setMp(newActorMana);
@@ -509,7 +509,20 @@ class BaseNetController extends EventEmitter {
 							}
 						}
 						if (shouldAddAction) {
-							if (!MATTIE.multiplayer.pvp.inPVP) {
+							console.log(action)
+							if(actor==null){
+								if(action._subjectActorId &lt;= 0){
+									//is enemy action
+									console.log($gameTroop.members()[action._subjectEnemyIndex]);
+									console.log($gameTroop.members()[action._subjectEnemyIndex]);
+									
+									this.processNormalEnemyAction($gameTroop.members()[action._subjectEnemyIndex], action, isExtraTurn, senderId);
+								}else {
+									//is  bad data
+								}
+								
+
+							} else if (!MATTIE.multiplayer.pvp.inPVP) {
 								this.processNormalAction(actor, action, isExtraTurn, senderId);
 							} else {
 								this.processPvpAction(actor, action, isExtraTurn, senderId);
@@ -529,9 +542,65 @@ class BaseNetController extends EventEmitter {
      * @param {UUID} senderId id of the net user that sent these actions
      */
 	processNormalAction(actor, action, isExtraTurn, senderId) {
+	
 		actor.partyIndex = () => this.netPlayers[senderId].battleMembers().indexOf(actor); // set the party index function
 		actor.setCurrentAction(action);
 		BattleManager.addNetActionBattler(actor, isExtraTurn);
+	}
+
+	/**
+	 * @description add a action to an enemy
+	 * @param {Game_Enemy} enemy actor that these actions are for
+	 * @param {Game_Action} action the action itself
+	 * @param {bool} isExtraTurn whether this is an extra turn
+	 * @param {UUID} senderId id of the net user that sent these actions
+	 */
+	processNormalEnemyAction(enemy, action, isExtraTurn, senderId) {
+		action._netTarget = senderId;
+		
+		enemy.setCurrentAction(action);
+		BattleManager.addNetActionBattler(enemy, isExtraTurn);
+		$gameTroop.members()[action._subjectEnemyIndex]._actions.forEach(act=>act.subject = () => $gameTroop.members()[action._subjectEnemyIndex]);
+
+		/** @type {Game_Action} */
+		const gameAction = enemy._actions[enemy._actions.length - 1];
+		enemy._actions[enemy._actions.length - 1].cb = () =>{
+			if(action.targetResults){
+				if(Object.keys(action.targetResults).some(key=>{
+					return action.targetResults[key].dmg > 0;
+				})){
+					enemy.requestEffect('whiten');
+					gameAction.makeTargets().forEach(target=>{
+						if(target instanceof Game_Actor){
+							/** @type {Game_Actor} */
+							const battler = MATTIE.multiplayer.getCurrentNetController().netPlayers[senderId].$netActors.baseActor(target.actorId());;
+							if(battler){
+								$gameParty.leader().actorId()
+								
+								if(gameAction.item()){
+									const animId = gameAction.item().animationId;
+									console.log(battler)
+									setTimeout(() => {
+										battler.startAnimation(animId);
+										setTimeout(() => {
+											battler.performDamage();
+										}, 1200);
+										
+									
+									}, 1500);
+									
+								}
+							}
+						}
+						
+						
+						
+					})
+				}
+				
+			}
+			
+		}
 	}
 
 	/**
