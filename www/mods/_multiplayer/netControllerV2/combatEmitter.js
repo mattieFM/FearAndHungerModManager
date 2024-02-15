@@ -83,7 +83,7 @@ BattleManager.getAllPlayerActions = function () {
 			/** @type {Game_Action} */
 			const action = battler.currentAction();
 			if (action) { // only do stuff if the action exists
-				if(action.item() != null){
+				if (action.item() != null) {
 					action.setNetTarget(MATTIE.multiplayer.getCurrentNetController().peerId);
 					action.preloadRng(action.makeTargets());
 					if (MATTIE.multiplayer.pvp.inPVP) {
@@ -94,7 +94,6 @@ BattleManager.getAllPlayerActions = function () {
 					}
 					arr.push(action);
 				}
-				
 			}
 		}
 	});

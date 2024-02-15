@@ -43,43 +43,44 @@ class BaseNetController extends EventEmitter {
 
 		this.canTryToReconnect = false;
 	}
+
 	/**
 	 * @description a method ment to be overriden by client and host
 	 */
-	connect(id){
+	connect(id) {
 
 	}
 
 	/**
-	 * @description if the user's accept button is a letter then when they hit accept for the connection code then it will append the letter aswell which will mess up the code.
+	 * @deprecated dont use this
+	 * @description if the user's accept button is a letter then when they hit accept for the connection code then it will
+	 * append the letter aswell which will mess up the code.
 	 */
-	acceptBtnTypedConnectionFix(){
+	acceptBtnTypedConnectionFix() {
 		const okayKeys = [];
 		const objKeys = Object.keys(Input.keyMapper);
 
-		//for all keyCodes in the key mapper.
-		objKeys.forEach(objKey=>{
-
-			//if a keyCode is mapped to the game command 'ok' -> ok is the accept/submit command
-			if(Input.keyMapper[objKey] === "ok"){
-				//convert the keycode to a char and check if the char is alphanumeric
+		// for all keyCodes in the key mapper.
+		objKeys.forEach((objKey) => {
+			// if a keyCode is mapped to the game command 'ok' -> ok is the accept/submit command
+			if (Input.keyMapper[objKey] === 'ok') {
+				// convert the keycode to a char and check if the char is alphanumeric
 				const asciiKey = String.fromCharCode(objKey);
-				if (asciiKey.match(/^[0-9a-z]+$/gi))
-				okayKeys.push(asciiKey);
+				if (asciiKey.match(/^[0-9a-z]+$/gi)) { okayKeys.push(asciiKey); }
 			}
-		})
-		
-		//if the hostId ends with any of the accept keys, remove it and try to connect again.
+		});
+
+		// if the hostId ends with any of the accept keys, remove it and try to connect again.
 		let endsWithBadVar = false;
-		okayKeys.forEach(okayLetterKey=>{
-			if(this.hostId.toLowerCase().endsWith(okayLetterKey.toLowerCase())) endsWithBadVar = true;
-		})
-		
+		okayKeys.forEach((okayLetterKey) => {
+			if (this.hostId.toLowerCase().endsWith(okayLetterKey.toLowerCase())) endsWithBadVar = true;
+		});
+
 		let tempHost;
-		if(endsWithBadVar){
+		if (endsWithBadVar) {
 			tempHost = this.hostId.slice(0, -1);
 			this.connect(tempHost, false);
-		}		
+		}
 	}
 
 	disconnectAllConns() {
@@ -87,8 +88,9 @@ class BaseNetController extends EventEmitter {
 		if (this.self) {
 			this.self.disconnect();
 		}
-		if(this.conn){
-		    this.conn.close();
+
+		if (this.conn) {
+			this.conn.close();
 		}
 	}
 
@@ -329,8 +331,8 @@ class BaseNetController extends EventEmitter {
 			const newActorHealth = actorData.hp;
 			const newActorMana = actorData.mp;
 			if (actor.hp > newActorHealth) {
-				//actor.performDamage();
-				//this.performCosmeticDamageAnimation($gameTroop.members()[0], [actor], 1);
+				// actor.performDamage();
+				// this.performCosmeticDamageAnimation($gameTroop.members()[0], [actor], 1);
 			}
 			actor.setHp(newActorHealth);
 			actor.setMp(newActorMana);
@@ -479,19 +481,17 @@ class BaseNetController extends EventEmitter {
 							}
 						}
 						if (shouldAddAction) {
-							console.log(action)
-							if(actor==null){
-								if(action._subjectActorId <= 0){
-									//is enemy action
+							console.log(action);
+							if (actor == null) {
+								if (action._subjectActorId <= 0) {
+									// is enemy action
 									console.log($gameTroop.members()[action._subjectEnemyIndex]);
 									console.log($gameTroop.members()[action._subjectEnemyIndex]);
-									
-									this.processNormalEnemyAction($gameTroop.members()[action._subjectEnemyIndex], action, isExtraTurn, senderId);
-								}else {
-									//is  bad data
-								}
-								
 
+									this.processNormalEnemyAction($gameTroop.members()[action._subjectEnemyIndex], action, isExtraTurn, senderId);
+								} else {
+									// is  bad data
+								}
 							} else if (!MATTIE.multiplayer.pvp.inPVP) {
 								this.processNormalAction(actor, action, isExtraTurn, senderId);
 							} else {
@@ -512,7 +512,6 @@ class BaseNetController extends EventEmitter {
      * @param {UUID} senderId id of the net user that sent these actions
      */
 	processNormalAction(actor, action, isExtraTurn, senderId) {
-	
 		actor.partyIndex = () => this.netPlayers[senderId].battleMembers().indexOf(actor); // set the party index function
 		actor.setCurrentAction(action);
 		BattleManager.addNetActionBattler(actor, isExtraTurn);
@@ -527,50 +526,40 @@ class BaseNetController extends EventEmitter {
 	 */
 	processNormalEnemyAction(enemy, action, isExtraTurn, senderId) {
 		action._netTarget = senderId;
-		
+
 		enemy.setCurrentAction(action);
 		BattleManager.addNetActionBattler(enemy, isExtraTurn);
-		$gameTroop.members()[action._subjectEnemyIndex]._actions.forEach(act=>act.subject = () => $gameTroop.members()[action._subjectEnemyIndex]);
+		$gameTroop.members()[action._subjectEnemyIndex]._actions.forEach((act) => { act.subject = () => $gameTroop.members()[action._subjectEnemyIndex]; });
 
 		/** @type {Game_Action} */
 		const gameAction = enemy._actions[enemy._actions.length - 1];
-		enemy._actions[enemy._actions.length - 1].cb = () =>{
-			if(action.targetResults){
-				if(Object.keys(action.targetResults).some(key=>{
-					return action.targetResults[key].dmg > 0;
-				})){
+		enemy._actions[enemy._actions.length - 1].cb = () => {
+			if (action.targetResults) {
+				if (Object.keys(action.targetResults).some((key) => action.targetResults[key].dmg > 0)) {
 					enemy.requestEffect('whiten');
-					gameAction.makeTargets().forEach(target=>{
-						if(target instanceof Game_Actor){
+					gameAction.makeTargets().forEach((target) => {
+						if (target instanceof Game_Actor) {
 							/** @type {Game_Actor} */
-							const battler = MATTIE.multiplayer.getCurrentNetController().netPlayers[senderId].$netActors.baseActor(target.actorId());;
-							if(battler){
-								$gameParty.leader().actorId()
-								
-								if(gameAction.item()){
+							const battler = MATTIE.multiplayer.getCurrentNetController().netPlayers[senderId].$netActors.baseActor(target.actorId());
+							if (battler) {
+								$gameParty.leader().actorId();
+
+								if (gameAction.item()) {
 									const animId = gameAction.item().animationId;
-									console.log(battler)
+									console.log(battler);
 									setTimeout(() => {
 										battler.startAnimation(animId);
 										setTimeout(() => {
 											battler.performDamage();
 										}, 1200);
-										
-									
 									}, 1500);
-									
 								}
 							}
 						}
-						
-						
-						
-					})
+					});
 				}
-				
 			}
-			
-		}
+		};
 	}
 
 	/**
@@ -1123,7 +1112,7 @@ class BaseNetController extends EventEmitter {
 			for (let index = 0; index < keys.length; index++) {
 				const key = keys[index];
 				const player = playerInfo[key];
-				if(player){
+				if (player) {
 					const netPlayer = this.netPlayers[player.peerId];
 					if (netPlayer) netPlayer.setFollowers(player.followerIds);
 				}

@@ -47,8 +47,7 @@ class ClientController extends BaseNetController {
 		}
 	}
 
-	connect(hostId = this.hostId, patch=true) {
-		
+	connect(hostId = this.hostId, patch = true) {
 		if (!this.lastHostId) this.lastHostId = '';
 		if (this.lastHostId.includes(hostId) && this.canTryToReconnect) {
 			this.reconnectAllConns();
