@@ -70,8 +70,8 @@ MATTIE.multiplayer.gamePlayer.override = function () {
 	// override the update main command to make all netPlayers update at the same time as though they were Game_Player
 	MATTIE.RPG.SceneMap_MainUpdate = Scene_Map.prototype.updateMain;
 	Scene_Map.prototype.updateMain = function () {
-		if(Graphics._fpsMeter.fps < 10){
-			SceneManager._deltaTime = .9 / Graphics._fpsMeter.fps;
+		if (Graphics._fpsMeter.fps < 10) {
+			SceneManager._deltaTime = 0.9 / Graphics._fpsMeter.fps;
 		}
 
 		const netController = MATTIE.multiplayer.getCurrentNetController();
@@ -87,8 +87,7 @@ MATTIE.multiplayer.gamePlayer.override = function () {
 
 		MATTIE.RPG.SceneMap_MainUpdate.call(this);
 
-		
-		//MATTIE.multiplayer._interpreter.update();
+		// MATTIE.multiplayer._interpreter.update();
 	};
 
 	// create an objet to sure transfer data
