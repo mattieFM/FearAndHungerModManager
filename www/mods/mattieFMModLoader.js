@@ -1281,6 +1281,42 @@ MATTIE.onError = function (e) {
 };
 
 /**
+ * Make loading error less obtrusive
+ *
+ * @static
+ * @method printLoadingError
+ * @param {String} url The url of the resource failed to load
+ */
+Graphics.printLoadingError = function(url) {
+    if (this._errorPrinter && !this._errorShowed && !MATTIE.ignoreWarnings) {
+        this._errorPrinter.innerHTML = this._makeErrorHtml('Loading Error', 'Failed to load: ' + url);
+		this._errorPrinter.style.fontSize = '16px';
+        var button = document.createElement('button');
+        button.innerHTML = 'Retry';
+        button.style.fontSize = '16px';
+        button.style.color = '#ffffff';
+        button.style.backgroundColor = '#000000';
+		var removeWarningsBtn = document.createElement('button');
+        removeWarningsBtn.innerHTML = 'Ignore All Future Warnings';
+        removeWarningsBtn.style.fontSize = '16px';
+        removeWarningsBtn.style.color = '#ffffff';
+        removeWarningsBtn.style.backgroundColor = '#000000';
+        button.onmousedown = button.ontouchstart = function(event) {
+            ResourceHandler.retry();
+            event.stopPropagation();
+        };
+		removeWarningsBtn.onmousedown = button.ontouchstart = function(event) {
+			ResourceHandler.retry();
+            MATTIE.ignoreWarnings=true;
+			event.stopPropagation();
+        };
+        this._errorPrinter.appendChild(button);
+		this._errorPrinter.appendChild(removeWarningsBtn);
+        this._loadingCount = -Infinity;
+    }
+};
+
+/**
  * @description pause the game and display an html file in an iframe
  */
 Graphics.displayFile = function (file) {

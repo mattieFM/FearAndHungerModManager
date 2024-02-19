@@ -52,11 +52,11 @@
 								"_multiplayer/multiplayerCompatability"
     ],
     "danger": false,
-				"assets": [
-					{
-							"source": "/mods/commonLibs/_common/images/imageAssets/",
-							"type":"imgFolder"
-					}
-					
-			]
+    "assets": [
+        {
+                "source": "/mods/commonLibs/_common/images/imageAssets/",
+                "type":"imgFolder"
+        }
+        
+]
 }
