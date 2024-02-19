@@ -30,6 +30,8 @@ Game_Event.prototype.forceMoveRoute = function (moveRoute) {
  * @param {*} moveRoute
  */
 Game_Character.prototype.getValidMove = function (moveRoute) {
+	//this might be causing mehabre lag
+	if(Graphics._fpsMeter.fps < 30) return true;
 	if (moveRoute.list.every((obj) => obj.code === 0)) return true;
 
 	if (!this.last20Commands) this.last20Commands = [];
