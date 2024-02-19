@@ -1,4 +1,5 @@
 /* eslint-disable max-classes-per-file */
+/* eslint-disable no-multi-assign */
 /*:
  * @plugindesc V0
  * a mod for fear and hunger
@@ -1287,33 +1288,34 @@ MATTIE.onError = function (e) {
  * @method printLoadingError
  * @param {String} url The url of the resource failed to load
  */
-Graphics.printLoadingError = function(url) {
-    if (this._errorPrinter && !this._errorShowed && !MATTIE.ignoreWarnings) {
-        this._errorPrinter.innerHTML = this._makeErrorHtml('Loading Error', 'Failed to load: ' + url);
+Graphics.printLoadingError = function (url) {
+	if (this._errorPrinter && !this._errorShowed && !MATTIE.ignoreWarnings) {
+		this._errorPrinter.innerHTML = this._makeErrorHtml('Loading Error', `Failed to load: ${url}`);
 		this._errorPrinter.style.fontSize = '16px';
-        var button = document.createElement('button');
-        button.innerHTML = 'Retry';
-        button.style.fontSize = '16px';
-        button.style.color = '#ffffff';
-        button.style.backgroundColor = '#000000';
+		var button = document.createElement('button');
+		button.innerHTML = 'Retry';
+		button.style.fontSize = '16px';
+		button.style.color = '#ffffff';
+		button.style.backgroundColor = '#000000';
 		var removeWarningsBtn = document.createElement('button');
-        removeWarningsBtn.innerHTML = 'Ignore All Future Warnings';
-        removeWarningsBtn.style.fontSize = '16px';
-        removeWarningsBtn.style.color = '#ffffff';
-        removeWarningsBtn.style.backgroundColor = '#000000';
-        button.onmousedown = button.ontouchstart = function(event) {
-            ResourceHandler.retry();
-            event.stopPropagation();
-        };
-		removeWarningsBtn.onmousedown = button.ontouchstart = function(event) {
+		removeWarningsBtn.innerHTML = 'Ignore All Future Warnings';
+		removeWarningsBtn.style.fontSize = '16px';
+		removeWarningsBtn.style.color = '#ffffff';
+		removeWarningsBtn.style.backgroundColor = '#000000';
+		button.onmousedown = button.ontouchstart = function (event) {
 			ResourceHandler.retry();
-            MATTIE.ignoreWarnings=true;
 			event.stopPropagation();
-        };
-        this._errorPrinter.appendChild(button);
+		};
+
+		removeWarningsBtn.onmousedown = button.ontouchstart = function (event) {
+			ResourceHandler.retry();
+			MATTIE.ignoreWarnings = true;
+			event.stopPropagation();
+		};
+		this._errorPrinter.appendChild(button);
 		this._errorPrinter.appendChild(removeWarningsBtn);
-        this._loadingCount = -Infinity;
-    }
+		this._loadingCount = -Infinity;
+	}
 };
 
 /**
