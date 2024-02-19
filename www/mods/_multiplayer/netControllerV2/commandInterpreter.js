@@ -1,6 +1,7 @@
 var MATTIE = MATTIE || {};
 MATTIE.multiplayer = MATTIE.multiplayer || {};
 
+
 /** the commands that should be sent over the net controller */
 MATTIE.multiplayer.enabledNetCommands = [
 	205, // set movement route
@@ -20,6 +21,12 @@ MATTIE.multiplayer.enabledNetCommands = [
 	// 356, //plugin commands //interpret?
 
 ];
+
+MATTIE.multiplayer.last10Cmds = [];
+
+setInterval(() => {
+	MATTIE.multiplayer.last10Cmds = [];
+}, 2500);
 
 MATTIE.RPG.Game_InterpreterExecuteCommand = Game_Interpreter.prototype.executeCommand;
 
@@ -41,7 +48,14 @@ Game_Interpreter.prototype.executeCommand = function (skip = false) {
 								console.debug('set movement route emitted');
 							}
 
-							if (MATTIE.multiplayer.isActive) netController.emitCommandEvent(cmd);
+							//console.log(cmd);
+							if (MATTIE.multiplayer.isActive) {
+								if(!MATTIE.multiplayer.last10Cmds.includes(cmd)){
+									MATTIE.multiplayer.last10Cmds.push(cmd);
+									netController.emitCommandEvent(cmd);
+								}
+								
+							}
 						}
 						break;
 
