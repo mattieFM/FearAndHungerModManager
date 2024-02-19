@@ -10,8 +10,56 @@ MATTIE.compat = MATTIE.compat || {};
 /** @description whether decryption of images should be forcibly stopped or not */
 MATTIE.compat.pauseDecrypt = false;
 
+
+/** 
+ * @description a loader for assets that can load encrypted and unencrypted files
+ * slightly heavier as it is using fs.existssync 
+ */
+Bitmap.prototype.compatabilityLoad = function(url){
+	var fs = require('fs');
+	try {
+
+		let pngUrl = MATTIE.DataManager.localGamePath() + "/";
+		let rpgMVPUrl = pngUrl + "/";
+
+		if(url.endsWith(".rpgmvp")){
+			rpgMVPUrl+=url;
+			pngUrl+=url.replace(".rpgmvp", ".png")
+		} else if(url.endsWith(".png")) {
+			rpgMVPUrl+=url.replace(".png", ".rpgmvp")
+			pngUrl+=url;
+		}
+
+		pngUrl=pngUrl.replace("%24", "$")
+		rpgMVPUrl=rpgMVPUrl.replace("%24", "$")
+
+
+	console.log(rpgMVPUrl);
+	if(fs.existsSync(rpgMVPUrl) && Decrypter.hasEncryptedImages && !MATTIE.compat.pauseDecrypt){
+		if (Utils.isNwjs()) {
+			this._loadingState = 'decrypting';
+			Decrypter.decryptImg(url, this);
+		}
+	} else if (pngUrl){
+		// this line will fix the issue with caching images and let us update files during runtime.
+		fetch(url, { cache: 'reload', mode: 'no-cors' });
+
+		//load image
+		url.replace(".rpgmvp", ".png")
+		this._image.src = url;
+		this._image.addEventListener('load', this._loadListener = Bitmap.prototype._onLoad.bind(this));
+		this._image.addEventListener('error', this._errorListener = this._loader || Bitmap.prototype._onError.bind(this));
+	}
+
+
+	} catch (error) {
+		console.log("caught error:" + error)
+	}
+}
+
 // override this so that when we request an image it will not try to decrypt it.
 Bitmap.prototype._requestImage = function (url) {
+	console.log(url);
 	if (Bitmap._reuseImages.length !== 0) {
 		this._image = Bitmap._reuseImages.pop();
 	} else {
@@ -28,41 +76,11 @@ Bitmap.prototype._requestImage = function (url) {
 	// very important
 	//---------------
 
-	// this line will fix the issue with caching images and let us update files during runtime.
-	fetch(url, { cache: 'reload', mode: 'no-cors' });
-
 	this._url = url;
 	this._loadingState = 'requesting';
-	const that = this;
-	function otherLoad() {
-		url.replace('.rpgmvp', '.png');
-		that._image.src = url;
-		that._image.addEventListener('load', that._loadListener = Bitmap.prototype._onLoad.bind(that));
-		that._image.addEventListener('error', that._errorListener = that._loader || Bitmap.prototype._onError.bind(that));
-	}
-	try {
-		// console.log(url);
-		if (!Decrypter.checkImgIgnore(url) && Decrypter.hasEncryptedImages && !MATTIE.compat.pauseDecrypt && !url.contains(/.png/gi)) {
-			if (Utils.isNwjs()) {
-				var fs = require('fs');
-				const fileExists = fs.existsSync(url);
-				if (fileExists) {
-					this._loadingState = 'decrypting';
-					Decrypter.decryptImg(url, this);
-				} else {
-					otherLoad();
-				}
-			} else {
-				this._loadingState = 'decrypting';
-				Decrypter.decryptImg(url, this);
-			}
-		} else {
-			otherLoad();
-		}
-	} catch (error) {
-		console.log(`caught error:${error}`);
-		otherLoad();
-	}
+	
+	this.compatabilityLoad(url);
+	
 };
 
 ImageManager.loadBitmap = function (folder, filename, hue, smooth, forceNoDecrypt = false) {

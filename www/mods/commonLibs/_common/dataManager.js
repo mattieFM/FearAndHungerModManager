@@ -98,6 +98,15 @@ MATTIE.DataManager.localFileDirectoryPath = function () {
 	return path.join(base, MATTIE.DataManager.dataPath);
 };
 
+/** @returns the path of the www/ folder*/
+MATTIE.DataManager.localGamePath = function () {
+	const path = require('path');
+
+	const base = path.dirname(process.mainModule.filename);
+	return base;
+};
+
+
 /**
  * @description creates a modData folder if one does not exist
  * or if a parm is passes it will create a specfic dir inside of the moddata folder
