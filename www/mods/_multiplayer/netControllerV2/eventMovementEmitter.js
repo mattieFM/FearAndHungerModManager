@@ -14,13 +14,15 @@ Game_Character.prototype.processMoveCommand = function (command) {
 // override the force move route cmd to check if it hasnt alreay been run
 MATTIE.multiplayer.forceMoveRoute = Game_Event.prototype.forceMoveRoute;
 Game_Event.prototype.forceMoveRoute = function (moveRoute) {
-	console.log(moveRoute);
+	//console.log(moveRoute);
 	if (this.getValidMove(moveRoute)) { MATTIE.multiplayer.forceMoveRoute.call(this, moveRoute); } else {
 		this._moveRouteForcing = false;
 	}
-	setTimeout(() => {
-		this._moveRouteForcing = false;
-	}, 15000);
+
+	//this will cause big mahabre lag
+	// setTimeout(() => {
+	// 	this._moveRouteForcing = false;
+	// }, 15000);
 };
 
 /**
@@ -46,8 +48,8 @@ Game_Character.prototype.getValidMove = function (moveRoute) {
 	let shouldContinue = true;
 
 	let foundOnce = false;
-	console.log(list);
-	console.log(last20Steps);
+	// console.log(list);
+	// console.log(last20Steps);
 	for (let index = last20Steps.length - 1; index > 0 && !found; index--) {
 		const element = last20Steps[index];
 		// go from the back of the list to the front till we find a code identical to the last code of our list
@@ -66,7 +68,7 @@ Game_Character.prototype.getValidMove = function (moveRoute) {
 				if (k <= 0 && hits >= list.length - 1) {
 					shouldContinue = false;
 					validMove = true;
-					console.log('valid by exasughtion');
+					//console.log('valid by exasughtion');
 				} else {
 					const currentElement = list[k];
 					const historicalElement = last20Steps[index];
@@ -93,7 +95,7 @@ Game_Character.prototype.getValidMove = function (moveRoute) {
 		if (foundOnce && index <= 0) {
 			validMove = true;
 			// valid by never finding the start
-			console.log('valid by never finding the start');
+			//console.log('valid by never finding the start');
 		}
 	}
 
@@ -102,7 +104,7 @@ Game_Character.prototype.getValidMove = function (moveRoute) {
 
 MATTIE.multiplayer.moveStraight = Game_CharacterBase.prototype.moveStraight;
 Game_Event.prototype.moveStraight = function (d, callAnyways = false) {
-	console.log(`moved with${d}`);
+	//console.log(`moved with${d}`);
 	if (!MATTIE.multiplayer.inBattle) {
 		if (MATTIE.multiplayer.isEnemyHost || callAnyways || this._moveRouteForcing) MATTIE.multiplayer.moveStraight.call(this, d);
 		if (MATTIE.multiplayer.isEnemyHost && !callAnyways && !this._moveRouteForcing) { // dont send if move route forcing

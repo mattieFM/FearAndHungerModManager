@@ -120,6 +120,7 @@ Game_Troop.prototype.removeIdFromCombatArr = function (id) {
 };
 
 Game_Troop.prototype.setReadyIfExists = function (id, bool, isExtraTurn) {
+	if(this._combatants)
 	if (Object.keys(this._combatants).indexOf(id) != -1) {
 		this._combatants[id] = {};
 		this._combatants[id].bool = bool;
