@@ -35,7 +35,7 @@ Bitmap.prototype._requestImage = function (url) {
 	this._loadingState = 'requesting';
 	const that = this;
 	function otherLoad() {
-		url.replace('.rpgmv', '.png');
+		url.replace('.rpgmvp', '.png');
 		that._image.src = url;
 		that._image.addEventListener('load', that._loadListener = Bitmap.prototype._onLoad.bind(that));
 		that._image.addEventListener('error', that._errorListener = that._loader || Bitmap.prototype._onError.bind(that));
