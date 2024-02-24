@@ -58,6 +58,6 @@ MATTIE.infoAPI.isInMenu = function () {
 		if(currentScene instanceof scene) onMenuScene = true
 	})
 
-	return onMenuMap || menuScenes;
+	return onMenuMap || onMenuScene;
 };
 
