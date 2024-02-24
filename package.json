@@ -25,7 +25,7 @@
     "build:docs:prod": "jsdoc -c ./www/dev/prodConf.json -r",
     "build:docs:dev": "jsdoc -c ./www/dev/devConf.json -r",
     "build:prod": "npm run lint:mods && npm run build:docs:prod",
-				"build:partialModData": "node .\\www\\dev\\rpgMakerModGen\\rpgModGen.js",
+    "build:partialModData": "node .\\www\\dev\\rpgMakerModGen\\rpgModGen.js",
     "lint:mods": "eslint -c ./.eslintrc.js --ignore-path ./.eslintignore www/mods/ --fix**"
   },
   "description": "Welcome to MATTIE's Fear And Hunger Mod Manager. This mod manager works for both F&H 1 and 2.",

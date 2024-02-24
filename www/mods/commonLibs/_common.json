@@ -1,12 +1,11 @@
 {
-    "name":"_common",
-    "status":true,
-    "parameters":{},
+    "name": "_common",
+    "status": true,
+    "parameters": {},
     "dependencies": [
-								"_common/lodash",
+        "_common/lodash",
         "_common/yanflyChecker",
         "_common/betterPhysAtkAnim",
-        
         "_common/systemEvents",
         "_common/menus/menu",
         "_common/menus/mainMenu",
@@ -17,16 +16,11 @@
         "_common/compatibility",
         "_common/menus/cheatMenu",
         "_common/static",
-
         "_common/optimisations",
         "_common/menus/devMenu",
         "_common/clipboard",
-
-
         "_common/optimizedTarraxLighting",
-
-
-								"_common/API_CORE/inputAPI",
+        "_common/API_CORE/inputAPI",
         "_common/API_CORE/heSoBBGirlAPI",
         "_common/API_CORE/itemAPI",
         "_common/API_CORE/vfxAPI",
@@ -34,26 +28,22 @@
         "_common/API_CORE/eventAPI",
         "_common/API_CORE/troopAPI",
         "_common/API_CORE/eventWrapper",
-								"_common/API_CORE/eventHooks",
+        "_common/API_CORE/eventHooks",
         "_common/API_CORE/msgAPI",
-								"_common/API_CORE/unstuckAPI",
-								"_common/API_CORE/teleportsAPI",
-								"_common/API_CORE/miscAPI",
-								"_common/API_CORE/simpleBattleAPI",
+        "_common/API_CORE/unstuckAPI",
+        "_common/API_CORE/teleportsAPI",
+        "_common/API_CORE/miscAPI",
+        "_common/API_CORE/infoAPI",
+        "_common/API_CORE/simpleBattleAPI",
         "_common/supporters",
-								"_common/seedRandom",
+        "_common/seedRandom",
         "_common/util",
-								"_common/API_CORE/preFabAPI",
-
-        
-								"_common/betterDebugMenu",
-								
+        "_common/API_CORE/preFabAPI",
+        "_common/betterDebugMenu",
         "_common/betterCrowMauler",
-								"_common/commonitems/costumes",
-								"_common/gameEmitter",
-								"_common/tas"
-    
+        "_common/commonitems/costumes",
+        "_common/gameEmitter",
+        "_common/tas"
     ],
     "danger": false
-
 }

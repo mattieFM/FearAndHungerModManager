@@ -322,10 +322,10 @@ MATTIE.DataManager.getMapData = function (mapId) {
 	const thisMapData = null;
 	if (mapId > 0) {
 		var filename = 'Map%1.json'.format(mapId.padZero(3));
-		this._mapLoader = ResourceHandler.createLoader(`data/${filename}`, this.loadDataFile.bind(this, '$dataMap', filename));
-		this.loadDataFile('thisMapData', filename);
+		this._mapLoader = ResourceHandler.createLoader(`data/${filename}`, DataManager.loadDataFile.bind(this, '$dataMap', filename));
+		DataManager.loadDataFile('thisMapData', filename);
 	} else {
-		this.makeEmptyMap();
+		DataManager.makeEmptyMap();
 	}
 	return thisMapData;
 };
