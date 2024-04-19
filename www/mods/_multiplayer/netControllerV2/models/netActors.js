@@ -24,7 +24,10 @@ DataManager.extractSaveContents = function (contents) {
 		console.log('could not create local player');
 	}
 };
-/** a simple class containing the game actor and the assosiated dataActor id (for clean up) */
+/** 
+ * @description a simple class containing the game actor and the assosiated dataActor id (for clean up)
+ * @class
+ */
 MATTIE.multiplayer.NetActor = function () {
 	this.initialize.apply(this, arguments);
 };
@@ -36,7 +39,10 @@ MATTIE.multiplayer.NetActor.prototype.initialize = function (gameActor, dataActo
 	this.baseActorId = baseActorId;
 };
 
-/** the wrapper class of an array of net actors */
+/**
+ * @description a wrapper class for an array of net actors
+ * @class
+ */
 MATTIE.multiplayer.NetActors = function () {
 	this.initialize.apply(this, arguments);
 };

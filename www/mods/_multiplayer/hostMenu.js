@@ -16,6 +16,7 @@ MATTIE.CmdManager.show = 'MATTIE_Show_Hide';
 /**
  * @description The scene for hosting a multiplayer game
  * @extends Scene_Base
+ * @class
  */
 MATTIE.scenes.multiplayer.host = function () {
 	this.initialize.apply(this, arguments);

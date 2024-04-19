@@ -215,6 +215,10 @@ Sprite_Actor.prototype.setActorHome = function (index) {
 	this.setHome(50 + xOffset, Graphics.boxHeight - MATTIE.multiplayer.multiCombat.minCharHeight - rowOffset - yOffset);
 };
 
+/**
+ * @description a window that displays the current number of alies in the fight with you.
+ * @class
+ */
 MATTIE.windows.multiplayer.multiCombat.AllyCount = function () {
 	this.initialize.apply(this, arguments);
 };
@@ -483,6 +487,10 @@ Window_BattleActor.prototype.actor = function () {
 // SPRITE Net Ex Turn
 //-----------------------------------------------------------------------------
 
+/**
+ * @description a window that displays the extra turn pop up
+ * @class
+ */
 MATTIE.multiplayer.SpriteNetExTurn = function () {
 	this.initialize.apply(this, arguments);
 };
@@ -511,6 +519,10 @@ MATTIE.multiplayer.SpriteNetExTurn.prototype.update = function () {
 // SPRITE Ready
 //-----------------------------------------------------------------------------
 
+/**
+ * @description a window that displays the ready popup in battle
+ * @class
+ */
 MATTIE.multiplayer.SpriteReady = function () {
 	this.initialize.apply(this, arguments);
 };
@@ -539,6 +551,10 @@ MATTIE.multiplayer.SpriteReady.prototype.update = function () {
 // SPRITE Awaiting Allies
 //-----------------------------------------------------------------------------
 
+/**
+ * @description a window that displays the waiting popup in battle
+ * @class
+ */
 MATTIE.multiplayer.SpriteWaiting = function () {
 	this.initialize.apply(this, arguments);
 };

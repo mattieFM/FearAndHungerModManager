@@ -13,6 +13,10 @@ MATTIE.CmdManager.spectate = 'MATTIE_Spectate';
 MATTIE.TextManager.bornAnew = 'Be born anew';
 MATTIE.CmdManager.bornAnew = 'rebirth';
 
+/**
+ * @description the class for the game over screen scene.
+ * @class
+ */
 MATTIE.scenes.multiplayer.Scene_GameOver = function () {
 	this.initialize.apply(this, arguments);
 };

@@ -7,6 +7,10 @@ MATTIE.windows.multiplayer = MATTIE.windows.multiplayer || {};
  * start game scene
  */
 
+/**
+ * @description a scene to display when starting the game.
+ * @class
+ */
 MATTIE.scenes.multiplayer.startGame = function () {
 	this.initialize.apply(this, arguments);
 };

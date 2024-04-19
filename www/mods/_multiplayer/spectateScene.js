@@ -11,6 +11,7 @@ MATTIE.multiplayer.spectate.init = Scene_Map.prototype.initialize;
  * Scene_Spectate
  * @description a scene for spectating after death
  * @extends Scene_Map
+ * @class
  */
 
 MATTIE.scenes.multiplayer.Scene_Spectate = function () {

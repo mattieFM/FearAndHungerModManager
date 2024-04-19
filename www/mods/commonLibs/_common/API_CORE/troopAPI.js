@@ -374,6 +374,7 @@ Game_Troop.prototype.meetsConditions = function (page) {
  * @param {int} xOffset, screen x offset for entire troop
  * @param {int} yOffset, screen y offset for entire troop
  * @returns {MATTIE.troopAPI.RuntimeTroop}
+ * @class
  * */
 MATTIE.troopAPI.RuntimeTroop = function () {
 	this.initialize.apply(this, arguments);
