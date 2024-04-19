@@ -31,7 +31,6 @@ MATTIE.infoAPI.getPlayerActorId = function () {
 	return actorid;
 };
 
-
 /**
  * @description Get the current actorid of the leader of the party
  * @returns the actor id of the leader of the party
@@ -49,9 +48,9 @@ MATTIE.infoAPI.isInMenu = function () {
 	const menuScenes = [Scene_Title, Scene_Equip, Scene_Item, Scene_KeyConfig, Scene_Status, Scene_Skill, Scene_MenuBase, Scene_Menu];
 	const currentScene = SceneManager._scene;
 	let onMenuScene = false;
-	menuScenes.forEach((scene)=>{
-		if(currentScene instanceof scene) onMenuScene = true
-	})
+	menuScenes.forEach((scene) => {
+		if (currentScene instanceof scene) onMenuScene = true;
+	});
 
 	return onMenuMap || onMenuScene;
 };
@@ -62,12 +61,10 @@ MATTIE.infoAPI.isInMenu = function () {
 MATTIE.infoAPI.currentlyFaughtEnemyName = function () {
 	const id = $gameTroop._troopId;
 	let finalName;
-	if(id){
+	if (id) {
 		const troopName = $dataTroops[id].name;
-		finalName = troopName.replace(/[0-9]*$/gi, "").replace(/\_/gi, " ");
+		finalName = troopName.replace(/[0-9]*$/gi, '').replace(/_/gi, ' ');
 	}
-	
 
-	return $gameParty.inBattle()? finalName : "No Enemy";
+	return $gameParty.inBattle() ? finalName : 'No Enemy';
 };
-

@@ -2,7 +2,6 @@
 // a class to override the base Game_Player to emit their inputs for multiplayer
 //-----------------------------------------------------------------------------------
 
-
 var MATTIE = MATTIE || {};
 MATTIE.multiplayer = MATTIE.multiplayer || {};
 MATTIE.menus.multiplayer = MATTIE.menus.multiplayer || {};
@@ -12,7 +11,6 @@ MATTIE.multiplayer.gamePlayer = MATTIE.multiplayer.gamePlayer || {};
 MATTIE.multiplayer.movementEmitter = MATTIE.multiplayer.movementEmitter || {};
 MATTIE.multiplayer.playerEmitter = MATTIE.multiplayer.playerEmitter || {};
 MATTIE.RPG = MATTIE.RPG || {};
-
 
 /**
  * override all necessary methods making them emit events for multiplayer support
@@ -29,7 +27,7 @@ MATTIE.multiplayer.selfTransMax = 100;
 MATTIE.multiplayer.movementEmitter.secondsTillPosSend = 10 * 1000;
 MATTIE.multiplayer.movementEmitter.secondsTillTrans = 100 * 1000;
 
-//the interval to handle position emission every n seconds
+// the interval to handle position emission every n seconds
 setInterval(() => {
 	if (MATTIE.multiplayer.isActive) {
 		var netController = MATTIE.multiplayer.getCurrentNetController();
@@ -39,7 +37,7 @@ setInterval(() => {
 	}
 }, MATTIE.multiplayer.movementEmitter.secondsTillPosSend);
 
-//the interval to handle transfer emission every n seconds
+// the interval to handle transfer emission every n seconds
 setInterval(() => {
 	if (MATTIE.multiplayer.isActive) {
 		var netController = MATTIE.multiplayer.getCurrentNetController();
@@ -49,29 +47,28 @@ setInterval(() => {
 	}
 }, MATTIE.multiplayer.movementEmitter.secondsTillTrans);
 
-
-//A bit of an old function from the earlier stages of the mod, used to setup some but not all player emissions
-//mostly for movement emissions of the player.
+// A bit of an old function from the earlier stages of the mod, used to setup some but not all player emissions
+// mostly for movement emissions of the player.
 MATTIE.multiplayer.gamePlayer.override = function () {
 	console.info('--emitter overrides initialized--');
 
 	// override the execute move command
 	MATTIE.multiplayer.gamePlayer.executeMove = Game_Player.prototype.executeMove;
 	Game_Player.prototype.executeMove = function (direction) {
-		//TODO: args is not setup well here. fix that
+		// TODO: args is not setup well here. fix that
 
 		MATTIE.multiplayer.gamePlayer.executeMove.call(this, direction);
 		var netController = MATTIE.multiplayer.getCurrentNetController();
 		const args = [direction];
 
-		//if we should not be transferring
+		// if we should not be transferring
 		if (MATTIE.multiplayer.selfMoveCount >= MATTIE.multiplayer.selfMax) {
 			args.push(this.x);
 			args.push(this.y);
 			MATTIE.multiplayer.selfMoveCount = 0;
 		}
-		
-		//if we should be transferring.
+
+		// if we should be transferring.
 		if (MATTIE.multiplayer.selfTransMoveCount >= MATTIE.multiplayer.selfTransMax) {
 			args.push(this.x);
 			args.push(this.y);
@@ -79,7 +76,7 @@ MATTIE.multiplayer.gamePlayer.override = function () {
 			MATTIE.multiplayer.selfTransMoveCount = 0;
 		}
 
-		//emit the move event.
+		// emit the move event.
 		netController.emitMoveEvent(...args);
 		MATTIE.multiplayer.selfMoveCount++;
 		MATTIE.multiplayer.selfTransMoveCount++;
@@ -88,13 +85,13 @@ MATTIE.multiplayer.gamePlayer.override = function () {
 	// override the update main command to make all netPlayers update at the same time as though they were Game_Player
 	MATTIE.RPG.SceneMap_MainUpdate = Scene_Map.prototype.updateMain;
 	Scene_Map.prototype.updateMain = function () {
-		//TODO: see if this fps function actually works for anything. It was intended to help the game when fps drops, but not sure if it
-		//does its job or not.
+		// TODO: see if this fps function actually works for anything. It was intended to help the game when fps drops, but not sure if it
+		// does its job or not.
 		if (Graphics._fpsMeter.fps < 10) {
 			SceneManager._deltaTime = 0.9 / Graphics._fpsMeter.fps;
 		}
 
-		//for each net player, update their local object on the main update
+		// for each net player, update their local object on the main update
 		const netController = MATTIE.multiplayer.getCurrentNetController();
 		for (key in netController.netPlayers) {
 			if (key) {
@@ -106,7 +103,7 @@ MATTIE.multiplayer.gamePlayer.override = function () {
 			}
 		}
 
-		//update everything else
+		// update everything else
 		MATTIE.RPG.SceneMap_MainUpdate.call(this);
 
 		// MATTIE.multiplayer._interpreter.update();
@@ -147,14 +144,14 @@ MATTIE.multiplayer.gamePlayer.override = function () {
 			MATTIE.multiplayer.setEnemyHost();
 			MATTIE.multiplayer.getCurrentNetController().updatePlayersOnCurrentMap();
 
-			//TODO: verify that this is not causing any issues for players being visible when they should not be
-			//SEE: https://discord.com/channels/1148766509406093342/1157000978885791765/1230770842179207209
+			// TODO: verify that this is not causing any issues for players being visible when they should not be
+			// SEE: https://discord.com/channels/1148766509406093342/1157000978885791765/1230770842179207209
 			$gamePlayer.setTransparent(false); // make sure the player is not transparent
 		}
 	};
 
-	//TODO: verify that this should be in this file, likely needs to be moved to the netcontroller class instead of being here.
-	//or moved to event local event emitter.
+	// TODO: verify that this should be in this file, likely needs to be moved to the netcontroller class instead of being here.
+	// or moved to event local event emitter.
 	/**
 	 * @description emits a transfer event to net controller
 	 */
@@ -176,7 +173,7 @@ MATTIE.multiplayer.gamePlayer.override = function () {
 	MATTIE.RPG.addActor = Game_Party.prototype.addActor;
 	MATTIE.RPG.removeActor = Game_Party.prototype.removeActor;
 
-	//extend the addActor method to update player info when a follower is added.
+	// extend the addActor method to update player info when a follower is added.
 	Game_Party.prototype.addActor = function (actorId) {
 		console.info('follower change event');
 		MATTIE.RPG.addActor.call(this, actorId);
@@ -184,7 +181,7 @@ MATTIE.multiplayer.gamePlayer.override = function () {
 	};
 
 	const removedActorIds = [];
-	//extend the addActor method to update player info when a follower is removed.
+	// extend the addActor method to update player info when a follower is removed.
 	Game_Party.prototype.removeActor = function (actorId) {
 		MATTIE.RPG.removeActor.call(this, actorId);
 		if (!removedActorIds.includes(actorId)) {
@@ -196,15 +193,14 @@ MATTIE.multiplayer.gamePlayer.override = function () {
 
 	MATTIE_RPG.Game_PlayerStartMapEvent = Game_Player.prototype.startMapEvent;
 
-
-	//Extend the start map event function to allow interacting with other players. We are doing this directly here
-	//as it is easier than having event pages attached to the net players.
+	// Extend the start map event function to allow interacting with other players. We are doing this directly here
+	// as it is easier than having event pages attached to the net players.
 	Game_Player.prototype.startMapEvent = function (x, y, triggers, normal) {
 		MATTIE_RPG.Game_PlayerStartMapEvent.call(this, x, y, triggers, normal);
 		MATTIE.multiplayer.playerEmitter.checkPlayerActionBtnEvent.call(this, x, y, triggers);
 	};
 
-	//this handles checking if you can interact with the player on your tile.
+	// this handles checking if you can interact with the player on your tile.
 	MATTIE.multiplayer.playerEmitter.checkPlayerActionBtnEvent = function (x, y, triggers) {
 		const netCont = MATTIE.multiplayer.getCurrentNetController();
 		Object.keys(netCont.netPlayers).forEach((key) => {
