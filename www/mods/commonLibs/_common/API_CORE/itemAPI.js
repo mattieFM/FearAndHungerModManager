@@ -198,14 +198,18 @@ Game_Item.prototype.onEquip = function () {
 MATTIE_RPG.Game_Actor_changeEquip = Game_Actor.prototype.changeEquip;
 /**
  * @description the overridden change equip method to also call out callbacks on equip/unequip
+ * Updated to allow meta tags for callbacks ie <equipCb:console.log("I was equipped")>
  * @param {int} slotId
  * @param {rm.types.Item} item
  */
 Game_Actor.prototype.changeEquip = function (slotId, item) {
 	if (item) if (item.equipCb) item.equipCb(this);
+	if (item) if (item._meta.equipCb) eval(item._meta.equipCb);
 	const otherItem = this.equips()[slotId];
 	console.log(otherItem);
 	if (otherItem) { if (otherItem.unequipCb) otherItem.unequipCb(this); }
+	if (otherItem) { if (otherItem._meta.unequipCb)eval(otherItem._meta.unequipCb); }
+	if (item) if (item._meta.equipCb) eval(item._meta.equipCb);
 	MATTIE_RPG.Game_Actor_changeEquip.call(this, slotId, item);
 };
 
