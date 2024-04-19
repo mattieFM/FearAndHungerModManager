@@ -255,6 +255,10 @@ MATTIE.itemAPI.quickBook = function (name, desc, iconName, bookOpenText, spawn =
 	return book;
 };
 
+/**
+ * @description a class that represents a single runtime item
+ * @class
+ */
 MATTIE.itemAPI.RunTimeItem = class {
 	/**
 	 * @description build a new item
@@ -537,6 +541,9 @@ MATTIE.itemAPI.createCostume = function (
 	return costume;
 };
 
+/**
+ * @description a class that allows loading an item icon IE a 96x96 img from system outside of the default iconset.png
+ */
 MATTIE.itemAPI.RuntimeIcon = class {
 	constructor(file) {
 		/** @description the name of the file within www/img/system excluding .png */

@@ -149,6 +149,10 @@ Game_Battler.prototype.useItem = function (item) {
 
 MATTIE.items.runtimeItems = [];
 
+/**
+ * @description a class that helps manage runtime items, that is items that were created from code alone at runtime.
+ * @class
+ */
 MATTIE.items.runTimeItem = class {
 	constructor(params) {
 		/**

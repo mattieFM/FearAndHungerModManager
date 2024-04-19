@@ -298,6 +298,7 @@ Game_Player.prototype.moveOneTile = function (dir4) {
 /**
  * @description a class that represents any player that is not the one the user is actively controlling.
  * @extends Game_Player
+ * @class
  */
 MATTIE.multiplayer.Secondary_Player = function () {
 	this.initialize.apply(this, arguments);

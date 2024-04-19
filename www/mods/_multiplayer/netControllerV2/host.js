@@ -1,7 +1,12 @@
 // @using peerJs from /dist/peerjs.min.js
 var MATTIE = MATTIE || {};
 MATTIE.multiplayer = MATTIE.multiplayer || {};
-/** @global */
+/**
+ * @description a wrapper class for the net controller for the host, this just overrides some things to fix up how data is sent and prepared
+ * for clients.
+ *  @global 
+ * @class
+ * */
 class HostController extends BaseNetController {
 	constructor() {
 		super();

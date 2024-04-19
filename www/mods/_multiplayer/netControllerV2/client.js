@@ -2,6 +2,10 @@
 var MATTIE = MATTIE || {};
 MATTIE.multiplayer = MATTIE.multiplayer || {};
 
+/**
+ * @description a small wrapper class for the net controller that just fixes up some things to make it work for the client
+ * basically just change the way data is sent and prepared
+ */
 class ClientController extends BaseNetController {
 	constructor() {
 		super();

@@ -23,6 +23,7 @@ MATTIE.actorAPI.forceMainChar = function (i) {
 
 /**
  *  @description A class that wraps data actor information allowing easy creation of data actors.
+ * @class
  * */
 MATTIE.actorAPI.Data_Actor_Wrapper = class {
 	constructor(params) {

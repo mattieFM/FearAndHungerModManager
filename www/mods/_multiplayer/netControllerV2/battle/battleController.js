@@ -6,6 +6,10 @@ MATTIE.windows.multiplayer = MATTIE.windows.multiplayer || {};
 
 var EventEmitter = require('events');
 
+/**
+ * @description a small class that helps handle some battle events
+ * @class
+ */
 class BattleController extends EventEmitter {
 	/**
      * @description trigger the ready event on battle controller and net controller.
