@@ -412,6 +412,9 @@ Asset.IMG_FOLDERS = {
 // Mod Class
 //----------------------------------------------------------------
 
+/**
+ * @description a class that represents a mod internally once it has been parsed and loaded
+ */
 class Mod {
 	/**
 	 *

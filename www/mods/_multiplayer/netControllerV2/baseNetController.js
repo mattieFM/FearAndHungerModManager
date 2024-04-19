@@ -22,6 +22,12 @@ setInterval(() => {
 
 var EventEmitter = require('events');
 
+/**
+ * @description the net controller class this handles all net traffic for the multiplayer mod.
+ * it is made to send and recive json packets, that contain as many or as few commands as we want, for instance, a packet could contain a move cmd, or a mov cmd and a bunch 
+ * of others.
+ * @class
+ */
 class BaseNetController extends EventEmitter {
 	constructor() {
 		super();
