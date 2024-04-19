@@ -14,6 +14,7 @@ MATTIE.CmdManager.reconnect = 'MATTIE_Reconnect';
 /**
  * @description The scene for hosting a multiplayer game
  * @extends Scene_Base
+ * @class
  */
 MATTIE.scenes.multiplayer.join = function () {
 	this.initialize.apply(this, arguments);

@@ -12,6 +12,7 @@ MATTIE.helpOncePerSession = false;
 /**
  * @description The scene for hosting a multiplayer game
  * @extends MATTIE.scenes.multiplayer.base
+ * @class
  */
 MATTIE.scenes.multiplayer.lobby = function () {
 	this.initialize.apply(this, arguments);

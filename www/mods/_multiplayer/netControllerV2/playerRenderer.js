@@ -56,6 +56,10 @@ MATTIE.multiplayer.renderer._renderNetPlayers = function (target) {
 //
 // The sprite for displaying a character.
 
+/**
+ * @description a simple wrapper class for spriteChar to display net sprites
+ * @class
+ */
 MATTIE.multiplayer.NetSpriteChar = function () {
 	this.initialize.apply(this, arguments);
 };

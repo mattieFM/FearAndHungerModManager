@@ -4,6 +4,10 @@ MATTIE.menus.multiplayer = MATTIE.menus.multiplayer || {};
 MATTIE.scenes.multiplayer = MATTIE.scenes.multiplayer || {};
 MATTIE.windows.multiplayer = MATTIE.windows.multiplayer || {};
 
+/**
+ * @description a class that extends a game_follower for net players
+ * @class
+ */
 MATTIE.multiplayer.NetFollower = function () {
 	this.initialize.apply(this, arguments);
 };
@@ -65,6 +69,10 @@ MATTIE.multiplayer.NetFollower.prototype.chaseCharacter = function (character) {
 	}
 };
 
+/**
+ * @description a wrapper class for an array of netFollowers
+ * @class
+ */
 MATTIE.multiplayer.NetFollowers = function () {
 	this.initialize.apply(this, arguments);
 };

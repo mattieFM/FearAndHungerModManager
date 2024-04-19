@@ -13,6 +13,11 @@ MATTIE.CmdManager.return = 'MATTIE_return';
 MATTIE.CmdManager.newGame = 'MATTIE_New_Game';
 MATTIE.CmdManager.loadGame = 'MATTIE_Load_Game';
 
+/**
+ * @description a scene that extends scene base but loads my bitmap instead, this is not really needed and is just
+ * legacy code left over from when I didn't really understand the engine
+ * @class
+ */
 MATTIE.scenes.multiplayer.base = function () {
 	this.initialize.apply(this, arguments);
 };
@@ -33,7 +38,10 @@ MATTIE.scenes.multiplayer.base.prototype.createBackground = function () {
 /**
  * main scene
  */
-
+/**
+ * @description a scene that displays the username input and the multiplayer host/join btns
+ * @class
+ */
 MATTIE.scenes.multiplayer.main = function () {
 	this.initialize.apply(this, arguments);
 };
@@ -93,6 +101,10 @@ MATTIE.scenes.multiplayer.main.prototype.createBackground = function () {
 /**
  * main window
  */
+/**
+ * @description a window the main multiplayer join/host btns
+ * @class
+ */
 MATTIE.windows.multiplayer.Main = function () {
 	this.initialize.apply(this, arguments);
 };
@@ -109,6 +121,10 @@ MATTIE.windows.multiplayer.Main.prototype.makeCommandList = function () {
 /**
  * main window
  */
+/**
+ * @description a window that displays the load/new game buttons when a multiplayer game is starting
+ * @class
+ */
 MATTIE.windows.multiplayer.StartWin = function () {
 	this.initialize.apply(this, arguments);
 };
@@ -123,6 +139,10 @@ MATTIE.windows.multiplayer.StartWin.prototype.makeCommandList = function () {
 
 /**
  * new game win
+ */
+/**
+ * @description a window that displays the load/new game buttons when a multiplayer game is starting.
+ * @class
  */
 MATTIE.windows.multiplayer.NewGameWin = function () {
 	this.initialize.apply(this, arguments);
@@ -143,6 +163,7 @@ MATTIE.windows.multiplayer.NewGameWin.prototype.makeCommandList = function () {
  * // Scene_DevItems
  * @description a scene to spawn in items for dev
  * @extends Scene_Item
+ * @class
  */
 MATTIE.scenes.Scene_DropItem = function () {
 	this.initialize.apply(this, arguments);
