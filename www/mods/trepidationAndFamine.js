@@ -5,7 +5,7 @@ $gameSystem.sillyMode = false;
 $gameSystem.tfMode = false;
 $gameSystem.aiMode = false;
 $gameSystem.xtMode = false;
-$gameSystem.suMode = false;
+$gameSystem.svmode = false;
 
 const bible = MATTIE.itemAPI.quickBook(
 	'The Holy Bible',
@@ -48,36 +48,37 @@ Nowhere is safe. All characters spawn with random custom debuffs. New books, ite
 
 	() => { MATTIE.TaF.enableTF(); },
 );
+// MATTIE.menus.difficultyMenu.addDifficultyChoice(
+// 	'Abhorrence & Inanition',
+// 	`All characters spawn with multiple custom major debuffs. You are known to all, you are hated by all, even the gods. 
+// Darkness roams, Run, lest they infest you. Attacks cost stamina. Pray the sandman only brings you sleep.
+//  (T&F ruleset also applies)`,
+
+// 	() => { MATTIE.TaF.enableAI(); },
+// );
+
+// let name = 'Unknown & Hidden';
+
+// let desc = 'Beat Abhorrence & Inanition to unlock this difficulty';
+// if (MATTIE.DataManager.global.get('BeatenAandI')) {
+// 	name = 'Extinction & Termination';
+// 	desc = `The god s hatred of you knows no bounds. You are an affront to life itself and must be made extinct. Rid the dungeons of all life.
+// (All ruleset except for silly mode & solo apply)`;
+// }
+
+// MATTIE.menus.difficultyMenu.addDifficultyChoice(
+// 	name,
+// 	desc,
+
+// 	() => { MATTIE.TaF.enableET(); },
+// );
 MATTIE.menus.difficultyMenu.addDifficultyChoice(
-	'Abhorrence & Inanition',
-	`All characters spawn with multiple custom major debuffs. You are known to all, you are hated by all, even the gods. 
-Darkness roams, Run, lest they infest you. Attacks cost stamina. Pray the sandman only brings you sleep.
- (T&F ruleset also applies)`,
-
-	() => { MATTIE.TaF.enableAI(); },
-);
-
-let name = 'Unknown & Hidden';
-
-let desc = 'Beat Abhorrence & Inanition to unlock this difficulty';
-if (MATTIE.DataManager.global.get('BeatenAandI')) {
-	name = 'Extinction & Termination';
-	desc = `The god s hatred of you knows no bounds. You are an affront to life itself and must be made extinct. Rid the dungeons of all life.
-(All ruleset except for silly mode & solo apply)`;
-}
-
-MATTIE.menus.difficultyMenu.addDifficultyChoice(
-	name,
-	desc,
-
-	() => { MATTIE.TaF.enableET(); },
-);
-MATTIE.menus.difficultyMenu.addDifficultyChoice(
-	'Speed & Unforgiving Decay',
-	`Time is Difficulty. You are prey, the hunt is on. Watch your step, for time devours all, kings, kingdoms and dungeons alike.
- Take nothing for granted, for all was once dust and will be dust once more.
+	'Survival & Vampires',
+	`.... Yes... its vampire survivers for funger...
+	Have fun lol.
     `,
-	() => { MATTIE.TaF.enableSU(); },
+	() => { MATTIE.TaF.enableSV(); },
+	'Fear and Hunger Survivors'
 );
 
 MATTIE.menus.difficultyMenu.addDifficultyChoice(
@@ -127,8 +128,9 @@ MATTIE.TaF.enableET = function () {
 /**
  * @description Enable Speed & Unforgiving Decay difficulty
  */
-MATTIE.TaF.enableSU = function () {
-	$gameSystem.suMode = true;
+MATTIE.TaF.enableSV = function () {
+	$gameSystem.svMode = true;
+	activateALtimitMovement();
 };
 
 /**
@@ -158,7 +160,7 @@ MATTIE.TaF.etTick = function () {
 /**
  * @description the tick for Speed & Unforgiving Decay difficulty
  */
-MATTIE.TaF.suTick = function () {
+MATTIE.TaF.svTick = function () {
 	//
 };
 
@@ -767,8 +769,8 @@ MATTIE.TaF.difficultyTick = function () {
 	if ($gameSystem.etMode) {
 		this.etTick();
 	}
-	if ($gameSystem.suMode) {
-		this.suTick();
+	if ($gameSystem.svMode) {
+		this.svTick();
 	}
 	if ($gameSystem.sillyMode) {
 		this.sillyTick();
@@ -786,7 +788,7 @@ Scene_Gameover.prototype.initialize = function () {
 	$gameSystem.tfMode = false;
 	$gameSystem.aiMode = false;
 	$gameSystem.xtMode = false;
-	$gameSystem.suMode = false;
+	$gameSystem.svmode = false;
 	MATTIE.TaF.addedHoneyBar = false;
 	MATTIE.TaF.sillyTickFirst = false;
 	if (MATTIE.TaF.undoSillyOverrides) { MATTIE.TaF.undoSillyOverrides(); }

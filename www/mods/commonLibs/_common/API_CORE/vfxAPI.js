@@ -203,3 +203,15 @@ Lightmask.prototype._updateMask = function () {
 		}
 	}
 };
+
+/**
+ * @description a function to zoom in or out focused on the charecter in the middle of the screen
+ * @param x the percentage to zoom, ie: 1 = none, .1 = 10x out 10 = 10x in.
+ */
+MATTIE.fxAPI.zoom = (x) =>{
+	const height = Graphics.boxHeight;
+	const width = Graphics.boxWidth;
+	$gameScreen.setZoom(width/2, height/2, x)
+
+}
+

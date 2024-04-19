@@ -664,3 +664,68 @@ Window_ChoiceList.prototype.initialize = function (messageWindow) {
 	MATTIE.window_choiceList.call(this, messageWindow);
 	this.setHandler('cancel', this.callCancelHandler);
 };
+
+
+//-----------------------------------------------------------------------------
+// Window_Bar
+// a generic window for display bars like hp and health
+//---------------------------------------
+
+function Window_Bar() {
+	this.initialize.apply(this, arguments);
+}
+
+Window_Bar.prototype = Object.create(Window_Base.prototype);
+Window_Bar.prototype.constructor = Window_Bar;
+/**
+ * @param {string} title the string to display over the bar
+ */
+Window_Bar.prototype.initialize = function (initalValue = 80, title="", clrs=['#bd9f0d', '#bd9f0d','#f0e7bb', '#f2eed8']) {
+	this.title = title;
+	var wight = this.windowWidth();
+	var height = this.windowHeight();
+	Window_Base.prototype.initialize.call(this, 0, 0, wight, height);
+	this.opacity = 0;
+	this.contentsOpacity = 200;
+	this._showCount = 0;
+	this.clrs=clrs;
+	this.setValue(initalValue);
+
+	this.refresh();
+};
+
+Window_Bar.prototype.windowWidth = function () {
+	return 360;
+};
+
+Window_Bar.prototype.windowHeight = function () {
+	return this.fittingHeight(1);
+};
+
+Window_Bar.prototype.update = function () {
+	Window_Base.prototype.update.call(this);
+};
+
+Window_Bar.prototype.maxValue = () => 80;
+
+Window_Bar.prototype.currentValue = function () { return this._currentValue; };
+
+Window_Bar.prototype.setValue = function (x) { this._currentValue = x; };
+
+Window_Bar.prototype.refresh = function () {
+	this.contents.clear();
+
+	var width = this.contentsWidth();
+	// this.drawBackground(0, 0, width, this.lineHeight());
+
+	this.contents.fillRect(0, 5, this.currentValue(), 50, this.clrs[0], this.clrs[1]);
+	this.drawText(this.title, 0, 0, width);
+	this.drawGauge(0, 5, 50, 1.6, this.clrs[2], this.clrs[3]);
+};
+
+Window_Bar.prototype.drawBackground = function (x, y, width, height) {
+	var color1 = this.dimColor1();
+	var color2 = this.dimColor2();
+	this.contents.gradientFillRect(x, y, width / 2, height, color2, color1);
+	this.contents.gradientFillRect(x + width / 2, y, width / 2, height, color1, color2);
+};

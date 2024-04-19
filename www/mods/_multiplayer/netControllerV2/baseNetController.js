@@ -227,7 +227,6 @@ class BaseNetController extends EventEmitter {
 		if (data.ready) {
 			this.onReadyData(data.ready, id);
 		}
-
 		if (data.turnEnd) {
 			this.onTurnEndData(data.turnEnd, id);
 		}
