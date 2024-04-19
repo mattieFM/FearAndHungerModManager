@@ -29,7 +29,6 @@ MATTIE.ignoredPlugins = (() => {
 //----------------------------------------------
 // Global Data
 //----------------------------------------------
-
 /** @description whether the version has been loaded and is valid */
 MATTIE.global.hasLoadedOnce = false;
 
@@ -98,14 +97,13 @@ MATTIE.DataManager.localFileDirectoryPath = function () {
 	return path.join(base, MATTIE.DataManager.dataPath);
 };
 
-/** @returns the path of the www/ folder*/
+/** @returns the path of the www/ folder */
 MATTIE.DataManager.localGamePath = function () {
 	const path = require('path');
 
 	const base = path.dirname(process.mainModule.filename);
 	return base;
 };
-
 
 /**
  * @description creates a modData folder if one does not exist

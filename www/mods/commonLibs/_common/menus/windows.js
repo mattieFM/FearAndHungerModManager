@@ -665,7 +665,6 @@ Window_ChoiceList.prototype.initialize = function (messageWindow) {
 	this.setHandler('cancel', this.callCancelHandler);
 };
 
-
 //-----------------------------------------------------------------------------
 // Window_Bar
 // a generic window for display bars like hp and health
@@ -680,7 +679,7 @@ Window_Bar.prototype.constructor = Window_Bar;
 /**
  * @param {string} title the string to display over the bar
  */
-Window_Bar.prototype.initialize = function (initalValue = 80, title="", clrs=['#bd9f0d', '#bd9f0d','#f0e7bb', '#f2eed8']) {
+Window_Bar.prototype.initialize = function (initalValue = 80, title = '', clrs = ['#bd9f0d', '#bd9f0d', '#f0e7bb', '#f2eed8']) {
 	this.title = title;
 	var wight = this.windowWidth();
 	var height = this.windowHeight();
@@ -688,7 +687,7 @@ Window_Bar.prototype.initialize = function (initalValue = 80, title="", clrs=['#
 	this.opacity = 0;
 	this.contentsOpacity = 200;
 	this._showCount = 0;
-	this.clrs=clrs;
+	this.clrs = clrs;
 	this.setValue(initalValue);
 
 	this.refresh();

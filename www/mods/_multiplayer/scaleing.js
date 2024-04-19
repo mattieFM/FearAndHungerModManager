@@ -277,7 +277,7 @@ Object.defineProperties(MATTIE.multiplayer.config, {
 		get: () => MATTIE.configGet('canInteract', true),
 		set: (value) => { MATTIE.configSet('canInteract', value); },
 	},
-	
+
 	bodyBlocking: {
 		get: () => MATTIE.configGet('bodyBlocking', false),
 		set: (value) => { MATTIE.configSet('bodyBlocking', value); },

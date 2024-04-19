@@ -3,6 +3,9 @@ MATTIE.multiplayer = MATTIE.multiplayer || {};
 MATTIE.menus.multiplayer = MATTIE.menus.multiplayer || {};
 MATTIE.scenes.multiplayer = MATTIE.scenes.multiplayer || {};
 MATTIE.windows.multiplayer = MATTIE.windows.multiplayer || {};
+/**
+ * @class the class that represents all non local players
+ */
 class PlayerModel {
 	constructor(name, actorId) {
 		/** a username */
@@ -56,7 +59,7 @@ class PlayerModel {
 		this.troopInCombatWith = null;
 	}
 
-	setCanInteract(bool){
+	setCanInteract(bool) {
 		this.canBeInteractedWith = bool;
 	}
 
@@ -86,7 +89,7 @@ class PlayerModel {
 
 	onInteract() {
 		// called when this player is interacted with by pressing okay.
-		if(this.canBeInteractedWith && MATTIE.multiplayer.config.canInteract){
+		if (this.canBeInteractedWith && MATTIE.multiplayer.config.canInteract) {
 			this.conversationModel.talk($gameParty.leader().actorId(), this);
 		}
 	}

@@ -1,7 +1,6 @@
 var MATTIE = MATTIE || {};
 MATTIE.multiplayer = MATTIE.multiplayer || {};
 
-
 /** the commands that should be sent over the net controller */
 MATTIE.multiplayer.enabledNetCommands = [
 	205, // set movement route
@@ -48,13 +47,12 @@ Game_Interpreter.prototype.executeCommand = function (skip = false) {
 								console.debug('set movement route emitted');
 							}
 
-							//console.log(cmd);
+							// console.log(cmd);
 							if (MATTIE.multiplayer.isActive) {
-								if(!MATTIE.multiplayer.last10Cmds.includes(cmd)){
+								if (!MATTIE.multiplayer.last10Cmds.includes(cmd)) {
 									MATTIE.multiplayer.last10Cmds.push(cmd);
 									netController.emitCommandEvent(cmd);
 								}
-								
 							}
 						}
 						break;

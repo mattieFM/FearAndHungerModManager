@@ -50,7 +50,7 @@ Nowhere is safe. All characters spawn with random custom debuffs. New books, ite
 );
 // MATTIE.menus.difficultyMenu.addDifficultyChoice(
 // 	'Abhorrence & Inanition',
-// 	`All characters spawn with multiple custom major debuffs. You are known to all, you are hated by all, even the gods. 
+// 	`All characters spawn with multiple custom major debuffs. You are known to all, you are hated by all, even the gods.
 // Darkness roams, Run, lest they infest you. Attacks cost stamina. Pray the sandman only brings you sleep.
 //  (T&F ruleset also applies)`,
 
@@ -78,7 +78,7 @@ MATTIE.menus.difficultyMenu.addDifficultyChoice(
 	Have fun lol.
     `,
 	() => { MATTIE.TaF.enableSV(); },
-	'Fear and Hunger Survivors'
+	'Fear and Hunger Survivors',
 );
 
 MATTIE.menus.difficultyMenu.addDifficultyChoice(
