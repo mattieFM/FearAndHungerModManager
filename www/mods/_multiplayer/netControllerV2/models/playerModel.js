@@ -8,6 +8,9 @@ class PlayerModel {
 		/** a username */
 		this.name = name;
 
+		/** @description whether this player can be interacted with or not. */
+		this.canBeInteractedWith = true;
+
 		/** the actor id this player should use */
 		this.actorId = actorId;
 
@@ -53,6 +56,10 @@ class PlayerModel {
 		this.troopInCombatWith = null;
 	}
 
+	setCanInteract(bool){
+		this.canBeInteractedWith = bool;
+	}
+
 	/** @description add an id to the pvp arr if it does not already exist */
 	addIdToPvp(id) {
 		if (this.pvpCombatArr.indexOf(id) == -1) this.pvpCombatArr.push(id);
@@ -79,7 +86,9 @@ class PlayerModel {
 
 	onInteract() {
 		// called when this player is interacted with by pressing okay.
-		this.conversationModel.talk($gameParty.leader().actorId(), this);
+		if(this.canBeInteractedWith && MATTIE.multiplayer.config.canInteract){
+			this.conversationModel.talk($gameParty.leader().actorId(), this);
+		}
 	}
 
 	resurrect() {

@@ -263,10 +263,21 @@ MATTIE.multiplayer.config.scaling.hpScaling = () => {
  * @description whether body blocking is enabled or not
  * @default false
  */
-MATTIE.multiplayer.config.bodyBlocking;
+MATTIE.multiplayer.config.bodyBlocking = false;
+
+/**
+ * @description whether players can interact with each other
+ * @default true
+ */
+MATTIE.multiplayer.config.canInteract = true;
 
 Object.defineProperties(MATTIE.multiplayer.config, {
 
+	canInteract: {
+		get: () => MATTIE.configGet('canInteract', true),
+		set: (value) => { MATTIE.configSet('canInteract', value); },
+	},
+	
 	bodyBlocking: {
 		get: () => MATTIE.configGet('bodyBlocking', false),
 		set: (value) => { MATTIE.configSet('bodyBlocking', value); },
