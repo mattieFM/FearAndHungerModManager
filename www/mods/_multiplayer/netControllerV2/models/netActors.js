@@ -24,7 +24,7 @@ DataManager.extractSaveContents = function (contents) {
 		console.log('could not create local player');
 	}
 };
-/** 
+/**
  * @description a simple class containing the game actor and the assosiated dataActor id (for clean up)
  * @class
  */
