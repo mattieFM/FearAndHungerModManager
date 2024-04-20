@@ -204,12 +204,12 @@ MATTIE_RPG.Game_Actor_changeEquip = Game_Actor.prototype.changeEquip;
  */
 Game_Actor.prototype.changeEquip = function (slotId, item) {
 	if (item) if (item.equipCb) item.equipCb(this);
-	if (item) if (item._meta.equipCb) eval(item._meta.equipCb);
+	if (item) if (item.meta.equipCb) eval(item.meta.equipCb);
 	const otherItem = this.equips()[slotId];
 	console.log(otherItem);
 	if (otherItem) { if (otherItem.unequipCb) otherItem.unequipCb(this); }
-	if (otherItem) { if (otherItem._meta.unequipCb)eval(otherItem._meta.unequipCb); }
-	if (item) if (item._meta.equipCb) eval(item._meta.equipCb);
+	if (otherItem) { if (otherItem.meta.unequipCb)eval(otherItem.meta.unequipCb); }
+	if (item) if (item.meta.equipCb) eval(item.meta.equipCb);
 	MATTIE_RPG.Game_Actor_changeEquip.call(this, slotId, item);
 };
 
