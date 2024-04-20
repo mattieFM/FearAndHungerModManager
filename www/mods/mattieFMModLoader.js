@@ -1258,6 +1258,8 @@ MATTIE.onError = function (e) {
 				errorText += `<font color=${color}>Press 'F5' to reboot with mods. <br></font>`;
 
 				Graphics.printError('', errorText);
+				const fs = require('fs');
+				fs.appendFile('./errLog.html', errorText);
 				AudioManager.stopAll();
 				const cb = ((key) => {
 					if (key.key === 'F6') {
