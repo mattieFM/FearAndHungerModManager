@@ -1259,12 +1259,16 @@ MATTIE.onError = function (e) {
 
 				Graphics.printError('', errorText);
 
-				//error logger added
-				//https://discord.com/channels/1148766509406093342/1231107373167542282/1231107634564698192
+				// error logger added
+				// https://discord.com/channels/1148766509406093342/1231107373167542282/1231107634564698192
 				const fs = require('fs');
-				let logErr = `<body style="background-color: black; color: white;"><div class="content" style="border: 2px solid white; padding: 20px;">` + errorText + ` </div></body>`
+				const logErr = `
+				<body style="background-color: black; color: white;">
+					<div class="content" style="border: 2px solid white; padding: 20px;">
+						${errorText} 
+					</div>
+				</body>`;
 				fs.appendFile('./errLog.html', logErr);
-
 
 				AudioManager.stopAll();
 				const cb = ((key) => {
