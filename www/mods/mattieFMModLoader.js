@@ -1258,8 +1258,14 @@ MATTIE.onError = function (e) {
 				errorText += `<font color=${color}>Press 'F5' to reboot with mods. <br></font>`;
 
 				Graphics.printError('', errorText);
+
+				//error logger added
+				//https://discord.com/channels/1148766509406093342/1231107373167542282/1231107634564698192
 				const fs = require('fs');
-				fs.appendFile('./errLog.html', errorText);
+				let logErr = `<body style="background-color: black; color: white;"><div class="content" style="border: 2px solid white; padding: 20px;">` + errorText + ` </div></body>`
+				fs.appendFile('./errLog.html', logErr);
+
+
 				AudioManager.stopAll();
 				const cb = ((key) => {
 					if (key.key === 'F6') {
