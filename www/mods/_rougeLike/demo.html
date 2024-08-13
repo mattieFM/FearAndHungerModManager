@@ -1,0 +1,32 @@
+<html>
+<head>
+  <link rel="stylesheet" href="style.css">
+  <title>dungeon generator</title>
+  <button onclick="resetMap()">clear</button>
+  <button onclick="drawMap()">draw</button>
+</head>
+<body>
+
+<canvas id="viewport" width="1024" height="500"></canvas>
+<script src="../commonLibs/_common/util.js"></script>
+<script src="mapController.js"></script>
+<script>
+    let width = 100;
+    let height = 100;
+    let targetWidth = 10;
+    function resetMap(){
+        const canvas = document.getElementById("viewport");
+        const context = canvas.getContext('2d');
+        context.clearRect(0, 0, canvas.width, canvas.height);
+    }
+    function drawMap(){
+        const map=new Region(0,0,width,height);
+        map.splitXDeep(3);
+        map.drawAllChildrenOnCanvas();
+        map.drawAllDoors();
+        console.log(map);
+    }
+</script>
+</body>
+</html>
+
