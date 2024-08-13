@@ -39,5 +39,9 @@
   "bugs": {
     "url": "https://github.com/mattieFM/FearAndHungerModManager/issues"
   },
-  "homepage": "https://github.com/mattieFM/FearAndHungerModManager#readme"
+  "homepage": "https://github.com/mattieFM/FearAndHungerModManager#readme",
+  "dependencies": {
+    "axios": "^1.6.8",
+    "request": "^2.88.2"
+  }
 }

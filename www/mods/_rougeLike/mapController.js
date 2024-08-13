@@ -218,7 +218,7 @@ class Region {
 			const bottomBoxLowerLeftCorner = this.bottomRightCorner;
 			const bottomRegion = new Region(bottomBoxUpperLeftCorner.x, bottomBoxUpperLeftCorner.y, bottomBoxLowerLeftCorner.x, bottomBoxLowerLeftCorner.y, this)
 
-			const door = new Point(MATTIE.util.randBetween(minX+10, maxX-10),splitYLevel);
+			const door = new Point(MATTIE.util.randBetween(minX+2, maxX-2),splitYLevel);
 			topRegion.doors.push(door);
 			bottomRegion.doors.push(door);
 
@@ -257,7 +257,7 @@ class Region {
 			const rightBoxLowerLeftCorner = this.bottomRightCorner;
 			const rightRegion = new Region(rightBoxUpperLeftCorner.x, rightBoxUpperLeftCorner.y, rightBoxLowerLeftCorner.x, rightBoxLowerLeftCorner.y, this)
 
-			const door = new Point(splitXLevel, MATTIE.util.randBetween(minY, maxY));
+			const door = new Point(splitXLevel, MATTIE.util.randBetween(minY+2, maxY-2));
 			leftRegion.doors.push(door);
 			rightRegion.doors.push(door);
 
