@@ -21,7 +21,7 @@
     }
     function drawMap(){
         const map=new Region(0,0,width,height);
-        map.splitXDeep(3);
+        map.splitXDeep(5);
         map.drawAllChildrenOnCanvas();
         map.drawAllDoors();
         console.log(map);

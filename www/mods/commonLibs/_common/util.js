@@ -1,3 +1,4 @@
+var MATTIE = MATTIE || {}
 /* eslint-disable no-trailing-spaces */
 MATTIE.util = MATTIE.util || {};
 
@@ -66,6 +67,25 @@ MATTIE.util.randSeededChance = function (chance) {
 	const roll = MATTIE.util.getSeedRandom();
 	return (roll <= chance);
 };
+
+/**
+ * @description check if a number is within +/- a tolerance to a target
+ * @param {*} number 
+ * @param {*} tol 
+ */
+MATTIE.util.numberWithinTolerance = function(number, tol, target){
+	return this.checkNumberInRange(number, target-tol, target+tol);
+}
+
+/**
+ * 
+ * @param {*} num the number to check
+ * @param {*} min the minimum inclusive
+ * @param {*} max the maximum inclusive
+ */
+MATTIE.util.checkNumberInRange = function(num, min, max){
+	return num >= min && num <= max;
+}
 
 /**
  *
@@ -200,7 +220,7 @@ MATTIE.util.getMapVariant = function (x = 0) {
 	];
 
 	return vars[$gameVariables.value(randVars[x])];
-};
+};  
 
 /**
  * linerly interpret between 2 numbers
