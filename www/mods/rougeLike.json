@@ -1,1 +1,9 @@
-{"name":"rougeLike","status":false,"parameters":{},"danger":true}
+{
+    "name": "rougeLike",
+    "status": false,
+    "parameters": {},
+    "danger": true,		
+    "dependencies": [
+        "_rougeLike/mapController"
+    ]			
+}

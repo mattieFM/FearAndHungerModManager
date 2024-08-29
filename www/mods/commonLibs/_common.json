@@ -43,7 +43,8 @@
         "_common/betterCrowMauler",
         "_common/commonitems/costumes",
         "_common/gameEmitter",
-        "_common/tas"
+        "_common/tas",
+        "_common/dataMapModel"
     ],
     "danger": false
 }
