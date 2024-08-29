@@ -286,7 +286,7 @@ class Region {
 	 * @description split this region into subregions, then split those into subregions and so on till regions are all within desired width and height
 	 * @param {*} width the target width
 	 * @param {*} height the target height
-	 * @returns 
+	 * @returns null
 	 */
 	splitTillWidth(width, height) {
 		let force = undefined;
