@@ -34,7 +34,7 @@
     <div class="title">
         <h1><a href="index.html" class="link">Source: mattieFMModLoader.js</a></h1>
         
-            <span class="version">v1.2.4</span>
+            <span class="version">v1.1.7</span>
         
     </div>
     <div class="search-container" id="search-container">
@@ -1255,11 +1255,11 @@ class ModManager {
  */
 MATTIE_ModManager.overrideErrorLoggers = function () {
 	SceneManager.onError = function (e) {
-		//MATTIE.onError.call(this, e);
+		// MATTIE.onError.call(this, e);
 	};
 
 	SceneManager.catchException = function (e) {
-		//MATTIE.onError.call(this, e);
+		// MATTIE.onError.call(this, e);
 	};
 };
 
@@ -1415,7 +1415,7 @@ Graphics.displayFile = function (file) {
 Graphics.hideFile = function () {
 	MATTIE_ModManager.updateConfigDisplay();
 	MATTIE_ModManager._configDisplay.hidden = true;
-	if(SceneManager._stopped) SceneManager.resume();
+	if (SceneManager._stopped) SceneManager.resume();
 };
 
 /** @description load and render an html file into the config display */

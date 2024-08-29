@@ -34,7 +34,7 @@
     <div class="title">
         <h1><a href="index.html" class="link">Source: commonLibs/_common/util.js</a></h1>
         
-            <span class="version">v1.2.4</span>
+            <span class="version">v1.1.7</span>
         
     </div>
     <div class="search-container" id="search-container">
@@ -63,7 +63,7 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>var MATTIE = MATTIE || {}
+            <pre class="prettyprint source linenums"><code>var MATTIE = MATTIE || {};
 /* eslint-disable no-trailing-spaces */
 MATTIE.util = MATTIE.util || {};
 
@@ -138,9 +138,9 @@ MATTIE.util.randSeededChance = function (chance) {
  * @param {*} number 
  * @param {*} tol 
  */
-MATTIE.util.numberWithinTolerance = function(number, tol, target){
-	return this.checkNumberInRange(number, target-tol, target+tol);
-}
+MATTIE.util.numberWithinTolerance = function (number, tol, target) {
+	return this.checkNumberInRange(number, target - tol, target + tol);
+};
 
 /**
  * 
@@ -148,9 +148,9 @@ MATTIE.util.numberWithinTolerance = function(number, tol, target){
  * @param {*} min the minimum inclusive
  * @param {*} max the maximum inclusive
  */
-MATTIE.util.checkNumberInRange = function(num, min, max){
+MATTIE.util.checkNumberInRange = function (num, min, max) {
 	return num >= min &amp;&amp; num &lt;= max;
-}
+};
 
 /**
  *
