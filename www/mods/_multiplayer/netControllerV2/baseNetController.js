@@ -1307,6 +1307,7 @@ class BaseNetController extends EventEmitter {
 			const _character = $gameMap.event(params[0] > 0 ? params[0] : cmd.eventId);
 			console.log('character');
 			console.log(_character);
+			if(cmd === MATTIE.static.rpg.commands.setMovementRoute)
 			if (_character) {
 				const moveRoute = params[1];
 				const tempCanPass = _character.canPass;

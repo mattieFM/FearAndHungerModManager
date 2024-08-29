@@ -5,17 +5,17 @@ MATTIE.multiplayer = MATTIE.multiplayer || {};
 MATTIE.multiplayer.enabledNetCommands = [
 	205, // set movement route
 	// 117, //common events. We will likely need to do more than just forward this. probs some filtering and stuff
-	601, // battle win //send
-	602, // battle escape //send?
-	603, // battle loss //interpret
-	313, // change state //interpret
-	331, // change enemy hp //send?
-	// set event location
-	333, // change enemy state //send?
-	334, // enemy recover all //send?
-	335, // enemy appear //send?
-	336, // enemy transform //send?
-	353, // game over //interpret
+	// 601, // battle win //send
+	// 602, // battle escape //send?
+	// 603, // battle loss //interpret
+	// 313, // change state //interpret
+	// 331, // change enemy hp //send?
+	// // set event location
+	// 333, // change enemy state //send?
+	// 334, // enemy recover all //send?
+	// 335, // enemy appear //send?
+	// 336, // enemy transform //send?
+	// 353, // game over //interpret
 	// 355, //scripts //interpret?
 	// 356, //plugin commands //interpret?
 
