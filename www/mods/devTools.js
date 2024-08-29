@@ -209,10 +209,10 @@ function toggleGodMode() {
 }
 
 /**
- * @description toggle on/off party health loss
+ * @description toggle on/off party hunger loss
  */
 function toggleHunger() {
-	toggleMemberProp('changeExp', 'hungerDisabled', (member) => member.expForLevel());
+	toggleMemberProp('changeExp', 'hungerDisabled', (member) => 99);
 }
 
 /**

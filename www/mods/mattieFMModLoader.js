@@ -1190,11 +1190,11 @@ class ModManager {
  */
 MATTIE_ModManager.overrideErrorLoggers = function () {
 	SceneManager.onError = function (e) {
-		MATTIE.onError.call(this, e);
+		//MATTIE.onError.call(this, e);
 	};
 
 	SceneManager.catchException = function (e) {
-		MATTIE.onError.call(this, e);
+		//MATTIE.onError.call(this, e);
 	};
 };
 
@@ -1350,7 +1350,7 @@ Graphics.displayFile = function (file) {
 Graphics.hideFile = function () {
 	MATTIE_ModManager.updateConfigDisplay();
 	MATTIE_ModManager._configDisplay.hidden = true;
-	SceneManager.resume();
+	if(SceneManager._stopped) SceneManager.resume();
 };
 
 /** @description load and render an html file into the config display */
