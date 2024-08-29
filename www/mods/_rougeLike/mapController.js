@@ -5,6 +5,9 @@
 
 MATTIE.util = MATTIE.util || {};
 
+const wallTile=1579;
+const floorTiles = [1587]
+const floorTile=()=>floorTiles[Math.floor(Math.random()*floorTiles.length)];
 const logging = false;
 const defaultCanvasId = 'viewport';
 
@@ -19,16 +22,12 @@ function getRandomColor() {
 }
 
 /** @description a class representing a x and y pair. */
-class Point {
-	/** @description the x cord */
-	x;
-
-	/** @description the y cord */
-	y;
-
-	/** @description init a new point with an x and a y cord. */
+class RougeLikePoint {
+	/** @description init a new RougeLikePoint with an x and a y cord. */
 	constructor(x, y) {
+		/** @description the x cord */
 		this.x = x;
+		/** @description the y cord */
 		this.y = y;
 	}
 }
@@ -38,23 +37,21 @@ class Point {
  */
 class Tile {
 	/**
-	 * @description the position of the tile
-	 * @type {Point}
-	 */
-	pos;
-
-	/** a variable for weather the tile is a wall or not */
-	isWall = true;
-
-	/**
 	 *
 	 * @param {number} x the x cord of this tile
 	 * @param {number} y the y cord of this tile
 	 * @param {boolean} isWall is this tile a wall?
 	 */
-	constructor(x, y, isWall = true) {
-		this.pos = new Point(x, y);
+	constructor(x, y, isWall = true, tileId = floorTile()) {
+		/**
+		 * @description the position of the tile
+		 * @type {RougeLikePoint}
+		 */
+		this.pos = new RougeLikePoint(x, y);
+		/** a variable for weather the tile is a wall or not */
 		this.isWall = isWall;
+		/** the variable for tile id */
+		this.tileId = tileId;
 	}
 }
 
@@ -63,42 +60,6 @@ class Tile {
  */
 class Region {
 	/**
-	 * the upper left corner of the region
-	 * @type {Point}
-	 * */
-	upperLeftCorner;
-
-	/**
-	 * the bottom left corner of the region
-	 * @type {Point}
-	 * */
-	bottomRightCorner;
-
-	/** @description a variable that marks if this is the highest layer of the region IE: a region with no parent */
-	isRoot = false;
-
-	/** @description a variable that marks if this is the lowest layer of the region IE: a region with no children */
-	isLeaf = true;
-
-	/**
-	 * @description any child regions that exist within this region
-	 * @type {Region[]}
-	 */
-	children = [];
-
-	/**
-	 * @description an array of cords that doors are at
-	 * @type {Point[]}
-	 */
-	doors = [];
-
-	/**
-	 * @description the parent region to this region
-	 * @type {Region}
-	 * */
-	parent = false;
-
-	/**
 	 * @description make a new region from 4 cords, top left corner then bottom right.
 	 * @param {number} topX x cord for top left corner
 	 * @param {number} topY y cord for top left corner
@@ -106,9 +67,44 @@ class Region {
 	 * @param {number} botY y cord for top right corner
 	 */
 	constructor(topX, topY, botX, botY, parent = null) {
+		/**
+		 * the upper left corner of the region
+		 * @type {RougeLikePoint}
+		 * */
+		this.upperLeftCorner;
+
+		/**
+		 * the bottom left corner of the region
+		 * @type {RougeLikePoint}
+		 * */
+		this.bottomRightCorner;
+
+		/** @description a variable that marks if this is the highest layer of the region IE: a region with no parent */
+		this.isRoot = false;
+
+		/** @description a variable that marks if this is the lowest layer of the region IE: a region with no children */
+		this.isLeaf = true;
+
+		/**
+		 * @description any child regions that exist within this region
+		 * @type {Region[]}
+		 */
+		this.children = [];
+
+		/**
+		 * @description an array of cords that doors are at
+		 * @type {RougeLikePoint[]}
+		 */
+		this.doors = [];
+
+		/**
+		 * @description the parent region to this region
+		 * @type {Region}
+		 * */
+		this.parent = false;
 		// assign values to class members
-		this.upperLeftCorner = new Point(topX, topY);
-		this.bottomRightCorner = new Point(botX, botY);
+		this.upperLeftCorner = new RougeLikePoint(topX, topY);
+		this.bottomRightCorner = new RougeLikePoint(botX, botY);
 		this.parent = parent;
 
 		// if this has no parent set as root
@@ -212,14 +208,14 @@ class Region {
 			if (logging) console.log(`maxY:${maxY}`);
 
 			const topBoxUpperLeftCorner = this.upperLeftCorner;
-			const topBoxLowerLeftCorner = new Point(this.bottomRightCorner.x, splitYLevel);
+			const topBoxLowerLeftCorner = new RougeLikePoint(this.bottomRightCorner.x, splitYLevel);
 			const topRegion = new Region(topBoxUpperLeftCorner.x, topBoxUpperLeftCorner.y, topBoxLowerLeftCorner.x, topBoxLowerLeftCorner.y, this);
 
-			const bottomBoxUpperLeftCorner = new Point(this.upperLeftCorner.x, splitYLevel);
+			const bottomBoxUpperLeftCorner = new RougeLikePoint(this.upperLeftCorner.x, splitYLevel);
 			const bottomBoxLowerLeftCorner = this.bottomRightCorner;
 			const bottomRegion = new Region(bottomBoxUpperLeftCorner.x, bottomBoxUpperLeftCorner.y, bottomBoxLowerLeftCorner.x, bottomBoxLowerLeftCorner.y, this);
 
-			const door = new Point(MATTIE.util.randBetween(minX + 2, maxX - 2), splitYLevel);
+			const door = new RougeLikePoint(MATTIE.util.randBetween(minX + 2, maxX - 2), splitYLevel);
 			topRegion.doors.push(door);
 			bottomRegion.doors.push(door);
 
@@ -247,14 +243,14 @@ class Region {
 			if (logging) console.log(`maxX:${maxX}`);
 
 			const leftBoxUpperLeftCorner = this.upperLeftCorner;
-			const leftBoxLowerLeftCorner = new Point(splitXLevel, this.bottomRightCorner.y);
+			const leftBoxLowerLeftCorner = new RougeLikePoint(splitXLevel, this.bottomRightCorner.y);
 			const leftRegion = new Region(leftBoxUpperLeftCorner.x, leftBoxUpperLeftCorner.y, leftBoxLowerLeftCorner.x, leftBoxLowerLeftCorner.y, this);
 
-			const rightBoxUpperLeftCorner = new Point(splitXLevel, this.upperLeftCorner.y);
+			const rightBoxUpperLeftCorner = new RougeLikePoint(splitXLevel, this.upperLeftCorner.y);
 			const rightBoxLowerLeftCorner = this.bottomRightCorner;
 			const rightRegion = new Region(rightBoxUpperLeftCorner.x, rightBoxUpperLeftCorner.y, rightBoxLowerLeftCorner.x, rightBoxLowerLeftCorner.y, this);
 
-			const door = new Point(splitXLevel, MATTIE.util.randBetween(minY + 2, maxY - 2));
+			const door = new RougeLikePoint(splitXLevel, MATTIE.util.randBetween(minY + 2, maxY - 2));
 			leftRegion.doors.push(door);
 			rightRegion.doors.push(door);
 
@@ -328,42 +324,11 @@ class Region {
  * @description an object representing the map data itself
  * 1: a map consists of multiple things, A a 2d array of tiles ie: the literal map data.
  * 2: the region data, ie: the subdivisions of the bulk space via the tree splitting algorithm
- * 3: points of interest
+ * 3: RougeLikePoints of interest
  * 4: an array of events on the map
  * */
-class Map {
-	/** @description the width of the map to be generated */
-	width = 50;
+class RougeLikeMap {
 
-	/** @description the width of the map to be generated */
-	height = 50;
-
-	/** @description x coordinate of the upper left corner */
-	upperLeftX = 0;
-
-	/** @description y coordinate of the upper left corner */
-	upperLeftY = 0;
-
-	/** @description the id of the map as it relates to mod saved data, not game data */
-	mapId;
-
-	/**
-	 * @description a 2d array of tile objects that represents the map
-	 * @type {Tile[][]}
-	 * */
-	mapTiles;
-
-	/**
-	 * @description an array of region objects representing the larger regions
-	 * @type {Tile[][]}
-	 * */
-	mapRegions;
-
-	/**
-	 * @description an array of room objects representing the lowest level of region, ie: a room. This is an array of all individual rooms
-	 * @type {Tile[][]}
-	 * */
-	mapRooms;
 
 	/**
 	 * @description insatiate a new object of the map controller
@@ -372,10 +337,142 @@ class Map {
 	 * @param {number} x (OPTIONAL) x coordinate of the upper left corner
 	 * @param {number} y (OPTIONAL) y coordinate of the upper left corner
 	 */
-	constructor(width, height, x = 0, y = 0) {
+	constructor(width = 100, height = 100, x = 0, y = 0) {
+		/** @description the width of the map to be generated */
+		this.width = 50;
+
+		/** @description the width of the map to be generated */
+		this.height = 50;
+
+		/** @description x coordinate of the upper left corner */
+		this.upperLeftX = 0;
+
+		/** @description y coordinate of the upper left corner */
+		this.upperLeftY = 0;
+
+		/** @description the id of the map as it relates to mod saved data, not game data */
+		this.mapId;
+
+		/**
+		 * @description a 1d array of tile objects that represents the map assume y increases by 1 every maxX x
+		 * @type {Tile[]}
+		 * */
+		this.mapTiles;
+
+		/**
+		 * @description the root of the region
+		 * @type {Region}
+		 * */
+		this.rootRegion;
+
+		/** 
+		 * @description an array of all regions 
+		 * @type {Region[]}
+		 * */
+		this.regions = [];
+
+		/**
+		 * @description an array of just leafs
+		 * @type {Region}
+		 */
+		this.rooms=[];
+
 		this.width = width;
 		this.height = height;
 		this.upperLeftX = x;
 		this.upperLeftY = y;
+		this.rootRegion = new Region(x,y,width,height);
+		this.rootRegion.splitXDeep(3);
+		this.updateRegions();
+		this.updateTiles();
 	}
+
+	/** traverse from root region updating the list of regions */
+	updateRegions(region = this.rootRegion) {
+		//if at root wipe regions
+		if (region.checkRoot()) {
+			this.regions = [];
+		};
+
+		this.regions.push(region);
+		region.children.forEach(child => {
+			this.regions.push(child);
+			this.updateRegions(child);
+		})
+	}
+
+	/**
+	 *  @description set a tile in the array based on x,y pair
+	 * @param {number} x x cord
+	 * @param {number} y y cord
+	 * @param {Tile} tile tile obj
+	 */
+	setTile(x, y, tile) {
+		try {
+			let realIndex = x + y * this.width;
+			this.mapTiles[realIndex] = null;
+			this.mapTiles[realIndex] = tile;
+		} catch (error) {
+			console.log(error)
+		}
+		
+	}
+
+	/** @description set the array to the correct length of empty tiles */
+	makeBlankTileSet() {
+		this.mapTiles=[];
+		for (let y = 0; y < this.height; y++) {
+			for (let x = 0; x < this.width; x++) {
+				this.mapTiles.push(new Tile(x, y))
+			}
+		}
+	}
+
+	/** @description rebuild mapTiles */
+	updateTiles() {
+		this.makeBlankTileSet();
+		this.regions.forEach(region => {
+			//draw top line
+			for (let x = region.upperLeftCorner.x; x < region.bottomRightCorner.x; x++) {
+				let y = region.upperLeftCorner.y;
+				this.setTile(x, y, new Tile(x, y, false, wallTile));
+			}
+
+			//draw bottom line
+			for (let x = region.upperLeftCorner.x; x < region.bottomRightCorner.x; x++) {
+				let y = region.bottomRightCorner.y;
+				this.setTile(x, y, new Tile(x, y, false, wallTile));
+			}
+
+			//draw left wall
+			for (let y = region.upperLeftCorner.y; y < region.bottomRightCorner.y; y++) {
+				let x = region.upperLeftCorner.x;
+				this.setTile(x, y, new Tile(x, y, false, wallTile));
+			}
+
+			//draw right wall
+			for (let y = region.upperLeftCorner.y; y < region.bottomRightCorner.y; y++) {
+				let x = region.bottomRightCorner.x;
+				this.setTile(x, y, new Tile(x, y, false, wallTile));
+			}
+		})
+
+		//draw doors
+		this.regions.forEach(region => {
+			if(region.doors && region.doors.length>0){
+				region.doors.forEach(door=>{
+					console.log(door);
+					this.setTile(door.x, door.y, new Tile(door.x, door.y, false, floorTile()));
+				})
+			}
+		});
+	}
+
+	/**
+	 * @description push the map data from this class to the data map
+	 */
+	pushToDataMap(){
+		$dataMap.data=this.mapTiles.map(tile=>tile.tileId);
+	}
+
 }
