@@ -1307,43 +1307,44 @@ class BaseNetController extends EventEmitter {
 			const _character = $gameMap.event(params[0] > 0 ? params[0] : cmd.eventId);
 			console.log('character');
 			console.log(_character);
-			if(cmd === MATTIE.static.rpg.commands.setMovementRoute)
-			if (_character) {
-				const moveRoute = params[1];
-				const tempCanPass = _character.canPass;
-				_character.canPass = () => true;
-				_character._moveRouteForcing = true;
-				_character.setTransparent(false);
-				_character._moveRoute = _character._moveRoute || {
-					list: [
-						{
-							code: 0,
-							parameters: [],
-						},
-					],
-					repeat: true,
-					skippable: false,
-					wait: false,
-				};
+			if (cmd === MATTIE.static.rpg.commands.setMovementRoute) {
+				if (_character) {
+					const moveRoute = params[1];
+					const tempCanPass = _character.canPass;
+					_character.canPass = () => true;
+					_character._moveRouteForcing = true;
+					_character.setTransparent(false);
+					_character._moveRoute = _character._moveRoute || {
+						list: [
+							{
+								code: 0,
+								parameters: [],
+							},
+						],
+						repeat: true,
+						skippable: false,
+						wait: false,
+					};
 
-				const found = false;
-				// whether the move is a duplicate
-				const validMove = _character.getValidMove(moveRoute);
+					const found = false;
+					// whether the move is a duplicate
+					const validMove = _character.getValidMove(moveRoute);
 
-				// if (last20Steps[0].code === list[list.length - 1].code) {
-				// 	console.log('valid by never finding start');
-				// 	validMove = true;
-				// }
+					// if (last20Steps[0].code === list[list.length - 1].code) {
+					// 	console.log('valid by never finding start');
+					// 	validMove = true;
+					// }
 
-				console.log(`validmove${validMove}`);
+					console.log(`validmove${validMove}`);
 
-				if (validMove) {
-					moveRoute.list.forEach((command) => {
-						console.log(`moving with cmd;${command.code}`);
-						_character.processMoveCommand(command, true);
-					});
-					_character.canPass = tempCanPass;
-					_character._moveRouteForcing = false;
+					if (validMove) {
+						moveRoute.list.forEach((command) => {
+							console.log(`moving with cmd;${command.code}`);
+							_character.processMoveCommand(command, true);
+						});
+						_character.canPass = tempCanPass;
+						_character._moveRouteForcing = false;
+					}
 				}
 			}
 		} catch (error) {
