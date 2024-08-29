@@ -1,4 +1,4 @@
-var MATTIE = MATTIE || {}
+var MATTIE = MATTIE || {};
 /* eslint-disable no-trailing-spaces */
 MATTIE.util = MATTIE.util || {};
 
@@ -73,9 +73,9 @@ MATTIE.util.randSeededChance = function (chance) {
  * @param {*} number 
  * @param {*} tol 
  */
-MATTIE.util.numberWithinTolerance = function(number, tol, target){
-	return this.checkNumberInRange(number, target-tol, target+tol);
-}
+MATTIE.util.numberWithinTolerance = function (number, tol, target) {
+	return this.checkNumberInRange(number, target - tol, target + tol);
+};
 
 /**
  * 
@@ -83,9 +83,9 @@ MATTIE.util.numberWithinTolerance = function(number, tol, target){
  * @param {*} min the minimum inclusive
  * @param {*} max the maximum inclusive
  */
-MATTIE.util.checkNumberInRange = function(num, min, max){
+MATTIE.util.checkNumberInRange = function (num, min, max) {
 	return num >= min && num <= max;
-}
+};
 
 /**
  *

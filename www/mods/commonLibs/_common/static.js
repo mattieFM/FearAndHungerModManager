@@ -160,10 +160,10 @@ MATTIE.static.skills.enGarde = null;
 // RPGMaker Constants
 MATTIE.static.rpg.battleProcessingId = 301;
 
-/** @description a dict of command ids*/
+/** @description a dict of command ids */
 MATTIE.static.rpg.commands = {
-	setMovementRoute:205
-}
+	setMovementRoute: 205,
+};
 
 // Variableids
 /** @description a list of sync variables for multiplayer */
