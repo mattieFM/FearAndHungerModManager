@@ -11,9 +11,9 @@
 <script src="../commonLibs/_common/util.js"></script>
 <script src="mapController.js"></script>
 <script>
-    let width = 100;
-    let height = 100;
-    let targetWidth = 10;
+    let width = 50;
+    let height = 50;
+    let targetWidth = 25;
     function resetMap(){
         const canvas = document.getElementById("viewport");
         const context = canvas.getContext('2d');
@@ -21,11 +21,13 @@
     }
     function drawMap(){
         const map=new Region(0,0,width,height);
-        map.splitXDeep(5);
+        map.splitTillWidth(targetWidth,targetWidth);
         map.drawAllChildrenOnCanvas();
         map.drawAllDoors();
         console.log(map);
     }
+
+    
 </script>
 </body>
 </html>
