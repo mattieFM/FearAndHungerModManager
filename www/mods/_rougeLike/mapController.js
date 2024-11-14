@@ -5,19 +5,19 @@
 
 MATTIE.util = MATTIE.util || {};
 
-//the chance on each wall tile that the rest of the wall will not generate
-const chanceForWallToCollapse = .05;
+// the chance on each wall tile that the rest of the wall will not generate
+const chanceForWallToCollapse = 0.05;
 /** the min and max amount of wall that can collapse */
-const [minCollapse,maxCollapse] = [2, 5];
-const wallTile=1579;
-const floorTiles = [1587]
-const collapseTiles = [1661,1662,1663]
-const floorTile=()=>floorTiles[Math.floor(Math.random()*floorTiles.length)];
-const collapseTile=()=>collapseTiles[Math.floor(Math.random()*collapseTiles.length)];
+const [minCollapse, maxCollapse] = [2, 5];
+const wallTile = 1579;
+const floorTiles = [1587];
+const collapseTiles = [1661, 1662, 1663];
+const floorTile = () => floorTiles[Math.floor(Math.random() * floorTiles.length)];
+const collapseTile = () => collapseTiles[Math.floor(Math.random() * collapseTiles.length)];
 const logging = false;
 const defaultCanvasId = 'viewport';
 /** the max depth to go to for width/height based splitting */
-const maxDepthForWidthSplit = 10
+const maxDepthForWidthSplit = 10;
 
 /** @todo remove this when done testing */
 function getRandomColor() {
@@ -63,7 +63,6 @@ class Tile {
 	}
 }
 
-
 /**
  * @description a class representing a region of space on the map.
  */
@@ -81,29 +80,29 @@ class Region {
 		 * @type {{Region[]}}
 		 */
 		this.connectsTo = {
-			left:[],
-			right:[],
-			up:[],
-			down:[],
+			left: [],
+			right: [],
+			up: [],
+			down: [],
 		};
 
 		/**
 		 * the upper left corner of the region
 		 * @type {RougeLikePoint}
 		 * */
-		this.upperLeftCorner;
+		this.upperLeftCorner = undefined;
 
 		/**
 		 * the bottom left corner of the region
 		 * @type {RougeLikePoint}
 		 * */
-		this.bottomRightCorner;
+		this.bottomRightCorner = undefined;
 
-		/** 
+		/**
 		 * @description an array containing all other points that are not in the main rectangle
 		 * @type {RougeLikePoint[]}
 		 */
-		this.otherPoints=[];
+		this.otherPoints = [];
 
 		/** @description a variable that marks if this is the highest layer of the region IE: a region with no parent */
 		this.isRoot = false;
@@ -138,35 +137,34 @@ class Region {
 	}
 
 	/**
-	 * 
-	 * @param {Region[]} arr 
-	 * @param {*} canvasId 
+	 *
+	 * @param {Region[]} arr
+	 * @param {*} canvasId
 	 */
-	static DrawArrayOntoCanvas(arr, canvasId = defaultCanvasId){
-		arr.forEach(region=>{
-			region.drawAllChildrenOnCanvas()
-		})
-		arr.forEach(region=>{
-			region.drawAllDoors()
-		})
+	static DrawArrayOntoCanvas(arr, canvasId = defaultCanvasId) {
+		arr.forEach((region) => {
+			region.drawAllChildrenOnCanvas();
+		});
+		arr.forEach((region) => {
+			region.drawAllDoors();
+		});
 	}
 
-	/** 
+	/**
 	 * @description return an array of all leafs in this region's children
 	 * @returns {Region[]}
 	 *  */
-	getAllLeafs(){
+	getAllLeafs() {
 		if (!this.checkLeaf()) {
-			let arr = []
+			let arr = [];
 			this.children.forEach((child) => {
-				arr = [...child.getAllLeafs(), ...arr]
+				arr = [...child.getAllLeafs(), ...arr];
 			});
 			return arr;
-		} else {
-			return [this]
 		}
+		return [this];
 	}
-	
+
 	/** @description draw all children onto the canvas */
 	drawAllChildrenOnCanvas(canvasId = defaultCanvasId) {
 		this.drawOnCanvas(canvasId);
@@ -268,7 +266,7 @@ class Region {
 			const bottomBoxLowerLeftCorner = this.bottomRightCorner;
 			const bottomRegion = new Region(bottomBoxUpperLeftCorner.x, bottomBoxUpperLeftCorner.y, bottomBoxLowerLeftCorner.x, bottomBoxLowerLeftCorner.y, this);
 
-			//add to eachother's connection array
+			// add to eachother's connection array
 			bottomRegion.connectsTo.up.push(topRegion);
 			topRegion.connectsTo.down.push(bottomRegion);
 
@@ -307,7 +305,7 @@ class Region {
 			const rightBoxLowerLeftCorner = this.bottomRightCorner;
 			const rightRegion = new Region(rightBoxUpperLeftCorner.x, rightBoxUpperLeftCorner.y, rightBoxLowerLeftCorner.x, rightBoxLowerLeftCorner.y, this);
 
-			//add to eachother's connection array
+			// add to eachother's connection array
 			rightRegion.connectsTo.left.push(leftRegion);
 			leftRegion.connectsTo.right.push(rightRegion);
 
@@ -341,25 +339,24 @@ class Region {
 	 * @param {*} height the target height
 	 * @returns null
 	 */
-	splitTillWidth(width, height, currentDepth=0) {
+	splitTillWidth(width, height, currentDepth = 0) {
 		let force;
 		const inWidth = MATTIE.util.checkNumberInRange(this.getWidth(), 0, width);
 		const inHeight = MATTIE.util.checkNumberInRange(this.getHeight(), 0, height);
-		if(logging)console.log(`width:${this.getWidth()}`)
-		if(logging)console.log(`Height:${this.getHeight()}`)
-		//if close to width goal force split
-		if (!inWidth && inHeight && (MATTIE.util.checkNumberInRange(this.getWidth(), 0, width*1.2)||currentDepth>3)) force = 0;
-		//if close to height goal force split
-		if (inWidth && !inHeight && (MATTIE.util.checkNumberInRange(this.getHeight(), 0, height*1.2)||currentDepth>2)) force = 1;
-		if(inWidth && inHeight) return;
-		if(currentDepth >= maxDepthForWidthSplit) return;
-	
-		
-		this.split(10,20,force);
+		if (logging)console.log(`width:${this.getWidth()}`);
+		if (logging)console.log(`Height:${this.getHeight()}`);
+		// if close to width goal force split
+		if (!inWidth && inHeight && (MATTIE.util.checkNumberInRange(this.getWidth(), 0, width * 1.2) || currentDepth > 3)) force = 0;
+		// if close to height goal force split
+		if (inWidth && !inHeight && (MATTIE.util.checkNumberInRange(this.getHeight(), 0, height * 1.2) || currentDepth > 2)) force = 1;
+		if (inWidth && inHeight) return;
+		if (currentDepth >= maxDepthForWidthSplit) return;
+
+		this.split(10, 20, force);
 		if (!this.checkLeaf()) {
 			this.children.forEach((child) => {
 				// decrement by one and recurse
-				child.splitTillWidth(width, height, currentDepth+1);
+				child.splitTillWidth(width, height, currentDepth + 1);
 			});
 		}
 	}
@@ -392,19 +389,19 @@ class Region {
 
 	/**
 	 * @description check if a point is within the bounds of the region
-	 * @param {*} x 
-	 * @param {*} y 
+	 * @param {*} x
+	 * @param {*} y
 	 */
-	isWithinBounds(x,y){
-		let inBounds = false;
-		//check if point in set of other points
-		if(this.otherPoints.some(point=>point.x==x&&point.y==y)) return true;
-		
-		//check if x and y are in bounds
-		if(this.bottomRightCorner.x < x && this.upperLeftCorner.y < y) return false;
-		if(this.bottomRightCorner.y > y && this.upperLeftCorner.x > x) return false;
+	isWithinBounds(x, y) {
+		const inBounds = false;
+		// check if point in set of other points
+		if (this.otherPoints.some((point) => point.x == x && point.y == y)) return true;
 
-		//thus in bounds
+		// check if x and y are in bounds
+		if (this.bottomRightCorner.x < x && this.upperLeftCorner.y < y) return false;
+		if (this.bottomRightCorner.y > y && this.upperLeftCorner.x > x) return false;
+
+		// thus in bounds
 		return true;
 	}
 }
@@ -417,8 +414,6 @@ class Region {
  * 4: an array of events on the map
  * */
 class RougeLikeMap {
-
-
 	/**
 	 * @description insatiate a new object of the map controller
 	 * @param {number} width INTEGER the width of the map to be generated
@@ -440,22 +435,22 @@ class RougeLikeMap {
 		this.upperLeftY = 0;
 
 		/** @description the id of the map as it relates to mod saved data, not game data */
-		this.mapId;
+		this.mapId = undefined;
 
 		/**
 		 * @description a 1d array of tile objects that represents the map assume y increases by 1 every maxX x
 		 * @type {Tile[]}
 		 * */
-		this.mapTiles;
+		this.mapTiles = undefined;
 
 		/**
 		 * @description the root of the region
 		 * @type {Region}
 		 * */
-		this.rootRegion;
+		this.rootRegion = undefined;
 
-		/** 
-		 * @description an array of all regions 
+		/**
+		 * @description an array of all regions
 		 * @type {Region[]}
 		 * */
 		this.regions = [];
@@ -464,33 +459,33 @@ class RougeLikeMap {
 		 * @description an array of just leafs
 		 * @type {Region}
 		 */
-		this.rooms=[];
+		this.rooms = [];
 
-		let targetWidth = 13;
+		const targetWidth = 13;
 		this.width = width;
 		this.height = height;
 		this.upperLeftX = x;
 		this.upperLeftY = y;
-		this.rootRegion = new Region(x,y,width,height);
-		this.rootRegion.splitTillWidth(targetWidth,targetWidth);
+		this.rootRegion = new Region(x, y, width, height);
+		this.rootRegion.splitTillWidth(targetWidth, targetWidth);
 		this.updateRegions();
 		this.updateTiles();
 	}
 
 	/** traverse from root region updating the list of regions */
 	updateRegions(region = this.rootRegion) {
-		//if at root wipe regions
+		// if at root wipe regions
 		if (region.checkRoot()) {
 			this.regions = [];
-		};
+		}
 
 		this.regions.push(region);
-		if(region.checkLeaf()){this.rooms.push(region)};
-		region.children.forEach(child => {
-			if(child.checkLeaf()){this.rooms.push(child)};
+		if (region.checkLeaf()) { this.rooms.push(region); }
+		region.children.forEach((child) => {
+			if (child.checkLeaf()) { this.rooms.push(child); }
 			this.regions.push(child);
 			this.updateRegions(child);
-		})
+		});
 	}
 
 	/**
@@ -501,21 +496,20 @@ class RougeLikeMap {
 	 */
 	setTile(x, y, tile) {
 		try {
-			let realIndex = x + y * this.width;
+			const realIndex = x + y * this.width;
 			this.mapTiles[realIndex] = null;
 			this.mapTiles[realIndex] = tile;
 		} catch (error) {
-			console.log(error)
+			console.log(error);
 		}
-		
 	}
 
 	/** @description set the array to the correct length of empty tiles */
 	makeBlankTileSet() {
-		this.mapTiles=[];
+		this.mapTiles = [];
 		for (let y = 0; y < this.height; y++) {
 			for (let x = 0; x < this.width; x++) {
-				this.mapTiles.push(new Tile(x, y))
+				this.mapTiles.push(new Tile(x, y));
 			}
 		}
 	}
@@ -523,40 +517,40 @@ class RougeLikeMap {
 	/** @description rebuild mapTiles */
 	updateTiles() {
 		this.makeBlankTileSet();
-		let rooms = [...this.rooms,this.rootRegion]
-		rooms.forEach(region => {
-			//draw top line
+		const rooms = [...this.rooms, this.rootRegion];
+		rooms.forEach((region) => {
+			// draw top line
 			for (let x = region.upperLeftCorner.x; x < region.bottomRightCorner.x; x++) {
-				let y = region.upperLeftCorner.y;
+				const y = region.upperLeftCorner.y;
 				this.setTile(x, y, new Tile(x, y, false, wallTile));
 			}
 
-			//draw bottom line
+			// draw bottom line
 			for (let x = region.upperLeftCorner.x; x < region.bottomRightCorner.x; x++) {
-				let y = region.bottomRightCorner.y;
+				const y = region.bottomRightCorner.y;
 				this.setTile(x, y, new Tile(x, y, false, wallTile));
 			}
 
-			//draw left wall
+			// draw left wall
 			for (let y = region.upperLeftCorner.y; y < region.bottomRightCorner.y; y++) {
-				let x = region.upperLeftCorner.x;
+				const x = region.upperLeftCorner.x;
 				this.setTile(x, y, new Tile(x, y, false, wallTile));
 			}
 
-			//draw right wall
+			// draw right wall
 			for (let y = region.upperLeftCorner.y; y < region.bottomRightCorner.y; y++) {
-				let x = region.bottomRightCorner.x;
+				const x = region.bottomRightCorner.x;
 				this.setTile(x, y, new Tile(x, y, false, wallTile));
 			}
-		})
+		});
 
-		//draw doors
-		this.regions.forEach(region => {
-			if(region.doors && region.doors.length>0){
-				region.doors.forEach(door=>{
+		// draw doors
+		this.regions.forEach((region) => {
+			if (region.doors && region.doors.length > 0) {
+				region.doors.forEach((door) => {
 					console.log(door);
 					this.setTile(door.x, door.y, new Tile(door.x, door.y, false, floorTile()));
-				})
+				});
 			}
 		});
 	}
@@ -564,10 +558,9 @@ class RougeLikeMap {
 	/**
 	 * @description push the map data from this class to the data map
 	 */
-	pushToDataMap(){
-		$dataMap.data=this.mapTiles.map(tile=>tile.tileId);
+	pushToDataMap() {
+		$dataMap.data = this.mapTiles.map((tile) => tile.tileId);
 	}
-
 }
 
 /**
@@ -581,30 +574,30 @@ class DungeonMap {
 	 * @param {number} bottomX bottom right bound
 	 * @param {number} bottomY bottom bound
 	 */
-	constructor(topX, topY, bottomX, bottomY){
-		/** 
+	constructor(topX, topY, bottomX, bottomY) {
+		/**
 		 * @description all the rooms of the dungeon
 		 * @type {Region[]}
 		 */
 		this.rooms = [];
 
-		/** 
+		/**
 		 * @description halls
 		 * @type {Region[]}
 		 */
 		this.halls = [];
 
-		/** @description the min size of a room (width or height)*/
-		this.roomSizeMin=10;
+		/** @description the min size of a room (width or height) */
+		this.roomSizeMin = 10;
 
-		/** @description the max size of a room (width or height)*/
-		this.roomSizeMax=20;
+		/** @description the max size of a room (width or height) */
+		this.roomSizeMax = 20;
 
 		/** @description the minimum rooms in the dungeon */
-		this.minRoomsInDungeon=5;
+		this.minRoomsInDungeon = 5;
 
 		/** @description the maximum rooms in the dungeon */
-		this.maxRoomsInDungeon=15;
+		this.maxRoomsInDungeon = 15;
 
 		/** @description the min padding between rooms */
 		this.minPaddingBetweenRooms = 3;
@@ -612,85 +605,82 @@ class DungeonMap {
 		this.maxPaddingBetweenRooms = 8;
 
 		/** @description the region denoting the bounds of the map */
-		this.mapBounds = new Region(topX,topY,bottomX,bottomY);
+		this.mapBounds = new Region(topX, topY, bottomX, bottomY);
 
-		//the min and max percentages of a region to use as a room
-		this.minPercentageUsed = .4;
+		// the min and max percentages of a region to use as a room
+		this.minPercentageUsed = 0.4;
 		this.maxPercentageUsed = 1;
 	}
-	
+
 	/** @description generate random rooms */
-	_generateRandomRooms(){
-		const numberOfRoomsToSpawn = MATTIE.util.randBetween(this.minRoomsInDungeon,this.maxRoomsInDungeon);
+	_generateRandomRooms() {
+		const numberOfRoomsToSpawn = MATTIE.util.randBetween(this.minRoomsInDungeon, this.maxRoomsInDungeon);
 		for (let index = 0; index < numberOfRoomsToSpawn; index++) {
 			let room;
 
-			let i =0;
+			let i = 0;
 			do {
-			let xMin = this.mapBounds.upperLeftCorner.x
-			let yMin = this.mapBounds.upperLeftCorner.y
-			let xMax = this.mapBounds.bottomRightCorner.x
-			let yMax = this.mapBounds.bottomRightCorner.y
-			
-			let point1 = new RougeLikePoint(
-				MATTIE.util.lerp(xMin,xMax,MATTIE.util.randBetween(0,1)),
-				MATTIE.util.lerp(yMin,yMax,MATTIE.util.randBetween(0,1))
-			)
+				const xMin = this.mapBounds.upperLeftCorner.x;
+				const yMin = this.mapBounds.upperLeftCorner.y;
+				const xMax = this.mapBounds.bottomRightCorner.x;
+				const yMax = this.mapBounds.bottomRightCorner.y;
 
-			let point2 = new RougeLikePoint(
-				MATTIE.util.lerp(xMin,xMax,MATTIE.util.randBetween(0,1)),
-				MATTIE.util.lerp(yMin,yMax,MATTIE.util.randBetween(0,1))
-			)
-			room = new Region(point1.x,point1.y,point2.x,point2.y);
-			i++;
-			} while (!this.rooms.some(other=>other.isWithinBounds(room)) && i < 4)
+				const point1 = new RougeLikePoint(
+					MATTIE.util.lerp(xMin, xMax, MATTIE.util.randBetween(0, 1)),
+					MATTIE.util.lerp(yMin, yMax, MATTIE.util.randBetween(0, 1)),
+				);
+
+				const point2 = new RougeLikePoint(
+					MATTIE.util.lerp(xMin, xMax, MATTIE.util.randBetween(0, 1)),
+					MATTIE.util.lerp(yMin, yMax, MATTIE.util.randBetween(0, 1)),
+				);
+				room = new Region(point1.x, point1.y, point2.x, point2.y);
+				i++;
+			} while (!this.rooms.some((other) => other.isWithinBounds(room)) && i < 4);
 			this.rooms.push(room);
 		}
 	}
 
 	/** @description generate random rooms */
-	generateRandomRooms(){
-		const numberOfRoomsToSpawn = MATTIE.util.randBetween(this.minRoomsInDungeon,this.maxRoomsInDungeon);
+	generateRandomRooms() {
+		const numberOfRoomsToSpawn = MATTIE.util.randBetween(this.minRoomsInDungeon, this.maxRoomsInDungeon);
 
-		//split our space if its not split up already
-		if(this.mapBounds.children.length==0)
-		this.mapBounds.splitTillWidth(11,11)
+		// split our space if its not split up already
+		if (this.mapBounds.children.length == 0) this.mapBounds.splitTillWidth(11, 11);
 
-		//extract all leaves and then randomly choose some
-		let arrOfRoomBounds = this.mapBounds.getAllLeafs();
+		// extract all leaves and then randomly choose some
+		const arrOfRoomBounds = this.mapBounds.getAllLeafs();
 
-		let arrayOfChosenBounds = [];
-		
-		//loop for each room to spawn
+		const arrayOfChosenBounds = [];
+
+		// loop for each room to spawn
 		for (let index = 0; index < numberOfRoomsToSpawn; index++) {
-			let room;
-
-			//choose a region that has not been used yet
-			let chosenRegion = arrOfRoomBounds[MATTIE.util.randBetween(0,arrOfRoomBounds.length)];
-			while(arrayOfChosenBounds.indexOf(chosenRegion) != -1){
-				chosenRegion = arrOfRoomBounds[MATTIE.util.randBetween(0,arrOfRoomBounds.length)];
+			// choose a region that has not been used yet
+			let chosenRegion = arrOfRoomBounds[MATTIE.util.randBetween(0, arrOfRoomBounds.length)];
+			while (arrayOfChosenBounds.indexOf(chosenRegion) != -1) {
+				chosenRegion = arrOfRoomBounds[MATTIE.util.randBetween(0, arrOfRoomBounds.length)];
 			}
 			arrayOfChosenBounds.push(chosenRegion);
 
-			let xMin = chosenRegion.upperLeftCorner.x
-			let yMin = chosenRegion.upperLeftCorner.y
-			let xMax = chosenRegion.bottomRightCorner.x
-			let yMax = chosenRegion.bottomRightCorner.y
+			const xMin = chosenRegion.upperLeftCorner.x;
+			const yMin = chosenRegion.upperLeftCorner.y;
+			const xMax = chosenRegion.bottomRightCorner.x;
+			const yMax = chosenRegion.bottomRightCorner.y;
 
-			const alpha = MATTIE.util.randBetween(0,this.minPercentageUsed);
-			let topleftPoint = new RougeLikePoint(
-				MATTIE.util.lerp(xMin,xMax,alpha),
-				MATTIE.util.lerp(yMin,yMax,alpha)
-			)
+			const alpha = MATTIE.util.randBetween(0, this.minPercentageUsed);
+			const topleftPoint = new RougeLikePoint(
+				MATTIE.util.lerp(xMin, xMax, alpha),
+				MATTIE.util.lerp(yMin, yMax, alpha),
+			);
 
-			const alpha2 = MATTIE.util.randBetween(0,this.minPercentageUsed-alpha);
-			let bottomRightPoint = new RougeLikePoint(
-				MATTIE.util.lerp(xMax,xMin,alpha2),
-				MATTIE.util.lerp(yMax,yMin,alpha2)
-			)
+			const alpha2 = MATTIE.util.randBetween(0, this.minPercentageUsed - alpha);
+			const bottomRightPoint = new RougeLikePoint(
+				MATTIE.util.lerp(xMax, xMin, alpha2),
+				MATTIE.util.lerp(yMax, yMin, alpha2),
+			);
 
-			room = new Region(topleftPoint.x,topleftPoint.y, bottomRightPoint.x,bottomRightPoint.y);
-			this.rooms.push(room)
+			const room = new Region(topleftPoint.x, topleftPoint.y, bottomRightPoint.x, bottomRightPoint.y);
+			this.rooms.push(room);
 		}
 	}
 }

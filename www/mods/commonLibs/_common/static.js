@@ -403,7 +403,7 @@ MATTIE.static.update = function () {
 
 	// eslint-disable-next-line no-constant-condition
 	if (MATTIE.global.isFunger()) { // for now just use funger 1 vars regardless
-		alert("the mod loader thinks you are running fear and hunger 1. if this is not correct things might go wrong.")
+		alert('the mod loader thinks you are running fear and hunger 1. if this is not correct things might go wrong.');
 		// static values specific to funger 1
 
 		MATTIE.static.commonEvents.lootTables = [];
@@ -1346,246 +1346,224 @@ MATTIE.static.update = function () {
 		MATTIE.static.events.images.shiny = () => MapEvent.generateImage(0, '!Flame', 6, 0, 0); // the shiny coin incon
 		MATTIE.static.events.images.coin = MATTIE.static.events.images.shiny;
 	} else if (MATTIE.global.isTermina()) {
-		alert("The mod loader thinks you are running fear and hunger 2 --Termina. If this is not correct things might go wrong.")
+		alert('The mod loader thinks you are running fear and hunger 2 --Termina. If this is not correct things might go wrong.');
 		console.log('termina');
 		// static values specific to funger 2
 		// switches
-		
+
 		MATTIE.static.switch.ignoredSwitches = [
-			//--limbs
-			"2069-2078", //journalist arms
-			//sawing off
-			"1327-1330",
-			"1333-1334",
-			"1335-1398",
+			// --limbs
+			'2069-2078', // journalist arms
+			// sawing off
+			'1327-1330',
+			'1333-1334',
+			'1335-1398',
 
-			//char mentioned
-			"1486-1498",
-			"1521-1529",
+			// char mentioned
+			'1486-1498',
+			'1521-1529',
 
-			//--Area--
-			"1601-1613", //area_names
-			"4317-4320",
+			// --Area--
+			'1601-1613', // area_names
+			'4317-4320',
 
-			//--menus
-			"2401-2414", //NAMES_SELECT
-			2420, //hexxen_gfk
-			"2843-2858", //intros
-			3400, //filter effects
-			3397, //message?
-			"3679-3680", //global meta
+			// --menus
+			'2401-2414', // NAMES_SELECT
+			2420, // hexxen_gfk
+			'2843-2858', // intros
+			3400, // filter effects
+			3397, // message?
+			'3679-3680', // global meta
 
+			203, // climbing
+			410, // cannot use bow
+			'2-15', // menus and lights
+			'45-51', // janitor sawing cut scene
+			'96-97', // janitor cut scene
+			'181-194', // lights
+			'195-196', // elevator
+			'201-202', // suicide
+			'210-211', // lights
+			'212-217', // misc
+			229, // love corner merc
+			241, // coming up ladder
+			260, // suicide skill learned
+			'287-294', // sawing
+			'295-297', // intro stuff
+			'299-301', // misc
+			340, // necromancy no mp
+			371, // fear
+			'373-379', // blood golam stuff
+			380, // fusion
+			410, // cannot use bow
+			411, // intro
 
+			// ronteal?
+			'414-418',
 
-
-
-
-
-			203, //climbing
-			410, //cannot use bow
-			"2-15", //menus and lights
-			"45-51", //janitor sawing cut scene 
-			"96-97", //janitor cut scene
-			"181-194", //lights
-			"195-196", //elevator
-			"201-202", //suicide 
-			"210-211", //lights
-			"212-217", //misc 
-			229, //love corner merc
-			241, //coming up ladder
-			260, //suicide skill learned
-			"287-294", //sawing
-			"295-297", //intro stuff
-			"299-301", //misc
-			340, //necromancy no mp
-			371, //fear
-			"373-379", //blood golam stuff
-			380, //fusion
-			410, //cannot use bow
-			411, //intro
-
-			//ronteal?
-			"414-418",
-
-			//withdrawl
+			// withdrawl
 			420,
-			"876-878", //heroin
-			"3186-3187", //doctor and mechanic heroin
+			'876-878', // heroin
+			'3186-3187', // doctor and mechanic heroin
 
-			//blocking cutscenes
-			437, //pigs eating
-			447, //pig scene 2
-			462, //pig eating 2
-			463, //sleeping
+			// blocking cutscenes
+			437, // pigs eating
+			447, // pig scene 2
+			462, // pig eating 2
+			463, // sleeping
 			540,
-			"743-749",
-			"839-840", //talking
-			"952-953",
+			'743-749',
+			'839-840', // talking
+			'952-953',
 			972, // first time in dark
-			980, //marina orphanage scene
-			997, //resting
-			"1298-1300",
-			"1595-1596", //dark preist scenes
-			"1597-1598", //run away
-			1599, //flute1
-			"2319-2326", //ladders
-			"4010-4013", //misc arrive, travel, ladders
-			"2346-2351", //mechanisms
+			980, // marina orphanage scene
+			997, // resting
+			'1298-1300',
+			'1595-1596', // dark preist scenes
+			'1597-1598', // run away
+			1599, // flute1
+			'2319-2326', // ladders
+			'4010-4013', // misc arrive, travel, ladders
+			'2346-2351', // mechanisms
 			4056,
 			4061,
-			"4062-4064",
+			'4062-4064',
 			4078,
 			4139,
 			4140,
-			4180, //engarde
-			4187, //tounge out
-			"4251-4260",
+			4180, // engarde
+			4187, // tounge out
+			'4251-4260',
 
-
-			//non blocking but might be bad
-			"1748-1752", //bar tender drinks
-			"2716-2723", //tanaka scenes
-			2723, //pav scene
-			"2725-2729", //pav
+			// non blocking but might be bad
+			'1748-1752', // bar tender drinks
+			'2716-2723', // tanaka scenes
+			2723, // pav scene
+			'2725-2729', // pav
 			2740,
 			2739,
-			"2741-2743",
-			"2861-2863", //sleep
-			2878, //coming back from hexen
-			"2888-2890", //falling
-			2891, //olivia talk
-			2894, //no more talking
-			2900, //got no offering
-			"3031-3048", //eating
-			"3097-3099", //needles scene
-			3131, //anallyze!
-			3135, //tower view scene
-			"3381-3392", //umbrella decenbt
-			"3226-3235", //mechanic scenes
-			"3542-3550",
-			"3881-3886", //bellend jump
-			4000, //partner
-			"4625-4644", //umbrella
-			//"4821-4849",
+			'2741-2743',
+			'2861-2863', // sleep
+			2878, // coming back from hexen
+			'2888-2890', // falling
+			2891, // olivia talk
+			2894, // no more talking
+			2900, // got no offering
+			'3031-3048', // eating
+			'3097-3099', // needles scene
+			3131, // anallyze!
+			3135, // tower view scene
+			'3381-3392', // umbrella decenbt
+			'3226-3235', // mechanic scenes
+			'3542-3550',
+			'3881-3886', // bellend jump
+			4000, // partner
+			'4625-4644', // umbrella
+			// "4821-4849",
 
+			/// -in party
+			'4761-4768', // in party
 
-			///-in party
-			"4761-4768", // in party
-
-
-			//--skills--
-			729,//lockpicking
-			"731-733", //skills avalible
-			766, //devour
-			801, //demon seed learned
-			802, //greater blood magic
-			803, //blood sacrivice
-			864, //greater necromancy ok?
-			871, //counter magic
-			1025, //leg sweep
-			1045, //backstab
-			"1041-1044", //backstab misc
-			1061, //new god rising
-			1167, //learned portal
-			"1185-1211", // a lot of skills
-			"1223-1241",
+			// --skills--
+			729, // lockpicking
+			'731-733', // skills avalible
+			766, // devour
+			801, // demon seed learned
+			802, // greater blood magic
+			803, // blood sacrivice
+			864, // greater necromancy ok?
+			871, // counter magic
+			1025, // leg sweep
+			1045, // backstab
+			'1041-1044', // backstab misc
+			1061, // new god rising
+			1167, // learned portal
+			'1185-1211', // a lot of skills
+			'1223-1241',
 			1248,
 			1250,
 			1253,
-			"1267-1268",
-			"1448-1455",
-			"1541-1552",
-			"1923-2045", //so very many skills
-			"2079-2099", //skils
-			"2201-2214", 
-			2399, //attacked wheelchair
+			'1267-1268',
+			'1448-1455',
+			'1541-1552',
+			'1923-2045', // so very many skills
+			'2079-2099', // skils
+			'2201-2214',
+			2399, // attacked wheelchair
 			2766,
 			2787,
 
+			// --crafting maybe drop chance--
+			'2064-2067', // maybe needs?
 
+			// --equips--
+			'2252-2254', // gun equiped
+			2750, // wheelchair
+			2899, // gasoline1
+			2924, // knife
 
-			//--crafting maybe drop chance--
-			"2064-2067", //maybe needs?
-
-			//--equips--
-			"2252-2254", //gun equiped
-			2750, //wheelchair
-			2899, //gasoline1
-			2924, //knife
-
-
-			//--effects---
-			"814-816", // parania, blindness and rapanoia
-			837, //fear effect
-			862, //hallucinations
-			901, //hallucinations
-			2062, //blind for first time
+			// --effects---
+			'814-816', // parania, blindness and rapanoia
+			837, // fear effect
+			862, // hallucinations
+			901, // hallucinations
+			2062, // blind for first time
 			3276,
 
-			//cipple
-			"817-835",
+			// cipple
+			'817-835',
 
-
-
-
-			//sacrifice circle / gods
-			"396-397",
-			"472-490", // a lot more sacrifice
-			588, //talk scene
-			625, //first talk
-			"641-651", //execution
+			// sacrifice circle / gods
+			'396-397',
+			'472-490', // a lot more sacrifice
+			588, // talk scene
+			625, // first talk
+			'641-651', // execution
 			694,
-			"856-858", //skelleton
-			1062, //ritual new gods
-			"1401-1406", //ritual1 
-			"1415-1420",
-			"1421-1427", //sigils
-			"1533-1538",
-			"1561-1563", //ritual0
-			"2047-2055", //circle4
-			2360, //no other gods
-			"2445-2455", //circle5
-			"3178-3180", //ritual church2
-			"3218-3220", //church
-			"3817-3823", //sins/confession
-			"3998-3999",
+			'856-858', // skelleton
+			1062, // ritual new gods
+			'1401-1406', // ritual1
+			'1415-1420',
+			'1421-1427', // sigils
+			'1533-1538',
+			'1561-1563', // ritual0
+			'2047-2055', // circle4
+			2360, // no other gods
+			'2445-2455', // circle5
+			'3178-3180', // ritual church2
+			'3218-3220', // church
+			'3817-3823', // sins/confession
+			'3998-3999',
 
+			// -- endings --
+			// 1413 ending a hard
+			// 1414 ending b hard
+			'1428-1442',
+			'1889-1892', // endings b c n and a
+			1900, // won the game
 
+			// portal
+			// "1157-1166"
+			// 1168
+			// 1178
+			// 1173
+			// 1219
+			// 2056-2060
+			// 3146-3160
 
+			// carving
+			'611-615', // carving
+			'668-675',
+			'1135-1136',
 
-
-			//-- endings --
-			//1413 ending a hard
-			//1414 ending b hard
-			"1428-1442",
-			"1889-1892", //endings b c n and a
-			1900, //won the game
-
-			//portal
-			//"1157-1166"
-			//1168
-			//1178
-			//1173
-			//1219
-			//2056-2060
-			//3146-3160
-
-
-			//carving
-			"611-615", //carving
-			"668-675",
-			"1135-1136",
-
-			//love
-			"399-405",
+			// love
+			'399-405',
 			440,
 
-			//affinity
-			"406-409",
+			// affinity
+			'406-409',
 
-
-
-		]
+		];
 
 		MATTIE.static.switch.ignoredSwitches = MATTIE.static.rangeParser(MATTIE.static.switch.ignoredSwitches);
 

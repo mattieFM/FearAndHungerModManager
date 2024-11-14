@@ -1,4 +1,7 @@
 /* consistent-return: 0 */
+/* eslint-disable consistent-return */
+/* eslint-disable no-constant-condition */
+
 const enabled = true;
 
 const baseFuncSceneCreate = Scene_Map.prototype.create;
@@ -25,19 +28,19 @@ DataManager.loadRougeMapData = function (mapId) {
 		this._mapLoader = ResourceHandler.createLoader(`data/${filename}`, this.loadDataFile.bind(this, '$dataMap', filename));
 		this.loadDataFile('$dataMap', filename);
 	} else {
-		//this.makeEmptyMap();
+		// this.makeEmptyMap();
 		// $dataMap = new MATTIE.dataMapModel();
-		let map = new RougeLikeMap(50,50);
+		const map = new RougeLikeMap(50, 50);
 		$dataMap = {};
-		$dataMap.data = [1,1,1,1];
+		$dataMap.data = [1, 1, 1, 1];
 		$dataMap.events = [];
 		$dataMap.width = 50;
 		$dataMap.height = 50;
 		$dataMap.scrollType = 0;
 		$dataMap.tilesetId = 3;
 		$dataMap.note = '';
-		
-		console.log(map.mapTiles.map(tile=>tile.tileId));
+
+		console.log(map.mapTiles.map((tile) => tile.tileId));
 		map.pushToDataMap();
 	}
 };
