@@ -403,7 +403,7 @@ MATTIE.static.update = function () {
 
 	// eslint-disable-next-line no-constant-condition
 	if (MATTIE.global.isFunger()) { // for now just use funger 1 vars regardless
-		alert("the mod loader thinks you are running fear and hunger 1")
+		alert("the mod loader thinks you are running fear and hunger 1. if this is not correct things might go wrong.")
 		// static values specific to funger 1
 
 		MATTIE.static.commonEvents.lootTables = [];
@@ -1346,7 +1346,7 @@ MATTIE.static.update = function () {
 		MATTIE.static.events.images.shiny = () => MapEvent.generateImage(0, '!Flame', 6, 0, 0); // the shiny coin incon
 		MATTIE.static.events.images.coin = MATTIE.static.events.images.shiny;
 	} else if (MATTIE.global.isTermina()) {
-		alert("the mod loader thinks you are running fear and hunger 2 --Termina")
+		alert("The mod loader thinks you are running fear and hunger 2 --Termina. If this is not correct things might go wrong.")
 		console.log('termina');
 		// static values specific to funger 2
 		// switches
