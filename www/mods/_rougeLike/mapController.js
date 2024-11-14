@@ -568,7 +568,7 @@ class RougeLikeMap {
  */
 class DungeonMap {
 	/**
-	 * @description
+	 * @description the dungoen map class for rouge like
 	 * @param {number} topX top left bound
 	 * @param {number} topY top bound
 	 * @param {number} bottomX bottom right bound
