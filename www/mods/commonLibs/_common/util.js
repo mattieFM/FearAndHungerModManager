@@ -23,7 +23,6 @@ MATTIE.util.lerp = function (a, b, alpha) {
 	return a + alpha * (b - a);
 };
 
-
 /** @description get the next random number in the set seed */
 MATTIE.util.getSeedRandom = function () {
 	return MATTIE.util.seedRandom();
@@ -232,4 +231,3 @@ MATTIE.util.getMapVariant = function (x = 0) {
 
 	return vars[$gameVariables.value(randVars[x])];
 };  
-
