@@ -107,9 +107,6 @@ Game_Event.prototype.event = function () {
 	return val;
 };
 
-// for some reason cheshire doesn't check if TY exists, so we will define it here.
-const TY = {};
-
 //------------------------------
 // Termina Compatibility
 //------------------------------

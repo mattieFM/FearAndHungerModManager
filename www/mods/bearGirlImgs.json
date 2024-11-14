@@ -1,0 +1,14 @@
+{
+    "name": "bearGirlImgs",
+    "status": false,
+    "parameters": {},
+    "danger": false,
+	"assets": [
+			{
+					"source": "/mods/bearGirlImgs/",
+					"type":"imgFolder"
+			}
+	],
+	"credit":"https://www.nexusmods.com/fearandhunger/mods/10",
+	"hidden":true
+}
