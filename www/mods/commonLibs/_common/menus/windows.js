@@ -730,34 +730,39 @@ Window_Bar.prototype.drawBackground = function (x, y, width, height) {
 };
 
 
-function TooltipWindow() {
+//-----------------------------------------------------------------------------
+// Window_Tooltip
+// a window that is a small "?" till hovered over and will then display text as a tooltip
+//---------------------------------------
+
+MATTIE.windows.Window_Tooltip = function () {
     this.initialize(...arguments);
 }
 
-TooltipWindow.prototype = Object.create(Window_Base.prototype);
-TooltipWindow.prototype.constructor = TooltipWindow;
+MATTIE.windows.Window_Tooltip.prototype = Object.create(Window_Base.prototype);
+MATTIE.windows.Window_Tooltip.prototype.constructor = MATTIE.windows.Window_Tooltip;
 
-TooltipWindow.prototype.initialize = function(x=0,y=0,width=300,_height=undefined,infoText="add text here") {
+MATTIE.windows.Window_Tooltip.prototype.initialize = function(x=0,y=0,infoText="add text here",width=300,_height=undefined) {
     const height = this.fittingHeight(1); // Adjust height for 1 line of text
     Window_Base.prototype.initialize.call(this, x, y, width, height);
-    this._text = '?';
 	this._infoText = infoText;
     this.opacity = 0; // Make the tooltip slightly transparent
+	this._iconIndex=122; //the index of the icon to display
 
-	this.x_cursor_offset = 23;
+	this.x_cursor_offset = 33;
 	this.y_cursor_offset = this.fittingHeight(1)/2;
 
 	//how close does the cursor have to be to show this tooltip
-	this.tolerance = 13
+	this.tolerance = 18
 
 	this._infoWin = new MATTIE.windows.TextDisplay(this.x,this.y,width,height,this._infoText)
 	this._infoWin.hide()
 	this.addChild(this._infoWin);
 	
-	this.drawText(this._text,0,0); 
+	this.drawIcon(this._iconIndex,0,0); 
 };
 
-TooltipWindow.prototype.setText = function(text) {
+MATTIE.windows.Window_Tooltip.prototype.setText = function(text) {
     if (this._infoText !== text) {
         this._infoText = text;
 		this._infoWin.updateText(this._infoText)
@@ -768,7 +773,7 @@ TooltipWindow.prototype.setText = function(text) {
 /**
  * the function that handles showing and hiding tooltips when the mouse hovers
  */
-TooltipWindow.prototype.showIfMouseIsNear = function(x, y) {
+MATTIE.windows.Window_Tooltip.prototype.showIfMouseIsNear = function(x, y) {
 	withinX = MATTIE.util.numberWithinTolerance(TouchInput._mouseOverX,this.tolerance,this.x+this.x_cursor_offset)
 	withinY = MATTIE.util.numberWithinTolerance(TouchInput._mouseOverY,this.tolerance,this.y+this.y_cursor_offset)
 	// console.log(`Mouse_x:${x} toolX:${this.x} touch x: ${TouchInput._mouseOverX}`)
@@ -779,17 +784,19 @@ TooltipWindow.prototype.showIfMouseIsNear = function(x, y) {
 		this.hideTooltip()
 	}
 };
-
-TooltipWindow.prototype.refresh = function() {
+/**
+ * @override to draw our icon on refresh
+ */
+MATTIE.windows.Window_Tooltip.prototype.refresh = function() {
     this.contents.clear();
 	
-	this.drawText(this._text,0,0); 
+	this.drawIcon(this._iconIndex,0,0); 
 };
 
 /**
  * @override to show when the mouse is near
  */
-TooltipWindow.prototype.update = function(){
+MATTIE.windows.Window_Tooltip.prototype.update = function(){
 	Window_Base.prototype.update.call(this)
 	this.showIfMouseIsNear()
 
@@ -800,17 +807,28 @@ TooltipWindow.prototype.update = function(){
 	}
 }
 
-TooltipWindow.prototype.updatePosition = function(x, y) {
+/**
+ * move to this pos
+ * @param {*} x 
+ * @param {*} y 
+ */
+MATTIE.windows.Window_Tooltip.prototype.updatePosition = function(x, y) {
     this.x = x;
     this.y = y;
 };
 
-TooltipWindow.prototype.showTooltip = function(text=undefined, x=undefined, y=undefined) {
+/**
+ * @description show a tooltip
+ * @param {*} text 
+ * @param {*} x 
+ * @param {*} y 
+ */
+MATTIE.windows.Window_Tooltip.prototype.showTooltip = function(text=undefined, x=undefined, y=undefined) {
     this.setText(text||this._infoText);
     this.updatePosition(x||this.x, y||this.y);
     this._infoWin.show();
 };
 
-TooltipWindow.prototype.hideTooltip = function() {
+MATTIE.windows.Window_Tooltip.prototype.hideTooltip = function() {
     this._infoWin.hide();
 };

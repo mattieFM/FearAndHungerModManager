@@ -114,7 +114,7 @@ MATTIE.scenes.decrypter.prototype.addTextWindow = function () {
 	this.addWindow(this._decryptStatusWin);
 
 	// Create the tooltip window
-    this._tooltipWindow = new TooltipWindow();
+    this._tooltipWindow = new MATTIE.windows.Window_Tooltip(0,0,"hiya");
     this.addWindow(this._tooltipWindow);
 
 }
