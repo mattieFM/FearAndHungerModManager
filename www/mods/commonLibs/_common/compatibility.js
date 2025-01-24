@@ -11,11 +11,20 @@ MATTIE.compat = MATTIE.compat || {};
 MATTIE.compat.pauseDecrypt = false;
 
 /**
+ * @description weather or not files should be decrypted and saved to their unencrypted sate while playing the game
+ * this has some benefits and some drawbacks. This should not be any better than leaving the files encrypted as it decrypts them first anyways
+ * this might be useful for some edge cases though.
+ * @default false
+ */
+MATTIE.compat.runtime_decrypt=false;
+
+/**
  * @description a loader for assets that can load encrypted and unencrypted files
  * slightly heavier as it is using fs.existssync
  */
 Bitmap.prototype.compatabilityLoad = function (url) {
 	var fs = require('fs');
+
 	try {
 		let pngUrl = `${MATTIE.DataManager.localGamePath()}/`;
 		let rpgMVPUrl = `${pngUrl}/`;
@@ -28,14 +37,21 @@ Bitmap.prototype.compatabilityLoad = function (url) {
 			pngUrl += url;
 		}
 
-		pngUrl = pngUrl.replace('%24', '$');
-		rpgMVPUrl = rpgMVPUrl.replace('%24', '$');
+		pngUrl = decodeURIComponent(pngUrl);
+		rpgMVPUrl = decodeURIComponent(rpgMVPUrl);
 
 		console.log(rpgMVPUrl);
-		if (fs.existsSync(rpgMVPUrl) && Decrypter.hasEncryptedImages && !MATTIE.compat.pauseDecrypt) {
+
+		rpgmakerWantsToDecrypt = !Decrypter.checkImgIgnore(url) && Decrypter.hasEncryptedImages
+		modmanagerWantsToDecrypt = fs.existsSync(rpgMVPUrl) && !MATTIE.compat.pauseDecrypt
+
+		console.log(`modmanger want to decrypt:${modmanagerWantsToDecrypt}\nrpgmakerwantstodecrypt${rpgmakerWantsToDecrypt}`);
+		if (modmanagerWantsToDecrypt && rpgmakerWantsToDecrypt) {
 			if (Utils.isNwjs()) {
 				this._loadingState = 'decrypting';
-				Decrypter.decryptImg(url, this);
+				Decrypter.decryptImg(pngUrl, this);
+				MATTIE.imageAPI.saveBitmapToFile(this,pngUrl)
+				console.log("image decrypted")
 			}
 		} else if (pngUrl) {
 		// this line will fix the issue with caching images and let us update files during runtime.

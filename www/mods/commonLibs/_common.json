@@ -35,6 +35,7 @@
         "_common/API_CORE/miscAPI",
         "_common/API_CORE/infoAPI",
         "_common/API_CORE/simpleBattleAPI",
+        "_common/API_CORE/imageAPI",
         "_common/supporters",
         "_common/seedRandom",
         "_common/util",
