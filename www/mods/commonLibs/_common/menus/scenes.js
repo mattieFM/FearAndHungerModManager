@@ -116,13 +116,9 @@ MATTIE.scenes.decrypter.prototype.addTextWindow = function () {
 	// Create the tooltip window
     this._tooltipWindow = new TooltipWindow();
     this.addWindow(this._tooltipWindow);
-	this._tooltipWindow.showTooltip(0,0)
 
 }
 
-MATTIE.scenes.decrypter.prototype.onMouseMove = function(event) {
-    this._tooltipWindow.updateMousePosition(event.pageX, event.pageY);
-};
 
 /**
  * a method that adds the decrypt btn to the page
