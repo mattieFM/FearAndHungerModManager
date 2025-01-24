@@ -18,6 +18,7 @@ MATTIE.compat.pauseDecrypt = false;
  */
 MATTIE.compat.runtime_decrypt=false;
 
+
 /**
  * @description a loader for assets that can load encrypted and unencrypted files
  * slightly heavier as it is using fs.existssync

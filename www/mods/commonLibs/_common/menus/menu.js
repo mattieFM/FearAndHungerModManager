@@ -28,6 +28,11 @@ MATTIE.menus.toModMenu = function () {
 	SceneManager.push(MATTIE.scenes.modLoader);
 };
 
+/** go to decrypt scene */
+MATTIE.menus.toDecryptMenu = function () {
+	SceneManager.push(MATTIE.scenes.decrypter);
+};
+
 /** go to load scene */
 MATTIE.menus.toLoadMenu = function () {
 	SceneManager.push(Scene_Load);
