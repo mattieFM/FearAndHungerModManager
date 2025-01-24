@@ -12,6 +12,7 @@ MATTIE.menus.mainMenu = MATTIE.menus.mainMenu || {};
 
 var MATTIE_RPG = MATTIE_RPG || {};
 TextManager.Mods = 'Mods';
+TextManager.Decrypt = 'Decrypt';
 
 /**
  * @description removes a button from the main menu forcibly. That is to say this is able

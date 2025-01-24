@@ -216,10 +216,17 @@ Input.update = function () {
 
 this.forceModdedSaves = MATTIE.DataManager.global.get('forceModded');
 this.forceVanillaSaves = MATTIE.DataManager.global.get('forceVanilla');
+
 MATTIE.menus.mainMenu.addBtnToMainMenu(
 	TextManager.Mods,
 	TextManager.Mods,
 	MATTIE.menus.toModMenu.bind(this),
+);
+
+MATTIE.menus.mainMenu.addBtnToMainMenu(
+	TextManager.Decrypt,
+	TextManager.Decrypt,
+	MATTIE.menus.toDecryptMenu.bind(this),
 );
 
 // --ENGINE OVERRIDES--

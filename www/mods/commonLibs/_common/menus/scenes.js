@@ -5,6 +5,12 @@ MATTIE.TextManager = MATTIE.TextManager || {};
 MATTIE.CmdManager = MATTIE.CmdManager || {};
 MATTIE.modLoader = MATTIE.modLoader || {};
 
+
+MATTIE.TextManager.decryptBtn="Decrypt Game"
+MATTIE.CmdManager.decryptBtn="CMD_Decrypt"
+MATTIE.TextManager.encryptBtn = "Encrypt Game"
+MATTIE.CmdManager.encryptBtn = "CMD_Encrypt"
+
 /**
  * @class
  * @description the base menu page with the manager logo
@@ -21,19 +27,136 @@ MATTIE.scenes.base.prototype.create = function () {
 	this.createBackground();
 };
 
+/**
+ * @override the create background function to have the modmanager background logo
+ */
 MATTIE.scenes.base.prototype.createBackground = function () {
 	this._backSprite2 = new Sprite(ImageManager.loadBitmap('mods/commonLibs/_common/images/', 'FearAndHungerModMan', 0, true, true));
 	this.addChild(this._backSprite2);
-	this._modListWin = new MATTIE.windows.ModListWin(0, 0);
-	this.addChild(this._modListWin);
 };
 
+//-----------------------------------
+// Mod loader Scene 
+//-----------------------------------
+
+/**
+ * @class the main scene for the mod list page or the modloader itself depending on how you view it.
+ */
 MATTIE.scenes.modLoader = function () {
 	this.initialize.apply(this, arguments);
 };
 
 MATTIE.scenes.modLoader.prototype = Object.create(MATTIE.scenes.base.prototype);
 MATTIE.scenes.modLoader.prototype.constructor = MATTIE.scenes.modLoader;
+
+/**
+ * @override we add the mods list window here.
+ */
+MATTIE.scenes.modLoader.prototype.create = function () {
+	MATTIE.scenes.base.prototype.create.call(this)
+	console.log("modloader create")
+	this.addModsListWindow()
+}
+
+/**
+ * a method that adds the mods list window to the page
+ */
+MATTIE.scenes.modLoader.prototype.addModsListWindow = function () {
+	this._modListWin = new MATTIE.windows.ModListWin(0, 0);
+	this.addChild(this._modListWin);
+};
+
+//-----------------------------------
+// Decrypter Scene 
+//-----------------------------------
+
+MATTIE.scenes.decrypter = function () {
+	this.initialize.apply(this, arguments);
+	this.text3="test"
+};
+
+MATTIE.scenes.decrypter.prototype = Object.create(MATTIE.scenes.base.prototype);
+MATTIE.scenes.decrypter.prototype.constructor = MATTIE.scenes.decrypter;
+
+/**
+ * @override we add the mods list window here.
+ */
+MATTIE.scenes.decrypter.prototype.create = function () {
+	MATTIE.scenes.base.prototype.create.call(this)
+	this.createWindowLayer();
+	this.addWins()
+	this.setupHandlers()
+	
+}
+
+/**add all wins for this scene */
+MATTIE.scenes.decrypter.prototype.addWins = function(){
+	this.addDecryptBtn()
+	this.addTextWindow()
+}
+
+/**add the window that shows information and text for this scene */
+MATTIE.scenes.decrypter.prototype.addTextWindow = function () {
+	const text = [
+		'This is the decryption utility page It will let',
+		'you encrypt and decrypt all applicable files.',
+	];
+	this._textDisplayWin = new MATTIE.windows.TextDisplay(0,0,600,200, text);
+	this._textDisplayWin.updatePlacement()
+	this.addWindow(this._textDisplayWin);
+
+	const text2 = [
+		`RPGMaker Status: ${Decrypter.hasEncryptedImages?"Encrypted":"Decrypted"}`,
+		`Files Status: ${Decrypter.hasEncryptedImages?"Encrypted":"Decrypted"}`,
+	];
+	this._decryptStatusWin = new MATTIE.windows.TextDisplay(0,0,400,100, text2);
+	this._decryptStatusWin.updatePlacement(100,-200)
+	this.addWindow(this._decryptStatusWin);
+
+	// Create the tooltip window
+    this._tooltipWindow = new TooltipWindow();
+    this.addWindow(this._tooltipWindow);
+	this._tooltipWindow.showTooltip(0,0)
+
+}
+
+MATTIE.scenes.decrypter.prototype.onMouseMove = function(event) {
+    this._tooltipWindow.updateMousePosition(event.pageX, event.pageY);
+};
+
+/**
+ * a method that adds the decrypt btn to the page
+ */
+MATTIE.scenes.decrypter.prototype.addDecryptBtn = function () {
+	const btns = {};
+	btns[MATTIE.TextManager.decryptBtn] = MATTIE.CmdManager.decryptBtn;
+	btns[MATTIE.TextManager.encryptBtn] = MATTIE.CmdManager.encryptBtn;
+	this._decryptBtn = new MATTIE.windows.HorizontalBtns(175 + 300 + 10, btns, 2);
+	this.addWindow(this._decryptBtn)
+};
+
+/**
+ * setup all handlers for this scene
+ */
+MATTIE.scenes.decrypter.prototype.setupHandlers = function() {
+	this._decryptBtn.setHandler(MATTIE.CmdManager.decryptBtn, (() => {
+		console.log("hiya")
+		//call activate so we dont get locked out
+		this._decryptBtn.activate();
+	}));
+	
+	this._decryptBtn.setHandler(MATTIE.CmdManager.encryptBtn, (() => {
+		console.log("hiya")
+		//call activate so we dont get locked out
+		this._decryptBtn.activate();
+	}));
+	this._decryptBtn.setHandler('cancel', this.popScene.bind(this));
+}
+
+
+
+
+
 
 //-----------------------------------
 // Window Item List Overrides @override

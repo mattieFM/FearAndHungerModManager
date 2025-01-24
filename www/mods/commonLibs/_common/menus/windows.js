@@ -728,3 +728,80 @@ Window_Bar.prototype.drawBackground = function (x, y, width, height) {
 	this.contents.gradientFillRect(x, y, width / 2, height, color2, color1);
 	this.contents.gradientFillRect(x + width / 2, y, width / 2, height, color1, color2);
 };
+
+
+function TooltipWindow() {
+    this.initialize(...arguments);
+}
+
+TooltipWindow.prototype = Object.create(Window_Base.prototype);
+TooltipWindow.prototype.constructor = TooltipWindow;
+
+TooltipWindow.prototype.initialize = function(x,y) {
+    const width = 300; // Set a fixed width for the tooltip
+    const height = this.fittingHeight(3); // Adjust height for 1 line of text
+    Window_Base.prototype.initialize.call(this, x, y, width, height);
+    this._text = '?';
+	this._infoText = '?';
+    this.opacity = 0; // Make the tooltip slightly transparent
+
+	this.cursorX = 0
+	this.cursorY = 0
+	//how close does the cursor have to be to show this tooltip
+	this.tolerance = 100
+
+	this._infoWin = new MATTIE.windows.TextDisplay(this.x,this.y,width,height,this._infoText)
+	this._infoWin.hide()
+	this.addChild(this._infoWin);
+	
+};
+
+TooltipWindow.prototype.setText = function(text) {
+    if (this._infoText !== text) {
+        this._infoText = text;
+        this.refresh();
+    }
+};
+
+/**
+ * the function that handles showing and hiding tooltips when the mouse hovers
+ */
+TooltipWindow.prototype.showIfMouseIsNear = function(x, y) {
+	withinX = MATTIE.util.numberWithinTolerance(TouchInput._mouseOverX,this.tolerance,this.x)
+	withinY = MATTIE.util.numberWithinTolerance(TouchInput._mouseOverY,this.tolerance,this.y)
+	// console.log(`Mouse_x:${x} toolX:${this.x} touch x: ${TouchInput._mouseOverX}`)
+	// console.log(`Mouse_y:${y} toolX:${this.y}, touch y: ${TouchInput._mouseOverY}`)
+    if(withinX && withinY){
+		this.showTooltip()
+	} else{
+		this.hideTooltip()
+	}
+};
+
+TooltipWindow.prototype.refresh = function() {
+    this.contents.clear();
+	this.drawText("?",0,0); 
+};
+
+/**
+ * @override to show when the mouse is near
+ */
+TooltipWindow.prototype.update = function(){
+	Window_Base.prototype.update.call(this)
+	this.showIfMouseIsNear()
+}
+
+TooltipWindow.prototype.updatePosition = function(x, y) {
+    this.x = x;
+    this.y = y;
+};
+
+TooltipWindow.prototype.showTooltip = function(text=undefined, x=undefined, y=undefined) {
+    this.setText(text|this._text);
+    this.updatePosition(x|this.x, y|this.y);
+    this.show();
+};
+
+TooltipWindow.prototype.hideTooltip = function() {
+    this.hide();
+};
