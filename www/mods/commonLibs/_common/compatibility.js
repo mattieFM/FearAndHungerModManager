@@ -83,7 +83,7 @@ Bitmap.prototype.compatabilityLoad = function (url, force = false) {
 
 		rpgmakerWantsToDecrypt = !Decrypter.checkImgIgnore(url) && Decrypter.hasEncryptedImages;
 		modmanagerWantsToDecrypt = fs.existsSync(rpgMVPUrl) && !MATTIE.compat.pauseDecrypt;
-		cannotUseEncrypted = !fs.existsSync(rpgMVPUrl) && fs.existsSync(pngUrl)
+		cannotUseEncrypted = !fs.existsSync(rpgMVPUrl) && fs.existsSync(pngUrl);
 
 		console.log(`modmanger want to decrypt:${modmanagerWantsToDecrypt}\nrpgmakerwantstodecrypt${rpgmakerWantsToDecrypt}`);
 		if (((rpgmakerWantsToDecrypt) || force || (fs.existsSync(rpgMVPUrl) && !fs.existsSync(pngUrl))) && !MATTIE.compat.pauseDecrypt && !cannotUseEncrypted) {
