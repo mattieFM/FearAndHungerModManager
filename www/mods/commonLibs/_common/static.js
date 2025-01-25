@@ -403,7 +403,8 @@ MATTIE.static.update = function () {
 
 	// eslint-disable-next-line no-constant-condition
 	if (MATTIE.global.isFunger()) { // for now just use funger 1 vars regardless
-		if(!MATTIE.DataManager.global.get("correctVersion"))if(confirm('The mod loader thinks you are running fear and hunger 1. If this is correct click okay to hide this prompt.'))MATTIE.DataManager.global.set("correctVersion",true)
+		// eslint-disable-next-line max-len
+		if (!MATTIE.DataManager.global.get('correctVersion')) if (confirm('The mod loader thinks you are running fear and hunger 1. If this is correct click okay to hide this prompt.'))MATTIE.DataManager.global.set('correctVersion', true);
 		// static values specific to funger 1
 
 		MATTIE.static.commonEvents.lootTables = [];
@@ -1346,7 +1347,8 @@ MATTIE.static.update = function () {
 		MATTIE.static.events.images.shiny = () => MapEvent.generateImage(0, '!Flame', 6, 0, 0); // the shiny coin incon
 		MATTIE.static.events.images.coin = MATTIE.static.events.images.shiny;
 	} else if (MATTIE.global.isTermina()) {
-		if(!MATTIE.DataManager.global.get("correctVersion"))if(confirm('The mod loader thinks you are running fear and hunger 2 --Termina. If this is correct click okay to hide this prompt.'))MATTIE.DataManager.global.set("correctVersion",true)
+		// eslint-disable-next-line max-len
+		if (!MATTIE.DataManager.global.get('correctVersion')) if (confirm('The mod loader thinks you are running fear and hunger 2 --Termina. If this is correct click okay to hide this prompt.'))MATTIE.DataManager.global.set('correctVersion', true);
 		console.log('termina');
 		// static values specific to funger 2
 		// switches
