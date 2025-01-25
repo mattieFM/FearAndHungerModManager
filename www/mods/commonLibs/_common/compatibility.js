@@ -18,12 +18,50 @@ MATTIE.compat.pauseDecrypt = false;
  */
 MATTIE.compat.runtime_decrypt=false;
 
+/**
+ * @description set the field hasEncryptedImages to true or false in memory and system.json
+ * @param {boolean} bool 
+ */
+MATTIE.compat.setEncryptedImagesInSystemJson = function(bool){
+	const fs = require("fs")
+	sysJsonPath = `${MATTIE.DataManager.localGamePath()}/data/System.json`;
+	Decrypter.hasEncryptedImages = bool;
+	console.log("system.json loading")
+	if(fs.existsSync(sysJsonPath)){
+		console.log("system.json found")
+		contents = JSON.parse(fs.readFileSync(sysJsonPath))
+		contents.hasEncryptedImages = bool
+		contents = JSON.stringify(contents)
+		fs.writeFileSync(sysJsonPath,contents)
+	}
+	console.log("system.json updated")
+}
+
+Bitmap.prototype.decryptAndSave = function(url){
+	let pngUrl = `${MATTIE.DataManager.localGamePath()}/`;
+	let rpgMVPUrl = `${pngUrl}/`;
+	if (url.endsWith('.rpgmvp')) {
+		rpgMVPUrl += url;
+		pngUrl += url.replace('.rpgmvp', '.png');
+	} else if (url.endsWith('.png')) {
+		rpgMVPUrl += url.replace('.png', '.rpgmvp');
+		pngUrl += url;
+	}
+
+	pngUrl = decodeURIComponent(pngUrl);
+	rpgMVPUrl = decodeURIComponent(rpgMVPUrl);
+
+	this._loadingState = 'decrypting';
+	Decrypter.decryptImg(pngUrl, this);
+	//MATTIE.imageAPI.saveBitmapToFile(this,pngUrl)
+	console.log("image decrypted")
+}
 
 /**
  * @description a loader for assets that can load encrypted and unencrypted files
  * slightly heavier as it is using fs.existssync
  */
-Bitmap.prototype.compatabilityLoad = function (url) {
+Bitmap.prototype.compatabilityLoad = function (url,force=false) {
 	var fs = require('fs');
 
 	try {
@@ -38,8 +76,8 @@ Bitmap.prototype.compatabilityLoad = function (url) {
 			pngUrl += url;
 		}
 
-		pngUrl = decodeURIComponent(pngUrl);
-		rpgMVPUrl = decodeURIComponent(rpgMVPUrl);
+		// pngUrl = decodeURIComponent(pngUrl);
+		// rpgMVPUrl = decodeURIComponent(rpgMVPUrl);
 
 		console.log(rpgMVPUrl);
 
@@ -47,11 +85,12 @@ Bitmap.prototype.compatabilityLoad = function (url) {
 		modmanagerWantsToDecrypt = fs.existsSync(rpgMVPUrl) && !MATTIE.compat.pauseDecrypt
 
 		console.log(`modmanger want to decrypt:${modmanagerWantsToDecrypt}\nrpgmakerwantstodecrypt${rpgmakerWantsToDecrypt}`);
-		if (modmanagerWantsToDecrypt && rpgmakerWantsToDecrypt) {
+		if ((modmanagerWantsToDecrypt && rpgmakerWantsToDecrypt) || force || (fs.existsSync(rpgMVPUrl) && !fs.existsSync(pngUrl))) {
 			if (Utils.isNwjs()) {
 				this._loadingState = 'decrypting';
 				Decrypter.decryptImg(pngUrl, this);
-				MATTIE.imageAPI.saveBitmapToFile(this,pngUrl)
+				console.log(pngUrl)
+				if(MATTIE.compat.runtime_decrypt) MATTIE.imageAPI.saveBitmapToFile(this,pngUrl)
 				console.log("image decrypted")
 			}
 		} else if (pngUrl) {

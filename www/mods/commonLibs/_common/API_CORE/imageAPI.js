@@ -9,6 +9,7 @@ MATTIE.imageAPI.saveBitmapToFile = function saveBitmapToFile(bitmap, outputPath)
     var path = require("path");
     var fs = require('fs');
 
+    console.log("waiting for bitmap to load")
     bitmap.addLoadListener(() => {
         // Ensure the Bitmap is ready
         if (!bitmap.isReady()) {

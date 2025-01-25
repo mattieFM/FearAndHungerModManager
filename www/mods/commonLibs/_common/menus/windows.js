@@ -781,6 +781,7 @@ MATTIE.windows.Window_Tooltip.prototype.initialize = function(x=0,y=0,infoText="
 	this.tolerance = 13
 
 	this._infoWin = new MATTIE.windows.TextDisplay(this.x,this.y,width,infoHeight,this._infoText)
+	this._infoWin.opacity=255
 	this._infoWin.hide()
 	this._iconWin = new MATTIE.windows.TooltipIcon(x,y,100,100," ?")
 	this._iconWin.opacity=0;
