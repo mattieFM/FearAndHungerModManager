@@ -78,7 +78,6 @@ MATTIE.util.randSeededChance = function (chance) {
 	return (roll <= chance);
 };
 
-
 /**
  * @description check if a number is within +/- a tolerance to a target
  * @param {*} number 
