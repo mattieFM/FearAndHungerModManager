@@ -154,8 +154,8 @@ MATTIE.windows.TextDisplay.prototype.updatePlacement = function (xOffset = 0, yO
 	this.y = ((Graphics.boxHeight - this.height)) / 2 + yOffset;
 };
 
-MATTIE.windows.TextDisplay.prototype.updateText = function (text,clear=true) {
-	if(clear)this.contents.clear();
+MATTIE.windows.TextDisplay.prototype.updateText = function (text, clear = true) {
+	if (clear) this.contents.clear();
 	this.text = text;
 	if (typeof text === typeof 'string') {
 		text += '\n';
@@ -172,7 +172,6 @@ MATTIE.windows.TextDisplay.prototype.windowWidth = function () {
 	return this.mattieWidth;
 };
 
-
 /**
  * A window to display text
  * @extends Window_Base
@@ -186,13 +185,11 @@ MATTIE.windows.TooltipIcon.prototype = Object.create(MATTIE.windows.TextDisplay.
 MATTIE.windows.TooltipIcon.prototype.constructor = MATTIE.windows.TooltipIcon;
 
 MATTIE.windows.TooltipIcon.prototype.initialize = function (x, y, width, height, text) {
-	MATTIE.windows.TextDisplay.prototype.initialize.call(this, x, y, width, height,text);
-    // Draw the circle
-    this.contents.drawCircle(11,17,12,"yellow")
-	this.updateText(text,false);
-    
+	MATTIE.windows.TextDisplay.prototype.initialize.call(this, x, y, width, height, text);
+	// Draw the circle
+	this.contents.drawCircle(11, 17, 12, 'yellow');
+	this.updateText(text, false);
 };
-
 
 /**
  * A list with header
@@ -816,116 +813,116 @@ Window_Bar.prototype.drawBackground = function (x, y, width, height) {
 	this.contents.gradientFillRect(x + width / 2, y, width / 2, height, color1, color2);
 };
 
-
 //-----------------------------------------------------------------------------
 // Window_Tooltip
 // a window that is a small "?" till hovered over and will then display text as a tooltip
 //---------------------------------------
 
 MATTIE.windows.Window_Tooltip = function () {
-    this.initialize(...arguments);
-}
+	this.initialize(...arguments);
+};
 
 MATTIE.windows.Window_Tooltip.prototype = Object.create(Window_Base.prototype);
 MATTIE.windows.Window_Tooltip.prototype.constructor = MATTIE.windows.Window_Tooltip;
 
-MATTIE.windows.Window_Tooltip.prototype.initialize = function(x=0,y=0,infoText="add text here",width=300,_height=undefined,infoHeight=200) {
-    const height = this.fittingHeight(1); // Adjust height for 1 line of text
-    Window_Base.prototype.initialize.call(this, 0, 0, 0, 0);
+MATTIE.windows.Window_Tooltip.prototype.initialize = function (x = 0, y = 0, infoText = 'add text here', width = 300, _height = undefined, infoHeight = 200) {
+	const height = this.fittingHeight(1); // Adjust height for 1 line of text
+	Window_Base.prototype.initialize.call(this, 0, 0, 0, 0);
 	this._infoText = infoText;
 	this.changePaintOpacity(true);
-    //this.opacity = 50; // Make the tooltip slightly transparent
-	this._iconIndex=122; //the index of the icon to display
+	// this.opacity = 50; // Make the tooltip slightly transparent
+	this._iconIndex = 122; // the index of the icon to display
 
-	this.rx=x;
-	this.ry=y;
+	this.rx = x;
+	this.ry = y;
 	this.x_cursor_offset = 25;
-	this.y_cursor_offset = this.fittingHeight(1)/2;
+	this.y_cursor_offset = this.fittingHeight(1) / 2;
 
-	//how close does the cursor have to be to show this tooltip
-	this.tolerance = 13
+	// how close does the cursor have to be to show this tooltip
+	this.tolerance = 13;
 
-	this._infoWin = new MATTIE.windows.TextDisplay(this.x,this.y,width,infoHeight,this._infoText)
-	this._infoWin.opacity=255
-	this._infoWin.hide()
-	this._iconWin = new MATTIE.windows.TooltipIcon(x,y,100,100," ?")
-	this._iconWin.opacity=0;
+	this._infoWin = new MATTIE.windows.TextDisplay(this.x, this.y, width, infoHeight, this._infoText);
+	this._infoWin.opacity = 255;
+	this._infoWin.hide();
+	this._iconWin = new MATTIE.windows.TooltipIcon(x, y, 100, 100, ' ?');
+	this._iconWin.opacity = 0;
 	this.addChild(this._infoWin);
 	this.addChild(this._iconWin);
-	
-	this.drawIcon(this._iconIndex,0,0); 
+
+	this.drawIcon(this._iconIndex, 0, 0);
 };
 
-MATTIE.windows.Window_Tooltip.prototype.setText = function(text) {
-    if (this._infoText !== text) {
-        this._infoText = text;
-		this._infoWin.updateText(this._infoText)
-        this.refresh();
-    }
+MATTIE.windows.Window_Tooltip.prototype.setText = function (text) {
+	if (this._infoText !== text) {
+		this._infoText = text;
+		this._infoWin.updateText(this._infoText);
+		this.refresh();
+	}
 };
 
 /**
  * the function that handles showing and hiding tooltips when the mouse hovers
  */
-MATTIE.windows.Window_Tooltip.prototype.showIfMouseIsNear = function(x, y) {
-	withinX = MATTIE.util.numberWithinTolerance(TouchInput._mouseOverX,this.tolerance,this.rx+this.x_cursor_offset)
-	withinY = MATTIE.util.numberWithinTolerance(TouchInput._mouseOverY,this.tolerance,this.ry+this.y_cursor_offset)
+MATTIE.windows.Window_Tooltip.prototype.showIfMouseIsNear = function (x, y) {
+	withinX = MATTIE.util.numberWithinTolerance(TouchInput._mouseOverX, this.tolerance, this.rx + this.x_cursor_offset);
+	withinY = MATTIE.util.numberWithinTolerance(TouchInput._mouseOverY, this.tolerance, this.ry + this.y_cursor_offset);
 	// console.log(`Mouse_x:${x} toolX:${this.x} touch x: ${TouchInput._mouseOverX}`)
 	// console.log(`Mouse_y:${y} toolX:${this.y}, touch y: ${TouchInput._mouseOverY}`)
-    if(withinX &amp;&amp; withinY){
-		this.showTooltip()
-	} else{
-		this.hideTooltip()
+	if (withinX &amp;&amp; withinY) {
+		this.showTooltip();
+	} else {
+		this.hideTooltip();
 	}
 };
 /**
  * @override to draw our icon on refresh
  */
-MATTIE.windows.Window_Tooltip.prototype.refresh = function() {
-    this.contents.clear();
-	
-	this.drawIcon(this._iconIndex,0,0); 
+MATTIE.windows.Window_Tooltip.prototype.refresh = function () {
+	this.contents.clear();
+
+	this.drawIcon(this._iconIndex, 0, 0);
 };
 
 /**
  * @override to show when the mouse is near
  */
-MATTIE.windows.Window_Tooltip.prototype.update = function(){
-	Window_Base.prototype.update.call(this)
-	this.showIfMouseIsNear()
+MATTIE.windows.Window_Tooltip.prototype.update = function () {
+	Window_Base.prototype.update.call(this);
+	this.showIfMouseIsNear();
 
-	//stick to cursor
-	if(this._infoWin.visible){
-		this._infoWin.x = TouchInput._mouseOverX
-		this._infoWin.y = TouchInput._mouseOverY
+	// stick to cursor
+	if (this._infoWin.visible) {
+		this._infoWin.x = TouchInput._mouseOverX;
+		this._infoWin.y = TouchInput._mouseOverY;
 	}
-}
+};
 
 /**
  * move to this pos
- * @param {*} x 
- * @param {*} y 
+ * @param {*} x
+ * @param {*} y
  */
-MATTIE.windows.Window_Tooltip.prototype.updatePosition = function(x, y) {
-    this.x = x;
-    this.y = y;
+MATTIE.windows.Window_Tooltip.prototype.updatePosition = function (x, y) {
+	this.x = x;
+	this.y = y;
 };
 
 /**
  * @description show a tooltip
- * @param {*} text 
- * @param {*} x 
- * @param {*} y 
+ * @param {*} text
+ * @param {*} x
+ * @param {*} y
  */
-MATTIE.windows.Window_Tooltip.prototype.showTooltip = function(text=undefined, x=undefined, y=undefined) {
-    this.setText(text||this._infoText);
-    this.updatePosition(x||this.x, y||this.y);
-    this._infoWin.show();
+MATTIE.windows.Window_Tooltip.prototype.showTooltip = function (text = undefined, x = undefined, y = undefined) {
+	this.setText(text || this._infoText);
+	this.updatePosition(x || this.x, y || this.y);
+	this._infoWin.show();
 };
 
-MATTIE.windows.Window_Tooltip.prototype.hideTooltip = function() {
-    this._infoWin.hide();
-};</code></pre>
+MATTIE.windows.Window_Tooltip.prototype.hideTooltip = function () {
+	this._infoWin.hide();
+};
+</code></pre>
         </article>
     </section>
 
