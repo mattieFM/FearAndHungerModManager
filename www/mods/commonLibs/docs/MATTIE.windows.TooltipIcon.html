@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Class: HorizontalBtns | Class: HorizontalBtns</title>
+    <title>Class: TooltipIcon | Class: TooltipIcon</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -30,7 +30,7 @@
         
     </div>
     <div class="title">
-        <h1><a href="index.html" class="link">Class: HorizontalBtns</a></h1>
+        <h1><a href="index.html" class="link">Class: TooltipIcon</a></h1>
         
             <span class="version">v1.1.7</span>
         
@@ -64,7 +64,7 @@
 <header>
     
         <h2><span class="attribs"><span class="type-signature"></span></span>
-            <span class="ancestors"><a href="MATTIE.html">MATTIE</a><a href="MATTIE.windows.html">.windows</a>.</span>HorizontalBtns<span class="signature">()</span><span class="type-signature"></span></h2>
+            <span class="ancestors"><a href="MATTIE.html">MATTIE</a><a href="MATTIE.windows.html">.windows</a>.</span>TooltipIcon<span class="signature">()</span><span class="type-signature"></span></h2>
         
     
 </header>
@@ -77,14 +77,14 @@
 
 <dt>
     
-        <h4 class="name" id="HorizontalBtns">
+        <h4 class="name" id="TooltipIcon">
             
-                new <span class="type-signature"></span>HorizontalBtns<span class="signature">()</span><span class="type-signature"></span>
+                new <span class="type-signature"></span>TooltipIcon<span class="signature">()</span><span class="type-signature"></span>
                 
             
             <div class="container-source members">
                 <code><a href="commonLibs__common_menus_windows.js.html">commonLibs/_common/menus/windows.js</a></code>,
-                <code><a href="commonLibs__common_menus_windows.js.html#line8">line 8</a></code>
+                <code><a href="commonLibs__common_menus_windows.js.html#line115">line 115</a></code>
             </div>
             
         </h4>
@@ -96,10 +96,7 @@
 
     
     <div class="description">
-        <p>create a new horisontal btn menu<br>
-y pos,<br>
-btns<br>
-width</p>
+        <p>A window to display text</p>
     </div>
     
 
@@ -169,6 +166,17 @@ width</p>
     
 
     
+        <h3 class="subsection-title">Extends</h3>
+
+        
+
+
+    <ul>
+        <li><a href="Window_Base.html">Window_Base</a></li>
+    </ul>
+
+
+    
 
     
 
@@ -190,14 +198,14 @@ width</p>
 
 <dt>
     
-        <h4 class="name" id="makeCommandList">
+        <h4 class="name" id="drawIcon">
             
-                <span class="type-signature"></span>makeCommandList<span class="signature">(btns)</span><span class="type-signature"></span>
+                <span class="type-signature"></span>drawIcon<span class="signature">()</span><span class="type-signature"></span>
                 
             
             <div class="container-source members">
-                <code><a href="commonLibs__common_menus_windows.js.html">commonLibs/_common/menus/windows.js</a></code>,
-                <code><a href="commonLibs__common_menus_windows.js.html#line47">line 47</a></code>
+                <code><a href="commonLibs__common_API_CORE_itemAPI.js.html">commonLibs/_common/API_CORE/itemAPI.js</a></code>,
+                <code><a href="commonLibs__common_API_CORE_itemAPI.js.html#line565">line 565</a></code>
             </div>
             
         </h4>
@@ -208,63 +216,17 @@ width</p>
 <dd>
 
     
-
-    
-
-    
-
-    
-
-    
-    <div class="container-params">
-        <h5>Parameters:</h5>
-        
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>btns</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="global.html#dict">dict</a></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>a key pair value {displayname:commandname}</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
+    <div class="description">
+        <p>draw icon method overridden to check if icon index is a runtime icon and load the runtime icon accordingly.</p>
     </div>
+    
+
+    
+
+    
+
+    
+
     
 
     
@@ -288,6 +250,11 @@ width</p>
 
     
 
+    
+    <dt class="inherited-from">Inherited From:</dt>
+    <dd class="inherited-from"><ul class="dummy"><li>
+        <a href="Window_Base.html#drawIcon">Window_Base#drawIcon</a>
+    </li></ul></dd>
     
 
     
@@ -345,7 +312,7 @@ width</p>
 <script src="scripts/linenumber.js"></script>
 
     <script>
-        var id = 'MATTIE.windows.HorizontalBtns_sub'.replace(/"/g, '_');
+        var id = 'MATTIE.windows.TooltipIcon_sub'.replace(/"/g, '_');
         var selectedApi = document.getElementById(id); // do not use jquery selector
         var $selectedApi = $(selectedApi);
 

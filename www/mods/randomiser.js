@@ -13,6 +13,13 @@ MATTIE.randomiser = MATTIE.randomiser || {};
 MATTIE.randomiser.config = {};
 
 /**
+ * @description this is the randomizer's seed for your run, when it is set to the string "random" a random seed will be used for every run.
+ * when set to any other string, that string will be used, and the logic will be consistent.
+ * @default "random"
+ */
+MATTIE.randomiser.config.seed = 'random';
+
+/**
  * @description whether to include dungeon knights maps for map randomization.
  * !!DANGER!! this will likely result in soft locks, but is funny when it doesn't
  * @default false
@@ -66,7 +73,7 @@ MATTIE.randomiser.config.randomizeClasses;
 
 /**
  * @description whether to randomize maps or not
- * @default true
+ * @default false
  * Works as long as you can use the books in your inventory to recover from softlocks
  * Ex Altiora lets you use the airship to get un stuck
  * and The Seven Lamps of Arcitecture lets you teleport to a new room (sometimes) if you got stuck.
@@ -75,13 +82,13 @@ MATTIE.randomiser.config.randomizeMaps;
 
 /**
  * @description whether to randomize animations or not
- * @default true
+ * @default false
  * */
 MATTIE.randomiser.config.randomizeAnimations;
 
 /**
  * @description whether to randomize states or not
- * @default true
+ * @default false
  * */
 MATTIE.randomiser.config.randomizeStates;
 
@@ -99,6 +106,10 @@ MATTIE.randomiser.config.commonEvents = false;
 MATTIE.randomiser.config.noFloorMemory = false;
 
 Object.defineProperties(MATTIE.randomiser.config, {
+	seed: {
+		get: () => MATTIE.configGet('randomizerSeed', 'random'),
+		set: (value) => { MATTIE.configSet('randomizerSeed', value); },
+	},
 	includeDungeonKnights: {
 		get: () => MATTIE.configGet('includeDungeonKnights', false),
 		set: (value) => { MATTIE.configSet('includeDungeonKnights', value); },
@@ -149,6 +160,7 @@ Object.defineProperties(MATTIE.randomiser.config, {
 		get: () => MATTIE.configGet('randomizeSkills', true),
 		set: (value) => { MATTIE.configSet('randomizeSkills', value); },
 	},
+
 });
 
 MATTIE.static = MATTIE.static || {};
@@ -159,7 +171,7 @@ const randomizerName = require('./mods/randomiser.json').name;
 const params = PluginManager.parameters(randomizerName);
 
 // setup the seed for the rng
-if (params.seed === 'random') {
+if (MATTIE.randomiser.config.seed === 'random') {
 	// if random string randomize the seed
 	MATTIE.util.setSeed(MATTIE.supporters.getRandomSupporter());
 } else {
@@ -201,7 +213,14 @@ MATTIE.randomiser.shuffle = function (arr, attrib = 'name', cb = () => {}, filte
 	}
 	const realArr = arr.filter(filterCb);
 
-	realArr.sort(() => MATTIE.util.seedRandom() - 0.5);
+	const excluded_troops = [
+		1,2,3,4,5,6,7,8,9,10,11,12,13,48,112,192,207,
+	]
+	
+	realArr.sort((troop_a,troop_b) => {
+		return MATTIE.util.seedRandom() - 0.5
+	}
+	);
 
 	let j = 0;
 	let i = 0;
