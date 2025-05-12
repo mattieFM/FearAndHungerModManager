@@ -42,4 +42,4 @@ jobs:
         id: deployment
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./www/mods/commonLibs/docs
+          path: './www/mods/commonLibs/docs'
