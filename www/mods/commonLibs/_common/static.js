@@ -403,15 +403,10 @@ MATTIE.static.update = function () {
 
 	// eslint-disable-next-line no-constant-condition
 	if (MATTIE.global.isFunger()) { // for now just use funger 1 vars regardless
-<<<<<<< HEAD
 		if (!MATTIE.DataManager.global.get('correctVersion')) {
 			if (confirm('The mod loader thinks you are running fear and hunger 1.'
 			+ 'If this is correct click okay to hide this prompt.'))MATTIE.DataManager.global.set('correctVersion', true);
 		}
-=======
-		// eslint-disable-next-line max-len
-		if (!MATTIE.DataManager.global.get('correctVersion')) if (confirm('The mod loader thinks you are running fear and hunger 1. If this is correct click okay to hide this prompt.'))MATTIE.DataManager.global.set('correctVersion', true);
->>>>>>> d3471a6a2140b249a254530850850b5629ce3cfd
 		// static values specific to funger 1
 
 		MATTIE.static.commonEvents.lootTables = [];
