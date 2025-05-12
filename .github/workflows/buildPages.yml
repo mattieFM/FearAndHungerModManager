@@ -36,10 +36,8 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: 'my-artifact'
+          name: 'github-pages'
           path: './www/mods/commonLibs/docs'
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-        with:
-          name: 'my-artifact'
