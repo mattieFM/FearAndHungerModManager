@@ -214,13 +214,10 @@ MATTIE.randomiser.shuffle = function (arr, attrib = 'name', cb = () => {}, filte
 	const realArr = arr.filter(filterCb);
 
 	const excluded_troops = [
-		1,2,3,4,5,6,7,8,9,10,11,12,13,48,112,192,207,
-	]
-	
-	realArr.sort((troop_a,troop_b) => {
-		return MATTIE.util.seedRandom() - 0.5
-	}
-	);
+		1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 48, 112, 192, 207,
+	];
+
+	realArr.sort((troop_a, troop_b) => MATTIE.util.seedRandom() - 0.5);
 
 	let j = 0;
 	let i = 0;
