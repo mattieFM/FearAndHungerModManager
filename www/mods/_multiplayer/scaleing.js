@@ -11,9 +11,9 @@ MATTIE.multiplayer.config = MATTIE.multiplayer.config || {};
  * @description the number of net packets the client is allowed to send per second,
  * turn this up if you are having a lot of lag (to like 50 don't go above 200),
  * turn this down if you are getting packet drops.
- * @default 25
+ * @default 50
  */
-MATTIE.multiplayer.config.maxPacketsPerSecond = 25;
+MATTIE.multiplayer.config.maxPacketsPerSecond = 50;
 
 /**
  * @namespace MATTIE.multiplayer.config.scaling
