@@ -15,10 +15,15 @@ MATTIE.multiplayer.varSyncRequested = false;
 
 MATTIE.multiplayer.maxPacketsPerSecond = 1500; // I dont know if this is useful
 MATTIE.multiplayer.packetsThisSecond = 0;
+MATTIE.multiplayer.netQueue = new PriorityQueue();
 
 setInterval(() => {
 	MATTIE.multiplayer.packetsThisSecond = 0;
 }, 1000);
+
+setInterval(() => {
+	MATTIE.multiplayer.getCurrentNetController().sendOrQueue();
+}, 50);
 
 var EventEmitter = require('events');
 
@@ -156,12 +161,116 @@ class BaseNetController extends EventEmitter {
      * @param {*} obj the object to send
      */
 	sendViaMainRoute(obj, excludedIds = []) {
-		// MATTIE.multiplayer.packetsThisSecond++;
-		// if(MATTIE.multiplayer.packetsThisSecond >= MATTIE.multiplayer.maxPacketsPerSecond){
+		const data = obj;
+		const id = data.id;
+		obj.priority = 1;
+		if (data.move) {
+			obj.priority = 10;
+		}
+		if (data.updateNetPlayers && MATTIE.multiplayer.isClient) { // only used by client
+			obj.priority = 100;
+		}
+		if (data.playerInfo && MATTIE.multiplayer.isHost) { // only used by host
+			obj.priority = 1001;
+		}
+		if (data.startGame && MATTIE.multiplayer.isClient) { // only used by client
+			obj.priority = 1001;
+		}
+		if (data.syncedVars && MATTIE.multiplayer.isClient) { // used only by client
+			obj.priority = 1;
+		}
+		if (data.syncedSwitches) {
+			obj.priority = 1;
+		}
+		if (data.requestedVarSync && MATTIE.multiplayer.isHost) { // used only by host
+			obj.priority = 1000;
+		}
+		if (data.transfer) {
+			obj.priority = 1001;
+		}
+		if (data.ctrlSwitch) {
+			if (SceneManager._scene.isActive() && MATTIE.multiplayer.varSyncer.syncedOnce) { obj.priority = 1; }
+		}
+		if (data.cmd) {
+			if (SceneManager._scene.isActive() && MATTIE.multiplayer.varSyncer.syncedOnce) { obj.priority = 1; }
+		}
+		if (data.event) {
+			if (SceneManager._scene.isActive() && MATTIE.multiplayer.varSyncer.syncedOnce) { obj.priority = 1; }
+		}
+		if (data.battleStart) {
+			obj.priority = 1;
+		}
+		if (data.battleEnd) {
+			obj.priority = 1;
+		}
+		if (data.ready) {
+			obj.priority = 100;
+		}
+		if (data.turnEnd) {
+			obj.priority = 100;
+		}
+		if (data.equipChange) {
+			obj.priority = 1000;
+		}
+		if (data.spawnEvent) {
+			obj.priority = 1000;
+		}
+		if (data.transformEnemy) {
+			obj.priority = 100;
+		}
+		if (data.appearEnemy) {
+			obj.priority = 100;
+		}
+		if (data.enemyState) {
+			obj.priority = 100;
+		}
+		if (data.saveEvent) {
+			obj.priority = 100;
+		}
+		if (data.spectate) {
+			obj.priority = 100;
+		}
+		if (data.runTimeTroopSpawn) {
+			obj.priority = 100;
+		}
+		if (data.pvpEvent) {
+			obj.priority = 100;
+		}
+		if (data.transparentEvent) {
+			obj.priority = 1000;
+		}
+		if (data.setCharImgEvent) {
+			obj.priority = 100;
+		}
+		if (data.dashEvent) {
+			obj.priority = 100;
+		}
+		if (data.moveSpeedEvent) {
+			obj.priority = 100;
+		}
+		if (data.marriageReq) {
+			obj.priority = 100;
+		}
+		if (data.marriageResponse) {
+			obj.priority = 100;
+		}
+		if (data.saveEventLocationEvent) {
+			obj.priority = 100;
+		}
+		obj.excludedIds = excludedIds;
 
-		// }else{
-		this.send(obj, excludedIds);
-		// }
+		this.sendOrQueue(obj, excludedIds);
+	}
+
+	sendOrQueue(obj = null, excludedIds = []) {
+		if (++MATTIE.multiplayer.packetsThisSecond < MATTIE.multiplayer.config.maxPacketsPerSecond) {
+			//
+			// and if queue item is empty or of lower PriorityQueue
+			if (MATTIE.multiplayer.netQueue.values.length > 0 && !MATTIE.multiplayer.netFreeze) {
+				const req = MATTIE.multiplayer.netQueue.dequeue();
+				this.send(req, req.excludedIds);
+			} else if (obj != null) this.send(obj, excludedIds);
+		} else if (obj != null) MATTIE.multiplayer.netQueue.enqueue(obj, obj.priority);
 	}
 
 	send(obj, excludedIds = []) {

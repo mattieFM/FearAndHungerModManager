@@ -13,7 +13,7 @@ MATTIE.DataManager = MATTIE.DataManager || {};
 MATTIE.DataManager.dataPath = '/modData/';
 MATTIE.multiplayer = MATTIE.multiplayer || {};
 
-const funger1IgnoredPlugins = ['TerraxLighting'];
+const funger1IgnoredPlugins = [];
 const terminaIgnoredPlugins = [];
 const ignoredPlugins = ['HIME_PreTitleEvents', 'physical_attack_animation'];
 
