@@ -13,7 +13,6 @@ MATTIE.multiplayer.hasLoadedVars = false;
 
 MATTIE.multiplayer.varSyncRequested = false;
 
-MATTIE.multiplayer.maxPacketsPerSecond = 1500; // I dont know if this is useful
 MATTIE.multiplayer.packetsThisSecond = 0;
 MATTIE.multiplayer.netQueue = new PriorityQueue();
 
@@ -23,7 +22,7 @@ setInterval(() => {
 
 setInterval(() => {
 	MATTIE.multiplayer.getCurrentNetController().sendOrQueue();
-}, 50);
+}, 1000/MATTIE.multiplayer.config.maxPacketsPerSecond);
 
 var EventEmitter = require('events');
 
@@ -163,12 +162,12 @@ class BaseNetController extends EventEmitter {
 	sendViaMainRoute(obj, excludedIds = []) {
 		const data = obj;
 		const id = data.id;
-		obj.priority = 1;
+		obj.priority = 6;
 		if (data.move) {
 			obj.priority = 10;
 		}
 		if (data.updateNetPlayers && MATTIE.multiplayer.isClient) { // only used by client
-			obj.priority = 100;
+			obj.priority = 1002;
 		}
 		if (data.playerInfo && MATTIE.multiplayer.isHost) { // only used by host
 			obj.priority = 1001;
@@ -186,7 +185,7 @@ class BaseNetController extends EventEmitter {
 			obj.priority = 1000;
 		}
 		if (data.transfer) {
-			obj.priority = 1001;
+			obj.priority = 1021;
 		}
 		if (data.ctrlSwitch) {
 			if (SceneManager._scene.isActive() && MATTIE.multiplayer.varSyncer.syncedOnce) { obj.priority = 1; }
@@ -240,13 +239,13 @@ class BaseNetController extends EventEmitter {
 			obj.priority = 1000;
 		}
 		if (data.setCharImgEvent) {
-			obj.priority = 100;
+			obj.priority = 1001;
 		}
 		if (data.dashEvent) {
 			obj.priority = 100;
 		}
 		if (data.moveSpeedEvent) {
-			obj.priority = 100;
+			obj.priority = 1008;
 		}
 		if (data.marriageReq) {
 			obj.priority = 100;
@@ -255,21 +254,33 @@ class BaseNetController extends EventEmitter {
 			obj.priority = 100;
 		}
 		if (data.saveEventLocationEvent) {
-			obj.priority = 100;
+			obj.priority = 1008;
 		}
 		obj.excludedIds = excludedIds;
 
+		if(obj.priority > 1 || MATTIE.multiplayer.netQueue.values.length < 100)
 		this.sendOrQueue(obj, excludedIds);
 	}
 
 	sendOrQueue(obj = null, excludedIds = []) {
+		if(obj.move || obj.setCharImgEvent){
+			this.send(obj, excludedIds)
+			return;
+		} else if(obj.node){
+			if(obj.node.move) this.send(obj.node,excludedIds)
+		}
 		if (++MATTIE.multiplayer.packetsThisSecond < MATTIE.multiplayer.config.maxPacketsPerSecond) {
-			//
 			// and if queue item is empty or of lower PriorityQueue
-			if (MATTIE.multiplayer.netQueue.values.length > 0 && !MATTIE.multiplayer.netFreeze) {
+			if (MATTIE.multiplayer.netQueue.values.length > 0) {
 				const req = MATTIE.multiplayer.netQueue.dequeue();
-				this.send(req, req.excludedIds);
-			} else if (obj != null) this.send(obj, excludedIds);
+				//console.log(req)
+				const excludedIds = req.excludedIds
+				req.excludedIds=undefined
+				req.node.excludedIds=undefined
+				this.send(req.node, req.excludedIds);
+			} else if (obj != null) {
+				this.send(obj, excludedIds);
+			}
 		} else if (obj != null) MATTIE.multiplayer.netQueue.enqueue(obj, obj.priority);
 	}
 
@@ -297,7 +308,7 @@ class BaseNetController extends EventEmitter {
      * @param conn the connection object
      */
 	onData(data, conn) {
-		console.log(data);
+		//console.log(data);
 		data = this.preprocessData(data, conn);
 		const id = data.id;
 		if (data.move) {
@@ -823,6 +834,7 @@ class BaseNetController extends EventEmitter {
      * @param {*} id the peer id of the player who moved
      */
 	onMoveData(moveData, id) {
+		console.log("here!")
 		if (this.netPlayers[id].isMarried) {
 			MATTIE.marriageAPI.handleMove.call(this, moveData, id);
 		} else {

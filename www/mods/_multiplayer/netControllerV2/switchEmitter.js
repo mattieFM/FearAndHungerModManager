@@ -203,7 +203,7 @@ const eventAndSwitchEmitterInit = function () {
 						const netController = MATTIE.multiplayer.getCurrentNetController();
 						if (netController) { if (MATTIE.multiplayer.isActive) netController.emitSwitchEvent(obj); }
 						// if(MATTIE.multiplayer.devTools.varLogger)
-						console.log(`Game var ${id} set to ${val} silenced=${silenced},included=${MATTIE.static.variable.syncedVars.includes(id)}`);
+						//console.log(`Game var ${id} set to ${val} silenced=${silenced},included=${MATTIE.static.variable.syncedVars.includes(id)}`);
 					}
 				}
 			}
