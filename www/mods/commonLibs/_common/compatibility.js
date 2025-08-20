@@ -135,14 +135,8 @@ Bitmap.prototype._requestImage = function (url) {
 };
 
 ImageManager.loadBitmap = function (folder, filename, hue, smooth, forceNoDecrypt = false) {
-	// this is a hacky soltion but should work fine for now
-	if (forceNoDecrypt) MATTIE.compat.pauseDecrypt = true;
-	setTimeout(() => {
-		MATTIE.compat.pauseDecrypt = false;
-	}, 1000);
 	if (filename) {
 		const path = `${folder + encodeURIComponent(filename)}.png`;
-
 		const bitmap = this.loadNormalBitmap(path, hue || 0);
 		bitmap.smooth = smooth;
 		return bitmap;

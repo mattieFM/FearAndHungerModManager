@@ -8,6 +8,14 @@ MATTIE.multiplayer = MATTIE.multiplayer || {};
 MATTIE.multiplayer.config = MATTIE.multiplayer.config || {};
 
 /**
+ * @description the number of net packets the client is allowed to send per second,
+ * turn this up if you are having a lot of lag (to like 50 don't go above 200),
+ * turn this down if you are getting packet drops.
+ * @default 25
+ */
+MATTIE.multiplayer.config.maxPacketsPerSecond = 25;
+
+/**
  * @namespace MATTIE.multiplayer.config.scaling
  * @description The namespace containing all configurable options for multiplayer scaling / balancing. <br>
  * While this is intended to let you customize the difficulty to your taste you can also just crank the values super high / low and do silly things

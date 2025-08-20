@@ -19,6 +19,7 @@
         "_multiplayer/hostMenu",
         "_multiplayer/joinMenu",
         "_multiplayer/lobby",
+        "_multiplayer/netControllerV2/models/priorityQueue",
         "_multiplayer/netControllerV2/models/connectionModel",
         "_multiplayer/netControllerV2/models/playerFollowerModel",
         "_multiplayer/netControllerV2/models/playerModel",
