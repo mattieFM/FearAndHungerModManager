@@ -22,7 +22,7 @@ setInterval(() => {
 
 setInterval(() => {
 	MATTIE.multiplayer.getCurrentNetController().sendOrQueue();
-}, 1000/MATTIE.multiplayer.config.maxPacketsPerSecond);
+}, 1000 / MATTIE.multiplayer.config.maxPacketsPerSecond);
 
 var EventEmitter = require('events');
 
@@ -258,25 +258,24 @@ class BaseNetController extends EventEmitter {
 		}
 		obj.excludedIds = excludedIds;
 
-		if(obj.priority > 1 || MATTIE.multiplayer.netQueue.values.length < 100)
-		this.sendOrQueue(obj, excludedIds);
+		if (obj.priority > 1 || MATTIE.multiplayer.netQueue.values.length < 100) this.sendOrQueue(obj, excludedIds);
 	}
 
 	sendOrQueue(obj = null, excludedIds = []) {
-		if(obj.move || obj.setCharImgEvent){
-			this.send(obj, excludedIds)
+		if (obj.move || obj.setCharImgEvent) {
+			this.send(obj, excludedIds);
 			return;
-		} else if(obj.node){
-			if(obj.node.move) this.send(obj.node,excludedIds)
+		} if (obj.node) {
+			if (obj.node.move) this.send(obj.node, excludedIds);
 		}
 		if (++MATTIE.multiplayer.packetsThisSecond < MATTIE.multiplayer.config.maxPacketsPerSecond) {
 			// and if queue item is empty or of lower PriorityQueue
 			if (MATTIE.multiplayer.netQueue.values.length > 0) {
 				const req = MATTIE.multiplayer.netQueue.dequeue();
-				//console.log(req)
-				const excludedIds = req.excludedIds
-				req.excludedIds=undefined
-				req.node.excludedIds=undefined
+				// console.log(req)
+				const excludedIds = req.excludedIds;
+				req.excludedIds = undefined;
+				req.node.excludedIds = undefined;
 				this.send(req.node, req.excludedIds);
 			} else if (obj != null) {
 				this.send(obj, excludedIds);
@@ -308,7 +307,7 @@ class BaseNetController extends EventEmitter {
      * @param conn the connection object
      */
 	onData(data, conn) {
-		//console.log(data);
+		// console.log(data);
 		data = this.preprocessData(data, conn);
 		const id = data.id;
 		if (data.move) {
@@ -834,7 +833,7 @@ class BaseNetController extends EventEmitter {
      * @param {*} id the peer id of the player who moved
      */
 	onMoveData(moveData, id) {
-		console.log("here!")
+		console.log('here!');
 		if (this.netPlayers[id].isMarried) {
 			MATTIE.marriageAPI.handleMove.call(this, moveData, id);
 		} else {
