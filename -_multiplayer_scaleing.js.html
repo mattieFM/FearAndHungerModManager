@@ -75,7 +75,9 @@ MATTIE.multiplayer.config = MATTIE.multiplayer.config || {};
 /**
  * @description the number of net packets the client is allowed to send per second,
  * turn this up if you are having a lot of lag (to like 50 don't go above 200),
- * turn this down if you are getting packet drops.
+ * turn this down if you are getting packet drops. NOTE: if you change this value and hit 'enter'
+ * and it seems to have little effect, try restarting your game once, then ensure this value remained 
+ * what you set it to. and try to play again, some changes from this require a restart. (f5 is fine)
  * @default 50
  */
 MATTIE.multiplayer.config.maxPacketsPerSecond = 50;
