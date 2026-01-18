@@ -154,7 +154,7 @@ Game_Interpreter.prototype.callScriptWithfungerSpecificChangesToScripts = functi
 
 		// handle each case
 		if (textScript.includes(arrayOfScriptsThatCauseSevereLag[0])) { // "$gamePlayer.refresh();"
-			console.log($gamePlayer.needsRefresh());
+			// console.log($gamePlayer.needsRefresh());
 			if ($gamePlayer.needsRefresh()) this.currentCommand().script();
 		} else { // fallthrough to default
 			this.currentCommand().script();
