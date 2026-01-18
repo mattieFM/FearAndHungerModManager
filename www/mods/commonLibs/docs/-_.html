@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Class: _ | Class: _</title>
+    <title>Class: _ | 1</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -30,7 +30,7 @@
         
     </div>
     <div class="title">
-        <h1><a href="index.html" class="link">Class: _</a></h1>
+        <h1><a href="index.html" class="link">1</a></h1>
         
             <span class="version">v1.1.7</span>
         
@@ -308,24 +308,7 @@ directly or indirectly included in the build.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>function square(n) {
-  return n * n;
-}
-
-var wrapped = _([1, 2, 3]);
-
-// Returns an unwrapped value.
-wrapped.reduce(_.add);
-// => 6
-
-// Returns a wrapped value.
-var squares = wrapped.map(square);
-
-_.isArray(squares);
-// => false
-
-_.isArray(squares.value());
-// => true</code></pre>
+    <pre class="prettyprint"><code>function square(n) {  return n * n;}var wrapped = _([1, 2, 3]);// Returns an unwrapped value.wrapped.reduce(_.add);// => 6// Returns a wrapped value.var squares = wrapped.map(square);_.isArray(squares);// => false_.isArray(squares.value());// => true</code></pre>
 
     
 
@@ -422,8 +405,7 @@ _.isArray(squares.value());
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>_.add(6, 4);
-// => 10</code></pre>
+    <pre class="prettyprint"><code>_.add(6, 4);// => 10</code></pre>
 
     
 </dd>
@@ -511,19 +493,7 @@ Subsequent sources overwrite property assignments of previous sources.</p>
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>function Foo() {
-  this.a = 1;
-}
-
-function Bar() {
-  this.c = 3;
-}
-
-Foo.prototype.b = 2;
-Bar.prototype.d = 4;
-
-_.assign({ 'a': 0 }, new Foo, new Bar);
-// => { 'a': 1, 'c': 3 }</code></pre>
+    <pre class="prettyprint"><code>function Foo() {  this.a = 1;}function Bar() {  this.c = 3;}Foo.prototype.b = 2;Bar.prototype.d = 4;_.assign({ 'a': 0 }, new Foo, new Bar);// => { 'a': 1, 'c': 3 }</code></pre>
 
     
 </dd>
@@ -611,14 +581,7 @@ is invoked with five arguments: (objValue, srcValue, key, object, source).</p>
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>function customizer(objValue, srcValue) {
-  return _.isUndefined(objValue) ? srcValue : objValue;
-}
-
-var defaults = _.partialRight(_.assignWith, customizer);
-
-defaults({ 'a': 1 }, { 'b': 2 }, { 'a': 3 });
-// => { 'a': 1, 'b': 2 }</code></pre>
+    <pre class="prettyprint"><code>function customizer(objValue, srcValue) {  return _.isUndefined(objValue) ? srcValue : objValue;}var defaults = _.partialRight(_.assignWith, customizer);defaults({ 'a': 1 }, { 'b': 2 }, { 'a': 3 });// => { 'a': 1, 'b': 2 }</code></pre>
 
     
 </dd>
@@ -695,10 +658,7 @@ defaults({ 'a': 1 }, { 'b': 2 }, { 'a': 3 });
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>var object = { 'a': [{ 'b': { 'c': 3 } }, 4] };
-
-_(object).at(['a[0].b.c', 'a[1]']).value();
-// => [3, 4]</code></pre>
+    <pre class="prettyprint"><code>var object = { 'a': [{ 'b': { 'c': 3 } }, 4] };_(object).at(['a[0].b.c', 'a[1]']).value();// => [3, 4]</code></pre>
 
     
 </dd>
@@ -775,10 +735,7 @@ _(object).at(['a[0].b.c', 'a[1]']).value();
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>var object = { 'a': [{ 'b': { 'c': 3 } }, 4] };
-
-_.at(object, ['a[0].b.c', 'a[1]']);
-// => [3, 4]</code></pre>
+    <pre class="prettyprint"><code>var object = { 'a': [{ 'b': { 'c': 3 } }, 4] };_.at(object, ['a[0].b.c', 'a[1]']);// => [3, 4]</code></pre>
 
     
 </dd>
@@ -856,14 +813,7 @@ object. Any additional arguments are provided to <code>func</code> when it's inv
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>// Avoid throwing errors for invalid selectors.
-var elements = _.attempt(function(selector) {
-  return document.querySelectorAll(selector);
-}, '>_>');
-
-if (_.isError(elements)) {
-  elements = [];
-}</code></pre>
+    <pre class="prettyprint"><code>// Avoid throwing errors for invalid selectors.var elements = _.attempt(function(selector) {  return document.querySelectorAll(selector);}, '>_>');if (_.isError(elements)) {  elements = [];}</code></pre>
 
     
 </dd>
@@ -945,20 +895,7 @@ property of bound functions.</p>
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>function greet(greeting, punctuation) {
-  return greeting + ' ' + this.user + punctuation;
-}
-
-var object = { 'user': 'fred' };
-
-var bound = _.bind(greet, object, 'hi');
-bound('!');
-// => 'hi fred!'
-
-// Bound with placeholders.
-var bound = _.bind(greet, object, _, '!');
-bound('hi');
-// => 'hi fred!'</code></pre>
+    <pre class="prettyprint"><code>function greet(greeting, punctuation) {  return greeting + ' ' + this.user + punctuation;}var object = { 'user': 'fred' };var bound = _.bind(greet, object, 'hi');bound('!');// => 'hi fred!'// Bound with placeholders.var bound = _.bind(greet, object, _, '!');bound('hi');// => 'hi fred!'</code></pre>
 
     
 </dd>
@@ -1037,16 +974,7 @@ method.</p>
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>var view = {
-  'label': 'docs',
-  'click': function() {
-    console.log('clicked ' + this.label);
-  }
-};
-
-_.bindAll(view, ['click']);
-jQuery(element).on('click', view.click);
-// => Logs 'clicked docs' when clicked.</code></pre>
+    <pre class="prettyprint"><code>var view = {  'label': 'docs',  'click': function() {    console.log('clicked ' + this.label);  }};_.bindAll(view, ['click']);jQuery(element).on('click', view.click);// => Logs 'clicked docs' when clicked.</code></pre>
 
     
 </dd>
@@ -1130,28 +1058,7 @@ builds, may be used as a placeholder for partially applied arguments.</p>
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>var object = {
-  'user': 'fred',
-  'greet': function(greeting, punctuation) {
-    return greeting + ' ' + this.user + punctuation;
-  }
-};
-
-var bound = _.bindKey(object, 'greet', 'hi');
-bound('!');
-// => 'hi fred!'
-
-object.greet = function(greeting, punctuation) {
-  return greeting + 'ya ' + this.user + punctuation;
-};
-
-bound('!');
-// => 'hiya fred!'
-
-// Bound with placeholders.
-var bound = _.bindKey(object, 'greet', _, '!');
-bound('hi');
-// => 'hiya fred!'</code></pre>
+    <pre class="prettyprint"><code>var object = {  'user': 'fred',  'greet': function(greeting, punctuation) {    return greeting + ' ' + this.user + punctuation;  }};var bound = _.bindKey(object, 'greet', 'hi');bound('!');// => 'hi fred!'object.greet = function(greeting, punctuation) {  return greeting + 'ya ' + this.user + punctuation;};bound('!');// => 'hiya fred!'// Bound with placeholders.var bound = _.bindKey(object, 'greet', _, '!');bound('hi');// => 'hiya fred!'</code></pre>
 
     
 </dd>
@@ -1228,14 +1135,7 @@ bound('hi');
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>_.camelCase('Foo Bar');
-// => 'fooBar'
-
-_.camelCase('--foo-bar--');
-// => 'fooBar'
-
-_.camelCase('__FOO_BAR__');
-// => 'fooBar'</code></pre>
+    <pre class="prettyprint"><code>_.camelCase('Foo Bar');// => 'fooBar'_.camelCase('--foo-bar--');// => 'fooBar'_.camelCase('__FOO_BAR__');// => 'fooBar'</code></pre>
 
     
 </dd>
@@ -1312,14 +1212,7 @@ _.camelCase('__FOO_BAR__');
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>_.ceil(4.006);
-// => 5
-
-_.ceil(6.004, 2);
-// => 6.01
-
-_.ceil(6040, -2);
-// => 6100</code></pre>
+    <pre class="prettyprint"><code>_.ceil(4.006);// => 5_.ceil(6.004, 2);// => 6.01_.ceil(6040, -2);// => 6100</code></pre>
 
     
 </dd>
@@ -1396,22 +1289,7 @@ _.ceil(6040, -2);
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>var users = [
-  { 'user': 'barney', 'age': 36 },
-  { 'user': 'fred',   'age': 40 }
-];
-
-// A sequence without explicit chaining.
-_(users).head();
-// => { 'user': 'barney', 'age': 36 }
-
-// A sequence with explicit chaining.
-_(users)
-  .chain()
-  .head()
-  .pick('user')
-  .value();
-// => { 'user': 'barney' }</code></pre>
+    <pre class="prettyprint"><code>var users = [  { 'user': 'barney', 'age': 36 },  { 'user': 'fred',   'age': 40 }];// A sequence without explicit chaining._(users).head();// => { 'user': 'barney', 'age': 36 }// A sequence with explicit chaining._(users)  .chain()  .head()  .pick('user')  .value();// => { 'user': 'barney' }</code></pre>
 
     
 </dd>
@@ -1488,21 +1366,7 @@ _(users)
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>var array = [1, 2];
-var wrapped = _(array).push(3);
-
-console.log(array);
-// => [1, 2]
-
-wrapped = wrapped.commit();
-console.log(array);
-// => [1, 2, 3]
-
-wrapped.last();
-// => 3
-
-console.log(array);
-// => [1, 2, 3]</code></pre>
+    <pre class="prettyprint"><code>var array = [1, 2];var wrapped = _(array).push(3);console.log(array);// => [1, 2]wrapped = wrapped.commit();console.log(array);// => [1, 2, 3]wrapped.last();// => 3console.log(array);// => [1, 2, 3]</code></pre>
 
     
 </dd>
@@ -1582,12 +1446,7 @@ iteratee is invoked with one argument: (value).</p>
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>_.countBy([6.1, 4.2, 6.3], Math.floor);
-// => { '4': 1, '6': 2 }
-
-// The `_.property` iteratee shorthand.
-_.countBy(['one', 'two', 'three'], 'length');
-// => { '3': 2, '5': 1 }</code></pre>
+    <pre class="prettyprint"><code>_.countBy([6.1, 4.2, 6.3], Math.floor);// => { '4': 1, '6': 2 }// The `_.property` iteratee shorthand._.countBy(['one', 'two', 'three'], 'length');// => { '3': 2, '5': 1 }</code></pre>
 
     
 </dd>
@@ -1675,8 +1534,7 @@ Once a property is set, additional values of the same property are ignored.</p>
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>_.defaults({ 'a': 1 }, { 'b': 2 }, { 'a': 3 });
-// => { 'a': 1, 'b': 2 }</code></pre>
+    <pre class="prettyprint"><code>_.defaults({ 'a': 1 }, { 'b': 2 }, { 'a': 3 });// => { 'a': 1, 'b': 2 }</code></pre>
 
     
 </dd>
@@ -1762,8 +1620,7 @@ default properties.</p>
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>_.defaultsDeep({ 'a': { 'b': 2 } }, { 'a': { 'b': 1, 'c': 3 } });
-// => { 'a': { 'b': 2, 'c': 3 } }</code></pre>
+    <pre class="prettyprint"><code>_.defaultsDeep({ 'a': { 'b': 2 } }, { 'a': { 'b': 1, 'c': 3 } });// => { 'a': { 'b': 2, 'c': 3 } }</code></pre>
 
     
 </dd>
@@ -1841,10 +1698,7 @@ additional arguments are provided to <code>func</code> when it's invoked.</p>
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>_.defer(function(text) {
-  console.log(text);
-}, 'deferred');
-// => Logs 'deferred' after one millisecond.</code></pre>
+    <pre class="prettyprint"><code>_.defer(function(text) {  console.log(text);}, 'deferred');// => Logs 'deferred' after one millisecond.</code></pre>
 
     
 </dd>
@@ -1922,10 +1776,7 @@ provided to <code>func</code> when it's invoked.</p>
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>_.delay(function(text) {
-  console.log(text);
-}, 1000, 'later');
-// => Logs 'later' after one second.</code></pre>
+    <pre class="prettyprint"><code>_.delay(function(text) {  console.log(text);}, 1000, 'later');// => Logs 'later' after one second.</code></pre>
 
     
 </dd>
@@ -2013,8 +1864,7 @@ determined by the first array.</p>
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>_.difference([2, 1], [2, 3]);
-// => [1]</code></pre>
+    <pre class="prettyprint"><code>_.difference([2, 1], [2, 3]);// => [1]</code></pre>
 
     
 </dd>
@@ -2096,12 +1946,7 @@ determined by the first array. The iteratee is invoked with one argument:<br>
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>_.differenceBy([2.1, 1.2], [2.3, 3.4], Math.floor);
-// => [1.2]
-
-// The `_.property` iteratee shorthand.
-_.differenceBy([{ 'x': 2 }, { 'x': 1 }], [{ 'x': 1 }], 'x');
-// => [{ 'x': 2 }]</code></pre>
+    <pre class="prettyprint"><code>_.differenceBy([2.1, 1.2], [2.3, 3.4], Math.floor);// => [1.2]// The `_.property` iteratee shorthand._.differenceBy([{ 'x': 2 }, { 'x': 1 }], [{ 'x': 1 }], 'x');// => [{ 'x': 2 }]</code></pre>
 
     
 </dd>
@@ -2182,10 +2027,7 @@ is invoked with two arguments: (arrVal, othVal).</p>
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>var objects = [{ 'x': 1, 'y': 2 }, { 'x': 2, 'y': 1 }];
-
-_.differenceWith(objects, [{ 'x': 1, 'y': 2 }], _.isEqual);
-// => [{ 'x': 2, 'y': 1 }]</code></pre>
+    <pre class="prettyprint"><code>var objects = [{ 'x': 1, 'y': 2 }, { 'x': 2, 'y': 1 }];_.differenceWith(objects, [{ 'x': 1, 'y': 2 }], _.isEqual);// => [{ 'x': 2, 'y': 1 }]</code></pre>
 
     
 </dd>
@@ -2262,8 +2104,7 @@ _.differenceWith(objects, [{ 'x': 1, 'y': 2 }], _.isEqual);
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>_.divide(6, 4);
-// => 1.5</code></pre>
+    <pre class="prettyprint"><code>_.divide(6, 4);// => 1.5</code></pre>
 
     
 </dd>
@@ -2342,15 +2183,7 @@ entries are returned.</p>
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>function Foo() {
-  this.a = 1;
-  this.b = 2;
-}
-
-Foo.prototype.c = 3;
-
-_.toPairs(new Foo);
-// => [['a', 1], ['b', 2]] (iteration order is not guaranteed)</code></pre>
+    <pre class="prettyprint"><code>function Foo() {  this.a = 1;  this.b = 2;}Foo.prototype.c = 3;_.toPairs(new Foo);// => [['a', 1], ['b', 2]] (iteration order is not guaranteed)</code></pre>
 
     
 </dd>
@@ -2429,15 +2262,7 @@ or set, its entries are returned.</p>
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>function Foo() {
-  this.a = 1;
-  this.b = 2;
-}
-
-Foo.prototype.c = 3;
-
-_.toPairsIn(new Foo);
-// => [['a', 1], ['b', 2], ['c', 3]] (iteration order is not guaranteed)</code></pre>
+    <pre class="prettyprint"><code>function Foo() {  this.a = 1;  this.b = 2;}Foo.prototype.c = 3;_.toPairsIn(new Foo);// => [['a', 1], ['b', 2], ['c', 3]] (iteration order is not guaranteed)</code></pre>
 
     
 </dd>
@@ -2523,19 +2348,7 @@ inherited source properties.</p>
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>function Foo() {
-  this.a = 1;
-}
-
-function Bar() {
-  this.c = 3;
-}
-
-Foo.prototype.b = 2;
-Bar.prototype.d = 4;
-
-_.assignIn({ 'a': 0 }, new Foo, new Bar);
-// => { 'a': 1, 'b': 2, 'c': 3, 'd': 4 }</code></pre>
+    <pre class="prettyprint"><code>function Foo() {  this.a = 1;}function Bar() {  this.c = 3;}Foo.prototype.b = 2;Bar.prototype.d = 4;_.assignIn({ 'a': 0 }, new Foo, new Bar);// => { 'a': 1, 'b': 2, 'c': 3, 'd': 4 }</code></pre>
 
     
 </dd>
@@ -2623,14 +2436,7 @@ is invoked with five arguments: (objValue, srcValue, key, object, source).</p>
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>function customizer(objValue, srcValue) {
-  return _.isUndefined(objValue) ? srcValue : objValue;
-}
-
-var defaults = _.partialRight(_.assignInWith, customizer);
-
-defaults({ 'a': 1 }, { 'b': 2 }, { 'a': 3 });
-// => { 'a': 1, 'b': 2 }</code></pre>
+    <pre class="prettyprint"><code>function customizer(objValue, srcValue) {  return _.isUndefined(objValue) ? srcValue : objValue;}var defaults = _.partialRight(_.assignInWith, customizer);defaults({ 'a': 1 }, { 'b': 2 }, { 'a': 3 });// => { 'a': 1, 'b': 2 }</code></pre>
 
     
 </dd>
@@ -2709,26 +2515,7 @@ arguments: (value, index|key, collection).</p>
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>var users = [
-  { 'user': 'barney',  'age': 36, 'active': true },
-  { 'user': 'fred',    'age': 40, 'active': false },
-  { 'user': 'pebbles', 'age': 1,  'active': true }
-];
-
-_.find(users, function(o) { return o.age &lt; 40; });
-// => object for 'barney'
-
-// The `_.matches` iteratee shorthand.
-_.find(users, { 'age': 1, 'active': true });
-// => object for 'pebbles'
-
-// The `_.matchesProperty` iteratee shorthand.
-_.find(users, ['active', false]);
-// => object for 'fred'
-
-// The `_.property` iteratee shorthand.
-_.find(users, 'active');
-// => object for 'barney'</code></pre>
+    <pre class="prettyprint"><code>var users = [  { 'user': 'barney',  'age': 36, 'active': true },  { 'user': 'fred',    'age': 40, 'active': false },  { 'user': 'pebbles', 'age': 1,  'active': true }];_.find(users, function(o) { return o.age &lt; 40; });// => object for 'barney'// The `_.matches` iteratee shorthand._.find(users, { 'age': 1, 'active': true });// => object for 'pebbles'// The `_.matchesProperty` iteratee shorthand._.find(users, ['active', false]);// => object for 'fred'// The `_.property` iteratee shorthand._.find(users, 'active');// => object for 'barney'</code></pre>
 
     
 </dd>
@@ -2806,10 +2593,7 @@ _.find(users, 'active');
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>_.findLast([1, 2, 3, 4], function(n) {
-  return n % 2 == 1;
-});
-// => 3</code></pre>
+    <pre class="prettyprint"><code>_.findLast([1, 2, 3, 4], function(n) {  return n % 2 == 1;});// => 3</code></pre>
 
     
 </dd>
@@ -2886,14 +2670,7 @@ _.find(users, 'active');
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>_.floor(4.006);
-// => 4
-
-_.floor(0.046, 2);
-// => 0.04
-
-_.floor(4060, -2);
-// => 4000</code></pre>
+    <pre class="prettyprint"><code>_.floor(4.006);// => 4_.floor(0.046, 2);// => 0.04_.floor(4060, -2);// => 4000</code></pre>
 
     
 </dd>
@@ -2979,13 +2756,7 @@ invocation is supplied the return value of the previous.</p>
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>function square(n) {
-  return n * n;
-}
-
-var addSquare = _.flow([_.add, square]);
-addSquare(1, 2);
-// => 9</code></pre>
+    <pre class="prettyprint"><code>function square(n) {  return n * n;}var addSquare = _.flow([_.add, square]);addSquare(1, 2);// => 9</code></pre>
 
     
 </dd>
@@ -3070,13 +2841,7 @@ invokes the given functions from right to left.</p>
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>function square(n) {
-  return n * n;
-}
-
-var addSquare = _.flowRight([square, _.add]);
-addSquare(1, 2);
-// => 9</code></pre>
+    <pre class="prettyprint"><code>function square(n) {  return n * n;}var addSquare = _.flowRight([square, _.add]);addSquare(1, 2);// => 9</code></pre>
 
     
 </dd>
@@ -3157,12 +2922,7 @@ key. The iteratee is invoked with one argument: (value).</p>
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>_.groupBy([6.1, 4.2, 6.3], Math.floor);
-// => { '4': [4.2], '6': [6.1, 6.3] }
-
-// The `_.property` iteratee shorthand.
-_.groupBy(['one', 'two', 'three'], 'length');
-// => { '3': ['one', 'two'], '5': ['three'] }</code></pre>
+    <pre class="prettyprint"><code>_.groupBy([6.1, 4.2, 6.3], Math.floor);// => { '4': [4.2], '6': [6.1, 6.3] }// The `_.property` iteratee shorthand._.groupBy(['one', 'two', 'three'], 'length');// => { '3': ['one', 'two'], '5': ['three'] }</code></pre>
 
     
 </dd>
@@ -3246,14 +3006,7 @@ _.groupBy(['one', 'two', 'three'], 'length');
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>_.gt(3, 1);
-// => true
-
-_.gt(3, 3);
-// => false
-
-_.gt(1, 3);
-// => false</code></pre>
+    <pre class="prettyprint"><code>_.gt(3, 1);// => true_.gt(3, 3);// => false_.gt(1, 3);// => false</code></pre>
 
     
 </dd>
@@ -3337,14 +3090,7 @@ _.gt(1, 3);
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>_.gte(3, 1);
-// => true
-
-_.gte(3, 3);
-// => true
-
-_.gte(1, 3);
-// => false</code></pre>
+    <pre class="prettyprint"><code>_.gte(3, 1);// => true_.gte(3, 3);// => true_.gte(1, 3);// => false</code></pre>
 
     
 </dd>
@@ -3424,8 +3170,7 @@ determined by the first array.</p>
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>_.intersection([2, 1], [2, 3]);
-// => [2]</code></pre>
+    <pre class="prettyprint"><code>_.intersection([2, 1], [2, 3]);// => [2]</code></pre>
 
     
 </dd>
@@ -3506,12 +3251,7 @@ determined by the first array. The iteratee is invoked with one argument:<br>
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>_.intersectionBy([2.1, 1.2], [2.3, 3.4], Math.floor);
-// => [2.1]
-
-// The `_.property` iteratee shorthand.
-_.intersectionBy([{ 'x': 1 }], [{ 'x': 2 }, { 'x': 1 }], 'x');
-// => [{ 'x': 1 }]</code></pre>
+    <pre class="prettyprint"><code>_.intersectionBy([2.1, 1.2], [2.3, 3.4], Math.floor);// => [2.1]// The `_.property` iteratee shorthand._.intersectionBy([{ 'x': 1 }], [{ 'x': 2 }, { 'x': 1 }], 'x');// => [{ 'x': 1 }]</code></pre>
 
     
 </dd>
@@ -3591,11 +3331,7 @@ invoked with two arguments: (arrVal, othVal).</p>
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>var objects = [{ 'x': 1, 'y': 2 }, { 'x': 2, 'y': 1 }];
-var others = [{ 'x': 1, 'y': 1 }, { 'x': 1, 'y': 2 }];
-
-_.intersectionWith(objects, others, _.isEqual);
-// => [{ 'x': 1, 'y': 2 }]</code></pre>
+    <pre class="prettyprint"><code>var objects = [{ 'x': 1, 'y': 2 }, { 'x': 2, 'y': 1 }];var others = [{ 'x': 1, 'y': 1 }, { 'x': 1, 'y': 2 }];_.intersectionWith(objects, others, _.isEqual);// => [{ 'x': 1, 'y': 2 }]</code></pre>
 
     
 </dd>
@@ -3674,10 +3410,7 @@ property assignments of previous values.</p>
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>var object = { 'a': 1, 'b': 2, 'c': 1 };
-
-_.invert(object);
-// => { '1': 'c', '2': 'b' }</code></pre>
+    <pre class="prettyprint"><code>var object = { 'a': 1, 'b': 2, 'c': 1 };_.invert(object);// => { '1': 'c', '2': 'b' }</code></pre>
 
     
 </dd>
@@ -3758,15 +3491,7 @@ with one argument: (value).</p>
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>var object = { 'a': 1, 'b': 2, 'c': 1 };
-
-_.invertBy(object);
-// => { '1': ['a', 'c'], '2': ['b'] }
-
-_.invertBy(object, function(value) {
-  return 'group' + value;
-});
-// => { 'group1': ['a', 'c'], 'group2': ['b'] }</code></pre>
+    <pre class="prettyprint"><code>var object = { 'a': 1, 'b': 2, 'c': 1 };_.invertBy(object);// => { '1': ['a', 'c'], '2': ['b'] }_.invertBy(object, function(value) {  return 'group' + value;});// => { 'group1': ['a', 'c'], 'group2': ['b'] }</code></pre>
 
     
 </dd>
@@ -3843,10 +3568,7 @@ _.invertBy(object, function(value) {
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>var object = { 'a': [{ 'b': { 'c': [1, 2, 3, 4] } }] };
-
-_.invoke(object, 'a[0].b.c.slice', 1, 3);
-// => [2, 3]</code></pre>
+    <pre class="prettyprint"><code>var object = { 'a': [{ 'b': { 'c': [1, 2, 3, 4] } }] };_.invoke(object, 'a[0].b.c.slice', 1, 3);// => [2, 3]</code></pre>
 
     
 </dd>
@@ -3926,11 +3648,7 @@ for, and <code>this</code> bound to, each element in <code>collection</code>.</p
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>_.invokeMap([[5, 1, 7], [3, 2, 1]], 'sort');
-// => [[1, 5, 7], [1, 2, 3]]
-
-_.invokeMap([123, 456], String.prototype.split, '');
-// => [['1', '2', '3'], ['4', '5', '6']]</code></pre>
+    <pre class="prettyprint"><code>_.invokeMap([[5, 1, 7], [3, 2, 1]], 'sort');// => [[1, 5, 7], [1, 2, 3]]_.invokeMap([123, 456], String.prototype.split, '');// => [['1', '2', '3'], ['4', '5', '6']]</code></pre>
 
     
 </dd>
@@ -4007,11 +3725,7 @@ _.invokeMap([123, 456], String.prototype.split, '');
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>_.isArguments(function() { return arguments; }());
-// => true
-
-_.isArguments([1, 2, 3]);
-// => false</code></pre>
+    <pre class="prettyprint"><code>_.isArguments(function() { return arguments; }());// => true_.isArguments([1, 2, 3]);// => false</code></pre>
 
     
 </dd>
@@ -4088,17 +3802,7 @@ _.isArguments([1, 2, 3]);
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>_.isArray([1, 2, 3]);
-// => true
-
-_.isArray(document.body.children);
-// => false
-
-_.isArray('abc');
-// => false
-
-_.isArray(_.noop);
-// => false</code></pre>
+    <pre class="prettyprint"><code>_.isArray([1, 2, 3]);// => true_.isArray(document.body.children);// => false_.isArray('abc');// => false_.isArray(_.noop);// => false</code></pre>
 
     
 </dd>
@@ -4175,11 +3879,7 @@ _.isArray(_.noop);
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>_.isArrayBuffer(new ArrayBuffer(2));
-// => true
-
-_.isArrayBuffer(new Array(2));
-// => false</code></pre>
+    <pre class="prettyprint"><code>_.isArrayBuffer(new ArrayBuffer(2));// => true_.isArrayBuffer(new Array(2));// => false</code></pre>
 
     
 </dd>
@@ -4256,11 +3956,7 @@ _.isArrayBuffer(new Array(2));
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>_.isBuffer(new Buffer(2));
-// => true
-
-_.isBuffer(new Uint8Array(2));
-// => false</code></pre>
+    <pre class="prettyprint"><code>_.isBuffer(new Buffer(2));// => true_.isBuffer(new Uint8Array(2));// => false</code></pre>
 
     
 </dd>
@@ -4337,11 +4033,7 @@ _.isBuffer(new Uint8Array(2));
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>_.isDate(new Date);
-// => true
-
-_.isDate('Mon April 23 2012');
-// => false</code></pre>
+    <pre class="prettyprint"><code>_.isDate(new Date);// => true_.isDate('Mon April 23 2012');// => false</code></pre>
 
     
 </dd>
@@ -4418,11 +4110,7 @@ _.isDate('Mon April 23 2012');
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>_.isMap(new Map);
-// => true
-
-_.isMap(new WeakMap);
-// => false</code></pre>
+    <pre class="prettyprint"><code>_.isMap(new Map);// => true_.isMap(new WeakMap);// => false</code></pre>
 
     
 </dd>
@@ -4499,11 +4187,7 @@ _.isMap(new WeakMap);
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>_.isRegExp(/abc/);
-// => true
-
-_.isRegExp('/abc/');
-// => false</code></pre>
+    <pre class="prettyprint"><code>_.isRegExp(/abc/);// => true_.isRegExp('/abc/');// => false</code></pre>
 
     
 </dd>
@@ -4580,11 +4264,7 @@ _.isRegExp('/abc/');
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>_.isSet(new Set);
-// => true
-
-_.isSet(new WeakSet);
-// => false</code></pre>
+    <pre class="prettyprint"><code>_.isSet(new Set);// => true_.isSet(new WeakSet);// => false</code></pre>
 
     
 </dd>
@@ -4661,11 +4341,7 @@ _.isSet(new WeakSet);
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>_.isTypedArray(new Uint8Array);
-// => true
-
-_.isTypedArray([]);
-// => false</code></pre>
+    <pre class="prettyprint"><code>_.isTypedArray(new Uint8Array);// => true_.isTypedArray([]);// => false</code></pre>
 
     
 </dd>
@@ -4743,14 +4419,7 @@ _.isTypedArray([]);
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>_.kebabCase('Foo Bar');
-// => 'foo-bar'
-
-_.kebabCase('fooBar');
-// => 'foo-bar'
-
-_.kebabCase('__FOO_BAR__');
-// => 'foo-bar'</code></pre>
+    <pre class="prettyprint"><code>_.kebabCase('Foo Bar');// => 'foo-bar'_.kebabCase('fooBar');// => 'foo-bar'_.kebabCase('__FOO_BAR__');// => 'foo-bar'</code></pre>
 
     
 </dd>
@@ -4830,18 +4499,7 @@ iteratee is invoked with one argument: (value).</p>
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>var array = [
-  { 'dir': 'left', 'code': 97 },
-  { 'dir': 'right', 'code': 100 }
-];
-
-_.keyBy(array, function(o) {
-  return String.fromCharCode(o.code);
-});
-// => { 'a': { 'dir': 'left', 'code': 97 }, 'd': { 'dir': 'right', 'code': 100 } }
-
-_.keyBy(array, 'dir');
-// => { 'left': { 'dir': 'left', 'code': 97 }, 'right': { 'dir': 'right', 'code': 100 } }</code></pre>
+    <pre class="prettyprint"><code>var array = [  { 'dir': 'left', 'code': 97 },  { 'dir': 'right', 'code': 100 }];_.keyBy(array, function(o) {  return String.fromCharCode(o.code);});// => { 'a': { 'dir': 'left', 'code': 97 }, 'd': { 'dir': 'right', 'code': 100 } }_.keyBy(array, 'dir');// => { 'left': { 'dir': 'left', 'code': 97 }, 'right': { 'dir': 'right', 'code': 100 } }</code></pre>
 
     
 </dd>
@@ -4918,14 +4576,7 @@ _.keyBy(array, 'dir');
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>_.lowerCase('--Foo-Bar--');
-// => 'foo bar'
-
-_.lowerCase('fooBar');
-// => 'foo bar'
-
-_.lowerCase('__FOO_BAR__');
-// => 'foo bar'</code></pre>
+    <pre class="prettyprint"><code>_.lowerCase('--Foo-Bar--');// => 'foo bar'_.lowerCase('fooBar');// => 'foo bar'_.lowerCase('__FOO_BAR__');// => 'foo bar'</code></pre>
 
     
 </dd>
@@ -5002,11 +4653,7 @@ _.lowerCase('__FOO_BAR__');
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>_.lowerFirst('Fred');
-// => 'fred'
-
-_.lowerFirst('FRED');
-// => 'fRED'</code></pre>
+    <pre class="prettyprint"><code>_.lowerFirst('Fred');// => 'fred'_.lowerFirst('FRED');// => 'fRED'</code></pre>
 
     
 </dd>
@@ -5090,14 +4737,7 @@ _.lowerFirst('FRED');
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>_.lt(1, 3);
-// => true
-
-_.lt(3, 3);
-// => false
-
-_.lt(3, 1);
-// => false</code></pre>
+    <pre class="prettyprint"><code>_.lt(1, 3);// => true_.lt(3, 3);// => false_.lt(3, 1);// => false</code></pre>
 
     
 </dd>
@@ -5181,14 +4821,7 @@ _.lt(3, 1);
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>_.lte(1, 3);
-// => true
-
-_.lte(3, 3);
-// => true
-
-_.lte(3, 1);
-// => false</code></pre>
+    <pre class="prettyprint"><code>_.lte(1, 3);// => true_.lte(3, 3);// => true_.lte(3, 1);// => false</code></pre>
 
     
 </dd>
@@ -5272,16 +4905,7 @@ sources overwrite property assignments of previous sources.</p>
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>var object = {
-  'a': [{ 'b': 2 }, { 'd': 4 }]
-};
-
-var other = {
-  'a': [{ 'c': 3 }, { 'e': 5 }]
-};
-
-_.merge(object, other);
-// => { 'a': [{ 'b': 2, 'c': 3 }, { 'd': 4, 'e': 5 }] }</code></pre>
+    <pre class="prettyprint"><code>var object = {  'a': [{ 'b': 2 }, { 'd': 4 }]};var other = {  'a': [{ 'c': 3 }, { 'e': 5 }]};_.merge(object, other);// => { 'a': [{ 'b': 2, 'c': 3 }, { 'd': 4, 'e': 5 }] }</code></pre>
 
     
 </dd>
@@ -5363,17 +4987,7 @@ method instead. The <code>customizer</code> is invoked with six arguments:<br>
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>function customizer(objValue, srcValue) {
-  if (_.isArray(objValue)) {
-    return objValue.concat(srcValue);
-  }
-}
-
-var object = { 'a': [1], 'b': [2] };
-var other = { 'a': [3], 'b': [4] };
-
-_.mergeWith(object, other, customizer);
-// => { 'a': [1, 3], 'b': [2, 4] }</code></pre>
+    <pre class="prettyprint"><code>function customizer(objValue, srcValue) {  if (_.isArray(objValue)) {    return objValue.concat(srcValue);  }}var object = { 'a': [1], 'b': [2] };var other = { 'a': [3], 'b': [4] };_.mergeWith(object, other, customizer);// => { 'a': [1, 3], 'b': [2, 4] }</code></pre>
 
     
 </dd>
@@ -5451,16 +5065,7 @@ Any additional arguments are provided to the invoked method.</p>
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>var objects = [
-  { 'a': { 'b': _.constant(2) } },
-  { 'a': { 'b': _.constant(1) } }
-];
-
-_.map(objects, _.method('a.b'));
-// => [2, 1]
-
-_.map(objects, _.method(['a', 'b']));
-// => [2, 1]</code></pre>
+    <pre class="prettyprint"><code>var objects = [  { 'a': { 'b': _.constant(2) } },  { 'a': { 'b': _.constant(1) } }];_.map(objects, _.method('a.b'));// => [2, 1]_.map(objects, _.method(['a', 'b']));// => [2, 1]</code></pre>
 
     
 </dd>
@@ -5539,14 +5144,7 @@ provided to the invoked method.</p>
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>var array = _.times(3, _.constant),
-    object = { 'a': array, 'b': array, 'c': array };
-
-_.map(['a[2]', 'c[0]'], _.methodOf(object));
-// => [2, 0]
-
-_.map([['a', '2'], ['c', '0']], _.methodOf(object));
-// => [2, 0]</code></pre>
+    <pre class="prettyprint"><code>var array = _.times(3, _.constant),    object = { 'a': array, 'b': array, 'c': array };_.map(['a[2]', 'c[0]'], _.methodOf(object));// => [2, 0]_.map([['a', '2'], ['c', '0']], _.methodOf(object));// => [2, 0]</code></pre>
 
     
 </dd>
@@ -5623,8 +5221,7 @@ _.map([['a', '2'], ['c', '0']], _.methodOf(object));
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>_.multiply(6, 4);
-// => 24</code></pre>
+    <pre class="prettyprint"><code>_.multiply(6, 4);// => 24</code></pre>
 
     
 </dd>
@@ -5702,16 +5299,7 @@ _.map([['a', '2'], ['c', '0']], _.methodOf(object));
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>var wrapped = _([1, 2]);
-
-wrapped.next();
-// => { 'done': false, 'value': 1 }
-
-wrapped.next();
-// => { 'done': false, 'value': 2 }
-
-wrapped.next();
-// => { 'done': true, 'value': undefined }</code></pre>
+    <pre class="prettyprint"><code>var wrapped = _([1, 2]);wrapped.next();// => { 'done': false, 'value': 1 }wrapped.next();// => { 'done': false, 'value': 2 }wrapped.next();// => { 'done': true, 'value': undefined }</code></pre>
 
     
 </dd>
@@ -5789,10 +5377,7 @@ the Unix epoch (1 January 1970 00:00:00 UTC).</p>
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>_.defer(function(stamp) {
-  console.log(_.now() - stamp);
-}, _.now());
-// => Logs the number of milliseconds it took for the deferred invocation.</code></pre>
+    <pre class="prettyprint"><code>_.defer(function(stamp) {  console.log(_.now() - stamp);}, _.now());// => Logs the number of milliseconds it took for the deferred invocation.</code></pre>
 
     
 </dd>
@@ -5871,10 +5456,7 @@ own and inherited enumerable property paths of <code>object</code> that are not 
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>var object = { 'a': 1, 'b': '2', 'c': 3 };
-
-_.omit(object, ['a', 'c']);
-// => { 'b': '2' }</code></pre>
+    <pre class="prettyprint"><code>var object = { 'a': 1, 'b': '2', 'c': 3 };_.omit(object, ['a', 'c']);// => { 'b': '2' }</code></pre>
 
     
 </dd>
@@ -5952,10 +5534,7 @@ and returns their results.</p>
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>var func = _.over([Math.max, Math.min]);
-
-func(1, 2, 3, 4);
-// => [4, 1]</code></pre>
+    <pre class="prettyprint"><code>var func = _.over([Math.max, Math.min]);func(1, 2, 3, 4);// => [4, 1]</code></pre>
 
     
 </dd>
@@ -6032,23 +5611,7 @@ func(1, 2, 3, 4);
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>function doubled(n) {
-  return n * 2;
-}
-
-function square(n) {
-  return n * n;
-}
-
-var func = _.overArgs(function(x, y) {
-  return [x, y];
-}, [square, doubled]);
-
-func(9, 3);
-// => [81, 6]
-
-func(10, 5);
-// => [100, 10]</code></pre>
+    <pre class="prettyprint"><code>function doubled(n) {  return n * 2;}function square(n) {  return n * n;}var func = _.overArgs(function(x, y) {  return [x, y];}, [square, doubled]);func(9, 3);// => [81, 6]func(10, 5);// => [100, 10]</code></pre>
 
     
 </dd>
@@ -6126,16 +5689,7 @@ truthy when invoked with the arguments it receives.</p>
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>var func = _.overEvery([Boolean, isFinite]);
-
-func('1');
-// => true
-
-func(null);
-// => false
-
-func(NaN);
-// => false</code></pre>
+    <pre class="prettyprint"><code>var func = _.overEvery([Boolean, isFinite]);func('1');// => truefunc(null);// => falsefunc(NaN);// => false</code></pre>
 
     
 </dd>
@@ -6213,16 +5767,7 @@ truthy when invoked with the arguments it receives.</p>
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>var func = _.overSome([Boolean, isFinite]);
-
-func('1');
-// => true
-
-func(null);
-// => true
-
-func(NaN);
-// => false</code></pre>
+    <pre class="prettyprint"><code>var func = _.overSome([Boolean, isFinite]);func('1');// => truefunc(null);// => truefunc(NaN);// => false</code></pre>
 
     
 </dd>
@@ -6305,18 +5850,7 @@ applied functions.</p>
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>function greet(greeting, name) {
-  return greeting + ' ' + name;
-}
-
-var sayHelloTo = _.partial(greet, 'hello');
-sayHelloTo('fred');
-// => 'hello fred'
-
-// Partially applied with placeholders.
-var greetFred = _.partial(greet, _, 'fred');
-greetFred('hi');
-// => 'hi fred'</code></pre>
+    <pre class="prettyprint"><code>function greet(greeting, name) {  return greeting + ' ' + name;}var sayHelloTo = _.partial(greet, 'hello');sayHelloTo('fred');// => 'hello fred'// Partially applied with placeholders.var greetFred = _.partial(greet, _, 'fred');greetFred('hi');// => 'hi fred'</code></pre>
 
     
 </dd>
@@ -6398,18 +5932,7 @@ applied functions.</p>
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>function greet(greeting, name) {
-  return greeting + ' ' + name;
-}
-
-var greetFred = _.partialRight(greet, 'fred');
-greetFred('hi');
-// => 'hi fred'
-
-// Partially applied with placeholders.
-var sayHelloTo = _.partialRight(greet, 'hello', _);
-sayHelloTo('fred');
-// => 'hello fred'</code></pre>
+    <pre class="prettyprint"><code>function greet(greeting, name) {  return greeting + ' ' + name;}var greetFred = _.partialRight(greet, 'fred');greetFred('hi');// => 'hi fred'// Partially applied with placeholders.var sayHelloTo = _.partialRight(greet, 'hello', _);sayHelloTo('fred');// => 'hello fred'</code></pre>
 
     
 </dd>
@@ -6489,26 +6012,7 @@ invoked with one argument: (value).</p>
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>var users = [
-  { 'user': 'barney',  'age': 36, 'active': false },
-  { 'user': 'fred',    'age': 40, 'active': true },
-  { 'user': 'pebbles', 'age': 1,  'active': false }
-];
-
-_.partition(users, function(o) { return o.active; });
-// => objects for [['fred'], ['barney', 'pebbles']]
-
-// The `_.matches` iteratee shorthand.
-_.partition(users, { 'age': 1, 'active': false });
-// => objects for [['pebbles'], ['barney', 'fred']]
-
-// The `_.matchesProperty` iteratee shorthand.
-_.partition(users, ['active', false]);
-// => objects for [['barney', 'pebbles'], ['fred']]
-
-// The `_.property` iteratee shorthand.
-_.partition(users, 'active');
-// => objects for [['fred'], ['barney', 'pebbles']]</code></pre>
+    <pre class="prettyprint"><code>var users = [  { 'user': 'barney',  'age': 36, 'active': false },  { 'user': 'fred',    'age': 40, 'active': true },  { 'user': 'pebbles', 'age': 1,  'active': false }];_.partition(users, function(o) { return o.active; });// => objects for [['fred'], ['barney', 'pebbles']]// The `_.matches` iteratee shorthand._.partition(users, { 'age': 1, 'active': false });// => objects for [['pebbles'], ['barney', 'fred']]// The `_.matchesProperty` iteratee shorthand._.partition(users, ['active', false]);// => objects for [['barney', 'pebbles'], ['fred']]// The `_.property` iteratee shorthand._.partition(users, 'active');// => objects for [['fred'], ['barney', 'pebbles']]</code></pre>
 
     
 </dd>
@@ -6585,10 +6089,7 @@ _.partition(users, 'active');
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>var object = { 'a': 1, 'b': '2', 'c': 3 };
-
-_.pick(object, ['a', 'c']);
-// => { 'a': 1, 'c': 3 }</code></pre>
+    <pre class="prettyprint"><code>var object = { 'a': 1, 'b': '2', 'c': 3 };_.pick(object, ['a', 'c']);// => { 'a': 1, 'c': 3 }</code></pre>
 
     
 </dd>
@@ -6665,18 +6166,7 @@ _.pick(object, ['a', 'c']);
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>function square(n) {
-  return n * n;
-}
-
-var wrapped = _([1, 2]).map(square);
-var other = wrapped.plant([3, 4]);
-
-other.value();
-// => [9, 16]
-
-wrapped.value();
-// => [1, 4]</code></pre>
+    <pre class="prettyprint"><code>function square(n) {  return n * n;}var wrapped = _([1, 2]).map(square);var other = wrapped.plant([3, 4]);other.value();// => [9, 16]wrapped.value();// => [1, 4]</code></pre>
 
     
 </dd>
@@ -6757,11 +6247,7 @@ to remove elements from an array by predicate.</p>
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>var array = ['a', 'b', 'c', 'a', 'b', 'c'];
-
-_.pull(array, 'a', 'c');
-console.log(array);
-// => ['b', 'b']</code></pre>
+    <pre class="prettyprint"><code>var array = ['a', 'b', 'c', 'a', 'b', 'c'];_.pull(array, 'a', 'c');console.log(array);// => ['b', 'b']</code></pre>
 
     
 </dd>
@@ -6840,14 +6326,7 @@ array of removed elements.</p>
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>var array = ['a', 'b', 'c', 'd'];
-var pulled = _.pullAt(array, [1, 3]);
-
-console.log(array);
-// => ['a', 'c']
-
-console.log(pulled);
-// => ['b', 'd']</code></pre>
+    <pre class="prettyprint"><code>var array = ['a', 'b', 'c', 'd'];var pulled = _.pullAt(array, [1, 3]);console.log(array);// => ['a', 'c']console.log(pulled);// => ['b', 'd']</code></pre>
 
     
 </dd>
@@ -6936,26 +6415,7 @@ floating-point values which can produce unexpected results.</p>
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>_.range(4);
-// => [0, 1, 2, 3]
-
-_.range(-4);
-// => [0, -1, -2, -3]
-
-_.range(1, 5);
-// => [1, 2, 3, 4]
-
-_.range(0, 20, 5);
-// => [0, 5, 10, 15]
-
-_.range(0, -4, -1);
-// => [0, -1, -2, -3]
-
-_.range(1, 4, 0);
-// => [1, 1, 1]
-
-_.range(0);
-// => []</code></pre>
+    <pre class="prettyprint"><code>_.range(4);// => [0, 1, 2, 3]_.range(-4);// => [0, -1, -2, -3]_.range(1, 5);// => [1, 2, 3, 4]_.range(0, 20, 5);// => [0, 5, 10, 15]_.range(0, -4, -1);// => [0, -1, -2, -3]_.range(1, 4, 0);// => [1, 1, 1]_.range(0);// => []</code></pre>
 
     
 </dd>
@@ -7040,26 +6500,7 @@ descending order.</p>
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>_.rangeRight(4);
-// => [3, 2, 1, 0]
-
-_.rangeRight(-4);
-// => [-3, -2, -1, 0]
-
-_.rangeRight(1, 5);
-// => [4, 3, 2, 1]
-
-_.rangeRight(0, 20, 5);
-// => [15, 10, 5, 0]
-
-_.rangeRight(0, -4, -1);
-// => [-3, -2, -1, 0]
-
-_.rangeRight(1, 4, 0);
-// => [1, 1, 1]
-
-_.rangeRight(0);
-// => []</code></pre>
+    <pre class="prettyprint"><code>_.rangeRight(4);// => [3, 2, 1, 0]_.rangeRight(-4);// => [-3, -2, -1, 0]_.rangeRight(1, 5);// => [4, 3, 2, 1]_.rangeRight(0, 20, 5);// => [15, 10, 5, 0]_.rangeRight(0, -4, -1);// => [-3, -2, -1, 0]_.rangeRight(1, 4, 0);// => [1, 1, 1]_.rangeRight(0);// => []</code></pre>
 
     
 </dd>
@@ -7139,12 +6580,7 @@ provided as the second argument, and so on.</p>
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>var rearged = _.rearg(function(a, b, c) {
-  return [a, b, c];
-}, [2, 0, 1]);
-
-rearged('b', 'c', 'a')
-// => ['a', 'b', 'c']</code></pre>
+    <pre class="prettyprint"><code>var rearged = _.rearg(function(a, b, c) {  return [a, b, c];}, [2, 0, 1]);rearged('b', 'c', 'a')// => ['a', 'b', 'c']</code></pre>
 
     
 </dd>
@@ -7222,13 +6658,7 @@ rearged('b', 'c', 'a')
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>var array = [1, 2, 3];
-
-_(array).reverse().value()
-// => [3, 2, 1]
-
-console.log(array);
-// => [3, 2, 1]</code></pre>
+    <pre class="prettyprint"><code>var array = [1, 2, 3];_(array).reverse().value()// => [3, 2, 1]console.log(array);// => [3, 2, 1]</code></pre>
 
     
 </dd>
@@ -7305,14 +6735,7 @@ console.log(array);
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>_.round(4.006);
-// => 4
-
-_.round(4.006, 2);
-// => 4.01
-
-_.round(4060, -2);
-// => 4100</code></pre>
+    <pre class="prettyprint"><code>_.round(4.006);// => 4_.round(4.006, 2);// => 4.01_.round(4060, -2);// => 4100</code></pre>
 
     
 </dd>
@@ -7390,14 +6813,7 @@ _.round(4060, -2);
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>_.snakeCase('Foo Bar');
-// => 'foo_bar'
-
-_.snakeCase('fooBar');
-// => 'foo_bar'
-
-_.snakeCase('--FOO-BAR--');
-// => 'foo_bar'</code></pre>
+    <pre class="prettyprint"><code>_.snakeCase('Foo Bar');// => 'foo_bar'_.snakeCase('fooBar');// => 'foo_bar'_.snakeCase('--FOO-BAR--');// => 'foo_bar'</code></pre>
 
     
 </dd>
@@ -7477,18 +6893,7 @@ equal elements. The iteratees are invoked with one argument: (value).</p>
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>var users = [
-  { 'user': 'fred',   'age': 48 },
-  { 'user': 'barney', 'age': 36 },
-  { 'user': 'fred',   'age': 40 },
-  { 'user': 'barney', 'age': 34 }
-];
-
-_.sortBy(users, [function(o) { return o.user; }]);
-// => objects for [['barney', 36], ['barney', 34], ['fred', 48], ['fred', 40]]
-
-_.sortBy(users, ['user', 'age']);
-// => objects for [['barney', 34], ['barney', 36], ['fred', 40], ['fred', 48]]</code></pre>
+    <pre class="prettyprint"><code>var users = [  { 'user': 'fred',   'age': 48 },  { 'user': 'barney', 'age': 36 },  { 'user': 'fred',   'age': 40 },  { 'user': 'barney', 'age': 34 }];_.sortBy(users, [function(o) { return o.user; }]);// => objects for [['barney', 36], ['barney', 34], ['fred', 48], ['fred', 40]]_.sortBy(users, ['user', 'age']);// => objects for [['barney', 34], ['barney', 36], ['fred', 40], ['fred', 48]]</code></pre>
 
     
 </dd>
@@ -7566,14 +6971,7 @@ _.sortBy(users, ['user', 'age']);
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>_.startCase('--foo-bar--');
-// => 'Foo Bar'
-
-_.startCase('fooBar');
-// => 'Foo Bar'
-
-_.startCase('__FOO_BAR__');
-// => 'FOO BAR'</code></pre>
+    <pre class="prettyprint"><code>_.startCase('--foo-bar--');// => 'Foo Bar'_.startCase('fooBar');// => 'Foo Bar'_.startCase('__FOO_BAR__');// => 'FOO BAR'</code></pre>
 
     
 </dd>
@@ -7650,8 +7048,7 @@ _.startCase('__FOO_BAR__');
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>_.subtract(6, 4);
-// => 2</code></pre>
+    <pre class="prettyprint"><code>_.subtract(6, 4);// => 2</code></pre>
 
     
 </dd>
@@ -7730,8 +7127,7 @@ for equality comparisons.</p>
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>_.union([2], [1, 2]);
-// => [2, 1]</code></pre>
+    <pre class="prettyprint"><code>_.union([2], [1, 2]);// => [2, 1]</code></pre>
 
     
 </dd>
@@ -7812,12 +7208,7 @@ array in which the value occurs. The iteratee is invoked with one argument:<br>
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>_.unionBy([2.1], [1.2, 2.3], Math.floor);
-// => [2.1, 1.2]
-
-// The `_.property` iteratee shorthand.
-_.unionBy([{ 'x': 1 }], [{ 'x': 2 }, { 'x': 1 }], 'x');
-// => [{ 'x': 1 }, { 'x': 2 }]</code></pre>
+    <pre class="prettyprint"><code>_.unionBy([2.1], [1.2, 2.3], Math.floor);// => [2.1, 1.2]// The `_.property` iteratee shorthand._.unionBy([{ 'x': 1 }], [{ 'x': 2 }, { 'x': 1 }], 'x');// => [{ 'x': 1 }, { 'x': 2 }]</code></pre>
 
     
 </dd>
@@ -7897,11 +7288,7 @@ with two arguments: (arrVal, othVal).</p>
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>var objects = [{ 'x': 1, 'y': 2 }, { 'x': 2, 'y': 1 }];
-var others = [{ 'x': 1, 'y': 1 }, { 'x': 1, 'y': 2 }];
-
-_.unionWith(objects, others, _.isEqual);
-// => [{ 'x': 1, 'y': 2 }, { 'x': 2, 'y': 1 }, { 'x': 1, 'y': 1 }]</code></pre>
+    <pre class="prettyprint"><code>var objects = [{ 'x': 1, 'y': 2 }, { 'x': 2, 'y': 1 }];var others = [{ 'x': 1, 'y': 1 }, { 'x': 1, 'y': 2 }];_.unionWith(objects, others, _.isEqual);// => [{ 'x': 1, 'y': 2 }, { 'x': 2, 'y': 1 }, { 'x': 1, 'y': 1 }]</code></pre>
 
     
 </dd>
@@ -7978,14 +7365,7 @@ _.unionWith(objects, others, _.isEqual);
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>_.upperCase('--foo-bar');
-// => 'FOO BAR'
-
-_.upperCase('fooBar');
-// => 'FOO BAR'
-
-_.upperCase('__foo_bar__');
-// => 'FOO BAR'</code></pre>
+    <pre class="prettyprint"><code>_.upperCase('--foo-bar');// => 'FOO BAR'_.upperCase('fooBar');// => 'FOO BAR'_.upperCase('__foo_bar__');// => 'FOO BAR'</code></pre>
 
     
 </dd>
@@ -8062,11 +7442,7 @@ _.upperCase('__foo_bar__');
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>_.upperFirst('fred');
-// => 'Fred'
-
-_.upperFirst('FRED');
-// => 'FRED'</code></pre>
+    <pre class="prettyprint"><code>_.upperFirst('fred');// => 'Fred'_.upperFirst('FRED');// => 'FRED'</code></pre>
 
     
 </dd>
@@ -8153,8 +7529,7 @@ for equality comparisons.</p>
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>_.without([2, 1, 2, 3], 1, 2);
-// => [3]</code></pre>
+    <pre class="prettyprint"><code>_.without([2, 1, 2, 3], 1, 2);// => [3]</code></pre>
 
     
 </dd>
@@ -8241,8 +7616,7 @@ they occur in the arrays.</p>
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>_.xor([2, 1], [2, 3]);
-// => [1, 3]</code></pre>
+    <pre class="prettyprint"><code>_.xor([2, 1], [2, 3]);// => [1, 3]</code></pre>
 
     
 </dd>
@@ -8323,12 +7697,7 @@ argument: (value).</p>
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>_.xorBy([2.1, 1.2], [2.3, 3.4], Math.floor);
-// => [1.2, 3.4]
-
-// The `_.property` iteratee shorthand.
-_.xorBy([{ 'x': 1 }], [{ 'x': 2 }, { 'x': 1 }], 'x');
-// => [{ 'x': 2 }]</code></pre>
+    <pre class="prettyprint"><code>_.xorBy([2.1, 1.2], [2.3, 3.4], Math.floor);// => [1.2, 3.4]// The `_.property` iteratee shorthand._.xorBy([{ 'x': 1 }], [{ 'x': 2 }, { 'x': 1 }], 'x');// => [{ 'x': 2 }]</code></pre>
 
     
 </dd>
@@ -8408,11 +7777,7 @@ with two arguments: (arrVal, othVal).</p>
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>var objects = [{ 'x': 1, 'y': 2 }, { 'x': 2, 'y': 1 }];
-var others = [{ 'x': 1, 'y': 1 }, { 'x': 1, 'y': 2 }];
-
-_.xorWith(objects, others, _.isEqual);
-// => [{ 'x': 2, 'y': 1 }, { 'x': 1, 'y': 1 }]</code></pre>
+    <pre class="prettyprint"><code>var objects = [{ 'x': 1, 'y': 2 }, { 'x': 2, 'y': 1 }];var others = [{ 'x': 1, 'y': 1 }, { 'x': 1, 'y': 2 }];_.xorWith(objects, others, _.isEqual);// => [{ 'x': 2, 'y': 1 }, { 'x': 1, 'y': 1 }]</code></pre>
 
     
 </dd>
@@ -8491,8 +7856,7 @@ second elements of the given arrays, and so on.</p>
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>_.zip(['a', 'b'], [1, 2], [true, false]);
-// => [['a', 1, true], ['b', 2, false]]</code></pre>
+    <pre class="prettyprint"><code>_.zip(['a', 'b'], [1, 2], [true, false]);// => [['a', 1, true], ['b', 2, false]]</code></pre>
 
     
 </dd>
@@ -8571,10 +7935,7 @@ elements of each group: (...group).</p>
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>_.zipWith([1, 2], [10, 20], [100, 200], function(a, b, c) {
-  return a + b + c;
-});
-// => [111, 222]</code></pre>
+    <pre class="prettyprint"><code>_.zipWith([1, 2], [10, 20], [100, 200], function(a, b, c) {  return a + b + c;});// => [111, 222]</code></pre>
 
     
 </dd>
@@ -8651,8 +8012,7 @@ elements of each group: (...group).</p>
     
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>_([1, 2, 3]).value();
-// => [1, 2, 3]</code></pre>
+    <pre class="prettyprint"><code>_([1, 2, 3]).value();// => [1, 2, 3]</code></pre>
 
     
 </dd>
@@ -8849,16 +8209,7 @@ elements of each group: (...group).</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var saves = ['profile', 'settings'];
-
-var done = _.after(saves.length, function() {
-  console.log('done saving!');
-});
-
-_.forEach(saves, function(type) {
-  asyncSave({ 'type': type, 'complete': done });
-});
-// => Logs 'done saving!' after the two async saves have completed.</code></pre>
+    <pre class="prettyprint"><code>var saves = ['profile', 'settings'];var done = _.after(saves.length, function() {  console.log('done saving!');});_.forEach(saves, function(type) {  asyncSave({ 'type': type, 'complete': done });});// => Logs 'done saving!' after the two async saves have completed.</code></pre>
 
     
 
@@ -9082,8 +8433,7 @@ ignoring any additional arguments.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.map(['6', '8', '10'], _.ary(parseInt, 1));
-// => [6, 8, 10]</code></pre>
+    <pre class="prettyprint"><code>_.map(['6', '8', '10'], _.ary(parseInt, 1));// => [6, 8, 10]</code></pre>
 
     
 
@@ -9276,8 +8626,7 @@ calls to the created function return the result of the last <code>func</code> in
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>jQuery(element).on('click', _.before(5, addContactToList));
-// => Allows adding up to 4 contacts to the list.</code></pre>
+    <pre class="prettyprint"><code>jQuery(element).on('click', _.before(5, addContactToList));// => Allows adding up to 4 contacts to the list.</code></pre>
 
     
 
@@ -9466,8 +8815,7 @@ to lower case.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.capitalize('FRED');
-// => 'Fred'</code></pre>
+    <pre class="prettyprint"><code>_.capitalize('FRED');// => 'Fred'</code></pre>
 
     
 
@@ -9635,27 +8983,7 @@ to lower case.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.castArray(1);
-// => [1]
-
-_.castArray({ 'a': 1 });
-// => [{ 'a': 1 }]
-
-_.castArray('abc');
-// => ['abc']
-
-_.castArray(null);
-// => [null]
-
-_.castArray(undefined);
-// => [undefined]
-
-_.castArray();
-// => []
-
-var array = [1, 2, 3];
-console.log(_.castArray(array) === array);
-// => true</code></pre>
+    <pre class="prettyprint"><code>_.castArray(1);// => [1]_.castArray({ 'a': 1 });// => [{ 'a': 1 }]_.castArray('abc');// => ['abc']_.castArray(null);// => [null]_.castArray(undefined);// => [undefined]_.castArray();// => []var array = [1, 2, 3];console.log(_.castArray(array) === array);// => true</code></pre>
 
     
 
@@ -9825,21 +9153,7 @@ with <code>_#value</code>.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var users = [
-  { 'user': 'barney',  'age': 36 },
-  { 'user': 'fred',    'age': 40 },
-  { 'user': 'pebbles', 'age': 1 }
-];
-
-var youngest = _
-  .chain(users)
-  .sortBy('age')
-  .map(function(o) {
-    return o.user + ' is ' + o.age;
-  })
-  .head()
-  .value();
-// => 'pebbles is 1'</code></pre>
+    <pre class="prettyprint"><code>var users = [  { 'user': 'barney',  'age': 36 },  { 'user': 'fred',    'age': 40 },  { 'user': 'pebbles', 'age': 1 }];var youngest = _  .chain(users)  .sortBy('age')  .map(function(o) {    return o.user + ' is ' + o.age;  })  .head()  .value();// => 'pebbles is 1'</code></pre>
 
     
 
@@ -10064,11 +9378,7 @@ elements.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.chunk(['a', 'b', 'c', 'd'], 2);
-// => [['a', 'b'], ['c', 'd']]
-
-_.chunk(['a', 'b', 'c', 'd'], 3);
-// => [['a', 'b', 'c'], ['d']]</code></pre>
+    <pre class="prettyprint"><code>_.chunk(['a', 'b', 'c', 'd'], 2);// => [['a', 'b'], ['c', 'd']]_.chunk(['a', 'b', 'c', 'd'], 3);// => [['a', 'b', 'c'], ['d']]</code></pre>
 
     
 
@@ -10310,11 +9620,7 @@ _.chunk(['a', 'b', 'c', 'd'], 3);
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.clamp(-10, -5, 5);
-// => -5
-
-_.clamp(10, -5, 5);
-// => 5</code></pre>
+    <pre class="prettyprint"><code>_.clamp(-10, -5, 5);// => -5_.clamp(10, -5, 5);// => 5</code></pre>
 
     
 
@@ -10496,11 +9802,7 @@ as error objects, functions, DOM nodes, and WeakMaps.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var objects = [{ 'a': 1 }, { 'b': 2 }];
-
-var shallow = _.clone(objects);
-console.log(shallow[0] === objects[0]);
-// => true</code></pre>
+    <pre class="prettyprint"><code>var objects = [{ 'a': 1 }, { 'b': 2 }];var shallow = _.clone(objects);console.log(shallow[0] === objects[0]);// => true</code></pre>
 
     
 
@@ -10675,11 +9977,7 @@ console.log(shallow[0] === objects[0]);
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var objects = [{ 'a': 1 }, { 'b': 2 }];
-
-var deep = _.cloneDeep(objects);
-console.log(deep[0] === objects[0]);
-// => false</code></pre>
+    <pre class="prettyprint"><code>var objects = [{ 'a': 1 }, { 'b': 2 }];var deep = _.cloneDeep(objects);console.log(deep[0] === objects[0]);// => false</code></pre>
 
     
 
@@ -10897,20 +10195,7 @@ console.log(deep[0] === objects[0]);
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>function customizer(value) {
-  if (_.isElement(value)) {
-    return value.cloneNode(true);
-  }
-}
-
-var el = _.cloneDeepWith(document.body, customizer);
-
-console.log(el === document.body);
-// => false
-console.log(el.nodeName);
-// => 'BODY'
-console.log(el.childNodes.length);
-// => 20</code></pre>
+    <pre class="prettyprint"><code>function customizer(value) {  if (_.isElement(value)) {    return value.cloneNode(true);  }}var el = _.cloneDeepWith(document.body, customizer);console.log(el === document.body);// => falseconsole.log(el.nodeName);// => 'BODY'console.log(el.childNodes.length);// => 20</code></pre>
 
     
 
@@ -11131,20 +10416,7 @@ up to four arguments; (value [, index|key, object, stack]).</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>function customizer(value) {
-  if (_.isElement(value)) {
-    return value.cloneNode(false);
-  }
-}
-
-var el = _.cloneWith(document.body, customizer);
-
-console.log(el === document.body);
-// => false
-console.log(el.nodeName);
-// => 'BODY'
-console.log(el.childNodes.length);
-// => 0</code></pre>
+    <pre class="prettyprint"><code>function customizer(value) {  if (_.isElement(value)) {    return value.cloneNode(false);  }}var el = _.cloneWith(document.body, customizer);console.log(el === document.body);// => falseconsole.log(el.nodeName);// => 'BODY'console.log(el.childNodes.length);// => 0</code></pre>
 
     
 
@@ -11313,8 +10585,7 @@ console.log(el.childNodes.length);
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.compact([0, 1, false, 2, '', 3]);
-// => [1, 2, 3]</code></pre>
+    <pre class="prettyprint"><code>_.compact([0, 1, false, 2, '', 3]);// => [1, 2, 3]</code></pre>
 
     
 
@@ -11528,14 +10799,7 @@ and/or values.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var array = [1];
-var other = _.concat(array, 2, [3], [[4]]);
-
-console.log(other);
-// => [1, 2, 3, [4]]
-
-console.log(array);
-// => [1]</code></pre>
+    <pre class="prettyprint"><code>var array = [1];var other = _.concat(array, 2, [3], [[4]]);console.log(other);// => [1, 2, 3, [4]]console.log(array);// => [1]</code></pre>
 
     
 
@@ -11706,20 +10970,7 @@ function.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var func = _.cond([
-  [_.matches({ 'a': 1 }),           _.constant('matches A')],
-  [_.conforms({ 'b': _.isNumber }), _.constant('matches B')],
-  [_.stubTrue,                      _.constant('no match')]
-]);
-
-func({ 'a': 1, 'b': 2 });
-// => 'matches A'
-
-func({ 'a': 0, 'b': 1 });
-// => 'matches B'
-
-func({ 'a': '1', 'b': '2' });
-// => 'no match'</code></pre>
+    <pre class="prettyprint"><code>var func = _.cond([  [_.matches({ 'a': 1 }),           _.constant('matches A')],  [_.conforms({ 'b': _.isNumber }), _.constant('matches B')],  [_.stubTrue,                      _.constant('no match')]]);func({ 'a': 1, 'b': 2 });// => 'matches A'func({ 'a': 0, 'b': 1 });// => 'matches B'func({ 'a': '1', 'b': '2' });// => 'no match'</code></pre>
 
     
 
@@ -11891,13 +11142,7 @@ all predicates return truthy, else <code>false</code>.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var objects = [
-  { 'a': 2, 'b': 1 },
-  { 'a': 1, 'b': 2 }
-];
-
-_.filter(objects, _.conforms({ 'b': function(n) { return n > 1; } }));
-// => [{ 'a': 1, 'b': 2 }]</code></pre>
+    <pre class="prettyprint"><code>var objects = [  { 'a': 2, 'b': 1 },  { 'a': 1, 'b': 2 }];_.filter(objects, _.conforms({ 'b': function(n) { return n > 1; } }));// => [{ 'a': 1, 'b': 2 }]</code></pre>
 
     
 
@@ -12091,13 +11336,7 @@ partially applied.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var object = { 'a': 1, 'b': 2 };
-
-_.conformsTo(object, { 'b': function(n) { return n > 1; } });
-// => true
-
-_.conformsTo(object, { 'b': function(n) { return n > 2; } });
-// => false</code></pre>
+    <pre class="prettyprint"><code>var object = { 'a': 1, 'b': 2 };_.conformsTo(object, { 'b': function(n) { return n > 1; } });// => true_.conformsTo(object, { 'b': function(n) { return n > 2; } });// => false</code></pre>
 
     
 
@@ -12265,13 +11504,7 @@ _.conformsTo(object, { 'b': function(n) { return n > 2; } });
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var objects = _.times(2, _.constant({ 'a': 1 }));
-
-console.log(objects);
-// => [{ 'a': 1 }, { 'a': 1 }]
-
-console.log(objects[0] === objects[1]);
-// => true</code></pre>
+    <pre class="prettyprint"><code>var objects = _.times(2, _.constant({ 'a': 1 }));console.log(objects);// => [{ 'a': 1 }, { 'a': 1 }]console.log(objects[0] === objects[1]);// => true</code></pre>
 
     
 
@@ -12484,25 +11717,7 @@ are assigned to the created object.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>function Shape() {
-  this.x = 0;
-  this.y = 0;
-}
-
-function Circle() {
-  Shape.call(this);
-}
-
-Circle.prototype = _.create(Shape.prototype, {
-  'constructor': Circle
-});
-
-var circle = new Circle;
-circle instanceof Circle;
-// => true
-
-circle instanceof Shape;
-// => true</code></pre>
+    <pre class="prettyprint"><code>function Shape() {  this.x = 0;  this.y = 0;}function Circle() {  Shape.call(this);}Circle.prototype = _.create(Shape.prototype, {  'constructor': Circle});var circle = new Circle;circle instanceof Circle;// => truecircle instanceof Shape;// => true</code></pre>
 
     
 
@@ -12732,24 +11947,7 @@ may be used as a placeholder for provided arguments.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var abc = function(a, b, c) {
-  return [a, b, c];
-};
-
-var curried = _.curry(abc);
-
-curried(1)(2)(3);
-// => [1, 2, 3]
-
-curried(1, 2)(3);
-// => [1, 2, 3]
-
-curried(1, 2, 3);
-// => [1, 2, 3]
-
-// Curried with placeholders.
-curried(1)(_, 3)(2);
-// => [1, 2, 3]</code></pre>
+    <pre class="prettyprint"><code>var abc = function(a, b, c) {  return [a, b, c];};var curried = _.curry(abc);curried(1)(2)(3);// => [1, 2, 3]curried(1, 2)(3);// => [1, 2, 3]curried(1, 2, 3);// => [1, 2, 3]// Curried with placeholders.curried(1)(_, 3)(2);// => [1, 2, 3]</code></pre>
 
     
 
@@ -12976,24 +12174,7 @@ builds, may be used as a placeholder for provided arguments.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var abc = function(a, b, c) {
-  return [a, b, c];
-};
-
-var curried = _.curryRight(abc);
-
-curried(3)(2)(1);
-// => [1, 2, 3]
-
-curried(2, 3)(1);
-// => [1, 2, 3]
-
-curried(1, 2, 3);
-// => [1, 2, 3]
-
-// Curried with placeholders.
-curried(3)(1, _)(2);
-// => [1, 2, 3]</code></pre>
+    <pre class="prettyprint"><code>var abc = function(a, b, c) {  return [a, b, c];};var curried = _.curryRight(abc);curried(3)(2)(1);// => [1, 2, 3]curried(2, 3)(1);// => [1, 2, 3]curried(1, 2, 3);// => [1, 2, 3]// Curried with placeholders.curried(3)(1, _)(2);// => [1, 2, 3]</code></pre>
 
     
 
@@ -13414,22 +12595,7 @@ for details over the differences between <code>_.debounce</code> and <code>_.thr
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>// Avoid costly calculations while the window size is in flux.
-jQuery(window).on('resize', _.debounce(calculateLayout, 150));
-
-// Invoke `sendMail` when clicked, debouncing subsequent calls.
-jQuery(element).on('click', _.debounce(sendMail, 300, {
-  'leading': true,
-  'trailing': false
-}));
-
-// Ensure `batchLog` is invoked once after 1 second of debounced calls.
-var debounced = _.debounce(batchLog, 250, { 'maxWait': 1000 });
-var source = new EventSource('/stream');
-jQuery(source).on('message', debounced);
-
-// Cancel the trailing debounced invocation.
-jQuery(window).on('popstate', debounced.cancel);</code></pre>
+    <pre class="prettyprint"><code>// Avoid costly calculations while the window size is in flux.jQuery(window).on('resize', _.debounce(calculateLayout, 150));// Invoke `sendMail` when clicked, debouncing subsequent calls.jQuery(element).on('click', _.debounce(sendMail, 300, {  'leading': true,  'trailing': false}));// Ensure `batchLog` is invoked once after 1 second of debounced calls.var debounced = _.debounce(batchLog, 250, { 'maxWait': 1000 });var source = new EventSource('/stream');jQuery(source).on('message', debounced);// Cancel the trailing debounced invocation.jQuery(window).on('popstate', debounced.cancel);</code></pre>
 
     
 
@@ -13621,8 +12787,7 @@ letters to basic Latin letters and removing<br>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.deburr('déjà vu');
-// => 'deja vu'</code></pre>
+    <pre class="prettyprint"><code>_.deburr('déjà vu');// => 'deja vu'</code></pre>
 
     
 
@@ -13815,11 +12980,7 @@ or <code>undefined</code>.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.defaultTo(1, 10);
-// => 1
-
-_.defaultTo(undefined, 10);
-// => 10</code></pre>
+    <pre class="prettyprint"><code>_.defaultTo(1, 10);// => 1_.defaultTo(undefined, 10);// => 10</code></pre>
 
     
 
@@ -14042,17 +13203,7 @@ _.defaultTo(undefined, 10);
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.drop([1, 2, 3]);
-// => [2, 3]
-
-_.drop([1, 2, 3], 2);
-// => [3]
-
-_.drop([1, 2, 3], 5);
-// => []
-
-_.drop([1, 2, 3], 0);
-// => [1, 2, 3]</code></pre>
+    <pre class="prettyprint"><code>_.drop([1, 2, 3]);// => [2, 3]_.drop([1, 2, 3], 2);// => [3]_.drop([1, 2, 3], 5);// => []_.drop([1, 2, 3], 0);// => [1, 2, 3]</code></pre>
 
     
 
@@ -14275,17 +13426,7 @@ _.drop([1, 2, 3], 0);
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.dropRight([1, 2, 3]);
-// => [1, 2]
-
-_.dropRight([1, 2, 3], 2);
-// => [1]
-
-_.dropRight([1, 2, 3], 5);
-// => []
-
-_.dropRight([1, 2, 3], 0);
-// => [1, 2, 3]</code></pre>
+    <pre class="prettyprint"><code>_.dropRight([1, 2, 3]);// => [1, 2]_.dropRight([1, 2, 3], 2);// => [1]_.dropRight([1, 2, 3], 5);// => []_.dropRight([1, 2, 3], 0);// => [1, 2, 3]</code></pre>
 
     
 
@@ -14510,26 +13651,7 @@ invoked with three arguments: (value, index, array).</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var users = [
-  { 'user': 'barney',  'active': true },
-  { 'user': 'fred',    'active': false },
-  { 'user': 'pebbles', 'active': false }
-];
-
-_.dropRightWhile(users, function(o) { return !o.active; });
-// => objects for ['barney']
-
-// The `_.matches` iteratee shorthand.
-_.dropRightWhile(users, { 'user': 'pebbles', 'active': false });
-// => objects for ['barney', 'fred']
-
-// The `_.matchesProperty` iteratee shorthand.
-_.dropRightWhile(users, ['active', false]);
-// => objects for ['barney']
-
-// The `_.property` iteratee shorthand.
-_.dropRightWhile(users, 'active');
-// => objects for ['barney', 'fred', 'pebbles']</code></pre>
+    <pre class="prettyprint"><code>var users = [  { 'user': 'barney',  'active': true },  { 'user': 'fred',    'active': false },  { 'user': 'pebbles', 'active': false }];_.dropRightWhile(users, function(o) { return !o.active; });// => objects for ['barney']// The `_.matches` iteratee shorthand._.dropRightWhile(users, { 'user': 'pebbles', 'active': false });// => objects for ['barney', 'fred']// The `_.matchesProperty` iteratee shorthand._.dropRightWhile(users, ['active', false]);// => objects for ['barney']// The `_.property` iteratee shorthand._.dropRightWhile(users, 'active');// => objects for ['barney', 'fred', 'pebbles']</code></pre>
 
     
 
@@ -14754,26 +13876,7 @@ invoked with three arguments: (value, index, array).</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var users = [
-  { 'user': 'barney',  'active': false },
-  { 'user': 'fred',    'active': false },
-  { 'user': 'pebbles', 'active': true }
-];
-
-_.dropWhile(users, function(o) { return !o.active; });
-// => objects for ['pebbles']
-
-// The `_.matches` iteratee shorthand.
-_.dropWhile(users, { 'user': 'barney', 'active': false });
-// => objects for ['fred', 'pebbles']
-
-// The `_.matchesProperty` iteratee shorthand.
-_.dropWhile(users, ['active', false]);
-// => objects for ['pebbles']
-
-// The `_.property` iteratee shorthand.
-_.dropWhile(users, 'active');
-// => objects for ['barney', 'fred', 'pebbles']</code></pre>
+    <pre class="prettyprint"><code>var users = [  { 'user': 'barney',  'active': false },  { 'user': 'fred',    'active': false },  { 'user': 'pebbles', 'active': true }];_.dropWhile(users, function(o) { return !o.active; });// => objects for ['pebbles']// The `_.matches` iteratee shorthand._.dropWhile(users, { 'user': 'barney', 'active': false });// => objects for ['fred', 'pebbles']// The `_.matchesProperty` iteratee shorthand._.dropWhile(users, ['active', false]);// => objects for ['pebbles']// The `_.property` iteratee shorthand._.dropWhile(users, 'active');// => objects for ['barney', 'fred', 'pebbles']</code></pre>
 
     
 
@@ -15014,15 +14117,7 @@ or <code>_.forOwn</code> for object iteration.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.forEach([1, 2], function(value) {
-  console.log(value);
-});
-// => Logs `1` then `2`.
-
-_.forEach({ 'a': 1, 'b': 2 }, function(value, key) {
-  console.log(key);
-});
-// => Logs 'a' then 'b' (iteration order is not guaranteed).</code></pre>
+    <pre class="prettyprint"><code>_.forEach([1, 2], function(value) {  console.log(value);});// => Logs `1` then `2`._.forEach({ 'a': 1, 'b': 2 }, function(value, key) {  console.log(key);});// => Logs 'a' then 'b' (iteration order is not guaranteed).</code></pre>
 
     
 
@@ -15259,10 +14354,7 @@ _.forEach({ 'a': 1, 'b': 2 }, function(value, key) {
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.forEachRight([1, 2], function(value) {
-  console.log(value);
-});
-// => Logs `2` then `1`.</code></pre>
+    <pre class="prettyprint"><code>_.forEachRight([1, 2], function(value) {  console.log(value);});// => Logs `2` then `1`.</code></pre>
 
     
 
@@ -15527,14 +14619,7 @@ else <code>false</code>.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.endsWith('abc', 'c');
-// => true
-
-_.endsWith('abc', 'b');
-// => false
-
-_.endsWith('abc', 'b', 2);
-// => true</code></pre>
+    <pre class="prettyprint"><code>_.endsWith('abc', 'c');// => true_.endsWith('abc', 'b');// => false_.endsWith('abc', 'b', 2);// => true</code></pre>
 
     
 
@@ -15727,23 +14812,7 @@ comparison between two values to determine if they are equivalent.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var object = { 'a': 1 };
-var other = { 'a': 1 };
-
-_.eq(object, object);
-// => true
-
-_.eq(object, other);
-// => false
-
-_.eq('a', 'a');
-// => true
-
-_.eq('a', Object('a'));
-// => false
-
-_.eq(NaN, NaN);
-// => true</code></pre>
+    <pre class="prettyprint"><code>var object = { 'a': 1 };var other = { 'a': 1 };_.eq(object, object);// => true_.eq(object, other);// => false_.eq('a', 'a');// => true_.eq('a', Object('a'));// => false_.eq(NaN, NaN);// => true</code></pre>
 
     
 
@@ -15942,8 +15011,7 @@ XSS vectors.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.escape('fred, barney, &amp; pebbles');
-// => 'fred, barney, &amp;amp; pebbles'</code></pre>
+    <pre class="prettyprint"><code>_.escape('fred, barney, &amp; pebbles');// => 'fred, barney, &amp;amp; pebbles'</code></pre>
 
     
 
@@ -16132,8 +15200,7 @@ XSS vectors.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.escapeRegExp('[lodash](https://lodash.com/)');
-// => '\[lodash\]\(https://lodash\.com/\)'</code></pre>
+    <pre class="prettyprint"><code>_.escapeRegExp('[lodash](https://lodash.com/)');// => '\[lodash\]\(https://lodash\.com/\)'</code></pre>
 
     
 
@@ -16366,25 +15433,7 @@ else <code>false</code>.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.every([true, 1, null, 'yes'], Boolean);
-// => false
-
-var users = [
-  { 'user': 'barney', 'age': 36, 'active': false },
-  { 'user': 'fred',   'age': 40, 'active': false }
-];
-
-// The `_.matches` iteratee shorthand.
-_.every(users, { 'user': 'barney', 'active': false });
-// => false
-
-// The `_.matchesProperty` iteratee shorthand.
-_.every(users, ['active', false]);
-// => true
-
-// The `_.property` iteratee shorthand.
-_.every(users, 'active');
-// => false</code></pre>
+    <pre class="prettyprint"><code>_.every([true, 1, null, 'yes'], Boolean);// => falsevar users = [  { 'user': 'barney', 'age': 36, 'active': false },  { 'user': 'fred',   'age': 40, 'active': false }];// The `_.matches` iteratee shorthand._.every(users, { 'user': 'barney', 'active': false });// => false// The `_.matchesProperty` iteratee shorthand._.every(users, ['active', false]);// => true// The `_.property` iteratee shorthand._.every(users, 'active');// => false</code></pre>
 
     
 
@@ -16683,17 +15732,7 @@ including, <code>end</code>.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var array = [1, 2, 3];
-
-_.fill(array, 'a');
-console.log(array);
-// => ['a', 'a', 'a']
-
-_.fill(Array(3), 2);
-// => [2, 2, 2]
-
-_.fill([4, 6, 8, 10], '*', 1, 3);
-// => [4, '*', '*', 10]</code></pre>
+    <pre class="prettyprint"><code>var array = [1, 2, 3];_.fill(array, 'a');console.log(array);// => ['a', 'a', 'a']_.fill(Array(3), 2);// => [2, 2, 2]_.fill([4, 6, 8, 10], '*', 1, 3);// => [4, '*', '*', 10]</code></pre>
 
     
 
@@ -16929,25 +15968,7 @@ arguments: (value, index|key, collection).</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var users = [
-  { 'user': 'barney', 'age': 36, 'active': true },
-  { 'user': 'fred',   'age': 40, 'active': false }
-];
-
-_.filter(users, function(o) { return !o.active; });
-// => objects for ['fred']
-
-// The `_.matches` iteratee shorthand.
-_.filter(users, { 'age': 36, 'active': true });
-// => objects for ['barney']
-
-// The `_.matchesProperty` iteratee shorthand.
-_.filter(users, ['active', false]);
-// => objects for ['fred']
-
-// The `_.property` iteratee shorthand.
-_.filter(users, 'active');
-// => objects for ['barney']</code></pre>
+    <pre class="prettyprint"><code>var users = [  { 'user': 'barney', 'age': 36, 'active': true },  { 'user': 'fred',   'age': 40, 'active': false }];_.filter(users, function(o) { return !o.active; });// => objects for ['fred']// The `_.matches` iteratee shorthand._.filter(users, { 'age': 36, 'active': true });// => objects for ['barney']// The `_.matchesProperty` iteratee shorthand._.filter(users, ['active', false]);// => objects for ['fred']// The `_.property` iteratee shorthand._.filter(users, 'active');// => objects for ['barney']</code></pre>
 
     
 
@@ -17210,26 +16231,7 @@ element <code>predicate</code> returns truthy for instead of the element itself.
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var users = [
-  { 'user': 'barney',  'active': false },
-  { 'user': 'fred',    'active': false },
-  { 'user': 'pebbles', 'active': true }
-];
-
-_.findIndex(users, function(o) { return o.user == 'barney'; });
-// => 0
-
-// The `_.matches` iteratee shorthand.
-_.findIndex(users, { 'user': 'fred', 'active': false });
-// => 1
-
-// The `_.matchesProperty` iteratee shorthand.
-_.findIndex(users, ['active', false]);
-// => 0
-
-// The `_.property` iteratee shorthand.
-_.findIndex(users, 'active');
-// => 2</code></pre>
+    <pre class="prettyprint"><code>var users = [  { 'user': 'barney',  'active': false },  { 'user': 'fred',    'active': false },  { 'user': 'pebbles', 'active': true }];_.findIndex(users, function(o) { return o.user == 'barney'; });// => 0// The `_.matches` iteratee shorthand._.findIndex(users, { 'user': 'fred', 'active': false });// => 1// The `_.matchesProperty` iteratee shorthand._.findIndex(users, ['active', false]);// => 0// The `_.property` iteratee shorthand._.findIndex(users, 'active');// => 2</code></pre>
 
     
 
@@ -17457,26 +16459,7 @@ else <code>undefined</code>.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var users = {
-  'barney':  { 'age': 36, 'active': true },
-  'fred':    { 'age': 40, 'active': false },
-  'pebbles': { 'age': 1,  'active': true }
-};
-
-_.findKey(users, function(o) { return o.age &lt; 40; });
-// => 'barney' (iteration order is not guaranteed)
-
-// The `_.matches` iteratee shorthand.
-_.findKey(users, { 'age': 1, 'active': true });
-// => 'pebbles'
-
-// The `_.matchesProperty` iteratee shorthand.
-_.findKey(users, ['active', false]);
-// => 'fred'
-
-// The `_.property` iteratee shorthand.
-_.findKey(users, 'active');
-// => 'barney'</code></pre>
+    <pre class="prettyprint"><code>var users = {  'barney':  { 'age': 36, 'active': true },  'fred':    { 'age': 40, 'active': false },  'pebbles': { 'age': 1,  'active': true }};_.findKey(users, function(o) { return o.age &lt; 40; });// => 'barney' (iteration order is not guaranteed)// The `_.matches` iteratee shorthand._.findKey(users, { 'age': 1, 'active': true });// => 'pebbles'// The `_.matchesProperty` iteratee shorthand._.findKey(users, ['active', false]);// => 'fred'// The `_.property` iteratee shorthand._.findKey(users, 'active');// => 'barney'</code></pre>
 
     
 
@@ -17739,26 +16722,7 @@ of <code>collection</code> from right to left.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var users = [
-  { 'user': 'barney',  'active': true },
-  { 'user': 'fred',    'active': false },
-  { 'user': 'pebbles', 'active': false }
-];
-
-_.findLastIndex(users, function(o) { return o.user == 'pebbles'; });
-// => 2
-
-// The `_.matches` iteratee shorthand.
-_.findLastIndex(users, { 'user': 'barney', 'active': true });
-// => 0
-
-// The `_.matchesProperty` iteratee shorthand.
-_.findLastIndex(users, ['active', false]);
-// => 2
-
-// The `_.property` iteratee shorthand.
-_.findLastIndex(users, 'active');
-// => 0</code></pre>
+    <pre class="prettyprint"><code>var users = [  { 'user': 'barney',  'active': true },  { 'user': 'fred',    'active': false },  { 'user': 'pebbles', 'active': false }];_.findLastIndex(users, function(o) { return o.user == 'pebbles'; });// => 2// The `_.matches` iteratee shorthand._.findLastIndex(users, { 'user': 'barney', 'active': true });// => 0// The `_.matchesProperty` iteratee shorthand._.findLastIndex(users, ['active', false]);// => 2// The `_.property` iteratee shorthand._.findLastIndex(users, 'active');// => 0</code></pre>
 
     
 
@@ -17986,26 +16950,7 @@ else <code>undefined</code>.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var users = {
-  'barney':  { 'age': 36, 'active': true },
-  'fred':    { 'age': 40, 'active': false },
-  'pebbles': { 'age': 1,  'active': true }
-};
-
-_.findLastKey(users, function(o) { return o.age &lt; 40; });
-// => returns 'pebbles' assuming `_.findKey` returns 'barney'
-
-// The `_.matches` iteratee shorthand.
-_.findLastKey(users, { 'age': 36, 'active': true });
-// => 'barney'
-
-// The `_.matchesProperty` iteratee shorthand.
-_.findLastKey(users, ['active', false]);
-// => 'fred'
-
-// The `_.property` iteratee shorthand.
-_.findLastKey(users, 'active');
-// => 'pebbles'</code></pre>
+    <pre class="prettyprint"><code>var users = {  'barney':  { 'age': 36, 'active': true },  'fred':    { 'age': 40, 'active': false },  'pebbles': { 'age': 1,  'active': true }};_.findLastKey(users, function(o) { return o.age &lt; 40; });// => returns 'pebbles' assuming `_.findKey` returns 'barney'// The `_.matches` iteratee shorthand._.findLastKey(users, { 'age': 36, 'active': true });// => 'barney'// The `_.matchesProperty` iteratee shorthand._.findLastKey(users, ['active', false]);// => 'fred'// The `_.property` iteratee shorthand._.findLastKey(users, 'active');// => 'pebbles'</code></pre>
 
     
 
@@ -18173,11 +17118,7 @@ _.findLastKey(users, 'active');
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.head([1, 2, 3]);
-// => 1
-
-_.head([]);
-// => undefined</code></pre>
+    <pre class="prettyprint"><code>_.head([1, 2, 3]);// => 1_.head([]);// => undefined</code></pre>
 
     
 
@@ -18405,12 +17346,7 @@ with three arguments: (value, index|key, collection).</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>function duplicate(n) {
-  return [n, n];
-}
-
-_.flatMap([1, 2], duplicate);
-// => [1, 1, 2, 2]</code></pre>
+    <pre class="prettyprint"><code>function duplicate(n) {  return [n, n];}_.flatMap([1, 2], duplicate);// => [1, 1, 2, 2]</code></pre>
 
     
 
@@ -18637,12 +17573,7 @@ mapped results.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>function duplicate(n) {
-  return [[[n, n]]];
-}
-
-_.flatMapDeep([1, 2], duplicate);
-// => [1, 1, 2, 2]</code></pre>
+    <pre class="prettyprint"><code>function duplicate(n) {  return [[[n, n]]];}_.flatMapDeep([1, 2], duplicate);// => [1, 1, 2, 2]</code></pre>
 
     
 
@@ -18908,12 +17839,7 @@ mapped results up to <code>depth</code> times.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>function duplicate(n) {
-  return [[[n, n]]];
-}
-
-_.flatMapDepth([1, 2], duplicate, 2);
-// => [[1, 1], [2, 2]]</code></pre>
+    <pre class="prettyprint"><code>function duplicate(n) {  return [[[n, n]]];}_.flatMapDepth([1, 2], duplicate, 2);// => [[1, 1], [2, 2]]</code></pre>
 
     
 
@@ -19081,8 +18007,7 @@ _.flatMapDepth([1, 2], duplicate, 2);
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.flatten([1, [2, [3, [4]], 5]]);
-// => [1, 2, [3, [4]], 5]</code></pre>
+    <pre class="prettyprint"><code>_.flatten([1, [2, [3, [4]], 5]]);// => [1, 2, [3, [4]], 5]</code></pre>
 
     
 
@@ -19250,8 +18175,7 @@ _.flatMapDepth([1, 2], duplicate, 2);
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.flattenDeep([1, [2, [3, [4]], 5]]);
-// => [1, 2, 3, 4, 5]</code></pre>
+    <pre class="prettyprint"><code>_.flattenDeep([1, [2, [3, [4]], 5]]);// => [1, 2, 3, 4, 5]</code></pre>
 
     
 
@@ -19474,13 +18398,7 @@ _.flatMapDepth([1, 2], duplicate, 2);
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var array = [1, [2, [3, [4]], 5]];
-
-_.flattenDepth(array, 1);
-// => [1, 2, [3, [4]], 5]
-
-_.flattenDepth(array, 2);
-// => [1, 2, 3, [4], 5]</code></pre>
+    <pre class="prettyprint"><code>var array = [1, [2, [3, [4]], 5]];_.flattenDepth(array, 1);// => [1, 2, [3, [4]], 5]_.flattenDepth(array, 2);// => [1, 2, 3, [4], 5]</code></pre>
 
     
 
@@ -19648,12 +18566,7 @@ _.flattenDepth(array, 2);
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var flipped = _.flip(function() {
-  return _.toArray(arguments);
-});
-
-flipped('a', 'b', 'c', 'd');
-// => ['d', 'c', 'b', 'a']</code></pre>
+    <pre class="prettyprint"><code>var flipped = _.flip(function() {  return _.toArray(arguments);});flipped('a', 'b', 'c', 'd');// => ['d', 'c', 'b', 'a']</code></pre>
 
     
 
@@ -19886,17 +18799,7 @@ iteration early by explicitly returning <code>false</code>.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>function Foo() {
-  this.a = 1;
-  this.b = 2;
-}
-
-Foo.prototype.c = 3;
-
-_.forIn(new Foo, function(value, key) {
-  console.log(key);
-});
-// => Logs 'a', 'b', then 'c' (iteration order is not guaranteed).</code></pre>
+    <pre class="prettyprint"><code>function Foo() {  this.a = 1;  this.b = 2;}Foo.prototype.c = 3;_.forIn(new Foo, function(value, key) {  console.log(key);});// => Logs 'a', 'b', then 'c' (iteration order is not guaranteed).</code></pre>
 
     
 
@@ -20127,17 +19030,7 @@ _.forIn(new Foo, function(value, key) {
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>function Foo() {
-  this.a = 1;
-  this.b = 2;
-}
-
-Foo.prototype.c = 3;
-
-_.forInRight(new Foo, function(value, key) {
-  console.log(key);
-});
-// => Logs 'c', 'b', then 'a' assuming `_.forIn` logs 'a', 'b', then 'c'.</code></pre>
+    <pre class="prettyprint"><code>function Foo() {  this.a = 1;  this.b = 2;}Foo.prototype.c = 3;_.forInRight(new Foo, function(value, key) {  console.log(key);});// => Logs 'c', 'b', then 'a' assuming `_.forIn` logs 'a', 'b', then 'c'.</code></pre>
 
     
 
@@ -20370,17 +19263,7 @@ early by explicitly returning <code>false</code>.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>function Foo() {
-  this.a = 1;
-  this.b = 2;
-}
-
-Foo.prototype.c = 3;
-
-_.forOwn(new Foo, function(value, key) {
-  console.log(key);
-});
-// => Logs 'a' then 'b' (iteration order is not guaranteed).</code></pre>
+    <pre class="prettyprint"><code>function Foo() {  this.a = 1;  this.b = 2;}Foo.prototype.c = 3;_.forOwn(new Foo, function(value, key) {  console.log(key);});// => Logs 'a' then 'b' (iteration order is not guaranteed).</code></pre>
 
     
 
@@ -20611,17 +19494,7 @@ _.forOwn(new Foo, function(value, key) {
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>function Foo() {
-  this.a = 1;
-  this.b = 2;
-}
-
-Foo.prototype.c = 3;
-
-_.forOwnRight(new Foo, function(value, key) {
-  console.log(key);
-});
-// => Logs 'b' then 'a' assuming `_.forOwn` logs 'a' then 'b'.</code></pre>
+    <pre class="prettyprint"><code>function Foo() {  this.a = 1;  this.b = 2;}Foo.prototype.c = 3;_.forOwnRight(new Foo, function(value, key) {  console.log(key);});// => Logs 'b' then 'a' assuming `_.forOwn` logs 'a' then 'b'.</code></pre>
 
     
 
@@ -20790,8 +19663,7 @@ from key-value <code>pairs</code>.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.fromPairs([['a', 1], ['b', 2]]);
-// => { 'a': 1, 'b': 2 }</code></pre>
+    <pre class="prettyprint"><code>_.fromPairs([['a', 1], ['b', 2]]);// => { 'a': 1, 'b': 2 }</code></pre>
 
     
 
@@ -20967,15 +19839,7 @@ of <code>object</code>.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>function Foo() {
-  this.a = _.constant('a');
-  this.b = _.constant('b');
-}
-
-Foo.prototype.c = _.constant('c');
-
-_.functions(new Foo);
-// => ['a', 'b']</code></pre>
+    <pre class="prettyprint"><code>function Foo() {  this.a = _.constant('a');  this.b = _.constant('b');}Foo.prototype.c = _.constant('c');_.functions(new Foo);// => ['a', 'b']</code></pre>
 
     
 
@@ -21151,15 +20015,7 @@ enumerable properties of <code>object</code>.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>function Foo() {
-  this.a = _.constant('a');
-  this.b = _.constant('b');
-}
-
-Foo.prototype.c = _.constant('c');
-
-_.functionsIn(new Foo);
-// => ['a', 'b', 'c']</code></pre>
+    <pre class="prettyprint"><code>function Foo() {  this.a = _.constant('a');  this.b = _.constant('b');}Foo.prototype.c = _.constant('c');_.functionsIn(new Foo);// => ['a', 'b', 'c']</code></pre>
 
     
 
@@ -21405,16 +20261,7 @@ _.functionsIn(new Foo);
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var object = { 'a': [{ 'b': { 'c': 3 } }] };
-
-_.get(object, 'a[0].b.c');
-// => 3
-
-_.get(object, ['a', '0', 'b', 'c']);
-// => 3
-
-_.get(object, 'a.b.c', 'default');
-// => 'default'</code></pre>
+    <pre class="prettyprint"><code>var object = { 'a': [{ 'b': { 'c': 3 } }] };_.get(object, 'a[0].b.c');// => 3_.get(object, ['a', '0', 'b', 'c']);// => 3_.get(object, 'a.b.c', 'default');// => 'default'</code></pre>
 
     
 
@@ -21608,20 +20455,7 @@ _.get(object, 'a.b.c', 'default');
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var object = { 'a': { 'b': 2 } };
-var other = _.create({ 'a': _.create({ 'b': 2 }) });
-
-_.has(object, 'a');
-// => true
-
-_.has(object, 'a.b');
-// => true
-
-_.has(object, ['a', 'b']);
-// => true
-
-_.has(other, 'a');
-// => false</code></pre>
+    <pre class="prettyprint"><code>var object = { 'a': { 'b': 2 } };var other = _.create({ 'a': _.create({ 'b': 2 }) });_.has(object, 'a');// => true_.has(object, 'a.b');// => true_.has(object, ['a', 'b']);// => true_.has(other, 'a');// => false</code></pre>
 
     
 
@@ -21815,19 +20649,7 @@ _.has(other, 'a');
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var object = _.create({ 'a': _.create({ 'b': 2 }) });
-
-_.hasIn(object, 'a');
-// => true
-
-_.hasIn(object, 'a.b');
-// => true
-
-_.hasIn(object, ['a', 'b']);
-// => true
-
-_.hasIn(object, 'b');
-// => false</code></pre>
+    <pre class="prettyprint"><code>var object = _.create({ 'a': _.create({ 'b': 2 }) });_.hasIn(object, 'a');// => true_.hasIn(object, 'a.b');// => true_.hasIn(object, ['a', 'b']);// => true_.hasIn(object, 'b');// => false</code></pre>
 
     
 
@@ -21995,10 +20817,7 @@ _.hasIn(object, 'b');
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var object = { 'a': 1 };
-
-console.log(_.identity(object) === object);
-// => true</code></pre>
+    <pre class="prettyprint"><code>var object = { 'a': 1 };console.log(_.identity(object) === object);// => true</code></pre>
 
     
 
@@ -22266,26 +21085,7 @@ negative ranges.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.inRange(3, 2, 4);
-// => true
-
-_.inRange(4, 8);
-// => true
-
-_.inRange(4, 2);
-// => false
-
-_.inRange(2, 2);
-// => false
-
-_.inRange(1.2, 2);
-// => true
-
-_.inRange(5.2, 4);
-// => false
-
-_.inRange(-3, -2, -6);
-// => true</code></pre>
+    <pre class="prettyprint"><code>_.inRange(3, 2, 4);// => true_.inRange(4, 8);// => true_.inRange(4, 2);// => false_.inRange(2, 2);// => false_.inRange(1.2, 2);// => true_.inRange(5.2, 4);// => false_.inRange(-3, -2, -6);// => true</code></pre>
 
     
 
@@ -22553,17 +21353,7 @@ the offset from the end of <code>collection</code>.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.includes([1, 2, 3], 1);
-// => true
-
-_.includes([1, 2, 3], 1, 2);
-// => false
-
-_.includes({ 'a': 1, 'b': 2 }, 1);
-// => true
-
-_.includes('abcd', 'bc');
-// => true</code></pre>
+    <pre class="prettyprint"><code>_.includes([1, 2, 3], 1);// => true_.includes([1, 2, 3], 1, 2);// => false_.includes({ 'a': 1, 'b': 2 }, 1);// => true_.includes('abcd', 'bc');// => true</code></pre>
 
     
 
@@ -22824,12 +21614,7 @@ offset from the end of <code>array</code>.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.indexOf([1, 2, 1, 2], 2);
-// => 1
-
-// Search from the `fromIndex`.
-_.indexOf([1, 2, 1, 2], 2, 2);
-// => 3</code></pre>
+    <pre class="prettyprint"><code>_.indexOf([1, 2, 1, 2], 2);// => 1// Search from the `fromIndex`._.indexOf([1, 2, 1, 2], 2, 2);// => 3</code></pre>
 
     
 
@@ -22997,8 +21782,7 @@ _.indexOf([1, 2, 1, 2], 2, 2);
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.initial([1, 2, 3]);
-// => [1, 2]</code></pre>
+    <pre class="prettyprint"><code>_.initial([1, 2, 3]);// => [1, 2]</code></pre>
 
     
 
@@ -23168,17 +21952,7 @@ equal to <code>0</code> and less than or equal to <code>Number.MAX_SAFE_INTEGER<
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.isArrayLike([1, 2, 3]);
-// => true
-
-_.isArrayLike(document.body.children);
-// => true
-
-_.isArrayLike('abc');
-// => true
-
-_.isArrayLike(_.noop);
-// => false</code></pre>
+    <pre class="prettyprint"><code>_.isArrayLike([1, 2, 3]);// => true_.isArrayLike(document.body.children);// => true_.isArrayLike('abc');// => true_.isArrayLike(_.noop);// => false</code></pre>
 
     
 
@@ -23348,17 +22122,7 @@ else <code>false</code>.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.isArrayLikeObject([1, 2, 3]);
-// => true
-
-_.isArrayLikeObject(document.body.children);
-// => true
-
-_.isArrayLikeObject('abc');
-// => false
-
-_.isArrayLikeObject(_.noop);
-// => false</code></pre>
+    <pre class="prettyprint"><code>_.isArrayLikeObject([1, 2, 3]);// => true_.isArrayLikeObject(document.body.children);// => true_.isArrayLikeObject('abc');// => false_.isArrayLikeObject(_.noop);// => false</code></pre>
 
     
 
@@ -23526,11 +22290,7 @@ _.isArrayLikeObject(_.noop);
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.isBoolean(false);
-// => true
-
-_.isBoolean(null);
-// => false</code></pre>
+    <pre class="prettyprint"><code>_.isBoolean(false);// => true_.isBoolean(null);// => false</code></pre>
 
     
 
@@ -23698,11 +22458,7 @@ _.isBoolean(null);
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.isElement(document.body);
-// => true
-
-_.isElement('&lt;body>');
-// => false</code></pre>
+    <pre class="prettyprint"><code>_.isElement(document.body);// => true_.isElement('&lt;body>');// => false</code></pre>
 
     
 
@@ -23875,20 +22631,7 @@ Similarly, maps and sets are considered empty if they have a <code>size</code> o
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.isEmpty(null);
-// => true
-
-_.isEmpty(true);
-// => true
-
-_.isEmpty(1);
-// => true
-
-_.isEmpty([1, 2, 3]);
-// => false
-
-_.isEmpty({ 'a': 1 });
-// => false</code></pre>
+    <pre class="prettyprint"><code>_.isEmpty(null);// => true_.isEmpty(true);// => true_.isEmpty(1);// => true_.isEmpty([1, 2, 3]);// => false_.isEmpty({ 'a': 1 });// => false</code></pre>
 
     
 
@@ -24085,14 +22828,7 @@ nodes are compared by strict equality, i.e. <code>===</code>.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var object = { 'a': 1 };
-var other = { 'a': 1 };
-
-_.isEqual(object, other);
-// => true
-
-object === other;
-// => false</code></pre>
+    <pre class="prettyprint"><code>var object = { 'a': 1 };var other = { 'a': 1 };_.isEqual(object, other);// => trueobject === other;// => false</code></pre>
 
     
 
@@ -24337,21 +23073,7 @@ six arguments: (objValue, othValue [, index|key, object, other, stack]).</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>function isGreeting(value) {
-  return /^h(?:i|ello)$/.test(value);
-}
-
-function customizer(objValue, othValue) {
-  if (isGreeting(objValue) &amp;&amp; isGreeting(othValue)) {
-    return true;
-  }
-}
-
-var array = ['hello', 'goodbye'];
-var other = ['hi', 'goodbye'];
-
-_.isEqualWith(array, other, customizer);
-// => true</code></pre>
+    <pre class="prettyprint"><code>function isGreeting(value) {  return /^h(?:i|ello)$/.test(value);}function customizer(objValue, othValue) {  if (isGreeting(objValue) &amp;&amp; isGreeting(othValue)) {    return true;  }}var array = ['hello', 'goodbye'];var other = ['hi', 'goodbye'];_.isEqualWith(array, other, customizer);// => true</code></pre>
 
     
 
@@ -24520,11 +23242,7 @@ _.isEqualWith(array, other, customizer);
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.isError(new Error);
-// => true
-
-_.isError(Error);
-// => false</code></pre>
+    <pre class="prettyprint"><code>_.isError(new Error);// => true_.isError(Error);// => false</code></pre>
 
     
 
@@ -24694,17 +23412,7 @@ _.isError(Error);
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.isFinite(3);
-// => true
-
-_.isFinite(Number.MIN_VALUE);
-// => true
-
-_.isFinite(Infinity);
-// => false
-
-_.isFinite('3');
-// => false</code></pre>
+    <pre class="prettyprint"><code>_.isFinite(3);// => true_.isFinite(Number.MIN_VALUE);// => true_.isFinite(Infinity);// => false_.isFinite('3');// => false</code></pre>
 
     
 
@@ -24872,11 +23580,7 @@ _.isFinite('3');
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.isFunction(_);
-// => true
-
-_.isFunction(/abc/);
-// => false</code></pre>
+    <pre class="prettyprint"><code>_.isFunction(_);// => true_.isFunction(/abc/);// => false</code></pre>
 
     
 
@@ -25046,17 +23750,7 @@ _.isFunction(/abc/);
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.isInteger(3);
-// => true
-
-_.isInteger(Number.MIN_VALUE);
-// => false
-
-_.isInteger(Infinity);
-// => false
-
-_.isInteger('3');
-// => false</code></pre>
+    <pre class="prettyprint"><code>_.isInteger(3);// => true_.isInteger(Number.MIN_VALUE);// => false_.isInteger(Infinity);// => false_.isInteger('3');// => false</code></pre>
 
     
 
@@ -25226,17 +23920,7 @@ _.isInteger('3');
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.isLength(3);
-// => true
-
-_.isLength(Number.MIN_VALUE);
-// => false
-
-_.isLength(Infinity);
-// => false
-
-_.isLength('3');
-// => false</code></pre>
+    <pre class="prettyprint"><code>_.isLength(3);// => true_.isLength(Number.MIN_VALUE);// => false_.isLength(Infinity);// => false_.isLength('3');// => false</code></pre>
 
     
 
@@ -25433,13 +24117,7 @@ for a list of supported value comparisons.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var object = { 'a': 1, 'b': 2 };
-
-_.isMatch(object, { 'b': 2 });
-// => true
-
-_.isMatch(object, { 'b': 1 });
-// => false</code></pre>
+    <pre class="prettyprint"><code>var object = { 'a': 1, 'b': 2 };_.isMatch(object, { 'b': 2 });// => true_.isMatch(object, { 'b': 1 });// => false</code></pre>
 
     
 
@@ -25684,21 +24362,7 @@ arguments: (objValue, srcValue, index|key, object, source).</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>function isGreeting(value) {
-  return /^h(?:i|ello)$/.test(value);
-}
-
-function customizer(objValue, srcValue) {
-  if (isGreeting(objValue) &amp;&amp; isGreeting(srcValue)) {
-    return true;
-  }
-}
-
-var object = { 'greeting': 'hello' };
-var source = { 'greeting': 'hi' };
-
-_.isMatchWith(object, source, customizer);
-// => true</code></pre>
+    <pre class="prettyprint"><code>function isGreeting(value) {  return /^h(?:i|ello)$/.test(value);}function customizer(objValue, srcValue) {  if (isGreeting(objValue) &amp;&amp; isGreeting(srcValue)) {    return true;  }}var object = { 'greeting': 'hello' };var source = { 'greeting': 'hi' };_.isMatchWith(object, source, customizer);// => true</code></pre>
 
     
 
@@ -25870,17 +24534,7 @@ global <a href="https://mdn.io/isNaN"><code>isNaN</code></a> which returns <code
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.isNaN(NaN);
-// => true
-
-_.isNaN(new Number(NaN));
-// => true
-
-isNaN(undefined);
-// => true
-
-_.isNaN(undefined);
-// => false</code></pre>
+    <pre class="prettyprint"><code>_.isNaN(NaN);// => true_.isNaN(new Number(NaN));// => trueisNaN(undefined);// => true_.isNaN(undefined);// => false</code></pre>
 
     
 
@@ -26056,11 +24710,7 @@ else <code>false</code>.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.isNative(Array.prototype.push);
-// => true
-
-_.isNative(_);
-// => false</code></pre>
+    <pre class="prettyprint"><code>_.isNative(Array.prototype.push);// => true_.isNative(_);// => false</code></pre>
 
     
 
@@ -26228,14 +24878,7 @@ _.isNative(_);
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.isNil(null);
-// => true
-
-_.isNil(void 0);
-// => true
-
-_.isNil(NaN);
-// => false</code></pre>
+    <pre class="prettyprint"><code>_.isNil(null);// => true_.isNil(void 0);// => true_.isNil(NaN);// => false</code></pre>
 
     
 
@@ -26403,11 +25046,7 @@ _.isNil(NaN);
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.isNull(null);
-// => true
-
-_.isNull(void 0);
-// => false</code></pre>
+    <pre class="prettyprint"><code>_.isNull(null);// => true_.isNull(void 0);// => false</code></pre>
 
     
 
@@ -26577,17 +25216,7 @@ classified as numbers, use the <code>_.isFinite</code> method.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.isNumber(3);
-// => true
-
-_.isNumber(Number.MIN_VALUE);
-// => true
-
-_.isNumber(Infinity);
-// => true
-
-_.isNumber('3');
-// => false</code></pre>
+    <pre class="prettyprint"><code>_.isNumber(3);// => true_.isNumber(Number.MIN_VALUE);// => true_.isNumber(Infinity);// => true_.isNumber('3');// => false</code></pre>
 
     
 
@@ -26757,17 +25386,7 @@ of <code>Object</code>. (e.g. arrays, functions, objects, regexes, <code>new Num
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.isObject({});
-// => true
-
-_.isObject([1, 2, 3]);
-// => true
-
-_.isObject(_.noop);
-// => true
-
-_.isObject(null);
-// => false</code></pre>
+    <pre class="prettyprint"><code>_.isObject({});// => true_.isObject([1, 2, 3]);// => true_.isObject(_.noop);// => true_.isObject(null);// => false</code></pre>
 
     
 
@@ -26936,17 +25555,7 @@ and has a <code>typeof</code> result of &quot;object&quot;.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.isObjectLike({});
-// => true
-
-_.isObjectLike([1, 2, 3]);
-// => true
-
-_.isObjectLike(_.noop);
-// => false
-
-_.isObjectLike(null);
-// => false</code></pre>
+    <pre class="prettyprint"><code>_.isObjectLike({});// => true_.isObjectLike([1, 2, 3]);// => true_.isObjectLike(_.noop);// => false_.isObjectLike(null);// => false</code></pre>
 
     
 
@@ -27115,21 +25724,7 @@ _.isObjectLike(null);
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>function Foo() {
-  this.a = 1;
-}
-
-_.isPlainObject(new Foo);
-// => false
-
-_.isPlainObject([1, 2, 3]);
-// => false
-
-_.isPlainObject({ 'x': 0, 'y': 0 });
-// => true
-
-_.isPlainObject(Object.create(null));
-// => true</code></pre>
+    <pre class="prettyprint"><code>function Foo() {  this.a = 1;}_.isPlainObject(new Foo);// => false_.isPlainObject([1, 2, 3]);// => false_.isPlainObject({ 'x': 0, 'y': 0 });// => true_.isPlainObject(Object.create(null));// => true</code></pre>
 
     
 
@@ -27300,17 +25895,7 @@ double precision number which isn't the result of a rounded unsafe integer.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.isSafeInteger(3);
-// => true
-
-_.isSafeInteger(Number.MIN_VALUE);
-// => false
-
-_.isSafeInteger(Infinity);
-// => false
-
-_.isSafeInteger('3');
-// => false</code></pre>
+    <pre class="prettyprint"><code>_.isSafeInteger(3);// => true_.isSafeInteger(Number.MIN_VALUE);// => false_.isSafeInteger(Infinity);// => false_.isSafeInteger('3');// => false</code></pre>
 
     
 
@@ -27478,11 +26063,7 @@ _.isSafeInteger('3');
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.isString('abc');
-// => true
-
-_.isString(1);
-// => false</code></pre>
+    <pre class="prettyprint"><code>_.isString('abc');// => true_.isString(1);// => false</code></pre>
 
     
 
@@ -27650,11 +26231,7 @@ _.isString(1);
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.isSymbol(Symbol.iterator);
-// => true
-
-_.isSymbol('abc');
-// => false</code></pre>
+    <pre class="prettyprint"><code>_.isSymbol(Symbol.iterator);// => true_.isSymbol('abc');// => false</code></pre>
 
     
 
@@ -27822,11 +26399,7 @@ _.isSymbol('abc');
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.isUndefined(void 0);
-// => true
-
-_.isUndefined(null);
-// => false</code></pre>
+    <pre class="prettyprint"><code>_.isUndefined(void 0);// => true_.isUndefined(null);// => false</code></pre>
 
     
 
@@ -27994,11 +26567,7 @@ _.isUndefined(null);
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.isWeakMap(new WeakMap);
-// => true
-
-_.isWeakMap(new Map);
-// => false</code></pre>
+    <pre class="prettyprint"><code>_.isWeakMap(new WeakMap);// => true_.isWeakMap(new Map);// => false</code></pre>
 
     
 
@@ -28166,11 +26735,7 @@ _.isWeakMap(new Map);
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.isWeakSet(new WeakSet);
-// => true
-
-_.isWeakSet(new Set);
-// => false</code></pre>
+    <pre class="prettyprint"><code>_.isWeakSet(new WeakSet);// => true_.isWeakSet(new Set);// => false</code></pre>
 
     
 
@@ -28362,32 +26927,7 @@ source properties, otherwise it returns <code>false</code>.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var users = [
-  { 'user': 'barney', 'age': 36, 'active': true },
-  { 'user': 'fred',   'age': 40, 'active': false }
-];
-
-// The `_.matches` iteratee shorthand.
-_.filter(users, _.iteratee({ 'user': 'barney', 'active': true }));
-// => [{ 'user': 'barney', 'age': 36, 'active': true }]
-
-// The `_.matchesProperty` iteratee shorthand.
-_.filter(users, _.iteratee(['user', 'fred']));
-// => [{ 'user': 'fred', 'age': 40 }]
-
-// The `_.property` iteratee shorthand.
-_.map(users, _.iteratee('user'));
-// => ['barney', 'fred']
-
-// Create custom iteratee shorthands.
-_.iteratee = _.wrap(_.iteratee, function(iteratee, func) {
-  return !_.isRegExp(func) ? iteratee(func) : function(string) {
-    return func.test(string);
-  };
-});
-
-_.filter(['abc', 'def'], /ef/);
-// => ['def']</code></pre>
+    <pre class="prettyprint"><code>var users = [  { 'user': 'barney', 'age': 36, 'active': true },  { 'user': 'fred',   'age': 40, 'active': false }];// The `_.matches` iteratee shorthand._.filter(users, _.iteratee({ 'user': 'barney', 'active': true }));// => [{ 'user': 'barney', 'age': 36, 'active': true }]// The `_.matchesProperty` iteratee shorthand._.filter(users, _.iteratee(['user', 'fred']));// => [{ 'user': 'fred', 'age': 40 }]// The `_.property` iteratee shorthand._.map(users, _.iteratee('user'));// => ['barney', 'fred']// Create custom iteratee shorthands._.iteratee = _.wrap(_.iteratee, function(iteratee, func) {  return !_.isRegExp(func) ? iteratee(func) : function(string) {    return func.test(string);  };});_.filter(['abc', 'def'], /ef/);// => ['def']</code></pre>
 
     
 
@@ -28610,8 +27150,7 @@ _.filter(['abc', 'def'], /ef/);
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.join(['a', 'b', 'c'], '~');
-// => 'a~b~c'</code></pre>
+    <pre class="prettyprint"><code>_.join(['a', 'b', 'c'], '~');// => 'a~b~c'</code></pre>
 
     
 
@@ -28782,18 +27321,7 @@ for more details.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>function Foo() {
-  this.a = 1;
-  this.b = 2;
-}
-
-Foo.prototype.c = 3;
-
-_.keys(new Foo);
-// => ['a', 'b'] (iteration order is not guaranteed)
-
-_.keys('hi');
-// => ['0', '1']</code></pre>
+    <pre class="prettyprint"><code>function Foo() {  this.a = 1;  this.b = 2;}Foo.prototype.c = 3;_.keys(new Foo);// => ['a', 'b'] (iteration order is not guaranteed)_.keys('hi');// => ['0', '1']</code></pre>
 
     
 
@@ -28962,15 +27490,7 @@ _.keys('hi');
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>function Foo() {
-  this.a = 1;
-  this.b = 2;
-}
-
-Foo.prototype.c = 3;
-
-_.keysIn(new Foo);
-// => ['a', 'b', 'c'] (iteration order is not guaranteed)</code></pre>
+    <pre class="prettyprint"><code>function Foo() {  this.a = 1;  this.b = 2;}Foo.prototype.c = 3;_.keysIn(new Foo);// => ['a', 'b', 'c'] (iteration order is not guaranteed)</code></pre>
 
     
 
@@ -29138,8 +27658,7 @@ _.keysIn(new Foo);
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.last([1, 2, 3]);
-// => 3</code></pre>
+    <pre class="prettyprint"><code>_.last([1, 2, 3]);// => 3</code></pre>
 
     
 
@@ -29398,12 +27917,7 @@ _.keysIn(new Foo);
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.lastIndexOf([1, 2, 1, 2], 2);
-// => 3
-
-// Search from the `fromIndex`.
-_.lastIndexOf([1, 2, 1, 2], 2, 2);
-// => 1</code></pre>
+    <pre class="prettyprint"><code>_.lastIndexOf([1, 2, 1, 2], 2);// => 3// Search from the `fromIndex`._.lastIndexOf([1, 2, 1, 2], 2, 2);// => 1</code></pre>
 
     
 
@@ -29638,24 +28152,7 @@ _.lastIndexOf([1, 2, 1, 2], 2, 2);
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>function square(n) {
-  return n * n;
-}
-
-_.map([4, 8], square);
-// => [16, 64]
-
-_.map({ 'a': 4, 'b': 8 }, square);
-// => [16, 64] (iteration order is not guaranteed)
-
-var users = [
-  { 'user': 'barney' },
-  { 'user': 'fred' }
-];
-
-// The `_.property` iteratee shorthand.
-_.map(users, 'user');
-// => ['barney', 'fred']</code></pre>
+    <pre class="prettyprint"><code>function square(n) {  return n * n;}_.map([4, 8], square);// => [16, 64]_.map({ 'a': 4, 'b': 8 }, square);// => [16, 64] (iteration order is not guaranteed)var users = [  { 'user': 'barney' },  { 'user': 'fred' }];// The `_.property` iteratee shorthand._.map(users, 'user');// => ['barney', 'fred']</code></pre>
 
     
 
@@ -29888,10 +28385,7 @@ with three arguments: (value, key, object).</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.mapKeys({ 'a': 1, 'b': 2 }, function(value, key) {
-  return key + value;
-});
-// => { 'a1': 1, 'b2': 2 }</code></pre>
+    <pre class="prettyprint"><code>_.mapKeys({ 'a': 1, 'b': 2 }, function(value, key) {  return key + value;});// => { 'a1': 1, 'b2': 2 }</code></pre>
 
     
 
@@ -30124,17 +28618,7 @@ by running each own enumerable string keyed property of <code>object</code> thru
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var users = {
-  'fred':    { 'user': 'fred',    'age': 40 },
-  'pebbles': { 'user': 'pebbles', 'age': 1 }
-};
-
-_.mapValues(users, function(o) { return o.age; });
-// => { 'fred': 40, 'pebbles': 1 } (iteration order is not guaranteed)
-
-// The `_.property` iteratee shorthand.
-_.mapValues(users, 'age');
-// => { 'fred': 40, 'pebbles': 1 } (iteration order is not guaranteed)</code></pre>
+    <pre class="prettyprint"><code>var users = {  'fred':    { 'user': 'fred',    'age': 40 },  'pebbles': { 'user': 'pebbles', 'age': 1 }};_.mapValues(users, function(o) { return o.age; });// => { 'fred': 40, 'pebbles': 1 } (iteration order is not guaranteed)// The `_.property` iteratee shorthand._.mapValues(users, 'age');// => { 'fred': 40, 'pebbles': 1 } (iteration order is not guaranteed)</code></pre>
 
     
 
@@ -30309,13 +28793,7 @@ for a list of supported value comparisons.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var objects = [
-  { 'a': 1, 'b': 2, 'c': 3 },
-  { 'a': 4, 'b': 5, 'c': 6 }
-];
-
-_.filter(objects, _.matches({ 'a': 4, 'c': 6 }));
-// => [{ 'a': 4, 'b': 5, 'c': 6 }]</code></pre>
+    <pre class="prettyprint"><code>var objects = [  { 'a': 1, 'b': 2, 'c': 3 },  { 'a': 4, 'b': 5, 'c': 6 }];_.filter(objects, _.matches({ 'a': 4, 'c': 6 }));// => [{ 'a': 4, 'b': 5, 'c': 6 }]</code></pre>
 
     
 
@@ -30514,13 +28992,7 @@ object value is equivalent, else <code>false</code>.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var objects = [
-  { 'a': 1, 'b': 2, 'c': 3 },
-  { 'a': 4, 'b': 5, 'c': 6 }
-];
-
-_.find(objects, _.matchesProperty('a', 4));
-// => { 'a': 4, 'b': 5, 'c': 6 }</code></pre>
+    <pre class="prettyprint"><code>var objects = [  { 'a': 1, 'b': 2, 'c': 3 },  { 'a': 4, 'b': 5, 'c': 6 }];_.find(objects, _.matchesProperty('a', 4));// => { 'a': 4, 'b': 5, 'c': 6 }</code></pre>
 
     
 
@@ -30689,11 +29161,7 @@ _.find(objects, _.matchesProperty('a', 4));
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.max([4, 2, 8, 6]);
-// => 8
-
-_.max([]);
-// => undefined</code></pre>
+    <pre class="prettyprint"><code>_.max([4, 2, 8, 6]);// => 8_.max([]);// => undefined</code></pre>
 
     
 
@@ -30918,14 +29386,7 @@ the value is ranked. The iteratee is invoked with one argument: (value).</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var objects = [{ 'n': 1 }, { 'n': 2 }];
-
-_.maxBy(objects, function(o) { return o.n; });
-// => { 'n': 2 }
-
-// The `_.property` iteratee shorthand.
-_.maxBy(objects, 'n');
-// => { 'n': 2 }</code></pre>
+    <pre class="prettyprint"><code>var objects = [{ 'n': 1 }, { 'n': 2 }];_.maxBy(objects, function(o) { return o.n; });// => { 'n': 2 }// The `_.property` iteratee shorthand._.maxBy(objects, 'n');// => { 'n': 2 }</code></pre>
 
     
 
@@ -31093,8 +29554,7 @@ _.maxBy(objects, 'n');
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.mean([4, 2, 8, 6]);
-// => 5</code></pre>
+    <pre class="prettyprint"><code>_.mean([4, 2, 8, 6]);// => 5</code></pre>
 
     
 
@@ -31319,14 +29779,7 @@ The iteratee is invoked with one argument: (value).</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var objects = [{ 'n': 4 }, { 'n': 2 }, { 'n': 8 }, { 'n': 6 }];
-
-_.meanBy(objects, function(o) { return o.n; });
-// => 5
-
-// The `_.property` iteratee shorthand.
-_.meanBy(objects, 'n');
-// => 5</code></pre>
+    <pre class="prettyprint"><code>var objects = [{ 'n': 4 }, { 'n': 2 }, { 'n': 8 }, { 'n': 6 }];_.meanBy(objects, function(o) { return o.n; });// => 5// The `_.property` iteratee shorthand._.meanBy(objects, 'n');// => 5</code></pre>
 
     
 
@@ -31546,27 +29999,7 @@ method interface of <code>clear</code>, <code>delete</code>, <code>get</code>, <
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var object = { 'a': 1, 'b': 2 };
-var other = { 'c': 3, 'd': 4 };
-
-var values = _.memoize(_.values);
-values(object);
-// => [1, 2]
-
-values(other);
-// => [3, 4]
-
-object.a = 2;
-values(object);
-// => [1, 2]
-
-// Modify the result cache.
-values.cache.set(object, ['a', 'b']);
-values(object);
-// => ['a', 'b']
-
-// Replace `_.memoize.Cache`.
-_.memoize.Cache = WeakMap;</code></pre>
+    <pre class="prettyprint"><code>var object = { 'a': 1, 'b': 2 };var other = { 'c': 3, 'd': 4 };var values = _.memoize(_.values);values(object);// => [1, 2]values(other);// => [3, 4]object.a = 2;values(object);// => [1, 2]// Modify the result cache.values.cache.set(object, ['a', 'b']);values(object);// => ['a', 'b']// Replace `_.memoize.Cache`._.memoize.Cache = WeakMap;</code></pre>
 
     
 
@@ -31735,11 +30168,7 @@ _.memoize.Cache = WeakMap;</code></pre>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.min([4, 2, 8, 6]);
-// => 2
-
-_.min([]);
-// => undefined</code></pre>
+    <pre class="prettyprint"><code>_.min([4, 2, 8, 6]);// => 2_.min([]);// => undefined</code></pre>
 
     
 
@@ -31964,14 +30393,7 @@ the value is ranked. The iteratee is invoked with one argument: (value).</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var objects = [{ 'n': 1 }, { 'n': 2 }];
-
-_.minBy(objects, function(o) { return o.n; });
-// => { 'n': 1 }
-
-// The `_.property` iteratee shorthand.
-_.minBy(objects, 'n');
-// => { 'n': 1 }</code></pre>
+    <pre class="prettyprint"><code>var objects = [{ 'n': 1 }, { 'n': 2 }];_.minBy(objects, function(o) { return o.n; });// => { 'n': 1 }// The `_.property` iteratee shorthand._.minBy(objects, 'n');// => { 'n': 1 }</code></pre>
 
     
 
@@ -32311,22 +30733,7 @@ avoid conflicts caused by modifying the original.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>function vowels(string) {
-  return _.filter(string, function(v) {
-    return /[aeiou]/i.test(v);
-  });
-}
-
-_.mixin({ 'vowels': vowels });
-_.vowels('fred');
-// => ['e']
-
-_('fred').vowels().value();
-// => ['e']
-
-_.mixin({ 'vowels': vowels }, { 'chain': false });
-_('fred').vowels();
-// => ['e']</code></pre>
+    <pre class="prettyprint"><code>function vowels(string) {  return _.filter(string, function(v) {    return /[aeiou]/i.test(v);  });}_.mixin({ 'vowels': vowels });_.vowels('fred');// => ['e']_('fred').vowels().value();// => ['e']_.mixin({ 'vowels': vowels }, { 'chain': false });_('fred').vowels();// => ['e']</code></pre>
 
     
 
@@ -32496,12 +30903,7 @@ created function.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>function isEven(n) {
-  return n % 2 == 0;
-}
-
-_.filter([1, 2, 3, 4, 5, 6], _.negate(isEven));
-// => [1, 3, 5]</code></pre>
+    <pre class="prettyprint"><code>function isEven(n) {  return n % 2 == 0;}_.filter([1, 2, 3, 4, 5, 6], _.negate(isEven));// => [1, 3, 5]</code></pre>
 
     
 
@@ -32717,8 +31119,7 @@ the <code>lodash</code> function.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.times(2, _.noop);
-// => [undefined, undefined]</code></pre>
+    <pre class="prettyprint"><code>_.times(2, _.noop);// => [undefined, undefined]</code></pre>
 
     
 
@@ -32942,13 +31343,7 @@ element from the end is returned.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var array = ['a', 'b', 'c', 'd'];
-
-_.nth(array, 1);
-// => 'b'
-
-_.nth(array, -2);
-// => 'c';</code></pre>
+    <pre class="prettyprint"><code>var array = ['a', 'b', 'c', 'd'];_.nth(array, 1);// => 'b'_.nth(array, -2);// => 'c';</code></pre>
 
     
 
@@ -33137,13 +31532,7 @@ the nth argument from the end is returned.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var func = _.nthArg(1);
-func('a', 'b', 'c', 'd');
-// => 'b'
-
-var func = _.nthArg(-2);
-func('a', 'b', 'c', 'd');
-// => 'c'</code></pre>
+    <pre class="prettyprint"><code>var func = _.nthArg(1);func('a', 'b', 'c', 'd');// => 'b'var func = _.nthArg(-2);func('a', 'b', 'c', 'd');// => 'c'</code></pre>
 
     
 
@@ -33369,10 +31758,7 @@ arguments: (value, key).</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var object = { 'a': 1, 'b': '2', 'c': 3 };
-
-_.omitBy(object, _.isNumber);
-// => { 'b': '2' }</code></pre>
+    <pre class="prettyprint"><code>var object = { 'a': 1, 'b': '2', 'c': 3 };_.omitBy(object, _.isNumber);// => { 'b': '2' }</code></pre>
 
     
 
@@ -33542,10 +31928,7 @@ invoked with the <code>this</code> binding and arguments of the created function
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var initialize = _.once(createApplication);
-initialize();
-initialize();
-// => `createApplication` is invoked once</code></pre>
+    <pre class="prettyprint"><code>var initialize = _.once(createApplication);initialize();initialize();// => `createApplication` is invoked once</code></pre>
 
     
 
@@ -33820,16 +32203,7 @@ descending or &quot;asc&quot; for ascending sort order of corresponding values.<
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var users = [
-  { 'user': 'fred',   'age': 48 },
-  { 'user': 'barney', 'age': 34 },
-  { 'user': 'fred',   'age': 40 },
-  { 'user': 'barney', 'age': 36 }
-];
-
-// Sort by `user` in ascending order and by `age` in descending order.
-_.orderBy(users, ['user', 'age'], ['asc', 'desc']);
-// => objects for [['barney', 36], ['barney', 34], ['fred', 48], ['fred', 40]]</code></pre>
+    <pre class="prettyprint"><code>var users = [  { 'user': 'fred',   'age': 48 },  { 'user': 'barney', 'age': 34 },  { 'user': 'fred',   'age': 40 },  { 'user': 'barney', 'age': 36 }];// Sort by `user` in ascending order and by `age` in descending order._.orderBy(users, ['user', 'age'], ['asc', 'desc']);// => objects for [['barney', 36], ['barney', 34], ['fred', 48], ['fred', 40]]</code></pre>
 
     
 
@@ -34096,14 +32470,7 @@ Padding characters are truncated if they can't be evenly divided by <code>length
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.pad('abc', 8);
-// => '  abc   '
-
-_.pad('abc', 8, '_-');
-// => '_-abc_-_'
-
-_.pad('abc', 3);
-// => 'abc'</code></pre>
+    <pre class="prettyprint"><code>_.pad('abc', 8);// => '  abc   '_.pad('abc', 8, '_-');// => '_-abc_-_'_.pad('abc', 3);// => 'abc'</code></pre>
 
     
 
@@ -34370,14 +32737,7 @@ characters are truncated if they exceed <code>length</code>.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.padEnd('abc', 6);
-// => 'abc   '
-
-_.padEnd('abc', 6, '_-');
-// => 'abc_-_'
-
-_.padEnd('abc', 3);
-// => 'abc'</code></pre>
+    <pre class="prettyprint"><code>_.padEnd('abc', 6);// => 'abc   '_.padEnd('abc', 6, '_-');// => 'abc_-_'_.padEnd('abc', 3);// => 'abc'</code></pre>
 
     
 
@@ -34644,14 +33004,7 @@ characters are truncated if they exceed <code>length</code>.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.padStart('abc', 6);
-// => '   abc'
-
-_.padStart('abc', 6, '_-');
-// => '_-_abc'
-
-_.padStart('abc', 3);
-// => 'abc'</code></pre>
+    <pre class="prettyprint"><code>_.padStart('abc', 6);// => '   abc'_.padStart('abc', 6, '_-');// => '_-_abc'_.padStart('abc', 3);// => 'abc'</code></pre>
 
     
 
@@ -34878,11 +33231,7 @@ hexadecimal, in which case a <code>radix</code> of <code>16</code> is used.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.parseInt('08');
-// => 8
-
-_.map(['6', '08', '10'], _.parseInt);
-// => [6, 8, 10]</code></pre>
+    <pre class="prettyprint"><code>_.parseInt('08');// => 8_.map(['6', '08', '10'], _.parseInt);// => [6, 8, 10]</code></pre>
 
     
 
@@ -35106,10 +33455,7 @@ truthy for. The predicate is invoked with two arguments: (value, key).</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var object = { 'a': 1, 'b': '2', 'c': 3 };
-
-_.pickBy(object, _.isNumber);
-// => { 'a': 1, 'c': 3 }</code></pre>
+    <pre class="prettyprint"><code>var object = { 'a': 1, 'b': '2', 'c': 3 };_.pickBy(object, _.isNumber);// => { 'a': 1, 'c': 3 }</code></pre>
 
     
 
@@ -35280,16 +33626,7 @@ _.pickBy(object, _.isNumber);
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var objects = [
-  { 'a': { 'b': 2 } },
-  { 'a': { 'b': 1 } }
-];
-
-_.map(objects, _.property('a.b'));
-// => [2, 1]
-
-_.map(_.sortBy(objects, _.property(['a', 'b'])), 'a.b');
-// => [1, 2]</code></pre>
+    <pre class="prettyprint"><code>var objects = [  { 'a': { 'b': 2 } },  { 'a': { 'b': 1 } }];_.map(objects, _.property('a.b'));// => [2, 1]_.map(_.sortBy(objects, _.property(['a', 'b'])), 'a.b');// => [1, 2]</code></pre>
 
     
 
@@ -35458,14 +33795,7 @@ the value at a given path of <code>object</code>.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var array = [0, 1, 2],
-    object = { 'a': array, 'b': array, 'c': array };
-
-_.map(['a[2]', 'c[0]'], _.propertyOf(object));
-// => [2, 0]
-
-_.map([['a', '2'], ['c', '0']], _.propertyOf(object));
-// => [2, 0]</code></pre>
+    <pre class="prettyprint"><code>var array = [0, 1, 2],    object = { 'a': array, 'b': array, 'c': array };_.map(['a[2]', 'c[0]'], _.propertyOf(object));// => [2, 0]_.map([['a', '2'], ['c', '0']], _.propertyOf(object));// => [2, 0]</code></pre>
 
     
 
@@ -35657,11 +33987,7 @@ _.map([['a', '2'], ['c', '0']], _.propertyOf(object));
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var array = ['a', 'b', 'c', 'a', 'b', 'c'];
-
-_.pullAll(array, ['a', 'c']);
-console.log(array);
-// => ['b', 'b']</code></pre>
+    <pre class="prettyprint"><code>var array = ['a', 'b', 'c', 'a', 'b', 'c'];_.pullAll(array, ['a', 'c']);console.log(array);// => ['b', 'b']</code></pre>
 
     
 
@@ -35922,11 +34248,7 @@ by which they're compared. The iteratee is invoked with one argument: (value).</
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var array = [{ 'x': 1 }, { 'x': 2 }, { 'x': 3 }, { 'x': 1 }];
-
-_.pullAllBy(array, [{ 'x': 1 }, { 'x': 3 }], 'x');
-console.log(array);
-// => [{ 'x': 2 }]</code></pre>
+    <pre class="prettyprint"><code>var array = [{ 'x': 1 }, { 'x': 2 }, { 'x': 3 }, { 'x': 1 }];_.pullAllBy(array, [{ 'x': 1 }, { 'x': 3 }], 'x');console.log(array);// => [{ 'x': 2 }]</code></pre>
 
     
 
@@ -36171,11 +34493,7 @@ invoked with two arguments: (arrVal, othVal).</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var array = [{ 'x': 1, 'y': 2 }, { 'x': 3, 'y': 4 }, { 'x': 5, 'y': 6 }];
-
-_.pullAllWith(array, [{ 'x': 3, 'y': 4 }], _.isEqual);
-console.log(array);
-// => [{ 'x': 1, 'y': 2 }, { 'x': 5, 'y': 6 }]</code></pre>
+    <pre class="prettyprint"><code>var array = [{ 'x': 1, 'y': 2 }, { 'x': 3, 'y': 4 }, { 'x': 5, 'y': 6 }];_.pullAllWith(array, [{ 'x': 3, 'y': 4 }], _.isEqual);console.log(array);// => [{ 'x': 1, 'y': 2 }, { 'x': 5, 'y': 6 }]</code></pre>
 
     
 
@@ -36444,17 +34762,7 @@ floating-point values which can produce unexpected results.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.random(0, 5);
-// => an integer between 0 and 5
-
-_.random(5);
-// => also an integer between 0 and 5
-
-_.random(5, true);
-// => a floating-point number between 0 and 5
-
-_.random(1.2, 5.2);
-// => a floating-point number between 1.2 and 5.2</code></pre>
+    <pre class="prettyprint"><code>_.random(0, 5);// => an integer between 0 and 5_.random(5);// => also an integer between 0 and 5_.random(5, true);// => a floating-point number between 0 and 5_.random(1.2, 5.2);// => a floating-point number between 1.2 and 5.2</code></pre>
 
     
 
@@ -36734,16 +35042,7 @@ and <code>sortBy</code></p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.reduce([1, 2], function(sum, n) {
-  return sum + n;
-}, 0);
-// => 3
-
-_.reduce({ 'a': 1, 'b': 2, 'c': 1 }, function(result, value, key) {
-  (result[value] || (result[value] = [])).push(key);
-  return result;
-}, {});
-// => { '1': ['a', 'c'], '2': ['b'] } (iteration order is not guaranteed)</code></pre>
+    <pre class="prettyprint"><code>_.reduce([1, 2], function(sum, n) {  return sum + n;}, 0);// => 3_.reduce({ 'a': 1, 'b': 2, 'c': 1 }, function(result, value, key) {  (result[value] || (result[value] = [])).push(key);  return result;}, {});// => { '1': ['a', 'c'], '2': ['b'] } (iteration order is not guaranteed)</code></pre>
 
     
 
@@ -37014,12 +35313,7 @@ _.reduce({ 'a': 1, 'b': 2, 'c': 1 }, function(result, value, key) {
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var array = [[0, 1], [2, 3], [4, 5]];
-
-_.reduceRight(array, function(flattened, other) {
-  return flattened.concat(other);
-}, []);
-// => [4, 5, 2, 3, 0, 1]</code></pre>
+    <pre class="prettyprint"><code>var array = [[0, 1], [2, 3], [4, 5]];_.reduceRight(array, function(flattened, other) {  return flattened.concat(other);}, []);// => [4, 5, 2, 3, 0, 1]</code></pre>
 
     
 
@@ -37253,25 +35547,7 @@ that <code>predicate</code> does <strong>not</strong> return truthy for.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var users = [
-  { 'user': 'barney', 'age': 36, 'active': false },
-  { 'user': 'fred',   'age': 40, 'active': true }
-];
-
-_.reject(users, function(o) { return !o.active; });
-// => objects for ['fred']
-
-// The `_.matches` iteratee shorthand.
-_.reject(users, { 'age': 40, 'active': true });
-// => objects for ['barney']
-
-// The `_.matchesProperty` iteratee shorthand.
-_.reject(users, ['active', false]);
-// => objects for ['fred']
-
-// The `_.property` iteratee shorthand.
-_.reject(users, 'active');
-// => objects for ['barney']</code></pre>
+    <pre class="prettyprint"><code>var users = [  { 'user': 'barney', 'age': 36, 'active': false },  { 'user': 'fred',   'age': 40, 'active': true }];_.reject(users, function(o) { return !o.active; });// => objects for ['fred']// The `_.matches` iteratee shorthand._.reject(users, { 'age': 40, 'active': true });// => objects for ['barney']// The `_.matchesProperty` iteratee shorthand._.reject(users, ['active', false]);// => objects for ['fred']// The `_.property` iteratee shorthand._.reject(users, 'active');// => objects for ['barney']</code></pre>
 
     
 
@@ -37498,16 +35774,7 @@ to pull elements from an array by value.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var array = [1, 2, 3, 4];
-var evens = _.remove(array, function(n) {
-  return n % 2 == 0;
-});
-
-console.log(array);
-// => [1, 3]
-
-console.log(evens);
-// => [2, 4]</code></pre>
+    <pre class="prettyprint"><code>var array = [1, 2, 3, 4];var evens = _.remove(array, function(n) {  return n % 2 == 0;});console.log(array);// => [1, 3]console.log(evens);// => [2, 4]</code></pre>
 
     
 
@@ -37734,14 +36001,7 @@ console.log(evens);
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.repeat('*', 3);
-// => '***'
-
-_.repeat('abc', 2);
-// => 'abcabc'
-
-_.repeat('abc', 0);
-// => ''</code></pre>
+    <pre class="prettyprint"><code>_.repeat('*', 3);// => '***'_.repeat('abc', 2);// => 'abcabc'_.repeat('abc', 0);// => ''</code></pre>
 
     
 
@@ -38007,8 +36267,7 @@ _.repeat('abc', 0);
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.replace('Hi Fred', 'Fred', 'Barney');
-// => 'Hi Barney'</code></pre>
+    <pre class="prettyprint"><code>_.replace('Hi Fred', 'Fred', 'Barney');// => 'Hi Barney'</code></pre>
 
     
 
@@ -38235,13 +36494,7 @@ an array.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var say = _.rest(function(what, names) {
-  return what + ' ' + _.initial(names).join(', ') +
-    (_.size(names) > 1 ? ', &amp; ' : '') + _.last(names);
-});
-
-say('hello', 'fred', 'barney', 'pebbles');
-// => 'hello fred, barney, &amp; pebbles'</code></pre>
+    <pre class="prettyprint"><code>var say = _.rest(function(what, names) {  return what + ' ' + _.initial(names).join(', ') +    (_.size(names) > 1 ? ', &amp; ' : '') + _.last(names);});say('hello', 'fred', 'barney', 'pebbles');// => 'hello fred, barney, &amp; pebbles'</code></pre>
 
     
 
@@ -38488,19 +36741,7 @@ its result is returned.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var object = { 'a': [{ 'b': { 'c1': 3, 'c2': _.constant(4) } }] };
-
-_.result(object, 'a[0].b.c1');
-// => 3
-
-_.result(object, 'a[0].b.c2');
-// => 4
-
-_.result(object, 'a[0].b.c3', 'default');
-// => 'default'
-
-_.result(object, 'a[0].b.c3', _.constant('default'));
-// => 'default'</code></pre>
+    <pre class="prettyprint"><code>var object = { 'a': [{ 'b': { 'c1': 3, 'c2': _.constant(4) } }] };_.result(object, 'a[0].b.c1');// => 3_.result(object, 'a[0].b.c2');// => 4_.result(object, 'a[0].b.c3', 'default');// => 'default'_.result(object, 'a[0].b.c3', _.constant('default'));// => 'default'</code></pre>
 
     
 
@@ -38671,13 +36912,7 @@ element becomes the second to last, and so on.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var array = [1, 2, 3];
-
-_.reverse(array);
-// => [3, 2, 1]
-
-console.log(array);
-// => [3, 2, 1]</code></pre>
+    <pre class="prettyprint"><code>var array = [1, 2, 3];_.reverse(array);// => [3, 2, 1]console.log(array);// => [3, 2, 1]</code></pre>
 
     
 
@@ -38865,23 +37100,7 @@ console.log(array);
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.mixin({ 'foo': _.constant('foo') });
-
-var lodash = _.runInContext();
-lodash.mixin({ 'bar': lodash.constant('bar') });
-
-_.isFunction(_.foo);
-// => true
-_.isFunction(_.bar);
-// => false
-
-lodash.isFunction(lodash.foo);
-// => false
-lodash.isFunction(lodash.bar);
-// => true
-
-// Create a suped-up `defer` in Node.js.
-var defer = _.runInContext({ 'setTimeout': setImmediate }).defer;</code></pre>
+    <pre class="prettyprint"><code>_.mixin({ 'foo': _.constant('foo') });var lodash = _.runInContext();lodash.mixin({ 'bar': lodash.constant('bar') });_.isFunction(_.foo);// => true_.isFunction(_.bar);// => falselodash.isFunction(lodash.foo);// => falselodash.isFunction(lodash.bar);// => true// Create a suped-up `defer` in Node.js.var defer = _.runInContext({ 'setTimeout': setImmediate }).defer;</code></pre>
 
     
 
@@ -39052,8 +37271,7 @@ var defer = _.runInContext({ 'setTimeout': setImmediate }).defer;</code></pre>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.sample([1, 2, 3, 4]);
-// => 2</code></pre>
+    <pre class="prettyprint"><code>_.sample([1, 2, 3, 4]);// => 2</code></pre>
 
     
 
@@ -39280,11 +37498,7 @@ size of <code>collection</code>.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.sampleSize([1, 2, 3], 2);
-// => [3, 1]
-
-_.sampleSize([1, 2, 3], 4);
-// => [2, 3, 1]</code></pre>
+    <pre class="prettyprint"><code>_.sampleSize([1, 2, 3], 2);// => [3, 1]_.sampleSize([1, 2, 3], 4);// => [2, 3, 1]</code></pre>
 
     
 
@@ -39505,15 +37719,7 @@ are created for all other missing properties. Use <code>_.setWith</code> to cust
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var object = { 'a': [{ 'b': { 'c': 3 } }] };
-
-_.set(object, 'a[0].b.c', 4);
-console.log(object.a[0].b.c);
-// => 4
-
-_.set(object, ['x', '0', 'y', 'z'], 5);
-console.log(object.x[0].y.z);
-// => 5</code></pre>
+    <pre class="prettyprint"><code>var object = { 'a': [{ 'b': { 'c': 3 } }] };_.set(object, 'a[0].b.c', 4);console.log(object.a[0].b.c);// => 4_.set(object, ['x', '0', 'y', 'z'], 5);console.log(object.x[0].y.z);// => 5</code></pre>
 
     
 
@@ -39793,10 +37999,7 @@ with three arguments: (nsValue, key, nsObject).</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var object = {};
-
-_.setWith(object, '[0][1]', 'a', Object);
-// => { '0': { '1': 'a' } }</code></pre>
+    <pre class="prettyprint"><code>var object = {};_.setWith(object, '[0][1]', 'a', Object);// => { '0': { '1': 'a' } }</code></pre>
 
     
 
@@ -39968,8 +38171,7 @@ _.setWith(object, '[0][1]', 'a', Object);
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.shuffle([1, 2, 3, 4]);
-// => [4, 1, 3, 2]</code></pre>
+    <pre class="prettyprint"><code>_.shuffle([1, 2, 3, 4]);// => [4, 1, 3, 2]</code></pre>
 
     
 
@@ -40144,14 +38346,7 @@ values or the number of own enumerable string keyed properties for objects.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.size([1, 2, 3]);
-// => 3
-
-_.size({ 'a': 1, 'b': 2 });
-// => 2
-
-_.size('pebbles');
-// => 7</code></pre>
+    <pre class="prettyprint"><code>_.size([1, 2, 3]);// => 3_.size({ 'a': 1, 'b': 2 });// => 2_.size('pebbles');// => 7</code></pre>
 
     
 
@@ -40640,25 +38835,7 @@ else <code>false</code>.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.some([null, 0, 'yes', false], Boolean);
-// => true
-
-var users = [
-  { 'user': 'barney', 'active': true },
-  { 'user': 'fred',   'active': false }
-];
-
-// The `_.matches` iteratee shorthand.
-_.some(users, { 'user': 'barney', 'active': false });
-// => false
-
-// The `_.matchesProperty` iteratee shorthand.
-_.some(users, ['active', false]);
-// => true
-
-// The `_.property` iteratee shorthand.
-_.some(users, 'active');
-// => true</code></pre>
+    <pre class="prettyprint"><code>_.some([null, 0, 'yes', false], Boolean);// => truevar users = [  { 'user': 'barney', 'active': true },  { 'user': 'fred',   'active': false }];// The `_.matches` iteratee shorthand._.some(users, { 'user': 'barney', 'active': false });// => false// The `_.matchesProperty` iteratee shorthand._.some(users, ['active', false]);// => true// The `_.property` iteratee shorthand._.some(users, 'active');// => true</code></pre>
 
     
 
@@ -40851,8 +39028,7 @@ into <code>array</code>.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.sortedIndex([30, 50], 40);
-// => 1</code></pre>
+    <pre class="prettyprint"><code>_.sortedIndex([30, 50], 40);// => 1</code></pre>
 
     
 
@@ -41113,14 +39289,7 @@ into <code>array</code>.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var objects = [{ 'x': 4 }, { 'x': 5 }];
-
-_.sortedIndexBy(objects, { 'x': 4 }, function(o) { return o.x; });
-// => 0
-
-// The `_.property` iteratee shorthand.
-_.sortedIndexBy(objects, { 'x': 4 }, 'x');
-// => 0</code></pre>
+    <pre class="prettyprint"><code>var objects = [{ 'x': 4 }, { 'x': 5 }];_.sortedIndexBy(objects, { 'x': 4 }, function(o) { return o.x; });// => 0// The `_.property` iteratee shorthand._.sortedIndexBy(objects, { 'x': 4 }, 'x');// => 0</code></pre>
 
     
 
@@ -41312,8 +39481,7 @@ search on a sorted <code>array</code>.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.sortedIndexOf([4, 5, 5, 5, 6], 5);
-// => 1</code></pre>
+    <pre class="prettyprint"><code>_.sortedIndexOf([4, 5, 5, 5, 6], 5);// => 1</code></pre>
 
     
 
@@ -41507,8 +39675,7 @@ into <code>array</code>.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.sortedLastIndex([4, 5, 5, 5, 6], 5);
-// => 4</code></pre>
+    <pre class="prettyprint"><code>_.sortedLastIndex([4, 5, 5, 5, 6], 5);// => 4</code></pre>
 
     
 
@@ -41769,14 +39936,7 @@ into <code>array</code>.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var objects = [{ 'x': 4 }, { 'x': 5 }];
-
-_.sortedLastIndexBy(objects, { 'x': 4 }, function(o) { return o.x; });
-// => 1
-
-// The `_.property` iteratee shorthand.
-_.sortedLastIndexBy(objects, { 'x': 4 }, 'x');
-// => 1</code></pre>
+    <pre class="prettyprint"><code>var objects = [{ 'x': 4 }, { 'x': 5 }];_.sortedLastIndexBy(objects, { 'x': 4 }, function(o) { return o.x; });// => 1// The `_.property` iteratee shorthand._.sortedLastIndexBy(objects, { 'x': 4 }, 'x');// => 1</code></pre>
 
     
 
@@ -41968,8 +40128,7 @@ search on a sorted <code>array</code>.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.sortedLastIndexOf([4, 5, 5, 5, 6], 5);
-// => 3</code></pre>
+    <pre class="prettyprint"><code>_.sortedLastIndexOf([4, 5, 5, 5, 6], 5);// => 3</code></pre>
 
     
 
@@ -42138,8 +40297,7 @@ for sorted arrays.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.sortedUniq([1, 1, 2]);
-// => [1, 2]</code></pre>
+    <pre class="prettyprint"><code>_.sortedUniq([1, 1, 2]);// => [1, 2]</code></pre>
 
     
 
@@ -42351,8 +40509,7 @@ for sorted arrays.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.sortedUniqBy([1.1, 1.2, 2.3, 2.4], Math.floor);
-// => [1.1, 2.3]</code></pre>
+    <pre class="prettyprint"><code>_.sortedUniqBy([1.1, 1.2, 2.3, 2.4], Math.floor);// => [1.1, 2.3]</code></pre>
 
     
 
@@ -42617,8 +40774,7 @@ for sorted arrays.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.split('a-b-c', '-', 2);
-// => ['a', 'b']</code></pre>
+    <pre class="prettyprint"><code>_.split('a-b-c', '-', 2);// => ['a', 'b']</code></pre>
 
     
 
@@ -42845,22 +41001,7 @@ create function and an array of arguments much like<br>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var say = _.spread(function(who, what) {
-  return who + ' says ' + what;
-});
-
-say(['fred', 'hello']);
-// => 'fred says hello'
-
-var numbers = Promise.all([
-  Promise.resolve(40),
-  Promise.resolve(36)
-]);
-
-numbers.then(_.spread(function(x, y) {
-  return x + y;
-}));
-// => a Promise of 76</code></pre>
+    <pre class="prettyprint"><code>var say = _.spread(function(who, what) {  return who + ' says ' + what;});say(['fred', 'hello']);// => 'fred says hello'var numbers = Promise.all([  Promise.resolve(40),  Promise.resolve(36)]);numbers.then(_.spread(function(x, y) {  return x + y;}));// => a Promise of 76</code></pre>
 
     
 
@@ -43125,14 +41266,7 @@ else <code>false</code>.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.startsWith('abc', 'a');
-// => true
-
-_.startsWith('abc', 'b');
-// => false
-
-_.startsWith('abc', 'b', 1);
-// => true</code></pre>
+    <pre class="prettyprint"><code>_.startsWith('abc', 'a');// => true_.startsWith('abc', 'b');// => false_.startsWith('abc', 'b', 1);// => true</code></pre>
 
     
 
@@ -43250,13 +41384,7 @@ _.startsWith('abc', 'b', 1);
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var arrays = _.times(2, _.stubArray);
-
-console.log(arrays);
-// => [[], []]
-
-console.log(arrays[0] === arrays[1]);
-// => false</code></pre>
+    <pre class="prettyprint"><code>var arrays = _.times(2, _.stubArray);console.log(arrays);// => [[], []]console.log(arrays[0] === arrays[1]);// => false</code></pre>
 
     
 
@@ -43374,8 +41502,7 @@ console.log(arrays[0] === arrays[1]);
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.times(2, _.stubFalse);
-// => [false, false]</code></pre>
+    <pre class="prettyprint"><code>_.times(2, _.stubFalse);// => [false, false]</code></pre>
 
     
 
@@ -43493,13 +41620,7 @@ console.log(arrays[0] === arrays[1]);
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var objects = _.times(2, _.stubObject);
-
-console.log(objects);
-// => [{}, {}]
-
-console.log(objects[0] === objects[1]);
-// => false</code></pre>
+    <pre class="prettyprint"><code>var objects = _.times(2, _.stubObject);console.log(objects);// => [{}, {}]console.log(objects[0] === objects[1]);// => false</code></pre>
 
     
 
@@ -43617,8 +41738,7 @@ console.log(objects[0] === objects[1]);
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.times(2, _.stubString);
-// => ['', '']</code></pre>
+    <pre class="prettyprint"><code>_.times(2, _.stubString);// => ['', '']</code></pre>
 
     
 
@@ -43736,8 +41856,7 @@ console.log(objects[0] === objects[1]);
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.times(2, _.stubTrue);
-// => [true, true]</code></pre>
+    <pre class="prettyprint"><code>_.times(2, _.stubTrue);// => [true, true]</code></pre>
 
     
 
@@ -43905,8 +42024,7 @@ console.log(objects[0] === objects[1]);
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.sum([4, 2, 8, 6]);
-// => 20</code></pre>
+    <pre class="prettyprint"><code>_.sum([4, 2, 8, 6]);// => 20</code></pre>
 
     
 
@@ -44131,14 +42249,7 @@ The iteratee is invoked with one argument: (value).</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var objects = [{ 'n': 4 }, { 'n': 2 }, { 'n': 8 }, { 'n': 6 }];
-
-_.sumBy(objects, function(o) { return o.n; });
-// => 20
-
-// The `_.property` iteratee shorthand.
-_.sumBy(objects, 'n');
-// => 20</code></pre>
+    <pre class="prettyprint"><code>var objects = [{ 'n': 4 }, { 'n': 2 }, { 'n': 8 }, { 'n': 6 }];_.sumBy(objects, function(o) { return o.n; });// => 20// The `_.property` iteratee shorthand._.sumBy(objects, 'n');// => 20</code></pre>
 
     
 
@@ -44306,8 +42417,7 @@ _.sumBy(objects, 'n');
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.tail([1, 2, 3]);
-// => [2, 3]</code></pre>
+    <pre class="prettyprint"><code>_.tail([1, 2, 3]);// => [2, 3]</code></pre>
 
     
 
@@ -44530,17 +42640,7 @@ _.sumBy(objects, 'n');
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.take([1, 2, 3]);
-// => [1]
-
-_.take([1, 2, 3], 2);
-// => [1, 2]
-
-_.take([1, 2, 3], 5);
-// => [1, 2, 3]
-
-_.take([1, 2, 3], 0);
-// => []</code></pre>
+    <pre class="prettyprint"><code>_.take([1, 2, 3]);// => [1]_.take([1, 2, 3], 2);// => [1, 2]_.take([1, 2, 3], 5);// => [1, 2, 3]_.take([1, 2, 3], 0);// => []</code></pre>
 
     
 
@@ -44763,17 +42863,7 @@ _.take([1, 2, 3], 0);
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.takeRight([1, 2, 3]);
-// => [3]
-
-_.takeRight([1, 2, 3], 2);
-// => [2, 3]
-
-_.takeRight([1, 2, 3], 5);
-// => [1, 2, 3]
-
-_.takeRight([1, 2, 3], 0);
-// => []</code></pre>
+    <pre class="prettyprint"><code>_.takeRight([1, 2, 3]);// => [3]_.takeRight([1, 2, 3], 2);// => [2, 3]_.takeRight([1, 2, 3], 5);// => [1, 2, 3]_.takeRight([1, 2, 3], 0);// => []</code></pre>
 
     
 
@@ -44998,26 +43088,7 @@ three arguments: (value, index, array).</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var users = [
-  { 'user': 'barney',  'active': true },
-  { 'user': 'fred',    'active': false },
-  { 'user': 'pebbles', 'active': false }
-];
-
-_.takeRightWhile(users, function(o) { return !o.active; });
-// => objects for ['fred', 'pebbles']
-
-// The `_.matches` iteratee shorthand.
-_.takeRightWhile(users, { 'user': 'pebbles', 'active': false });
-// => objects for ['pebbles']
-
-// The `_.matchesProperty` iteratee shorthand.
-_.takeRightWhile(users, ['active', false]);
-// => objects for ['fred', 'pebbles']
-
-// The `_.property` iteratee shorthand.
-_.takeRightWhile(users, 'active');
-// => []</code></pre>
+    <pre class="prettyprint"><code>var users = [  { 'user': 'barney',  'active': true },  { 'user': 'fred',    'active': false },  { 'user': 'pebbles', 'active': false }];_.takeRightWhile(users, function(o) { return !o.active; });// => objects for ['fred', 'pebbles']// The `_.matches` iteratee shorthand._.takeRightWhile(users, { 'user': 'pebbles', 'active': false });// => objects for ['pebbles']// The `_.matchesProperty` iteratee shorthand._.takeRightWhile(users, ['active', false]);// => objects for ['fred', 'pebbles']// The `_.property` iteratee shorthand._.takeRightWhile(users, 'active');// => []</code></pre>
 
     
 
@@ -45242,26 +43313,7 @@ three arguments: (value, index, array).</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var users = [
-  { 'user': 'barney',  'active': false },
-  { 'user': 'fred',    'active': false },
-  { 'user': 'pebbles', 'active': true }
-];
-
-_.takeWhile(users, function(o) { return !o.active; });
-// => objects for ['barney', 'fred']
-
-// The `_.matches` iteratee shorthand.
-_.takeWhile(users, { 'user': 'barney', 'active': false });
-// => objects for ['barney']
-
-// The `_.matchesProperty` iteratee shorthand.
-_.takeWhile(users, ['active', false]);
-// => objects for ['barney', 'fred']
-
-// The `_.property` iteratee shorthand.
-_.takeWhile(users, 'active');
-// => []</code></pre>
+    <pre class="prettyprint"><code>var users = [  { 'user': 'barney',  'active': false },  { 'user': 'fred',    'active': false },  { 'user': 'pebbles', 'active': true }];_.takeWhile(users, function(o) { return !o.active; });// => objects for ['barney', 'fred']// The `_.matches` iteratee shorthand._.takeWhile(users, { 'user': 'barney', 'active': false });// => objects for ['barney']// The `_.matchesProperty` iteratee shorthand._.takeWhile(users, ['active', false]);// => objects for ['barney', 'fred']// The `_.property` iteratee shorthand._.takeWhile(users, 'active');// => []</code></pre>
 
     
 
@@ -45454,14 +43506,7 @@ is invoked with one argument; (value). The purpose of this method is to<br>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_([1, 2, 3])
- .tap(function(array) {
-   // Mutate input array.
-   array.pop();
- })
- .reverse()
- .value();
-// => [2, 1]</code></pre>
+    <pre class="prettyprint"><code>_([1, 2, 3]) .tap(function(array) {   // Mutate input array.   array.pop(); }) .reverse() .value();// => [2, 1]</code></pre>
 
     
 
@@ -45962,70 +44007,7 @@ for easier debugging.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>// Use the "interpolate" delimiter to create a compiled template.
-var compiled = _.template('hello &lt;%= user %>!');
-compiled({ 'user': 'fred' });
-// => 'hello fred!'
-
-// Use the HTML "escape" delimiter to escape data property values.
-var compiled = _.template('&lt;b>&lt;%- value %>&lt;/b>');
-compiled({ 'value': '&lt;script>' });
-// => '&lt;b>&amp;lt;script&amp;gt;&lt;/b>'
-
-// Use the "evaluate" delimiter to execute JavaScript and generate HTML.
-var compiled = _.template('&lt;% _.forEach(users, function(user) { %>&lt;li>&lt;%- user %>&lt;/li>&lt;% }); %>');
-compiled({ 'users': ['fred', 'barney'] });
-// => '&lt;li>fred&lt;/li>&lt;li>barney&lt;/li>'
-
-// Use the internal `print` function in "evaluate" delimiters.
-var compiled = _.template('&lt;% print("hello " + user); %>!');
-compiled({ 'user': 'barney' });
-// => 'hello barney!'
-
-// Use the ES template literal delimiter as an "interpolate" delimiter.
-// Disable support by replacing the "interpolate" delimiter.
-var compiled = _.template('hello ${ user }!');
-compiled({ 'user': 'pebbles' });
-// => 'hello pebbles!'
-
-// Use backslashes to treat delimiters as plain text.
-var compiled = _.template('&lt;%= "\\&lt;%- value %\\>" %>');
-compiled({ 'value': 'ignored' });
-// => '&lt;%- value %>'
-
-// Use the `imports` option to import `jQuery` as `jq`.
-var text = '&lt;% jq.each(users, function(user) { %>&lt;li>&lt;%- user %>&lt;/li>&lt;% }); %>';
-var compiled = _.template(text, { 'imports': { 'jq': jQuery } });
-compiled({ 'users': ['fred', 'barney'] });
-// => '&lt;li>fred&lt;/li>&lt;li>barney&lt;/li>'
-
-// Use the `sourceURL` option to specify a custom sourceURL for the template.
-var compiled = _.template('hello &lt;%= user %>!', { 'sourceURL': '/basic/greeting.jst' });
-compiled(data);
-// => Find the source of "greeting.jst" under the Sources tab or Resources panel of the web inspector.
-
-// Use the `variable` option to ensure a with-statement isn't used in the compiled template.
-var compiled = _.template('hi &lt;%= data.user %>!', { 'variable': 'data' });
-compiled.source;
-// => function(data) {
-//   var __t, __p = '';
-//   __p += 'hi ' + ((__t = ( data.user )) == null ? '' : __t) + '!';
-//   return __p;
-// }
-
-// Use custom template delimiters.
-_.templateSettings.interpolate = /{{([\s\S]+?)}}/g;
-var compiled = _.template('hello {{ user }}!');
-compiled({ 'user': 'mustache' });
-// => 'hello mustache!'
-
-// Use the `source` property to inline compiled templates for meaningful
-// line numbers in error messages and stack traces.
-fs.writeFileSync(path.join(process.cwd(), 'jst.js'), '\
-  var JST = {\
-    "main": ' + _.template(mainText).source + '\
-  };\
-');</code></pre>
+    <pre class="prettyprint"><code>// Use the "interpolate" delimiter to create a compiled template.var compiled = _.template('hello &lt;%= user %>!');compiled({ 'user': 'fred' });// => 'hello fred!'// Use the HTML "escape" delimiter to escape data property values.var compiled = _.template('&lt;b>&lt;%- value %>&lt;/b>');compiled({ 'value': '&lt;script>' });// => '&lt;b>&amp;lt;script&amp;gt;&lt;/b>'// Use the "evaluate" delimiter to execute JavaScript and generate HTML.var compiled = _.template('&lt;% _.forEach(users, function(user) { %>&lt;li>&lt;%- user %>&lt;/li>&lt;% }); %>');compiled({ 'users': ['fred', 'barney'] });// => '&lt;li>fred&lt;/li>&lt;li>barney&lt;/li>'// Use the internal `print` function in "evaluate" delimiters.var compiled = _.template('&lt;% print("hello " + user); %>!');compiled({ 'user': 'barney' });// => 'hello barney!'// Use the ES template literal delimiter as an "interpolate" delimiter.// Disable support by replacing the "interpolate" delimiter.var compiled = _.template('hello ${ user }!');compiled({ 'user': 'pebbles' });// => 'hello pebbles!'// Use backslashes to treat delimiters as plain text.var compiled = _.template('&lt;%= "\\&lt;%- value %\\>" %>');compiled({ 'value': 'ignored' });// => '&lt;%- value %>'// Use the `imports` option to import `jQuery` as `jq`.var text = '&lt;% jq.each(users, function(user) { %>&lt;li>&lt;%- user %>&lt;/li>&lt;% }); %>';var compiled = _.template(text, { 'imports': { 'jq': jQuery } });compiled({ 'users': ['fred', 'barney'] });// => '&lt;li>fred&lt;/li>&lt;li>barney&lt;/li>'// Use the `sourceURL` option to specify a custom sourceURL for the template.var compiled = _.template('hello &lt;%= user %>!', { 'sourceURL': '/basic/greeting.jst' });compiled(data);// => Find the source of "greeting.jst" under the Sources tab or Resources panel of the web inspector.// Use the `variable` option to ensure a with-statement isn't used in the compiled template.var compiled = _.template('hi &lt;%= data.user %>!', { 'variable': 'data' });compiled.source;// => function(data) {//   var __t, __p = '';//   __p += 'hi ' + ((__t = ( data.user )) == null ? '' : __t) + '!';//   return __p;// }// Use custom template delimiters._.templateSettings.interpolate = /{{([\s\S]+?)}}/g;var compiled = _.template('hello {{ user }}!');compiled({ 'user': 'mustache' });// => 'hello mustache!'// Use the `source` property to inline compiled templates for meaningful// line numbers in error messages and stack traces.fs.writeFileSync(path.join(process.cwd(), 'jst.js'), '\  var JST = {\    "main": ' + _.template(mainText).source + '\  };\');</code></pre>
 
     
 
@@ -46408,15 +44390,7 @@ for details over the differences between <code>_.throttle</code> and <code>_.deb
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>// Avoid excessively updating the position while scrolling.
-jQuery(window).on('scroll', _.throttle(updatePosition, 100));
-
-// Invoke `renewToken` when the click event is fired, but not more than once every 5 minutes.
-var throttled = _.throttle(renewToken, 300000, { 'trailing': false });
-jQuery(element).on('click', throttled);
-
-// Cancel the trailing throttled invocation.
-jQuery(window).on('popstate', throttled.cancel);</code></pre>
+    <pre class="prettyprint"><code>// Avoid excessively updating the position while scrolling.jQuery(window).on('scroll', _.throttle(updatePosition, 100));// Invoke `renewToken` when the click event is fired, but not more than once every 5 minutes.var throttled = _.throttle(renewToken, 300000, { 'trailing': false });jQuery(element).on('click', throttled);// Cancel the trailing throttled invocation.jQuery(window).on('popstate', throttled.cancel);</code></pre>
 
     
 
@@ -46609,14 +44583,7 @@ results in a method chain sequence.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_('  abc  ')
- .chain()
- .trim()
- .thru(function(value) {
-   return [value];
- })
- .value();
-// => ['abc']</code></pre>
+    <pre class="prettyprint"><code>_('  abc  ') .chain() .trim() .thru(function(value) {   return [value]; }) .value();// => ['abc']</code></pre>
 
     
 
@@ -46840,11 +44807,7 @@ each invocation. The iteratee is invoked with one argument; (index).</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.times(3, String);
-// => ['0', '1', '2']
-
- _.times(4, _.constant(0));
-// => [0, 0, 0, 0]</code></pre>
+    <pre class="prettyprint"><code>_.times(3, String);// => ['0', '1', '2'] _.times(4, _.constant(0));// => [0, 0, 0, 0]</code></pre>
 
     
 
@@ -47012,17 +44975,7 @@ each invocation. The iteratee is invoked with one argument; (index).</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.toArray({ 'a': 1, 'b': 2 });
-// => [1, 2]
-
-_.toArray('abc');
-// => ['a', 'b', 'c']
-
-_.toArray(1);
-// => []
-
-_.toArray(null);
-// => []</code></pre>
+    <pre class="prettyprint"><code>_.toArray({ 'a': 1, 'b': 2 });// => [1, 2]_.toArray('abc');// => ['a', 'b', 'c']_.toArray(1);// => []_.toArray(null);// => []</code></pre>
 
     
 
@@ -47190,17 +45143,7 @@ _.toArray(null);
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.toFinite(3.2);
-// => 3.2
-
-_.toFinite(Number.MIN_VALUE);
-// => 5e-324
-
-_.toFinite(Infinity);
-// => 1.7976931348623157e+308
-
-_.toFinite('3.2');
-// => 3.2</code></pre>
+    <pre class="prettyprint"><code>_.toFinite(3.2);// => 3.2_.toFinite(Number.MIN_VALUE);// => 5e-324_.toFinite(Infinity);// => 1.7976931348623157e+308_.toFinite('3.2');// => 3.2</code></pre>
 
     
 
@@ -47370,17 +45313,7 @@ _.toFinite('3.2');
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.toInteger(3.2);
-// => 3
-
-_.toInteger(Number.MIN_VALUE);
-// => 0
-
-_.toInteger(Infinity);
-// => 1.7976931348623157e+308
-
-_.toInteger('3.2');
-// => 3</code></pre>
+    <pre class="prettyprint"><code>_.toInteger(3.2);// => 3_.toInteger(Number.MIN_VALUE);// => 0_.toInteger(Infinity);// => 1.7976931348623157e+308_.toInteger('3.2');// => 3</code></pre>
 
     
 
@@ -47551,17 +45484,7 @@ array-like object.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.toLength(3.2);
-// => 3
-
-_.toLength(Number.MIN_VALUE);
-// => 0
-
-_.toLength(Infinity);
-// => 4294967295
-
-_.toLength('3.2');
-// => 3</code></pre>
+    <pre class="prettyprint"><code>_.toLength(3.2);// => 3_.toLength(Number.MIN_VALUE);// => 0_.toLength(Infinity);// => 4294967295_.toLength('3.2');// => 3</code></pre>
 
     
 
@@ -47750,14 +45673,7 @@ _.toLength('3.2');
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.toLower('--Foo-Bar--');
-// => '--foo-bar--'
-
-_.toLower('fooBar');
-// => 'foobar'
-
-_.toLower('__FOO_BAR__');
-// => '__foo_bar__'</code></pre>
+    <pre class="prettyprint"><code>_.toLower('--Foo-Bar--');// => '--foo-bar--'_.toLower('fooBar');// => 'foobar'_.toLower('__FOO_BAR__');// => '__foo_bar__'</code></pre>
 
     
 
@@ -47925,17 +45841,7 @@ _.toLower('__FOO_BAR__');
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.toNumber(3.2);
-// => 3.2
-
-_.toNumber(Number.MIN_VALUE);
-// => 5e-324
-
-_.toNumber(Infinity);
-// => Infinity
-
-_.toNumber('3.2');
-// => 3.2</code></pre>
+    <pre class="prettyprint"><code>_.toNumber(3.2);// => 3.2_.toNumber(Number.MIN_VALUE);// => 5e-324_.toNumber(Infinity);// => Infinity_.toNumber('3.2');// => 3.2</code></pre>
 
     
 
@@ -48103,11 +46009,7 @@ _.toNumber('3.2');
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.toPath('a.b.c');
-// => ['a', 'b', 'c']
-
-_.toPath('a[0].b.c');
-// => ['a', '0', 'b', 'c']</code></pre>
+    <pre class="prettyprint"><code>_.toPath('a.b.c');// => ['a', 'b', 'c']_.toPath('a[0].b.c');// => ['a', '0', 'b', 'c']</code></pre>
 
     
 
@@ -48276,17 +46178,7 @@ keyed properties of <code>value</code> to own properties of the plain object.</p
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>function Foo() {
-  this.b = 2;
-}
-
-Foo.prototype.c = 3;
-
-_.assign({ 'a': 1 }, new Foo);
-// => { 'a': 1, 'b': 2 }
-
-_.assign({ 'a': 1 }, _.toPlainObject(new Foo));
-// => { 'a': 1, 'b': 2, 'c': 3 }</code></pre>
+    <pre class="prettyprint"><code>function Foo() {  this.b = 2;}Foo.prototype.c = 3;_.assign({ 'a': 1 }, new Foo);// => { 'a': 1, 'b': 2 }_.assign({ 'a': 1 }, _.toPlainObject(new Foo));// => { 'a': 1, 'b': 2, 'c': 3 }</code></pre>
 
     
 
@@ -48455,17 +46347,7 @@ represented correctly.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.toSafeInteger(3.2);
-// => 3
-
-_.toSafeInteger(Number.MIN_VALUE);
-// => 0
-
-_.toSafeInteger(Infinity);
-// => 9007199254740991
-
-_.toSafeInteger('3.2');
-// => 3</code></pre>
+    <pre class="prettyprint"><code>_.toSafeInteger(3.2);// => 3_.toSafeInteger(Number.MIN_VALUE);// => 0_.toSafeInteger(Infinity);// => 9007199254740991_.toSafeInteger('3.2');// => 3</code></pre>
 
     
 
@@ -48634,14 +46516,7 @@ and <code>undefined</code> values. The sign of <code>-0</code> is preserved.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.toString(null);
-// => ''
-
-_.toString(-0);
-// => '-0'
-
-_.toString([1, 2, 3]);
-// => '1,2,3'</code></pre>
+    <pre class="prettyprint"><code>_.toString(null);// => ''_.toString(-0);// => '-0'_.toString([1, 2, 3]);// => '1,2,3'</code></pre>
 
     
 
@@ -48830,14 +46705,7 @@ _.toString([1, 2, 3]);
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.toUpper('--foo-bar--');
-// => '--FOO-BAR--'
-
-_.toUpper('fooBar');
-// => 'FOOBAR'
-
-_.toUpper('__foo_bar__');
-// => '__FOO_BAR__'</code></pre>
+    <pre class="prettyprint"><code>_.toUpper('--foo-bar--');// => '--FOO-BAR--'_.toUpper('fooBar');// => 'FOOBAR'_.toUpper('__foo_bar__');// => '__FOO_BAR__'</code></pre>
 
     
 
@@ -49103,16 +46971,7 @@ Iteratee functions may exit iteration early by explicitly returning <code>false<
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.transform([2, 3, 4], function(result, n) {
-  result.push(n *= n);
-  return n % 2 == 0;
-}, []);
-// => [4, 9]
-
-_.transform({ 'a': 1, 'b': 2, 'c': 1 }, function(result, value, key) {
-  (result[value] || (result[value] = [])).push(key);
-}, {});
-// => { '1': ['a', 'c'], '2': ['b'] }</code></pre>
+    <pre class="prettyprint"><code>_.transform([2, 3, 4], function(result, n) {  result.push(n *= n);  return n % 2 == 0;}, []);// => [4, 9]_.transform({ 'a': 1, 'b': 2, 'c': 1 }, function(result, value, key) {  (result[value] || (result[value] = [])).push(key);}, {});// => { '1': ['a', 'c'], '2': ['b'] }</code></pre>
 
     
 
@@ -49339,14 +47198,7 @@ _.transform({ 'a': 1, 'b': 2, 'c': 1 }, function(result, value, key) {
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.trim('  abc  ');
-// => 'abc'
-
-_.trim('-_-abc-_-', '_-');
-// => 'abc'
-
-_.map(['  foo  ', '  bar  '], _.trim);
-// => ['foo', 'bar']</code></pre>
+    <pre class="prettyprint"><code>_.trim('  abc  ');// => 'abc'_.trim('-_-abc-_-', '_-');// => 'abc'_.map(['  foo  ', '  bar  '], _.trim);// => ['foo', 'bar']</code></pre>
 
     
 
@@ -49573,11 +47425,7 @@ _.map(['  foo  ', '  bar  '], _.trim);
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.trimEnd('  abc  ');
-// => '  abc'
-
-_.trimEnd('-_-abc-_-', '_-');
-// => '-_-abc'</code></pre>
+    <pre class="prettyprint"><code>_.trimEnd('  abc  ');// => '  abc'_.trimEnd('-_-abc-_-', '_-');// => '-_-abc'</code></pre>
 
     
 
@@ -49804,11 +47652,7 @@ _.trimEnd('-_-abc-_-', '_-');
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.trimStart('  abc  ');
-// => 'abc  '
-
-_.trimStart('-_-abc-_-', '_-');
-// => 'abc-_-'</code></pre>
+    <pre class="prettyprint"><code>_.trimStart('  abc  ');// => 'abc  '_.trimStart('-_-abc-_-', '_-');// => 'abc-_-'</code></pre>
 
     
 
@@ -50184,25 +48028,7 @@ string which defaults to &quot;...&quot;.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.truncate('hi-diddly-ho there, neighborino');
-// => 'hi-diddly-ho there, neighbo...'
-
-_.truncate('hi-diddly-ho there, neighborino', {
-  'length': 24,
-  'separator': ' '
-});
-// => 'hi-diddly-ho there,...'
-
-_.truncate('hi-diddly-ho there, neighborino', {
-  'length': 24,
-  'separator': /,? +/
-});
-// => 'hi-diddly-ho there...'
-
-_.truncate('hi-diddly-ho there, neighborino', {
-  'omission': ' [...]'
-});
-// => 'hi-diddly-ho there, neig [...]'</code></pre>
+    <pre class="prettyprint"><code>_.truncate('hi-diddly-ho there, neighborino');// => 'hi-diddly-ho there, neighbo...'_.truncate('hi-diddly-ho there, neighborino', {  'length': 24,  'separator': ' '});// => 'hi-diddly-ho there,...'_.truncate('hi-diddly-ho there, neighborino', {  'length': 24,  'separator': /,? +/});// => 'hi-diddly-ho there...'_.truncate('hi-diddly-ho there, neighborino', {  'omission': ' [...]'});// => 'hi-diddly-ho there, neig [...]'</code></pre>
 
     
 
@@ -50371,8 +48197,7 @@ additional arguments.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.map(['6', '8', '10'], _.unary(parseInt));
-// => [6, 8, 10]</code></pre>
+    <pre class="prettyprint"><code>_.map(['6', '8', '10'], _.unary(parseInt));// => [6, 8, 10]</code></pre>
 
     
 
@@ -50564,8 +48389,7 @@ HTML entities use a third-party library like <a href="https://mths.be/he"><em>he
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.unescape('fred, barney, &amp;amp; pebbles');
-// => 'fred, barney, &amp; pebbles'</code></pre>
+    <pre class="prettyprint"><code>_.unescape('fred, barney, &amp;amp; pebbles');// => 'fred, barney, &amp; pebbles'</code></pre>
 
     
 
@@ -50737,8 +48561,7 @@ in the array.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.uniq([2, 1, 2]);
-// => [2, 1]</code></pre>
+    <pre class="prettyprint"><code>_.uniq([2, 1, 2]);// => [2, 1]</code></pre>
 
     
 
@@ -50965,12 +48788,7 @@ order they occur in the array. The iteratee is invoked with one argument:<br>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.uniqBy([2.1, 1.2, 2.3], Math.floor);
-// => [2.1, 1.2]
-
-// The `_.property` iteratee shorthand.
-_.uniqBy([{ 'x': 1 }, { 'x': 2 }, { 'x': 1 }], 'x');
-// => [{ 'x': 1 }, { 'x': 2 }]</code></pre>
+    <pre class="prettyprint"><code>_.uniqBy([2.1, 1.2, 2.3], Math.floor);// => [2.1, 1.2]// The `_.property` iteratee shorthand._.uniqBy([{ 'x': 1 }, { 'x': 2 }, { 'x': 1 }], 'x');// => [{ 'x': 1 }, { 'x': 2 }]</code></pre>
 
     
 
@@ -51184,10 +49002,7 @@ with two arguments: (arrVal, othVal).</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var objects = [{ 'x': 1, 'y': 2 }, { 'x': 2, 'y': 1 }, { 'x': 1, 'y': 2 }];
-
-_.uniqWith(objects, _.isEqual);
-// => [{ 'x': 1, 'y': 2 }, { 'x': 2, 'y': 1 }]</code></pre>
+    <pre class="prettyprint"><code>var objects = [{ 'x': 1, 'y': 2 }, { 'x': 2, 'y': 1 }, { 'x': 1, 'y': 2 }];_.uniqWith(objects, _.isEqual);// => [{ 'x': 1, 'y': 2 }, { 'x': 2, 'y': 1 }]</code></pre>
 
     
 
@@ -51375,11 +49190,7 @@ _.uniqWith(objects, _.isEqual);
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.uniqueId('contact_');
-// => 'contact_104'
-
-_.uniqueId();
-// => '105'</code></pre>
+    <pre class="prettyprint"><code>_.uniqueId('contact_');// => 'contact_104'_.uniqueId();// => '105'</code></pre>
 
     
 
@@ -51574,18 +49385,7 @@ _.uniqueId();
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var object = { 'a': [{ 'b': { 'c': 7 } }] };
-_.unset(object, 'a[0].b.c');
-// => true
-
-console.log(object);
-// => { 'a': [{ 'b': {} }] };
-
-_.unset(object, ['a', '0', 'b', 'c']);
-// => true
-
-console.log(object);
-// => { 'a': [{ 'b': {} }] };</code></pre>
+    <pre class="prettyprint"><code>var object = { 'a': [{ 'b': { 'c': 7 } }] };_.unset(object, 'a[0].b.c');// => trueconsole.log(object);// => { 'a': [{ 'b': {} }] };_.unset(object, ['a', '0', 'b', 'c']);// => trueconsole.log(object);// => { 'a': [{ 'b': {} }] };</code></pre>
 
     
 
@@ -51755,11 +49555,7 @@ configuration.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var zipped = _.zip(['a', 'b'], [1, 2], [true, false]);
-// => [['a', 1, true], ['b', 2, false]]
-
-_.unzip(zipped);
-// => [['a', 'b'], [1, 2], [true, false]]</code></pre>
+    <pre class="prettyprint"><code>var zipped = _.zip(['a', 'b'], [1, 2], [true, false]);// => [['a', 1, true], ['b', 2, false]]_.unzip(zipped);// => [['a', 'b'], [1, 2], [true, false]]</code></pre>
 
     
 
@@ -51985,11 +49781,7 @@ regrouped values.</p></td>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var zipped = _.zip([1, 2], [10, 20], [100, 200]);
-// => [[1, 10, 100], [2, 20, 200]]
-
-_.unzipWith(zipped, _.add);
-// => [3, 30, 300]</code></pre>
+    <pre class="prettyprint"><code>var zipped = _.zip([1, 2], [10, 20], [100, 200]);// => [[1, 10, 100], [2, 20, 200]]_.unzipWith(zipped, _.add);// => [3, 30, 300]</code></pre>
 
     
 
@@ -52209,15 +50001,7 @@ is invoked with one argument: (value).</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var object = { 'a': [{ 'b': { 'c': 3 } }] };
-
-_.update(object, 'a[0].b.c', function(n) { return n * n; });
-console.log(object.a[0].b.c);
-// => 9
-
-_.update(object, 'x[0].y.z', function(n) { return n ? n + 1 : 0; });
-console.log(object.x[0].y.z);
-// => 0</code></pre>
+    <pre class="prettyprint"><code>var object = { 'a': [{ 'b': { 'c': 3 } }] };_.update(object, 'a[0].b.c', function(n) { return n * n; });console.log(object.a[0].b.c);// => 9_.update(object, 'x[0].y.z', function(n) { return n ? n + 1 : 0; });console.log(object.x[0].y.z);// => 0</code></pre>
 
     
 
@@ -52497,10 +50281,7 @@ with three arguments: (nsValue, key, nsObject).</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var object = {};
-
-_.updateWith(object, '[0][1]', _.constant('a'), Object);
-// => { '0': { '1': 'a' } }</code></pre>
+    <pre class="prettyprint"><code>var object = {};_.updateWith(object, '[0][1]', _.constant('a'), Object);// => { '0': { '1': 'a' } }</code></pre>
 
     
 
@@ -52669,18 +50450,7 @@ _.updateWith(object, '[0][1]', _.constant('a'), Object);
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>function Foo() {
-  this.a = 1;
-  this.b = 2;
-}
-
-Foo.prototype.c = 3;
-
-_.values(new Foo);
-// => [1, 2] (iteration order is not guaranteed)
-
-_.values('hi');
-// => ['h', 'i']</code></pre>
+    <pre class="prettyprint"><code>function Foo() {  this.a = 1;  this.b = 2;}Foo.prototype.c = 3;_.values(new Foo);// => [1, 2] (iteration order is not guaranteed)_.values('hi');// => ['h', 'i']</code></pre>
 
     
 
@@ -52850,15 +50620,7 @@ values of <code>object</code>.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>function Foo() {
-  this.a = 1;
-  this.b = 2;
-}
-
-Foo.prototype.c = 3;
-
-_.valuesIn(new Foo);
-// => [1, 2, 3] (iteration order is not guaranteed)</code></pre>
+    <pre class="prettyprint"><code>function Foo() {  this.a = 1;  this.b = 2;}Foo.prototype.c = 3;_.valuesIn(new Foo);// => [1, 2, 3] (iteration order is not guaranteed)</code></pre>
 
     
 
@@ -53086,11 +50848,7 @@ _.valuesIn(new Foo);
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.words('fred, barney, &amp; pebbles');
-// => ['fred', 'barney', 'pebbles']
-
-_.words('fred, barney, &amp; pebbles', /[^, ]+/g);
-// => ['fred', 'barney', '&amp;', 'pebbles']</code></pre>
+    <pre class="prettyprint"><code>_.words('fred, barney, &amp; pebbles');// => ['fred', 'barney', 'pebbles']_.words('fred, barney, &amp; pebbles', /[^, ]+/g);// => ['fred', 'barney', '&amp;', 'pebbles']</code></pre>
 
     
 
@@ -53316,12 +51074,7 @@ binding of the created function.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>var p = _.wrap(_.escape, function(func, text) {
-  return '&lt;p>' + func(text) + '&lt;/p>';
-});
-
-p('fred, barney, &amp; pebbles');
-// => '&lt;p>fred, barney, &amp;amp; pebbles&lt;/p>'</code></pre>
+    <pre class="prettyprint"><code>var p = _.wrap(_.escape, function(func, text) {  return '&lt;p>' + func(text) + '&lt;/p>';});p('fred, barney, &amp; pebbles');// => '&lt;p>fred, barney, &amp;amp; pebbles&lt;/p>'</code></pre>
 
     
 
@@ -53549,8 +51302,7 @@ one of property identifiers and one of corresponding values.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.zipObject(['a', 'b'], [1, 2]);
-// => { 'a': 1, 'b': 2 }</code></pre>
+    <pre class="prettyprint"><code>_.zipObject(['a', 'b'], [1, 2]);// => { 'a': 1, 'b': 2 }</code></pre>
 
     
 
@@ -53777,8 +51529,7 @@ one of property identifiers and one of corresponding values.</p>
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>_.zipObjectDeep(['a.b[0].c', 'a.b[1].d'], [1, 2]);
-// => { 'a': { 'b': [{ 'c': 1 }, { 'd': 2 }] } }</code></pre>
+    <pre class="prettyprint"><code>_.zipObjectDeep(['a.b[0].c', 'a.b[1].d'], [1, 2]);// => { 'a': { 'b': [{ 'c': 1 }, { 'd': 2 }] } }</code></pre>
 
     
 
