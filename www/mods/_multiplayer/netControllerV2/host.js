@@ -30,9 +30,24 @@ class HostController extends BaseNetController {
 	}
 
 	open() {
+		if (this.self && this.self.destroy) {
+			console.log('Destroying previous host instance to free port');
+			this.self.destroy();
+		}
 		this.initEmitterOverrides(); // override stuff for interceptors
 		this.setIsHost();
-		this.self = new Peer();
+		if (MATTIE.multiplayer.forceFallback) {
+			console.log('Forcing Fallback TCP Transport (Host)');
+			if (typeof NodeTcpTransport !== 'undefined') {
+				this.self = new NodeTcpTransport(true);
+				console.log('Host Transport created via global NodeTcpTransport');
+			} else {
+				console.error('FATAL: NodeTcpTransport is not defined globally.');
+			}
+			if (this.self) this.peerId = this.self.id;
+		} else {
+			this.self = new Peer();
+		}
 		this.self.on('open', () => {
 			console.info(`host opened at: ${this.self.id}`);
 			this.peerId = this.self.id;
@@ -50,6 +65,10 @@ class HostController extends BaseNetController {
 			conn.on('data', (data) => {
 				this.onData(data, conn);
 			});
+		});
+
+		this.self.on('error', (err) => {
+			console.error('Host Transport Error:', err);
 		});
 	}
 
@@ -118,6 +137,13 @@ class HostController extends BaseNetController {
 	handleConnection(conn) {
 		const id = conn.peer; // get the id of the peer that is on the other side of the connection
 		this.connections.push(conn);
+
+		// Send initial player info to the new client so they can see the host/others immediately
+		console.log('Sending initial player info to new client:', id);
+		const newNetPlayers = this.createOutGoingNetPlayers(id);
+		const obj = {};
+		obj.updateNetPlayers = newNetPlayers;
+		conn.send(obj);
 	}
 
 	/** send an updated list of all net players to the client.

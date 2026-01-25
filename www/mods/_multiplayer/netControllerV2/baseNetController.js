@@ -11,6 +11,14 @@ MATTIE.windows.multiplayer = MATTIE.windows.multiplayer || {};
 MATTIE.multiplayer.emittedInit = false;
 MATTIE.multiplayer.hasLoadedVars = false;
 
+// Auto-fallback system
+MATTIE.multiplayer.forceFallback = false;
+MATTIE.multiplayer.fallbackAutoSwitched = false; // Tracks if we already tried swapping automatically
+MATTIE.multiplayer.userOverrideFallback = null; // null = no preference, true = force TCP, false = force PeerJS
+
+// Initialize default state if not set (reloads)
+if (MATTIE.multiplayer.userOverrideFallback === undefined) MATTIE.multiplayer.userOverrideFallback = null;
+
 MATTIE.multiplayer.varSyncRequested = false;
 
 MATTIE.multiplayer.packetsThisSecond = 0;
@@ -262,6 +270,7 @@ class BaseNetController extends EventEmitter {
 	}
 
 	sendOrQueue(obj = null, excludedIds = []) {
+		if (obj == null) return;
 		if (obj.move || obj.setCharImgEvent) {
 			this.send(obj, excludedIds);
 			return;
