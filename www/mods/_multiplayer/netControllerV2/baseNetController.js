@@ -1225,8 +1225,13 @@ class BaseNetController extends EventEmitter {
 			if (!this.netPlayers[key]) {
 				this.initializeNetPlayer(netPlayer); // if this player hasn't been defined yet initialize it.
 			} else {
+				const oldActorId = this.netPlayers[key].actorId;
 				// replace any files that conflict with new data, otherwise keep old data
 				this.netPlayers[key] = Object.assign(this.netPlayers[key], netPlayer);
+				if (this.netPlayers[key].actorId !== oldActorId) {
+					// console.log(`[NetController] Player ${key} changed actor from ${oldActorId} to ${this.netPlayers[key].actorId}`);
+					this.netPlayers[key].setActorId(this.netPlayers[key].actorId);
+				}
 			}
 		}
 		this.emit('updateNetPlayers', netPlayers);
@@ -1935,8 +1940,9 @@ class BaseNetController extends EventEmitter {
 	emitSetCharacterImageEvent(characterName, characterIndex, actorId) {
 		const obj = { setCharImgEvent: {} };
 		obj.setCharImgEvent.characterIndex = characterIndex;
-		obj.setCharImgEvent.characterName = characterName;
+		obj.setCharImgEvent.characterName = characterName || '';
 		obj.setCharImgEvent.actorId = actorId;
+		console.log(`[NetController] Emitting SetCharacterImage: ${characterName}, Index: ${characterIndex}, Actor: ${actorId}`);
 		this.emit('setCharImgEvent');
 		this.sendViaMainRoute(obj);
 	}
@@ -1947,22 +1953,22 @@ class BaseNetController extends EventEmitter {
 	 * @param {UUID} id the id of the original sender
 	 */
 	onSetCharacterImageEventData(outfitChangeData, id) {
-		console.log('outfit Aread');
-		console.log(outfitChangeData);
 		const charName = outfitChangeData.characterName;
 		const charIndex = outfitChangeData.characterIndex;
 		const actorId = outfitChangeData.actorId;
+		
+		console.log(`[NetController] Received Outfit Change from ${id}: Name=${charName}, Index=${charIndex}, Actor=${actorId}`);
 
 		const netPlayer = this.netPlayers[id];
+		if (!netPlayer) return;
+
 		const netActors = netPlayer.$netActors;
 		const actor = netActors.baseActor(actorId);
 
-		console.log(netActors);
-		console.log(actor);
 		if (actor) {
 			actor.setCharacterImage(charName, charIndex);
-			actor.refresh(); // this likely does nothing, but its good practice to call here as the engine tends to do similarly
-			netPlayer.$gamePlayer.refresh(); // this updates the actual display sprite
+			actor.refresh(); 
+			netPlayer.$gamePlayer.refresh(); 
 		}
 		this.additionalOutfitActions(outfitChangeData, id);
 	}
@@ -1981,14 +1987,24 @@ class BaseNetController extends EventEmitter {
 		const actor = netActors.baseActor(actorId);
 
 		// handle torch logic
-		if (actorId === netPlayer.actorId) { // we only care about the main char for torches
-			if (charName.toLowerCase().contains('torch')) {
-				console.log('PLAYER HAS TORCH');
-				netPlayer.$gamePlayer.setTorch(true);
+		// Check both the assigned actorId and the current one on the gamePlayer to be safe
+		const isMainActor = (actorId == netPlayer.actorId) || 
+		                    (netPlayer.$gamePlayer && netPlayer.$gamePlayer.actor() && netPlayer.$gamePlayer.actor().actorId() == actorId);
+
+		if (isMainActor) { 
+			if (charName && charName.toLowerCase().includes('torch')) {
+				console.log(`[NetController] Enabling Torch for ${id} (Actor ${actorId})`);
+				if (netPlayer.$gamePlayer && netPlayer.$gamePlayer.setTorch) {
+					netPlayer.$gamePlayer.setTorch(true);
+				}
 			} else {
-				console.log('PLAYER HAS NO TORCH :( *cries');
-				netPlayer.$gamePlayer.setTorch(false);
+				// console.log('PLAYER HAS NO TORCH');
+				if (netPlayer.$gamePlayer && netPlayer.$gamePlayer.setTorch) {
+					netPlayer.$gamePlayer.setTorch(false);
+				}
 			}
+		} else {
+			console.log(`[NetController] Ignoring torch update for non-main actor: ${actorId} (Main: ${netPlayer.actorId})`);
 		}
 	}
 
