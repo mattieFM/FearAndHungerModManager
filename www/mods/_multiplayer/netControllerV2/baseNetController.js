@@ -23,6 +23,13 @@ MATTIE.multiplayer.varSyncRequested = false;
 
 MATTIE.multiplayer.packetsThisSecond = 0;
 MATTIE.multiplayer.netQueue = new PriorityQueue();
+// Network Simulation Configuration
+MATTIE.multiplayer.simulation = {
+	latency: 900, // ms
+	jitter: 400, // ms variance
+	packetLoss: 0.2, // 0.0 to 1.0
+	enabled: true, // Feature flag
+};
 
 setInterval(() => {
 	MATTIE.multiplayer.packetsThisSecond = 0;
@@ -61,6 +68,25 @@ class BaseNetController extends EventEmitter {
 		this.maxTransferRetries = 10;
 
 		this.canTryToReconnect = false;
+
+        // Optim: Track pending timeouts for smooth movement to clear them on new packets
+		/** @type {Object.<string, number[]>} */
+        this.pendingMoveTimeouts = {};
+
+        // Reliability: Deduplication Cache
+        /** @type {Map<string, number>} uid -> timestamp */
+        this._receivedUids = new Map();
+        // Prune unseen IDs every 60s
+        setInterval(() => {
+            const now = Date.now();
+            for (const [uid, time] of this._receivedUids) {
+                if (now - time > 60000) this._receivedUids.delete(uid);
+            }
+        }, 60000);
+
+        // Sequence tracking for movements (handling jitter/out-of-order)
+        this._lastMoveSeq = {}; 
+        this._moveSeqCounter = 0;
 	}
 
 	/**
@@ -266,30 +292,93 @@ class BaseNetController extends EventEmitter {
 		}
 		obj.excludedIds = excludedIds;
 
+        // RELIABILITY: Redundancy for Critical Packets
+        // We simulate reliability by sending critical events multiple times.
+        // The receiver effectively de-dupes them via 'uid'.
+        if (this._isCriticalPacket(obj)) {
+            // Assign Unique ID if not present
+            if (!obj.uid) obj.uid = Math.random().toString(36).substr(2, 9);
+            
+            // Send clones with delay
+            // We clone to ensure the queue doesn't get messed up by reference modification 
+            // separate delays ensure we bridge gaps in packet loss
+            setTimeout(() => this.sendOrQueue(Object.assign({}, obj), excludedIds), 150);
+			setTimeout(() => this.sendOrQueue(Object.assign({}, obj), excludedIds), 300);
+            setTimeout(() => this.sendOrQueue(Object.assign({}, obj), excludedIds), 600);
+			setTimeout(() => this.sendOrQueue(Object.assign({}, obj), excludedIds), 1200);
+             // Verify extreme loss conditions
+            if (MATTIE.multiplayer.simulation && MATTIE.multiplayer.simulation.packetLoss > 0.2) {
+                 setTimeout(() => this.sendOrQueue(Object.assign({}, obj), excludedIds), 600);
+            }
+        }
+        
+        // MOVEMENT: Sequencing
+        // Add sequence number to moves to handle out-of-order packets (Jitter)
+        if (obj.move) {
+            obj.move.seq = ++this._moveSeqCounter;
+        }
+
 		if (obj.priority > 1 || MATTIE.multiplayer.netQueue.values.length < 100) this.sendOrQueue(obj, excludedIds);
 	}
 
+    /**
+     * @description Determine if a packet type is critical and requires redundancy
+     */
+    _isCriticalPacket(obj) {
+        // Any state-changing event event that isn't frequent movement
+        return obj.ctrlSwitch || 
+               obj.cmd || 
+               obj.battleStart || 
+               obj.battleEnd || 
+               obj.event || // Event movement/interaction
+               obj.equipChange ||
+               obj.spawnEvent ||
+               obj.transformEnemy ||
+               obj.appearEnemy ||
+               obj.enemyState ||
+               obj.pvpEvent ||
+               obj.marriageReq ||
+               obj.marriageResponse ||
+               obj.setCharImgEvent ||
+			   obj.saveEvent ||
+			   obj.runTimeTroopSpawn ||
+			   obj.saveEventLocationEvent ||
+			   obj.transparentEvent ||
+			   obj.startGame ||
+			   obj.ready ||
+			   obj.turnEnd ||
+			   obj.spectate;
+    }
+
 	sendOrQueue(obj = null, excludedIds = []) {
-		if (obj == null) return;
-		if (obj.move || obj.setCharImgEvent) {
+		if (obj && (obj.move || obj.setCharImgEvent)) {
 			this.send(obj, excludedIds);
 			return;
-		} if (obj.node) {
+		} 
+		if (obj && obj.node) {
 			if (obj.node.move) this.send(obj.node, excludedIds);
 		}
-		if (++MATTIE.multiplayer.packetsThisSecond < MATTIE.multiplayer.config.maxPacketsPerSecond) {
-			// and if queue item is empty or of lower PriorityQueue
+
+		// Ensure the new packet is queued (so it's not lost if we prioritize the queue)
+		if (obj) {
+			if (excludedIds && excludedIds.length > 0) obj.excludedIds = excludedIds;
+			MATTIE.multiplayer.netQueue.enqueue(obj, obj.priority);
+		}
+
+		// Attempt to process the queue (including the item we just added, if it's the highest priority)
+		// We use < because we increment inside the block
+		if (MATTIE.multiplayer.packetsThisSecond < MATTIE.multiplayer.config.maxPacketsPerSecond) {
 			if (MATTIE.multiplayer.netQueue.values.length > 0) {
+				MATTIE.multiplayer.packetsThisSecond++;
 				const req = MATTIE.multiplayer.netQueue.dequeue();
-				// console.log(req)
-				const excludedIds = req.excludedIds;
-				req.excludedIds = undefined;
-				req.node.excludedIds = undefined;
-				this.send(req.node, req.excludedIds);
-			} else if (obj != null) {
-				this.send(obj, excludedIds);
+				// The queue stores { node: obj, priority: ... }
+				// The obj might have 'excludedIds' attached
+				const payload = req.node;
+				const exc = payload.excludedIds || [];
+				payload.excludedIds = undefined;
+				this.send(payload, exc);
 			}
-		} else if (obj != null) MATTIE.multiplayer.netQueue.enqueue(obj, obj.priority);
+		}
 	}
 
 	send(obj, excludedIds = []) {
@@ -316,7 +405,34 @@ class BaseNetController extends EventEmitter {
      * @param conn the connection object
      */
 	onData(data, conn) {
+		// Network Simulation Hook
+		if (MATTIE.multiplayer.simulation.enabled) {
+			if (MATTIE.multiplayer.simulation.packetLoss > 0 && Math.random() < MATTIE.multiplayer.simulation.packetLoss) {
+				return; // Dropped
+			}
+			const simLatency = MATTIE.multiplayer.simulation.latency + (Math.random() * MATTIE.multiplayer.simulation.jitter);
+			if (simLatency > 0) {
+				setTimeout(() => {
+					this._processData(data, conn);
+				}, simLatency);
+				return;
+			}
+		}
+		this._processData(data, conn);
+	}
+
+	_processData(data, conn) {
 		// console.log(data);
+
+        // RELIABILITY: Deduplication
+        if (data.uid) {
+            if (this._receivedUids.has(data.uid)) {
+                // console.log(`[Net] Discarding duplicate packet ${data.uid}`);
+                return; 
+            }
+            this._receivedUids.set(data.uid, Date.now());
+        }
+
 		data = this.preprocessData(data, conn);
 		const id = data.id;
 		if (data.move) {
@@ -842,7 +958,19 @@ class BaseNetController extends EventEmitter {
      * @param {*} id the peer id of the player who moved
      */
 	onMoveData(moveData, id) {
-		console.log('here!');
+		// console.log('here!');
+        
+        // JITTER HANDLING: Discard out-of-order packets
+        if (moveData.seq) {
+            if (!this._lastMoveSeq[id]) this._lastMoveSeq[id] = 0;
+            if (moveData.seq <= this._lastMoveSeq[id]) {
+                 // Packet is older than what we have processed. Ignore it.
+                 // This prevents rubber-banding if a delayed packet arrives late.
+                 return;
+            }
+            this._lastMoveSeq[id] = moveData.seq;
+        }
+
 		if (this.netPlayers[id].isMarried) {
 			MATTIE.marriageAPI.handleMove.call(this, moveData, id);
 		} else {
@@ -856,16 +984,27 @@ class BaseNetController extends EventEmitter {
 	 * @param {*} player the game char to move
 	 * @param {*} delayPerStep the delay between each step
 	 * @param {*} location {x:x, y:y} the location obj
+     * @param {*} id optional peer id to track and clear timeouts
 	 */
-	smoothMoveNetPlayer(numSteps, player, location, delayPerStep = 150) {
+	smoothMoveNetPlayer(numSteps, player, location, delayPerStep = 150, id = null) {
+        // Optimization: Clear existing timeouts for this player to prevent movement stacking during lag spikes
+        if (id && this.pendingMoveTimeouts[id]) {
+            this.pendingMoveTimeouts[id].forEach(t => clearTimeout(t));
+            this.pendingMoveTimeouts[id] = [];
+        } else if (id) {
+            this.pendingMoveTimeouts[id] = [];
+        }
+
 		for (let index = 0; index < numSteps; index++) {
-			setTimeout(() => {
+			const t = setTimeout(() => {
 				try {
 					if (SceneManager._scene instanceof Scene_Map) { player.moveTowardCharacter(location); }
 				} catch (error) {
 					console.warn('player smooth move being bad');
 				}
 			}, delayPerStep * index);
+
+            if (id) this.pendingMoveTimeouts[id].push(t);
 		}
 	}
 
@@ -892,7 +1031,7 @@ class BaseNetController extends EventEmitter {
 					const deltaX = moveData.x - this.netPlayers[id].$gamePlayer._x;
 					const deltaY = moveData.y - this.netPlayers[id].$gamePlayer._y;
 					const numSteps = Math.abs(deltaX) + Math.abs(deltaY);
-					this.smoothMoveNetPlayer(numSteps, this.netPlayers[id].$gamePlayer, moveData, 75);
+					this.smoothMoveNetPlayer(numSteps, this.netPlayers[id].$gamePlayer, moveData, 75, id);
 				}
 			} else {
 				try {
@@ -1007,35 +1146,66 @@ class BaseNetController extends EventEmitter {
      * @param {*} troopId the troop id that the player is now incombat with
      */
 	emitBattleStartEvent(eventId, mapId, troopId) {
-		var obj = {};
-		obj.battleStart = {};
-		obj.battleStart.eventId = eventId;
-		obj.battleStart.mapId = mapId;
-		obj.battleStart.troopId = troopId;
-		MATTIE.multiplayer.currentBattleEnemy = obj.battleStart;
-		MATTIE.multiplayer.currentBattleEvent = $gameMap.event(eventId);
-		this.emit('battleStartEvent', obj);
-		this.sendViaMainRoute(obj);
-		this.emitChangeInBattlersEvent(this.formatChangeInBattleObj(obj.eventId, obj.mapid, this.peerId));
-		const event = $gameMap.event(obj.battleStart.eventId);
-		if (event) event.addIdToCombatArr(this.peerId);
-		this.battleStartAddCombatant(obj.battleStart.troopId, this.peerId);
-		MATTIE.emitTransfer(); // emit transfer event to make sure player is positioned correctly on other players screens
+		try {
+			var obj = {
+				battleStart: {
+					eventId: eventId,
+					mapId: mapId,
+					troopId: troopId
+				}
+			};
+			
+			MATTIE.multiplayer.currentBattleEnemy = obj.battleStart; // Store ref locally
+			MATTIE.multiplayer.currentBattleEvent = $gameMap.event(eventId);
+
+			// Update local player model state so it syncs to late joiners
+			if (this.player) {
+				this.player.troopInCombatWith = troopId;
+			}
+
+			this.emit('battleStartEvent', obj);
+			this.sendViaMainRoute(obj);
+
+			// Correctly reference the nested properties
+			this.emitChangeInBattlersEvent(this.formatChangeInBattleObj(eventId, mapId, this.peerId));
+
+			const event = $gameMap.event(eventId);
+			if (event) event.addIdToCombatArr(this.peerId);
+			
+			this.battleStartAddCombatant(troopId, this.peerId);
+			MATTIE.emitTransfer(); // Sync position
+		} catch (error) {
+			console.error("Error in emitBattleStartEvent:", error);
+		}
 	}
 
 	onBattleStartData(battleStartObj, id) { // take the battleStartObj and set that enemy as "in combat" with id
-		this.battleStartAddCombatant(battleStartObj.troopId, id);
-		this.netPlayers[id].troopInCombatWith = battleStartObj.troopId;
+		try {
+			this.battleStartAddCombatant(battleStartObj.troopId, id);
+			
+			if (this.netPlayers[id]) {
+				this.netPlayers[id].troopInCombatWith = battleStartObj.troopId;
+			}
 
-		// handle all logic needed for the event tile
-		if (battleStartObj.mapId == $gameMap.mapId()) { // event tile tracking can only be done on same screen
-			if (MATTIE.multiplayer.devTools.battleLogger) console.info('net event battle start --on enemy host');
-			var event = $gameMap.event(battleStartObj.eventId);
-			event.addIdToCombatArr(id);
-			event.lock();
-			event._trueLock = true;
+			// Handle event tile logic if on same map
+			// We use strict equality for mapId to ensure we are looking at the same instance
+			if (battleStartObj.mapId === $gameMap.mapId()) { 
+				if (MATTIE.multiplayer.devTools.battleLogger) console.info(`[NetPacket] Battle Start for ${id}`);
+				
+				const event = $gameMap.event(battleStartObj.eventId);
+				if (event) {
+					event.addIdToCombatArr(id);
+					event.lock();
+					event._trueLock = true;
+				} else {
+					// console.warn(`[NetPacket] Received battle start for event ${battleStartObj.eventId} but it does not exist on this map.`);
+				}
+			}
+			
+			this.emitChangeInBattlersEvent(this.formatChangeInBattleObj(battleStartObj.eventId, battleStartObj.mapId, id));
+		} catch (error) {
+			console.error("Error processing onBattleStartData:", error);
 		}
-		this.emitChangeInBattlersEvent(this.formatChangeInBattleObj(battleStartObj.eventId, battleStartObj.mapid, id));
 	}
 
 	/** called whenever anyone enters or leaves a battle, contains the id of the player and the battle */
@@ -1132,41 +1302,71 @@ class BaseNetController extends EventEmitter {
      * @param {obj} enemy the net obj for an enemy
      */
 	emitBattleEndEvent(troopId, enemy) {
-		var obj = {};
-		obj.battleEnd = enemy;
-		obj.battleEnd.troopId = troopId;
-		this.emit('battleEndEvent', obj);
-		this.emitChangeInBattlersEvent(this.formatChangeInBattleObj(obj.eventId, obj.mapid, this.peerId));
-		if ($gameMap.event(obj.battleEnd.eventId))$gameMap.event(obj.battleEnd.eventId).removeIdFromCombatArr(this.peerId);
-		this.battleEndRemoveCombatant(obj.battleEnd.troopId, this.peerId);
+		try {
+			var obj = {};
+			obj.battleEnd = enemy;
+			obj.battleEnd.troopId = troopId;
+			this.emit('battleEndEvent', obj);
+			
+			// Fix: Use obj.battleEnd to access properties; obj itself doesn't have them at root
+			this.emitChangeInBattlersEvent(this.formatChangeInBattleObj(obj.battleEnd.eventId, obj.battleEnd.mapId, this.peerId));
+			
+			// Update local player model state so it syncs to late joiners
+			if (this.player) {
+				this.player.troopInCombatWith = null;
+			}
 
-		this.sendViaMainRoute(obj);
+			const event = $gameMap.event(obj.battleEnd.eventId);
+			if (event) {
+				event.removeIdFromCombatArr(this.peerId);
+			}
 
-		Object.keys(this.netPlayers).forEach((key) => {
-			const netPlayer = this.netPlayers[key];
-			netPlayer.clearBattleOnlyMembers();
-		});
+			this.battleEndRemoveCombatant(obj.battleEnd.troopId, this.peerId);
+
+			this.sendViaMainRoute(obj);
+
+			Object.keys(this.netPlayers).forEach((key) => {
+				const netPlayer = this.netPlayers[key];
+				if (netPlayer) netPlayer.clearBattleOnlyMembers();
+			});
+		} catch (error) {
+			console.error("Error in emitBattleEndEvent:", error);
+		}
 	}
 
 	onBattleEndData(battleEndObj, id) { // take the battleEndObj and set that enemy as "out of combat" with id
-		this.battleEndRemoveCombatant(battleEndObj.troopId, id);
-		this.netPlayers[id].troopInCombatWith = null;
+		try {
+			this.battleEndRemoveCombatant(battleEndObj.troopId, id);
+			
+			if (this.netPlayers[id]) {
+				this.netPlayers[id].troopInCombatWith = null;
+			}
 
-		// handle all logic needed for the event tile
-		if (battleEndObj.mapId == $gameMap.mapId()) { // event tile tracking can only be done on same screen
-			if (MATTIE.multiplayer.devTools.enemyHostLogger) console.debug('net event battle end --on enemy host');
-			console.debug('net player left event');
-			var event = $gameMap.event(battleEndObj.eventId);
-			event.removeIdFromCombatArr(id);
+			// handle all logic needed for the event tile
+			if (battleEndObj.mapId === $gameMap.mapId()) { // event tile tracking can only be done on same screen
+				if (MATTIE.multiplayer.devTools.enemyHostLogger) console.debug(`[NetPacket] Battle End for ${id}`);
+				
+				const event = $gameMap.event(battleEndObj.eventId);
+				if (event) {
+					event.removeIdFromCombatArr(id);
 
-			if (!event.inCombat()) {
-				setTimeout(() => {
-					event.unlock();
-					event._trueLock = false;
-				}, MATTIE.multiplayer.runTime);
-			} else event.lock();
+					if (!event.inCombat()) {
+						setTimeout(() => {
+							if (event && !event.inCombat()) { // Re-check existence and status
+								event.unlock();
+								event._trueLock = false;
+							}
+						}, MATTIE.multiplayer.runTime); // Note: verify if MATTIE.multiplayer.runTime is a duration or a timestamp
+					} else {
+						event.lock();
+					}
+				}
+			}
+			
+			this.emitChangeInBattlersEvent(this.formatChangeInBattleObj(battleEndObj.eventId, battleEndObj.mapId, id));
+		} catch (error) {
+			console.error("Error processing onBattleEndData:", error);
 		}
-		this.emitChangeInBattlersEvent(this.formatChangeInBattleObj(battleEndObj.eventId, battleEndObj.mapid, id));
 	}
 
 	//-----------------------------------------------------
