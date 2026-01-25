@@ -120,7 +120,12 @@ MATTIE.multiplayer.Conversations.prototype.talkOptionsCb = function (n) {
 		MATTIE.multiplayer.getCurrentNetController().emitMarriageRequest([this.target.peerId]);
 		break;
 	case 5: // assist
-		MATTIE.simpleBattleAPI.startFightWith(this.target.troopInCombatWith);
+		if (this.target.troopInCombatWith) {
+			MATTIE.simpleBattleAPI.startFightWith(this.target.troopInCombatWith);
+		} else {
+			MATTIE.msgAPI.displayMsg("Cannot assist: Player is not in combat.");
+			console.warn("[Assist] Target player has no troopInCombatWith set.");
+		}
 		break;
 	case 6: // cancel
 		break;
