@@ -861,16 +861,45 @@ class BaseNetController extends EventEmitter {
 						/** @type {Game_Actor} */
 						const actor = netPlayer.$netActors.baseActor(action._subjectActorId);
 
-						if (action.netPartyId) {
+						// Skip netPartyId forced targeting if the action subject is from the same party
+						// (self-targeting netactor abilities like defensive stance)
+						const isSelfTargetingNetActor = action.netPartyId && action.netPartyId === senderId;
+
+						if (action.netPartyId && !isSelfTargetingNetActor) {
 							if (!partyAction) {
 								action.forcedTargets = [];
 								// eslint-disable-next-line no-nested-ternary
 								const targetedNetParty = action.netPartyId != this.peerId
-									? this.netPlayers[action.netPartyId].battleMembers()
+									? (this.netPlayers[action.netPartyId] ? this.netPlayers[action.netPartyId].battleMembers() : null)
 									: action.netPartyId == this.peerId
 										? $gameParty.battleMembers()
 										: null;
-								if (targetedNetParty) action.forcedTargets.push(targetedNetParty[action._targetIndex]);
+								
+								if (targetedNetParty && targetedNetParty.length > 0) {
+									// Ensure target index is valid
+									const targetIndex = Math.min(action._targetIndex || 0, targetedNetParty.length - 1);
+									const target = targetedNetParty[targetIndex];
+									
+									if (target && !target.isDead()) {
+										action.forcedTargets.push(target);
+									} else {
+										// Target is dead or invalid, find first alive member
+										const aliveTarget = targetedNetParty.find(m => m && !m.isDead());
+										if (aliveTarget) {
+											action.forcedTargets.push(aliveTarget);
+											if (MATTIE.multiplayer.devTools.battleLogger) {
+												console.warn(`[NetAction] Original target index ${action._targetIndex} invalid, redirecting to ${targetedNetParty.indexOf(aliveTarget)}`);
+											}
+										} else {
+											console.warn(`[NetAction] No valid targets in party ${action.netPartyId}`);
+											shouldAddAction = false;
+										}
+									}
+								} else {
+									console.warn(`[NetAction] Target party ${action.netPartyId} not found or empty`);
+									shouldAddAction = false;
+								}
+								
 								action._netTarget = action.netPartyId;
 							} else {
 								if (!MATTIE.multiplayer.config.scaling.partyActionsTargetAll) {
@@ -911,7 +940,15 @@ class BaseNetController extends EventEmitter {
      * @param {UUID} senderId id of the net user that sent these actions
      */
 	processNormalAction(actor, action, isExtraTurn, senderId) {
-		actor.partyIndex = () => this.netPlayers[senderId].battleMembers().indexOf(actor); // set the party index function
+		if (!this.netPlayers[senderId]) {
+			console.error(`[NetAction] Cannot process action - sender ${senderId} not found`);
+			return;
+		}
+		
+		actor.partyIndex = () => {
+			const members = this.netPlayers[senderId].battleMembers();
+			return members ? members.indexOf(actor) : -1;
+		};
 		actor.setCurrentAction(action);
 		BattleManager.addNetActionBattler(actor, isExtraTurn);
 	}
@@ -924,6 +961,11 @@ class BaseNetController extends EventEmitter {
 	 * @param {UUID} senderId id of the net user that sent these actions
 	 */
 	processNormalEnemyAction(enemy, action, isExtraTurn, senderId) {
+		if (!enemy) {
+			console.error(`[NetAction] Cannot process enemy action - enemy is null`);
+			return;
+		}
+		
 		action._netTarget = senderId;
 
 		enemy.setCurrentAction(action);
@@ -938,8 +980,15 @@ class BaseNetController extends EventEmitter {
 					enemy.requestEffect('whiten');
 					gameAction.makeTargets().forEach((target) => {
 						if (target instanceof Game_Actor) {
+							// Ensure netPlayer exists before accessing
+							const netPlayer = MATTIE.multiplayer.getCurrentNetController().netPlayers[senderId];
+							if (!netPlayer || !netPlayer.$netActors) {
+								console.error(`[NetAction] Cannot find netPlayer for ${senderId}`);
+								return;
+							}
+							
 							/** @type {Game_Actor} */
-							const battler = MATTIE.multiplayer.getCurrentNetController().netPlayers[senderId].$netActors.baseActor(target.actorId());
+							const battler = netPlayer.$netActors.baseActor(target.actorId());
 							if (battler) {
 								$gameParty.leader().actorId();
 
@@ -969,6 +1018,11 @@ class BaseNetController extends EventEmitter {
      * @param {UUID} senderId id of the net user that sent these actions
      */
 	processPvpAction(actor, action, isExtraTurn, senderId) {
+		if (!this.netPlayers[senderId]) {
+			console.error(`[NetAction] Cannot process PVP action - sender ${senderId} not found`);
+			return;
+		}
+		
 		let targetActor = $gameActors.actor(action.targetActorId);
 		let legCut = false;
 		let armCut = false;
@@ -986,8 +1040,17 @@ class BaseNetController extends EventEmitter {
 			const i = 2;
 			const enemies = $gameTroop._additionalTroops[troopId].baseMembers();
 			let battler = enemies[i]; // just grab the first member for now
-			for (let i = 2; battler.isDead() && i < enemies.length; i++) battler = enemies[i];
-			actor.partyIndex = () => this.netPlayers[senderId].battleMembers().indexOf(actor); // just say thye go first for now to test
+			for (let i = 2; battler && battler.isDead() && i < enemies.length; i++) battler = enemies[i];
+			
+			if (!battler) {
+				console.error(`[NetAction] Cannot find valid PVP battler for troop ${troopId}`);
+				return;
+			}
+			
+			actor.partyIndex = () => {
+				const members = this.netPlayers[senderId].battleMembers();
+				return members ? members.indexOf(actor) : -1;
+			};
 			action._netTarget = false;
 
 			if (targetActor) {
