@@ -10,6 +10,179 @@ function enemyLog(msg) {
 	}
 }
 
+//-----------------------------------------------------
+// Enemy Action Authority - Deterministic Target Selection
+//-----------------------------------------------------
+/**
+ * @description Build a list of all actors across all parties for enemy targeting
+ */
+MATTIE.multiplayer.getAllBattleActors = function() {
+	const netController = MATTIE.multiplayer.getCurrentNetController();
+	const allActors = [];
+	
+	// Build a sorted list of all peer IDs for deterministic ordering
+	const allPeerIds = [netController.peerId];
+	if (netController.netPlayers) {
+		allPeerIds.push(...Object.keys(netController.netPlayers));
+	}
+	allPeerIds.sort(); // Sort alphabetically for deterministic order
+	
+	// Add actors in sorted peer order
+	allPeerIds.forEach(peerId => {
+		let members = [];
+		if (peerId === netController.peerId) {
+			members = $gameParty.battleMembers();
+		} else if (netController.netPlayers[peerId]) {
+			const netPlayer = netController.netPlayers[peerId];
+			if (netPlayer && netPlayer.battleMembers) {
+				members = netPlayer.battleMembers();
+			}
+		}
+		
+		members.forEach((actor, index) => {
+			if (actor && actor.isAlive()) {
+				allActors.push({
+					actor: actor,
+					ownerId: peerId,
+					actorId: actor.actorId(),
+					index: index
+				});
+			}
+		});
+	});
+	
+	return allActors;
+};
+
+/**
+ * @description Override targetsForOpponents to make enemy target selection deterministic across all parties
+ * Uses turn count and enemy index as seed so both machines pick the same target
+ */
+MATTIE.multiplayer.Game_Action_targetsForOpponents_Original = Game_Action.prototype.targetsForOpponents;
+Game_Action.prototype.targetsForOpponents = function() {
+	const netController = MATTIE.multiplayer.getCurrentNetController();
+	
+	// Only apply for enemy actions in multiplayer
+	if (!this.subject() || !this.subject().isEnemy || !this.subject().isEnemy() ||
+	    !netController || !netController.netPlayers || Object.keys(netController.netPlayers).length === 0) {
+		return MATTIE.multiplayer.Game_Action_targetsForOpponents_Original.call(this);
+	}
+	
+	const allActors = MATTIE.multiplayer.getAllBattleActors();
+	
+	if (allActors.length === 0) {
+		return MATTIE.multiplayer.Game_Action_targetsForOpponents_Original.call(this);
+	}
+	
+	let targets = [];
+	
+	// Improved Deterministic Seed Generation to prevent static targeting
+	// Inputs: Turn Count, Enemy ID, Enemy Index, Remaining Actions
+	const turn = $gameTroop._turnCount || 1; 
+    // Use unique enemy ID + Index to ensure different enemies have different seeds/targets
+	const enemyId = this.subject().enemyId();
+    const enemyIndex = this.subject().index();
+	const currentActionCount = this.subject()._actions ? this.subject()._actions.length : 0;
+    
+    // Create a composite seed integer
+    // We mix these values to create a unique state for this specific action attempt
+    let seedState = (turn * 397) ^ (enemyId * 769) ^ (enemyIndex * 2039) ^ (currentActionCount * 4099);
+
+    // Simple Jenkins-like hash for better avalanche
+    seedState = (seedState + 0x7ED55D16) + (seedState << 12);
+    seedState = (seedState ^ 0xC761C23C) ^ (seedState >>> 19);
+    seedState = (seedState + 0x165667B1) + (seedState << 5);
+    seedState = (seedState + 0xD3A2646C) ^ (seedState << 9);
+    seedState = (seedState + 0xFD7046C5) + (seedState << 3);
+    seedState = (seedState ^ 0xB55A4F09) ^ (seedState >>> 16);
+    
+    // Normalize to 0-1 float
+    const randomVal = (seedState >>> 0) / 4294967296;
+
+    // DEBUG LOGGING
+    if (MATTIE.isDev || MATTIE.multiplayer.devTools.battleLogger) {
+        console.log(`[TargetDEBUG] Turn: ${turn}, Enemy: ${enemyIndex}, Hash: ${randomVal.toFixed(4)}`);
+        console.log(`[TargetDEBUG] Global Targets: ${allActors.length}`);
+    }
+	
+	if (this.isForRandom()) {
+		// Random target needs deterministic selection across ALL parties
+		const targetIndex = Math.floor(randomVal * allActors.length) % allActors.length;
+		targets.push(allActors[targetIndex].actor);
+	} else if (this.isForOne()) {
+		if (this._targetIndex < 0) {
+			// Random single target - deterministic across ALL parties
+			const targetIndex = Math.floor(randomVal * allActors.length) % allActors.length;
+            if (MATTIE.isDev) console.log(`[TargetDEBUG] Target Index: ${targetIndex} (${allActors[targetIndex].actor.name()})`);
+			targets.push(allActors[targetIndex].actor);
+		} else {
+            // [Fix] Even specific target indices (0-3) are likely from local-only AI logic
+            // To ensure we hit ALL players, we treat "Specific Index" as a "Deterministic Random" as well
+            // UNLESS it's a very specific script usage, but in vanilla/F&H, 0 usually just means "First Actor"
+            // We mix the specific index into the hash to keep it deterministic but allowing global spread
+            
+            // Re-use hash logic but add targetIndex as salt
+            // This ensures if AI picked Index 1 vs Index 0, we get different global targets
+            const salt = this._targetIndex * 127;
+            let targetedState = (seedState + salt) >>> 0;
+            const targetedRandom = (targetedState / 4294967296);
+
+			const targetIndex = Math.floor(targetedRandom * allActors.length) % allActors.length;
+            if (MATTIE.isDev) console.log(`[TargetDEBUG] Selected Index: ${targetIndex} (One-Specific-Remapped) -> ${allActors[targetIndex].actor.name()}`);
+			targets.push(allActors[targetIndex].actor);
+		}
+	} else {
+		// For all - return all actors from all parties
+		targets = allActors.map(a => a.actor);
+	}
+	
+	return targets;
+};
+
+/**
+ * @description Override Game_Action.apply to prevent enemy damage from duplicating across machines
+ * Enemies can target any party member, but damage only applies if target is in LOCAL party
+ * This ensures each attack hits ONE party's actors, not both
+ */
+MATTIE.multiplayer.Game_Action_apply_Original = Game_Action.prototype.apply;
+Game_Action.prototype.apply = function(target) {
+	const netController = MATTIE.multiplayer.getCurrentNetController();
+	
+	// If this is an enemy action and we're in multiplayer
+	if (this.subject() && this.subject().isEnemy && this.subject().isEnemy() && 
+	    netController && netController.netPlayers && Object.keys(netController.netPlayers).length > 0) {
+		
+		// Check if target is in a netplayer's party (not local)
+		let isNetPlayerActor = false;
+		let matchingPeer = "";
+		
+		Object.keys(netController.netPlayers).forEach(playerId => {
+			// Safety: Skip self if present in netPlayers for any reason
+			if (playerId === netController.peerId) return;
+			
+			const netPlayer = netController.netPlayers[playerId];
+			if (netPlayer && netPlayer.battleMembers) {
+				if (netPlayer.battleMembers().includes(target)) {
+					isNetPlayerActor = true;
+					matchingPeer = playerId;
+				}
+			}
+		});
+		
+		// If target belongs to a netplayer, skip damage on this machine
+		if (isNetPlayerActor) {
+			if (MATTIE.isDev || MATTIE.multiplayer.devTools.battleLogger) {
+				console.log(`[EnemyAI] Skipping damage to actor ${target.name()} (ID: ${target.actorId()}) belonging to Peer ${matchingPeer}`);
+			}
+			target.result().clear();
+			return;
+		}
+	}
+	
+	// Proceed with normal damage application
+	return MATTIE.multiplayer.Game_Action_apply_Original.call(this, target);
+};
+
 // event battle emitters
 // game system.onBattleStart is only used for statistics, but this makes the most logical sense to override.
 MATTIE.multiplayer.gameSystem_OnBattleStart = Game_System.prototype.onBattleStart;
