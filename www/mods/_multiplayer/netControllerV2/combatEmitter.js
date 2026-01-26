@@ -404,6 +404,10 @@ BattleManager.update = function () {
 			break;
 
 		case 'input':
+			if (this.checkSomeExtraTurn() && !Galv.EXTURN.active) {
+				this.ready();
+				break;
+			}
 			if (!$gameParty.canInput()) { // if the game party cannot input then they are ready
 				this.ready();
 			}
@@ -458,7 +462,7 @@ BattleManager.update = function () {
 		case 'doneSyncing':
 			if (MATTIE.multiplayer.combatEmitter.netExTurn) {
 				MATTIE.multiplayer.combatEmitter.netExTurn = false; // turn of net extra turn
-				this.ready(); // re enter the ready state
+				this.updateTurnEnd();
 			} else {
 				this.updateTurnEnd();
 			}

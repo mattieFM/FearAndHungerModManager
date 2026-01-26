@@ -210,4 +210,29 @@ Window_MenuCommand.prototype.addMainCommands = function () {
 	this.addCommand('Help', 'MATTIE_HELP', true);
 };
 
+// Fix for modded commands appearing black/invisible in some themes
+var _Window_MenuCommand_drawItem = Window_MenuCommand.prototype.drawItem;
+Window_MenuCommand.prototype.drawItem = function (index) {
+	var symbol = this.commandSymbol(index);
+	if (symbol === 'MATTIE_DROP' || symbol === 'MATTIE_HELP') {
+		var rect = this.itemRectForText(index);
+		var align = this.itemTextAlign();
+		this.resetTextColor();
+		// Force color to index 0 (White) ensuring visibility regardless of theme quirks
+		var normalColor = this.normalColor(); // Try standard normal color first
+        // If normal color is suspiciously black (and logically shouldn't be), force white.
+        // Checking for hex black variants or rbg(0,0,0)
+        if (normalColor === '#000000' || normalColor === 'rgb(0, 0, 0)' || normalColor === 'rgba(0, 0, 0, 1)') {
+             this.changeTextColor('#ffffff'); 
+        } else {
+             this.changeTextColor(normalColor);
+        }
+		this.changePaintOpacity(this.isCommandEnabled(index));
+		this.drawText(this.commandName(index), rect.x, rect.y, rect.width, align);
+	} else {
+		_Window_MenuCommand_drawItem.call(this, index);
+	}
+};
+
+
 // MATTIE.eventAPI.addItemDropToCurrentMap(new Game_Item(MATTIE.static.items.emptyScroll));

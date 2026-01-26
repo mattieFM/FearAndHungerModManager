@@ -81,6 +81,7 @@ function updateKey(key) {
  * 4 = not on scene_map
  */
 Input.checkScope = function (scope) {
+	//do not add that line back. it breaks the function
 	switch (scope) {
 	case -1:
 		return false;
