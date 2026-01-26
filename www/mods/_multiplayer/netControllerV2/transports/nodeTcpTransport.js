@@ -65,7 +65,8 @@ class NodeTcpTransport extends EventEmitter {
 	open() {
 		console.log(`NodeTcpTransport: opening... (Host: ${this.isHost})`);
 		if (this.isHost) {
-			this.server = net.createServer((socket) => {
+			// Create connection handler function to avoid duplication
+			const createConnectionHandler = (socket) => {
 				socket._buffer = ''; // Data buffer
 				socket._handshakeDone = false;
 
@@ -86,16 +87,45 @@ class NodeTcpTransport extends EventEmitter {
 					console.error('Socket error', err);
 					if (socket._wrapper) socket._wrapper.emit('error', err);
 				});
-			});
+			};
 
-			this.server.listen(this.port, () => {
-				console.log(`TCP Host listening on port ${this.port}`);
-				this.emit('open', this.id);
-			});
+			this.server = net.createServer(createConnectionHandler);
 
-			this.server.on('error', (err) => {
-				this.emit('error', err);
-			});
+			// Add retry logic for EADDRINUSE errors with automatic port switching
+			const attemptListen = (retries = 3, delay = 1000, maxPortAttempts = 10) => {
+				this.server.listen(this.port, () => {
+					console.log(`TCP Host listening on port ${this.port}`);
+					// Regenerate ID with correct port
+					this.id = this.generateId();
+					this.emit('open', this.id);
+				});
+
+				this.server.once('error', (err) => {
+					if (err.code === 'EADDRINUSE' && retries > 0) {
+						console.warn(`Port ${this.port} is in use, retrying... (${retries} retries left)`);
+						this.server.close(() => {
+							setTimeout(() => attemptListen(retries - 1, delay, maxPortAttempts), delay);
+						});
+					} else if (err.code === 'EADDRINUSE' && retries === 0 && maxPortAttempts > 0) {
+						// Switch to next port
+						this.port++;
+						console.warn(`All retries failed on previous port. Switching to port ${this.port}... (${maxPortAttempts - 1} port attempts remaining)`);
+						this.server.close(() => {
+							// Recreate server for new port with fresh state
+							this.server = net.createServer(createConnectionHandler);
+							// Try next port with fresh retry count
+							setTimeout(() => attemptListen(3, delay, maxPortAttempts - 1), delay);
+						});
+					} else if (err.code === 'EADDRINUSE' && maxPortAttempts === 0) {
+						console.error(`Failed to bind after trying multiple ports. All ports in range appear to be in use.`);
+						this.emit('error', err);
+					} else {
+						this.emit('error', err);
+					}
+				});
+			};
+
+			attemptListen();
 		} else {
 			// Client "open" is immediate as it's just ready to connect
 			setTimeout(() => this.emit('open', this.id), 10);
@@ -162,14 +192,24 @@ class NodeTcpTransport extends EventEmitter {
 	destroy() {
 		console.log('NodeTcpTransport: Destroying...');
 		if (this.server) {
+			// Unref to allow process to exit cleanly
+			if (this.server.unref) this.server.unref();
 			this.server.close(() => console.log('Server closed'));
+			// Force close all active connections
+			this.sockets.forEach((s) => {
+				if (!s.destroyed) s.destroy();
+			});
 			this.server = null;
 		}
 		if (this.clientSocket) {
-			this.clientSocket.destroy();
+			if (!this.clientSocket.destroyed) {
+				this.clientSocket.destroy();
+			}
 			this.clientSocket = null;
 		}
-		this.sockets.forEach((s) => s.destroy());
+		this.sockets.forEach((s) => {
+			if (!s.destroyed) s.destroy();
+		});
 		this.sockets = [];
 		this.emit('close');
 		this.emit('disconnected'); // PeerJS emits disconnected too
