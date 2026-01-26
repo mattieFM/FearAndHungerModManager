@@ -69,6 +69,7 @@ class BattleController extends EventEmitter {
 			const obj = {};
 			obj.hp = actor.hp;
 			obj.mp = actor.mp;
+			obj.actorId = actor.actorId(); // Include actor ID for proper matching
 			return obj;
 		});
 		MATTIE.multiplayer.getCurrentNetController().emitTurnEndEvent(enemyHps, enemyStates, actorData, enemyMhps);

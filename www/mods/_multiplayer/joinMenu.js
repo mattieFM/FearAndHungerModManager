@@ -78,12 +78,23 @@ MATTIE.scenes.multiplayer.join.prototype.addOptionsBtns = function () {
 	this._optionsWindow.setHandler(MATTIE.CmdManager.joinGame, (() => {
 		this._inputWin.close();
 		const inputVal = (this._inputWin.getInput()).trim();
-		MATTIE.multiplayer.clientController.hostId = inputVal;
+		
+		// Decode base64 peer ID
+		let decodedHostId = inputVal;
+		try {
+			decodedHostId = atob(inputVal);
+			console.log('Decoded peer ID from base64');
+		} catch (e) {
+			console.warn('Input is not base64, using as-is (legacy/raw format)');
+			decodedHostId = inputVal;
+		}
+		
+		MATTIE.multiplayer.clientController.hostId = decodedHostId;
 
 		// Auto-detect IP format if no user override is set
 		if (MATTIE.multiplayer.userOverrideFallback === null) {
 			// Basic IP regex: standard IP, or IP:Port, or IP:Port_Suffix
-			const isIpLike = /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}(:\d+)?(_[\w]+)?$/.test(inputVal);
+			const isIpLike = /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}(:\d+)?(_[\w]+)?$/.test(decodedHostId);
 			if (isIpLike) {
 				console.log('Detected IP address input, auto-switching to Fallback TCP.');
 				MATTIE.multiplayer.forceFallback = true;

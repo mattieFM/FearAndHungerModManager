@@ -508,6 +508,9 @@ class BaseNetController extends EventEmitter {
 		if (data.ready) {
 			this.onReadyData(data.ready, id);
 		}
+		if (data.enemyActions) {
+			this.onEnemyActionsData(data.enemyActions, id);
+		}
 		if (data.turnEnd) {
 			this.onTurnEndData(data.turnEnd, id);
 		}
@@ -562,6 +565,42 @@ class BaseNetController extends EventEmitter {
 	}
 
 	//-----------------------------------------------------
+	// Enemy Actions (Host-Authoritative AI)
+	//-----------------------------------------------------
+
+	/**
+	 * @description emit enemy actions from host (host-authoritative AI)
+	 * @param {Array} enemyActions array of pre-calculated enemy actions with targets and results
+	 */
+	emitEnemyActions(enemyActions) {
+		if (!this.isHost) return; // Only host should emit enemy actions
+		
+		const obj = {};
+		obj.enemyActions = enemyActions;
+		console.log('[HostAI] Broadcasting enemy actions:', enemyActions);
+		this.sendViaMainRoute(obj);
+	}
+
+	/**
+	 * @description receive and process enemy actions from host
+	 * @param {Array} enemyActions array of enemy actions from host
+	 * @param {string} id sender id (should be host)
+	 */
+	onEnemyActionsData(enemyActions, id) {
+		console.log('[HostAI] Received enemy actions:', enemyActions);
+		
+		if (!enemyActions || !Array.isArray(enemyActions)) {
+			console.error('[HostAI] Invalid enemy actions data');
+			return;
+		}
+		
+		// Queue enemy actions for execution
+		enemyActions.forEach(actionData => {
+			this.processHostEnemyAction(actionData, id);
+		});
+	}
+
+	//-----------------------------------------------------
 	// Turn End Event
 	//-----------------------------------------------------
 
@@ -585,6 +624,25 @@ class BaseNetController extends EventEmitter {
 	}
 
 	/**
+	 * @description receive and process enemy actions from host
+	 * @param {Array} enemyActions array of enemy actions from host
+	 * @param {string} id sender id (should be host)
+	 */
+	onEnemyActionsData(enemyActions, id) {
+		console.log('[HostAI] Received enemy actions:', enemyActions);
+		
+		if (!enemyActions || !Array.isArray(enemyActions)) {
+			console.error('[HostAI] Invalid enemy actions data');
+			return;
+		}
+		
+		// Process each enemy action
+		enemyActions.forEach(actionData => {
+			this.processHostEnemyAction(actionData, id);
+		});
+	}
+
+	/**
      *
      * @param {*} data the turnEnd obj, for now just contains an array of enemy healths
      */
@@ -604,19 +662,54 @@ class BaseNetController extends EventEmitter {
 	}
 
 	syncActorData(actorDataArr, partyId) {
+        if (!this.netPlayers[partyId]) {
+			// This can happen if a packet arrives before the player setup packet
+			console.warn(`[ActorSync] Received data for unknown party ${partyId}`);
+			return;
+        }
+
 		const party = this.netPlayers[partyId].battleMembers();
-		for (let index = 0; index < actorDataArr.length; index++) {
-			/** @type {Game_Actor} */
-			const actor = party[index];
-			const actorData = actorDataArr[index];
+		
+		// Match actors by their dataActorId (not position) to prevent cross-party sync
+		actorDataArr.forEach((actorData) => {
+			if (!actorData || typeof actorData.actorId === 'undefined') return;
+			
+			// Find the matching actor in this netplayer's party by dataActorId
+			const actor = party.find(a => a && a.actorId() === actorData.actorId);
+			
+			// 2024-01-25 Fix: If actor exists in data but not key, try to recreate/find it via base ID
+			// Sometimes netActors aren't initialized yet or are desynced
+			if (!actor) {
+				const netPlayer = this.netPlayers[partyId];
+				if (netPlayer && netPlayer.$netActors) {
+					// Check if we can find it by base ID (e.g. "Mercenary" instead of specific instance)
+                    // The actorData might contain baseId if we added it to the packet, but failing that we can try matching by other means
+					console.warn(`[ActorSync] Could not find actor ${actorData.actorId} in party ${partyId}. Available: ${party.map(a => a.actorId()).join(',')}`);
+					
+					// Force refresh of that player's party composition from followers?
+					// This might be risky during battle
+				}
+				return;
+			}
+			
 			const newActorHealth = actorData.hp;
 			const newActorMana = actorData.mp;
+			
 			if (actor.hp > newActorHealth) {
 				// actor.performDamage();
 				// this.performCosmeticDamageAnimation($gameTroop.members()[0], [actor], 1);
 			}
+			
 			actor.setHp(newActorHealth);
 			actor.setMp(newActorMana);
+		});
+		
+		// Refresh battle status window if viewing this party
+		if (SceneManager._scene instanceof Scene_Battle) {
+			const scene = SceneManager._scene;
+			if (scene._statusWindow && scene._statusWindow._gameParty === this.netPlayers[partyId]) {
+				scene._statusWindow.refresh();
+			}
 		}
 
 		// handle despawning chars for pvp
@@ -1023,7 +1116,30 @@ class BaseNetController extends EventEmitter {
 			return;
 		}
 		
-		let targetActor = $gameActors.actor(action.targetActorId);
+		// Find target actor - need to map targetActorId (baseActorId) to the correct netplayer's netactor
+		let targetActor = null;
+		const baseTargetActorId = action.targetActorId; // This is a baseActorId (e.g., 1 for Darce)
+		
+		// First check if it's the local player's actor
+		if ($gameParty.battleMembers().some(m => m.actorId() === baseTargetActorId)) {
+			targetActor = $gameActors.actor(baseTargetActorId);
+		} else {
+			// Find which netplayer has this actor in their party
+			for (const netPlayerId in this.netPlayers) {
+				const netPlayer = this.netPlayers[netPlayerId];
+				const netActorObj = netPlayer.$netActors.baseActor(baseTargetActorId);
+				if (netActorObj && netPlayer.battleMembers().includes(netActorObj)) {
+					targetActor = netActorObj;
+					break;
+				}
+			}
+		}
+		
+		if (!targetActor) {
+			console.error(`[NetAction] Cannot find target actor for baseActorId ${baseTargetActorId}`);
+			return;
+		}
+		
 		let legCut = false;
 		let armCut = false;
 		/** @type {Game_Enemy} */

@@ -51,7 +51,8 @@
 								"_multiplayer/items",
 								"_multiplayer/netControllerV2/marriageHandler",
 								"_multiplayer/netControllerV2/saveEventLocationEmitter",
-								"_multiplayer/multiplayerCompatability"
+								"_multiplayer/multiplayerCompatability",
+        "_multiplayer/netControllerV2/hostEnemyAI"
     ],
     "danger": false,
     "assets": [

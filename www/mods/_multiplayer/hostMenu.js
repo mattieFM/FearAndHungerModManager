@@ -105,11 +105,14 @@ MATTIE.scenes.multiplayer.host.prototype.initListController = function () {
 };
 
 MATTIE.scenes.multiplayer.host.prototype.showHideCode = function (hidden) {
+	const rawPeerId = MATTIE.multiplayer.hostController.peerId;
+	const encodedPeerId = rawPeerId ? btoa(rawPeerId) : null;
+	
 	const text = [
 		'People can join using this number:',
-		hidden && MATTIE.multiplayer.hostController.peerId
-			? '*'.repeat(MATTIE.multiplayer.hostController.peerId.length)
-			: (MATTIE.multiplayer.hostController.peerId || 'Error getting ID'),
+		hidden && encodedPeerId
+			? '*'.repeat(encodedPeerId.length)
+			: (encodedPeerId || 'Error getting ID'),
 	];
 
 	if (this._peerWindow) this._peerWindow.updateText(text);
@@ -186,7 +189,9 @@ MATTIE.scenes.multiplayer.host.prototype.addOptionsBtns = function () {
 	}));
 
 	this._optionsWindow.setHandler(MATTIE.CmdManager.copy, (() => {
-		MATTIE.clipboard.put(MATTIE.multiplayer.hostController.peerId || '');
+		const rawPeerId = MATTIE.multiplayer.hostController.peerId;
+		const encodedPeerId = rawPeerId ? btoa(rawPeerId) : '';
+		MATTIE.clipboard.put(encodedPeerId);
 		this._optionsWindow.activate();
 	}));
 
