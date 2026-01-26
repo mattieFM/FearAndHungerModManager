@@ -5,9 +5,10 @@ MATTIE.simpleBattleAPI = {};
 /**
  * @description a simple function to start a fight. Latch onto the battle processing cmd
  * @param {*} troopId the id of the troop
+ * @param {*} eventId optional event id to link the battle to
  */
-MATTIE.simpleBattleAPI.startFightWith = function (troopId) {
-	console.log(`[SimpleBattleAPI] Attempting to start fight with Troop ID: ${troopId}`);
+MATTIE.simpleBattleAPI.startFightWith = function (troopId, eventId = 0) {
+	console.log(`[SimpleBattleAPI] Attempting to start fight with Troop ID: ${troopId} (Event: ${eventId})`);
 	if (!troopId) {
 		console.error("[SimpleBattleAPI] Error: troopId is null/undefined");
 		return;
@@ -31,7 +32,18 @@ MATTIE.simpleBattleAPI.startFightWith = function (troopId) {
 		
 		// Setup context to mimic a real event (avoids issues in overrides)
 		tempInterp._mapId = $gameMap.mapId();
-		tempInterp._eventId = 0; 
+		tempInterp._eventId = Number(eventId) || 0; 
+
+        // ROBUSTNESS: If eventId is 0, we risk creating a desynced lobby if an event IS actually involved.
+        // Try to find an event that is currently fighting this troop to latch onto it.
+        // This fixes "Neither fighting the same enemy" issues when Assist has missing event context.
+        if (tempInterp._eventId === 0 && MATTIE.multiplayer.inBattleRefScan) {
+            const foundEvent = MATTIE.multiplayer.inBattleRefScan(troopId);
+            if (foundEvent) {
+                tempInterp._eventId = foundEvent.eventId();
+                console.log(`[SimpleBattleAPI] Auto-detected Event #${tempInterp._eventId} for Troop ${troopId}`);
+            }
+        }
 
 		try {
 			const result = tempInterp.command301();

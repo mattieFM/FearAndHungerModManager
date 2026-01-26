@@ -28,10 +28,11 @@ MATTIE.multiplayer.simulation = {
 	latency: 900, // ms
 	jitter: 400, // ms variance
 	packetLoss: 0.2, // 0.0 to 1.0
-	enabled: true, // Feature flag
+	enabled: false, // Feature flag
 };
 
 setInterval(() => {
+	MATTIE.multiplayer.lastPacketsPerSecond = MATTIE.multiplayer.packetsThisSecond;
 	MATTIE.multiplayer.packetsThisSecond = 0;
 }, 1000);
 
@@ -232,6 +233,12 @@ class BaseNetController extends EventEmitter {
 		}
 		if (data.battleStart) {
 			obj.priority = 1;
+		}
+		if (data.battleSyncReq) {
+			obj.priority = 50;
+		}
+		if (data.battleSyncData) {
+			obj.priority = 50;
 		}
 		if (data.battleEnd) {
 			obj.priority = 1;
@@ -472,6 +479,29 @@ class BaseNetController extends EventEmitter {
 		if (data.battleStart) {
 			this.onBattleStartData(data.battleStart, id);
 		}
+        if (data.scalingCorrection) {
+            // Host Authority: Correcting our scaling factor mid-flight
+            if (MATTIE.multiplayer.devTools.battleLogger) console.log(`[Net] Received Scaling Correction: ${data.scalingCorrection.factor}`);
+            
+            // Apply immediately to current troops using safe transition
+            if (MATTIE.multiplayer.config.scaling.applyTroopScaling && $gameTroop.members().length > 0) {
+                MATTIE.multiplayer.config.scaling.applyTroopScaling(() => {
+                    MATTIE.multiplayer.hostScalingFactor = data.scalingCorrection.factor;
+                }); 
+            } else {
+                 MATTIE.multiplayer.hostScalingFactor = data.scalingCorrection.factor;
+                 // If enemies don't exist yet, they'll pick up this factor when created
+                 if (MATTIE.multiplayer.devTools.battleLogger && $gameTroop.members().length === 0) {
+                     console.log(`[Net] No enemies exist yet. Factor will be applied during enemy initialization.`);
+                 }
+            }
+        }
+		if (data.battleSyncReq) {
+			this.onBattleSyncRequest(data.battleSyncReq, id);
+		}
+		if (data.battleSyncData) {
+			this.onBattleSyncData(data.battleSyncData);
+		}
 		if (data.battleEnd) {
 			this.onBattleEndData(data.battleEnd, id);
 		}
@@ -542,10 +572,11 @@ class BaseNetController extends EventEmitter {
      *  @param enemyHps {int[][]} an array of arrays of ints which are the state ids of the enemies
      * @emits turnend
      */
-	emitTurnEndEvent(enemyHps, enemyStates, actorData) {
+	emitTurnEndEvent(enemyHps, enemyStates, actorData, enemyMhps) {
 		var obj = {};
 		obj.turnEnd = {};
 		obj.turnEnd.enemyHps = enemyHps;
+        obj.turnEnd.enemyMhps = enemyMhps; // Added MHP sync
 		obj.turnEnd.enemyStates = enemyStates;
 		obj.turnEnd.actorData = actorData;
 		console.log(obj);
@@ -564,7 +595,7 @@ class BaseNetController extends EventEmitter {
 			const actorHealthArr = actorDataArr.map((data) => data.hp);
 			const enemyStatesArr = data.enemyStates;
 			if (actorDataArr) { this.syncActorData(actorDataArr, id); }
-			if (enemyHealthArr) { this.syncEnemyHealths(enemyHealthArr); }
+			if (enemyHealthArr) { this.syncEnemyHealths(enemyHealthArr, enemyStatesArr, data.enemyMhps); }
 			if (enemyStatesArr) { this.syncEnemyStates(enemyStatesArr); }
 			setTimeout(() => {
 				BattleManager.doneSyncing(); // done syncing
@@ -615,10 +646,15 @@ class BaseNetController extends EventEmitter {
 		for (let index = 0; index < $gameTroop.members().length; index++) {
 			const enemy = $gameTroop.members()[index];
 			const netStates = enemyStatesArr[index];
-			if (netStates) {
+			if (netStates && Array.isArray(netStates)) {
 				for (let j = 0; j < netStates.length; j++) {
 					const state = netStates[j];
+                    if (typeof state !== 'number') continue;
 					if (!enemy.isStateAffected(state)) {
+                        // Log death syncing for diagnosis
+                        if (state === enemy.deathStateId()) {
+                             console.warn(`[NetSync] Applying DEATH state to enemy ${index} (Current HP: ${enemy.hp})`);
+                        }
 						enemy.addState(state);
 					}
 				}
@@ -626,12 +662,107 @@ class BaseNetController extends EventEmitter {
 		}
 	}
 
-	syncEnemyHealths(enemyHealthArr) {
+	syncEnemyHealths(enemyHealthArr, enemyStatesArr, remoteMaxHpArr) { // Added remoteMaxHpArr
+		// Log inbound health array for debugging scaling/sync issues
+		if (MATTIE.multiplayer.devTools.battleLogger) {
+			console.log("[NetSync] Received Enemy Healths:", JSON.stringify(enemyHealthArr), "States:", JSON.stringify(enemyStatesArr));
+		}
+
 		for (let index = 0; index < $gameTroop.members().length; index++) {
 			const enemy = $gameTroop.members()[index];
 			if (enemy) {
+				const remoteHp = enemyHealthArr[index];
+                // Optional: Use remote Max HP to detect desync scaling events
+                const remoteMaxHp = remoteMaxHpArr ? remoteMaxHpArr[index] : null;
+
+				// Safety check: ensure remoteHp is a valid number
+				// This prevents array length mismatches (undefined) or corrupted data (null/NaN) 
+				// from effectively executing a one-hit kill logic via Math.min(x, undefined) -> NaN or Math.min(x, null) -> 0
+				if (remoteHp === undefined || remoteHp === null || typeof remoteHp !== 'number' || isNaN(remoteHp)) {
+					continue;
+				}
+
 				const orgHp = enemy.hp;
-				enemy.setHp(Math.min(orgHp, enemyHealthArr[index]));
+                const orgMhp = enemy.mhp;
+
+                // [Smart Scaling Compensation]
+                // If Remote MHP Differs from our MHP, we must normalize the Remote HP before applying damage.
+                // Scenario: We = 3000 MHP. Remote = 1500 MHP. Remote HP = 1500.
+                // If we blindly take 1500, we halve our HP for no reason.
+                let adjustedRemoteHp = remoteHp;
+
+                if (remoteMaxHp && remoteMaxHp !== orgMhp && remoteMaxHp > 0) {
+                    //  // Calculate Remote Health Percentage
+                    //  const remotePercent = remoteHp / remoteMaxHp;
+                    //  // Convert that to OUR scale
+                    //  adjustedRemoteHp = Math.floor(orgMhp * remotePercent);
+                     
+                    //  if (MATTIE.multiplayer.devTools.battleLogger) {
+                    //      console.log(`[NetSync] MHP Mismatch detected for Enemy ${index}. LocalMHP: ${orgMhp}, RemoteMHP: ${remoteMaxHp}. Adjusting RemoteHP ${remoteHp} -> ${adjustedRemoteHp}`);
+                    //  }
+                } else if (!remoteMaxHp && MATTIE.multiplayer.config.scaling.scaleHp) {
+                    // Fallback: If remote MHP not provided, but we are scaling, and remoteHP == unscaled MHP??
+                    // Dangerous guess work. Skipping for now.
+                }
+
+                // [Safety Fix] - Prevent 0 HP kills unless supported by Death State
+				if (adjustedRemoteHp <= 0 && orgHp > 0) {
+					// ... (Keep existing death checks) ...
+                	// STRICT VERIFICATION: If States are missing, we cannot trust 0 HP.
+					// We only proceed if we have state data AND it confirms death.
+                    let isVerifiedKill = false;
+
+					if (enemyStatesArr && Array.isArray(enemyStatesArr)) {
+						const remoteStates = enemyStatesArr[index] || [];
+						if (remoteStates.includes(enemy.deathStateId())) {
+                            isVerifiedKill = true;
+                        } else {
+                            // States exist, but no death state -> Living 0 HP glitch -> Ignore
+                            if (MATTIE.multiplayer.devTools.battleLogger) {
+								console.warn(`[NetSync] Ignored suspicious 0 HP for Enemy ${index} (No Death State in sync packet). OrgHP: ${orgHp}`);
+							}
+                        }
+					} else {
+                         // Missing State Data -> Unverified Kill -> Ignore
+                         if (MATTIE.multiplayer.devTools.battleLogger) {
+                            console.warn(`[NetSync] Ignored suspicious 0 HP for Enemy ${index} (No State Data provided). OrgHP: ${orgHp}`);
+                        }
+                    }
+
+                    if (!isVerifiedKill) {
+                        continue; // SKIP THE KILL
+                    }
+				}
+
+                // HP SYNC LOGIC
+                // Logic: Generally trust the lowest HP (Lag compensation - damage happened recently).
+                // EXCEPTION: If Local HP is EXACTLY Local Base Max (Unscaled) and Remote is Scaled High,
+                // we assume Local is "Fresh/Uninitialized Scale" and allow Healing up to Remote.
+                
+                let limitHp = Math.min(orgHp, adjustedRemoteHp);
+
+                // Detect Unscaled Initialization Trap
+                // If Local is stuck at BaseMHP (e.g. 1000) but Real MHP is Scaled (e.g. 1500)
+                // And Remote says 1500.
+                // We should take 1500.
+                if (orgHp < adjustedRemoteHp) {
+                    // Check if orgHp is suspiciously close to Base Param
+                    const baseMhp = enemy.paramBase(0);
+                    if (Math.abs(orgHp - baseMhp) < 5 && adjustedRemoteHp > orgHp) {
+                         if (MATTIE.multiplayer.devTools.battleLogger) {
+                            console.log(`[NetSync] Detected Unscaled Local HP (${orgHp}). Allowing sync UP to ${adjustedRemoteHp}`);
+                         }
+                         limitHp = adjustedRemoteHp;
+                    }
+                }
+
+				enemy.setHp(limitHp);
+
+                // ... (Keep logging) ...
+                if (index === 0 && orgHp > 0 && enemy.hp <= 0) {
+                     console.log(`[NetSync] Enemy 0 (Head?) died via sync. RemoteHP: ${remoteHp} (Adj: ${adjustedRemoteHp}), OrgHP: ${orgHp}`);
+                }
+
 				if (orgHp > 0 && enemy.hp <= 0 && !enemy.hasState(enemy.deathStateId())) {
 					enemy.addState(enemy.deathStateId());
 					enemy.performCollapse();
@@ -1139,6 +1270,65 @@ class BaseNetController extends EventEmitter {
 	// Battle Start Event
 	//-----------------------------------------------------
 
+	emitBattleSyncRequest(troopId) {
+		var obj = {
+			battleSyncReq: {
+				troopId: troopId
+			}
+		};
+		if (MATTIE.multiplayer.devTools.battleLogger) console.info(`[Net] Requesting Battle Sync for Troop ${troopId}`);
+		this.sendViaMainRoute(obj);
+	}
+
+	onBattleSyncRequest(req, requesterId) {
+		// If I am in battle with the requested troop, send my state
+		if (MATTIE.multiplayer.inBattle && $gameTroop._troopId === req.troopId) {
+			const hp = $gameTroop.members().map((e) => e.hp);
+            const mhps = $gameTroop.members().map((e) => e.param(0));
+			const states = $gameTroop.members().map((e) => e.states().map((s) => s.id));
+			const turnCount = $gameTroop.turnCount();
+			if (MATTIE.multiplayer.devTools.battleLogger) console.info(`[Net] Replying to Battle Sync for Troop ${req.troopId} from ${requesterId}`);
+			this.emitBattleSyncData(hp, states, turnCount, mhps);
+		}
+	}
+
+	emitBattleSyncData(hp, states, turnCount, mhps) {
+		var obj = {
+			battleSyncData: {
+				hp: hp,
+				states: states,
+				turnCount: turnCount,
+                mhps: mhps,
+                scalingFactor: (MATTIE.multiplayer.config.scaling && MATTIE.multiplayer.config.scaling.hpScaling) ? MATTIE.multiplayer.config.scaling.hpScaling() : 1.0
+			}
+		};
+		this.sendViaMainRoute(obj);
+	}
+
+	onBattleSyncData(data) {
+		if (MATTIE.multiplayer.inBattle) {
+            // [Sync Scaling]
+            if (data.scalingFactor && !MATTIE.multiplayer.isHost) {
+                 MATTIE.multiplayer.hostScalingFactor = data.scalingFactor;
+            }
+
+			if (MATTIE.multiplayer.devTools.battleLogger) console.info('[Net] Applying Battle Sync Data');
+			if (data.hp) this.syncEnemyHealths(data.hp, data.states, data.mhps);
+			if (data.states) this.syncEnemyStates(data.states);
+			if (data.turnCount !== undefined) {
+				$gameTroop._turnCount = data.turnCount;
+                // do not sync BattleManager._turnCount as it might break the phase flow
+			}
+
+			// Also force a refresh of the HUD?
+			if (SceneManager._scene instanceof Scene_Battle) {
+				if (SceneManager._scene._statusWindow && typeof SceneManager._scene._statusWindow.refresh === 'function') {
+                    SceneManager._scene._statusWindow.refresh();
+                }
+			}
+		}
+	}
+
 	/**
      * @description send the battle start event to connections
      * @param {*} eventId the id of the event tile the battle was triggered from
@@ -1151,7 +1341,8 @@ class BaseNetController extends EventEmitter {
 				battleStart: {
 					eventId: eventId,
 					mapId: mapId,
-					troopId: troopId
+					troopId: troopId,
+                    scalingFactor: (MATTIE.multiplayer.config.scaling && MATTIE.multiplayer.config.scaling.hpScaling) ? MATTIE.multiplayer.config.scaling.hpScaling() : 1.0
 				}
 			};
 			
@@ -1181,10 +1372,29 @@ class BaseNetController extends EventEmitter {
 
 	onBattleStartData(battleStartObj, id) { // take the battleStartObj and set that enemy as "in combat" with id
 		try {
+            // [Sync Scaling]
+            if (battleStartObj.scalingFactor && !MATTIE.multiplayer.isHost) {
+                 if (MATTIE.multiplayer.devTools.battleLogger) console.log(`[Net] Received Host Scaling Factor: ${battleStartObj.scalingFactor}`);
+                 
+                 // If we are late-joining (or just joining) and enemies *might* already exist (e.g. from local logic?), we should wrap this too.
+                 // However, usually onBattleStart precedes enemy creation for the local client.
+                 // But just in case:
+                 
+                 if (MATTIE.multiplayer.config.scaling.applyTroopScaling && $gameTroop.members().length > 0) {
+                     MATTIE.multiplayer.config.scaling.applyTroopScaling(() => {
+                         MATTIE.multiplayer.hostScalingFactor = battleStartObj.scalingFactor;
+                     });
+                 } else {
+                     MATTIE.multiplayer.hostScalingFactor = battleStartObj.scalingFactor;
+                 }
+            }
+
 			this.battleStartAddCombatant(battleStartObj.troopId, id);
 			
 			if (this.netPlayers[id]) {
 				this.netPlayers[id].troopInCombatWith = battleStartObj.troopId;
+                this.netPlayers[id].eventInCombatWith = battleStartObj.eventId; // Track Event ID
+                this.netPlayers[id].mapInCombatWith = battleStartObj.mapId;     // Track Map ID
 			}
 
 			// Handle event tile logic if on same map
@@ -1219,6 +1429,10 @@ class BaseNetController extends EventEmitter {
 		obj.eventId = eventid;
 		obj.mapId = mapid;
 		obj.peerId = peerid;
+        // Host broadcasts new scaling factor when roster changes
+        if (MATTIE.multiplayer.isHost && MATTIE.multiplayer.config.scaling && MATTIE.multiplayer.config.scaling.hpScaling) {
+            obj.scalingFactor = MATTIE.multiplayer.config.scaling.hpScaling();
+        }
 		return obj;
 	}
 
@@ -1229,23 +1443,31 @@ class BaseNetController extends EventEmitter {
      * @param {*} id
      */
 	battleEndRemoveCombatant(troopId, id) {
-		if ($dataTroops[troopId]) {
-			const troopName = $dataTroops[troopId].name;
+		const updateLogic = () => {
+			if ($dataTroops[troopId]) {
+				const troopName = $dataTroops[troopId].name;
 
-			$dataTroops.forEach((element) => {
-				if (element) {
-					if (element.name === troopName) {
-						if (element._combatants) {
-							delete element._combatants[id];
+				$dataTroops.forEach((element) => {
+					if (element) {
+						if (element.name === troopName) {
+							if (element._combatants) {
+								delete element._combatants[id];
+							}
 						}
 					}
-				}
-			});
+				});
 
-			$gameTroop.removeIdFromCombatArr(id);
-			if ($dataTroops[troopId]._combatants) {
-				delete $dataTroops[troopId]._combatants[id];
+				$gameTroop.removeIdFromCombatArr(id);
+				if ($dataTroops[troopId]._combatants) {
+					delete $dataTroops[troopId]._combatants[id];
+				}
 			}
+		};
+
+		if (MATTIE.multiplayer.config.scaling && MATTIE.multiplayer.config.scaling.applyTroopScaling) {
+			MATTIE.multiplayer.config.scaling.applyTroopScaling(updateLogic);
+		} else {
+			updateLogic();
 		}
 	}
 
@@ -1256,39 +1478,60 @@ class BaseNetController extends EventEmitter {
      * @param {*} id
      */
 	battleStartAddCombatant(troopId, id) {
-		const troopName = $dataTroops[troopId].name;
-		$dataTroops.forEach((element) => {
-			if (element) {
-				if (element.name === troopName) {
-					if (element._combatants) {
-						element._combatants[id] = {};
-						element._combatants[id].bool = 0;
-						element._combatants[id].isExtraTurn = 0;
-					} else {
-						element._combatants = {};
-						element._combatants[id] = {};
-						element._combatants[id].bool = 0;
-						element._combatants[id].isExtraTurn = 0;
+		const updateLogic = () => {
+			if (!$dataTroops[troopId]) return;
+			const troopName = $dataTroops[troopId].name;
+
+            // Update active battle if matches
+            if (MATTIE.multiplayer.inBattle && $gameTroop) {
+                // Check by ID or Name
+                if ($gameTroop._troopId === troopId || $gameTroop.troop().name === troopName) {
+                    if (typeof $gameTroop.addIdToCombatArr === 'function') {
+                        $gameTroop.addIdToCombatArr(id);
+                        if (MATTIE.multiplayer.devTools.battleLogger) console.info(`[Net] Added ${id} to active Game_Troop combatants`);
+                    }
+                }
+            }
+
+			$dataTroops.forEach((element) => {
+				if (element) {
+					if (element.name === troopName) {
+						if (element._combatants) {
+							element._combatants[id] = {};
+							element._combatants[id].bool = 0;
+							element._combatants[id].isExtraTurn = 0;
+						} else {
+							element._combatants = {};
+							element._combatants[id] = {};
+							element._combatants[id].bool = 0;
+							element._combatants[id].isExtraTurn = 0;
+						}
 					}
 				}
+			});
+
+			if ($gameTroop.name == troopName) {
+				$gameTroop.addIdToCombatArr(id);
 			}
-		});
 
-		if ($gameTroop.name == troopName) {
-			$gameTroop.addIdToCombatArr(id);
-		}
+			if ($gameTroop._troopId == troopId) {
+				$gameTroop.addIdToCombatArr(id);
+			} else if ($dataTroops[troopId]._combatants) {
+				$dataTroops[troopId]._combatants[id] = {};
+				$dataTroops[troopId]._combatants[id].bool = 0;
+				$dataTroops[troopId]._combatants[id].isExtraTurn = 0;
+			} else {
+				$dataTroops[troopId]._combatants = {};
+				$dataTroops[troopId]._combatants[id] = {};
+				$dataTroops[troopId]._combatants[id].bool = 0;
+				$dataTroops[troopId]._combatants[id].isExtraTurn = 0;
+			}
+		};
 
-		if ($gameTroop._troopId == troopId) {
-			$gameTroop.addIdToCombatArr(id);
-		} else if ($dataTroops[troopId]._combatants) {
-			$dataTroops[troopId]._combatants[id] = {};
-			$dataTroops[troopId]._combatants[id].bool = 0;
-			$dataTroops[troopId]._combatants[id].isExtraTurn = 0;
+		if (MATTIE.multiplayer.config.scaling && MATTIE.multiplayer.config.scaling.applyTroopScaling) {
+			MATTIE.multiplayer.config.scaling.applyTroopScaling(updateLogic);
 		} else {
-			$dataTroops[troopId]._combatants = {};
-			$dataTroops[troopId]._combatants[id] = {};
-			$dataTroops[troopId]._combatants[id].bool = 0;
-			$dataTroops[troopId]._combatants[id].isExtraTurn = 0;
+			updateLogic();
 		}
 	}
 
@@ -1309,16 +1552,18 @@ class BaseNetController extends EventEmitter {
 			this.emit('battleEndEvent', obj);
 			
 			// Fix: Use obj.battleEnd to access properties; obj itself doesn't have them at root
-			this.emitChangeInBattlersEvent(this.formatChangeInBattleObj(obj.battleEnd.eventId, obj.battleEnd.mapId, this.peerId));
-			
-			// Update local player model state so it syncs to late joiners
-			if (this.player) {
-				this.player.troopInCombatWith = null;
-			}
+			if (obj.battleEnd && obj.battleEnd.eventId) {
+				this.emitChangeInBattlersEvent(this.formatChangeInBattleObj(obj.battleEnd.eventId, obj.battleEnd.mapId, this.peerId));
+				
+				// Update local player model state so it syncs to late joiners
+				if (this.player) {
+					this.player.troopInCombatWith = null;
+				}
 
-			const event = $gameMap.event(obj.battleEnd.eventId);
-			if (event) {
-				event.removeIdFromCombatArr(this.peerId);
+				const event = $gameMap.event(obj.battleEnd.eventId);
+				if (event) {
+					event.removeIdFromCombatArr(this.peerId);
+				}
 			}
 
 			this.battleEndRemoveCombatant(obj.battleEnd.troopId, this.peerId);

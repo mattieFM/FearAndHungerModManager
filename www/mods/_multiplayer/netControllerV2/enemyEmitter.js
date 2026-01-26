@@ -57,11 +57,57 @@ Game_Interpreter.prototype.command301 = function () {
 	} else {
 		troopId = $gameTroop._troopId;
 	}
-	MATTIE.multiplayer.battleProcessing.call(this);
+    MATTIE.multiplayer.battleProcessing.call(this);
 
-	MATTIE.multiplayer.getCurrentNetController().emitBattleStartEvent(this.eventId(), this._mapId, troopId);
-	MATTIE.multiplayer.hasImmunityToBattles = true;
-	enemyLog(`Battle Processing for event #${this.eventId()} on map #${this._mapId}\n with troopID: ${troopId}`);
+    // Sync Check: if joining an existing battle, populate BattleManager with known combatants
+    try {
+        const netCtrl = MATTIE.multiplayer.getCurrentNetController();
+        const activeTroopId = $gameTroop._troopId;
+        const myId = netCtrl && netCtrl.peerId;
+
+        // Fallback: Populate from $dataTroops if possible, even if Event is missing/broken
+        if (activeTroopId && $dataTroops[activeTroopId] && $dataTroops[activeTroopId]._combatants) {
+             const combatants = Object.keys($dataTroops[activeTroopId]._combatants);
+             combatants.forEach(id => {
+                if (id !== myId && BattleManager._netActors && BattleManager._netActors.indexOf(id) === -1) {
+                     BattleManager._netActors.push(id);
+                     if (MATTIE.multiplayer.devTools.battleLogger) console.info(`[Net] Fallback linked combatant ${id} from DataTroop`);
+                }
+             });
+        }
+        
+        // Also check Event Logic if available (Preferred)
+        const event = $gameMap.event(this.eventId());
+        if (event && event.inCombat && event.inCombat()) {
+             const eCombatants = Object.keys(event._combatants || {});
+             eCombatants.forEach(id => {
+                if (id !== myId && BattleManager._netActors.indexOf(id) === -1) {
+                     BattleManager._netActors.push(id);
+                }
+             });
+        }
+    
+        // Try to request Sync if anyone else is here
+        if (BattleManager._netActors && BattleManager._netActors.length > 0 && netCtrl) {
+              netCtrl.emitBattleSyncRequest(activeTroopId);
+        }
+
+    } catch (err) {
+        console.error("[Net] Error linking existing combatants:", err);
+    }
+
+    // Defensive check to ensure troopId is valid before emitting
+    if (troopId) {
+        MATTIE.multiplayer.getCurrentNetController().emitBattleStartEvent(this.eventId(), this._mapId, troopId);
+        MATTIE.multiplayer.hasImmunityToBattles = true;
+        
+        // Safe logging
+        const eId = typeof this.eventId === 'function' ? this.eventId() : '???';
+        const mId = this._mapId !== undefined ? this._mapId : '???';
+        // enemyLog(`Battle Processing for event #${eId} on map #${mId}\n with troopID: ${troopId}`);
+    } else {
+        console.warn("[Net] Skipping Battle Start limit: Invalid TroopID");
+    }
 	return true;
 };
 
@@ -80,7 +126,18 @@ Game_Map.prototype.unlockEvent = function (eventId) {
 MATTIE.multiplayer.gameTroopSetup = Game_Troop.prototype.setup;
 Game_Troop.prototype.setup = function (troopId) {
 	MATTIE.multiplayer.gameTroopSetup.call(this, troopId);
-	this._combatants = this.troop()._combatants || {};
+    
+    // Fix: Prefer existing combatants (possibly set by TroopAPI fix for multiplayer sync) 
+    // or fetch from live dataTroops to ensure network updates persist.
+    // Avoid using this.troop()._combatants as it may be a disconnected clone.
+	if (!this._combatants) {
+        if ($dataTroops[troopId] && $dataTroops[troopId]._combatants) {
+            this._combatants = $dataTroops[troopId]._combatants;
+        } else {
+             this._combatants = this.troop()._combatants || {};
+        }
+    }
+    
 	this.name = this.troop().name;
 };
 Game_Troop.prototype.getIdsInCombatWithExSelf = function () {
@@ -237,6 +294,33 @@ Game_CharacterBase.prototype.inCombat = function () {
 	if (!this._combatants) this._combatants = {};
 	if (MATTIE.multiplayer.devTools.battleLogger) console.info(`incombat. The following players are in combat with this event: ${this.totalCombatants()}`);
 	return this.totalCombatants() > 0;
+};
+
+// Global helper to find an event involved in a specific troop battle
+// Used by SimpleBattleAPI to auto-resolve "Assist" targets
+MATTIE.multiplayer.inBattleRefScan = function(troopId) {
+    if (!$gameMap || !$gameMap.events) return null;
+    const events = $gameMap.events();
+    for (let i = 0; i < events.length; i++) {
+        const e = events[i];
+        if (e && e.inCombat && e.inCombat() && e.getIdsInCombatWith && e.getIdsInCombatWith().length > 0) {
+            // How do we match TroopID? We can't easily on the event itself unless checking NetPlayers.
+            // But if ANY event is in combat, it's a strong candidate.
+            // Let's refine: Check if the troop members match? No.
+            // Let's assume on a map, players are fighting only one active thing usually.
+            // Or check NetController to see if any player involved in this event is fighting that Troop.
+            const ids = e.getIdsInCombatWith();
+            const netCtrl = MATTIE.multiplayer.getCurrentNetController();
+            for (let j = 0; j < ids.length; j++) {
+                const pid = ids[j];
+                const player = netCtrl.netPlayers[pid];
+                if (player && player.troopInCombatWith === troopId) {
+                    return e;
+                }
+            }
+        }
+    }
+    return null;
 };
 
 // loggers

@@ -36,13 +36,18 @@ class NodeTcpTransport extends EventEmitter {
 
 	generateId() {
 		try {
+            // Append random suffix to Ensure uniqueness even on same machine
+            // This fixes "Same IP" loopback issues where PeerIDs collided
+            const randomSuffix = Math.floor(Math.random() * 10000).toString(16);
+
 			if (os) {
 				const nets = os.networkInterfaces();
 				for (const name of Object.keys(nets)) {
 					for (const netObj of nets[name]) {
 						if (netObj.family === 'IPv4' && !netObj.internal) {
-							console.log('NodeTcpTransport: Found IP ID: ', netObj.address);
-							return `${netObj.address}:${this.port}`;
+							const id = `${netObj.address}:${this.port}_${randomSuffix}`;
+                            console.log('NodeTcpTransport: Generated Unique IP ID: ', id);
+							return id;
 						}
 					}
 				}
@@ -101,17 +106,27 @@ class NodeTcpTransport extends EventEmitter {
 		if (this.isHost) return null;
 
 		// Handle address format if needed (e.g. "127.0.0.1:6878" or just "127.0.0.1")
+        // If connecting to a PeerID with suffix (e.g. 192.168.1.5:6878_a1b2), strip the suffix for the actual TCP connection
 		let host = hostAddress;
 		let port = this.port;
-		if (host.includes(':')) {
-			const parts = host.split(':');
+        
+        let targetPeerId = hostAddress; // The ID we expect to talk to (or just the IP if user typed short)
+
+        // Remove suffix for connection parsing
+        let connectString = hostAddress;
+        if (hostAddress.includes('_')) {
+             connectString = hostAddress.split('_')[0];
+        }
+
+		if (connectString.includes(':')) {
+			const parts = connectString.split(':');
 			host = parts[0];
 			port = parseInt(parts[1], 10);
 		}
 
 		const socket = new net.Socket();
 		this.clientSocket = socket;
-		socket.id = hostAddress; // Set the peer ID to the address we are connecting to
+		socket.id = targetPeerId; // Set the peer ID (initially just the target address)
 
 		socket._buffer = '';
 		socket._handshakeDone = true; // Client assumes host is ready

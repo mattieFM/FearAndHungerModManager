@@ -82,8 +82,8 @@ MATTIE.scenes.multiplayer.join.prototype.addOptionsBtns = function () {
 
 		// Auto-detect IP format if no user override is set
 		if (MATTIE.multiplayer.userOverrideFallback === null) {
-			// Basic IP regex or check for colon port
-			const isIpLike = /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}(:\d+)?$/.test(inputVal);
+			// Basic IP regex: standard IP, or IP:Port, or IP:Port_Suffix
+			const isIpLike = /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}(:\d+)?(_[\w]+)?$/.test(inputVal);
 			if (isIpLike) {
 				console.log('Detected IP address input, auto-switching to Fallback TCP.');
 				MATTIE.multiplayer.forceFallback = true;
@@ -115,4 +115,12 @@ MATTIE.scenes.multiplayer.join.prototype.addOptionsBtns = function () {
 	this.addWindow(this._optionsWindow);
 	this._optionsWindow.updateWidth(600);
 	this._optionsWindow.updatePlacement(175 + 300 + 10);
+};
+
+// Ensure event listeners are cleaned up when leaving the scene
+MATTIE.scenes.multiplayer.join.prototype.terminate = function() {
+    if (this._inputWin) {
+        this._inputWin.close();
+    }
+    MATTIE.scenes.multiplayer.base.prototype.terminate.call(this);
 };

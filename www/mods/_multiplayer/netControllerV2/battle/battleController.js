@@ -45,10 +45,11 @@ class BattleController extends EventEmitter {
      */
 	emitTurnEndEvent() {
 		this.emit('turnEnd');
-		if ($gameParty.leader().isDead()) {
+		if ($gameParty.leader().isDead() || ($gameTroop.isAllDead() && !$dataTroops[$gameTroop._troopId].isBoss) ) {
 			MATTIE.multiplayer.getCurrentNetController().emitBattleEndEvent($gameTroop._troopId, MATTIE.multiplayer.currentBattleEnemy);
 		}
 		const enemyHps = $gameTroop.members().map((enemy) => enemy._hp);
+        const enemyMhps = $gameTroop.members().map((enemy) => enemy.mhp); // Send MHP for scaling verification
 		// console.log($gameTroop.members());
 		const enemyStates = $gameTroop.members().map((enemy) => enemy.states().map((state) => state.id));
 		const actorData = $gameParty.battleMembers().map((actor) => {
@@ -57,7 +58,7 @@ class BattleController extends EventEmitter {
 			obj.mp = actor.mp;
 			return obj;
 		});
-		MATTIE.multiplayer.getCurrentNetController().emitTurnEndEvent(enemyHps, enemyStates, actorData);
+		MATTIE.multiplayer.getCurrentNetController().emitTurnEndEvent(enemyHps, enemyStates, actorData, enemyMhps);
 	}
 
 	/**
