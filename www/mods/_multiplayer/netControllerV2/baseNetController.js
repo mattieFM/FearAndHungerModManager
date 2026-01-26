@@ -643,23 +643,29 @@ class BaseNetController extends EventEmitter {
 	}
 
 	syncEnemyStates(enemyStatesArr) {
-		for (let index = 0; index < $gameTroop.members().length; index++) {
-			const enemy = $gameTroop.members()[index];
-			const netStates = enemyStatesArr[index];
-			if (netStates && Array.isArray(netStates)) {
-				for (let j = 0; j < netStates.length; j++) {
-					const state = netStates[j];
+		// Match enemies by their index and enemyId to prevent wrong targets from getting states
+		enemyStatesArr.forEach((remoteData) => {
+			if (!remoteData || typeof remoteData !== 'object') return;
+			
+			// Find matching enemy by index and enemyId
+			const enemy = $gameTroop.members().find(e => 
+				e.index() === remoteData.index && e.enemyId() === remoteData.enemyId
+			);
+			
+			if (enemy && remoteData.states && Array.isArray(remoteData.states)) {
+				for (let j = 0; j < remoteData.states.length; j++) {
+					const state = remoteData.states[j];
                     if (typeof state !== 'number') continue;
 					if (!enemy.isStateAffected(state)) {
                         // Log death syncing for diagnosis
                         if (state === enemy.deathStateId()) {
-                             console.warn(`[NetSync] Applying DEATH state to enemy ${index} (Current HP: ${enemy.hp})`);
+                             console.warn(`[NetSync] Applying DEATH state to enemy ${remoteData.index} ID:${remoteData.enemyId} (Current HP: ${enemy.hp})`);
                         }
 						enemy.addState(state);
 					}
 				}
 			}
-		}
+		});
 	}
 
 	syncEnemyHealths(enemyHealthArr, enemyStatesArr, remoteMaxHpArr) { // Added remoteMaxHpArr
@@ -668,18 +674,27 @@ class BaseNetController extends EventEmitter {
 			console.log("[NetSync] Received Enemy Healths:", JSON.stringify(enemyHealthArr), "States:", JSON.stringify(enemyStatesArr));
 		}
 
-		for (let index = 0; index < $gameTroop.members().length; index++) {
-			const enemy = $gameTroop.members()[index];
+		// Match enemies by their index and enemyId to prevent wrong targets from being synced
+		enemyHealthArr.forEach((remoteData) => {
+			if (!remoteData || typeof remoteData !== 'object') return;
+			
+			// Find matching enemy by index and enemyId
+			const enemy = $gameTroop.members().find(e => 
+				e.index() === remoteData.index && e.enemyId() === remoteData.enemyId
+			);
+			
 			if (enemy) {
-				const remoteHp = enemyHealthArr[index];
-                // Optional: Use remote Max HP to detect desync scaling events
-                const remoteMaxHp = remoteMaxHpArr ? remoteMaxHpArr[index] : null;
+				const remoteHp = remoteData.hp;
+				const remoteEntry = remoteMaxHpArr ? remoteMaxHpArr.find(m => 
+					m.index === remoteData.index && m.enemyId === remoteData.enemyId
+				) : null;
+                const remoteMaxHp = remoteEntry ? remoteEntry.mhp : null;
 
 				// Safety check: ensure remoteHp is a valid number
 				// This prevents array length mismatches (undefined) or corrupted data (null/NaN) 
 				// from effectively executing a one-hit kill logic via Math.min(x, undefined) -> NaN or Math.min(x, null) -> 0
 				if (remoteHp === undefined || remoteHp === null || typeof remoteHp !== 'number' || isNaN(remoteHp)) {
-					continue;
+					return;
 				}
 
 				const orgHp = enemy.hp;
@@ -713,24 +728,27 @@ class BaseNetController extends EventEmitter {
                     let isVerifiedKill = false;
 
 					if (enemyStatesArr && Array.isArray(enemyStatesArr)) {
-						const remoteStates = enemyStatesArr[index] || [];
+						const remoteStateEntry = enemyStatesArr.find(s => 
+							s.index === remoteData.index && s.enemyId === remoteData.enemyId
+						);
+						const remoteStates = remoteStateEntry ? remoteStateEntry.states : [];
 						if (remoteStates.includes(enemy.deathStateId())) {
                             isVerifiedKill = true;
                         } else {
                             // States exist, but no death state -> Living 0 HP glitch -> Ignore
                             if (MATTIE.multiplayer.devTools.battleLogger) {
-								console.warn(`[NetSync] Ignored suspicious 0 HP for Enemy ${index} (No Death State in sync packet). OrgHP: ${orgHp}`);
+								console.warn(`[NetSync] Ignored suspicious 0 HP for Enemy ${remoteData.index} (No Death State in sync packet). OrgHP: ${orgHp}`);
 							}
                         }
 					} else {
                          // Missing State Data -> Unverified Kill -> Ignore
                          if (MATTIE.multiplayer.devTools.battleLogger) {
-                            console.warn(`[NetSync] Ignored suspicious 0 HP for Enemy ${index} (No State Data provided). OrgHP: ${orgHp}`);
+                            console.warn(`[NetSync] Ignored suspicious 0 HP for Enemy ${remoteData.index} (No State Data provided). OrgHP: ${orgHp}`);
                         }
                     }
 
                     if (!isVerifiedKill) {
-                        continue; // SKIP THE KILL
+                        return; // SKIP THE KILL
                     }
 				}
 
@@ -759,7 +777,7 @@ class BaseNetController extends EventEmitter {
 				enemy.setHp(limitHp);
 
                 // ... (Keep logging) ...
-                if (index === 0 && orgHp > 0 && enemy.hp <= 0) {
+                if (remoteData.index === 0 && orgHp > 0 && enemy.hp <= 0) {
                      console.log(`[NetSync] Enemy 0 (Head?) died via sync. RemoteHP: ${remoteHp} (Adj: ${adjustedRemoteHp}), OrgHP: ${orgHp}`);
                 }
 
@@ -769,7 +787,7 @@ class BaseNetController extends EventEmitter {
 					enemy.hide();
 				}
 			}
-		}
+		});
 	}
 
 	//-----------------------------------------------------
