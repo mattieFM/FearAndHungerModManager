@@ -366,7 +366,7 @@ Game_Action.prototype.makeTargets = function () {
 		if (net && typeof net.battleMembers === 'function') {
 			netParty = net.battleMembers();
 			// Filter out dead/null members
-			netParty = netParty.filter(m => m && !m.isDead());
+			netParty = netParty.filter((m) => m && !m.isDead());
 			if (netParty.length > 0) {
 				return netParty;
 			}

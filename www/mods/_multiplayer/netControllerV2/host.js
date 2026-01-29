@@ -98,31 +98,31 @@ class HostController extends BaseNetController {
 	preprocessData(data, conn) {
 		if (MATTIE.multiplayer.devTools.dataLogger) console.log(data);
 		data.id = conn.peer; // set the id of the data to the id of the peer on the other side of this connection
-        
-        // Host enforces Scaling Authority
-        if (data.battleStart) {
-             if (MATTIE.multiplayer.config.scaling && MATTIE.multiplayer.config.scaling.hpScaling) {
-                 // Project the new combatant count (Current + 1 for the sender)
-                 // This ensures clients receive the "Future" scaling factor immediately, avoiding the 1.0 -> 1.5 jump
-                 const projectedCount = $gameTroop.totalCombatants() + 1;
-                 const hpPlayerDivisor = MATTIE.multiplayer.config.scaling.hpPlayerDivisor || 1.0;
-                 const hpScaler = MATTIE.multiplayer.config.scaling.hpScaler || 1.0;
-                 
-                 const playerScaler = projectedCount > 1 ? projectedCount / hpPlayerDivisor : 1;
-                 const projectedFactor = (playerScaler * hpScaler);
-                 
-                 data.battleStart.scalingFactor = projectedFactor;
-                 // Send correction back to the sender so they scale their local troop immediately
-                 // This fixes the issue where the Joiner initializes with Factor 1.0 while others get Factor X.
-                 if (conn) { 
-                     const correctionPacket = { scalingCorrection: { factor: projectedFactor } };
-                     conn.send(correctionPacket);
-                 }
 
-                 if (MATTIE.multiplayer.devTools.dataLogger) console.log(`[Host] Injected Projected Scaling Factor: ${projectedFactor} (Count: ${projectedCount})`);
-             }
-        }
-        
+		// Host enforces Scaling Authority
+		if (data.battleStart) {
+			if (MATTIE.multiplayer.config.scaling && MATTIE.multiplayer.config.scaling.hpScaling) {
+				// Project the new combatant count (Current + 1 for the sender)
+				// This ensures clients receive the "Future" scaling factor immediately, avoiding the 1.0 -> 1.5 jump
+				const projectedCount = $gameTroop.totalCombatants() + 1;
+				const hpPlayerDivisor = MATTIE.multiplayer.config.scaling.hpPlayerDivisor || 1.0;
+				const hpScaler = MATTIE.multiplayer.config.scaling.hpScaler || 1.0;
+
+				const playerScaler = projectedCount > 1 ? projectedCount / hpPlayerDivisor : 1;
+				const projectedFactor = (playerScaler * hpScaler);
+
+				data.battleStart.scalingFactor = projectedFactor;
+				// Send correction back to the sender so they scale their local troop immediately
+				// This fixes the issue where the Joiner initializes with Factor 1.0 while others get Factor X.
+				if (conn) {
+					const correctionPacket = { scalingCorrection: { factor: projectedFactor } };
+					conn.send(correctionPacket);
+				}
+
+				if (MATTIE.multiplayer.devTools.dataLogger) console.log(`[Host] Injected Projected Scaling Factor: ${projectedFactor} (Count: ${projectedCount})`);
+			}
+		}
+
 		this.distributeDataToClients(data, conn.peer);
 
 		return data;

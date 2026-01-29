@@ -107,7 +107,7 @@ MATTIE.scenes.multiplayer.host.prototype.initListController = function () {
 MATTIE.scenes.multiplayer.host.prototype.showHideCode = function (hidden) {
 	const rawPeerId = MATTIE.multiplayer.hostController.peerId;
 	const encodedPeerId = rawPeerId ? btoa(rawPeerId) : null;
-	
+
 	const text = [
 		'People can join using this number:',
 		hidden && encodedPeerId
@@ -201,8 +201,8 @@ MATTIE.scenes.multiplayer.host.prototype.addOptionsBtns = function () {
 		if (newState === true) {
 			const ignored = MATTIE.DataManager.global.get('ignoreTCPWarning');
 			if (!ignored) {
-				window.alert("TCP directly reveals your ip only send this code to trusted friends.");
-				const disableFuture = window.confirm("Would you like to stop seeing the TCP IP warning?");
+				window.alert('TCP directly reveals your ip only send this code to trusted friends.');
+				const disableFuture = window.confirm('Would you like to stop seeing the TCP IP warning?');
 				if (disableFuture) {
 					MATTIE.DataManager.global.set('ignoreTCPWarning', true);
 				}
@@ -215,14 +215,14 @@ MATTIE.scenes.multiplayer.host.prototype.addOptionsBtns = function () {
 		// Immediately update button state (also handled by animateTick if running)
 		this.updateFallbackButtonState();
 
-        // Clear the displayed code immediately
-        if (this._peerWindow) {
-            this._peerWindow.updateText([
-                'People can join using this number:',
-                'Generating ID'
-            ]);
-        }
-        MATTIE.multiplayer.hostController.peerId = null;
+		// Clear the displayed code immediately
+		if (this._peerWindow) {
+			this._peerWindow.updateText([
+				'People can join using this number:',
+				'Generating ID',
+			]);
+		}
+		MATTIE.multiplayer.hostController.peerId = null;
 
 		this._optionsWindow.activate();
 

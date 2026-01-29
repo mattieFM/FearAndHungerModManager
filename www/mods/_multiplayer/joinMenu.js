@@ -78,7 +78,7 @@ MATTIE.scenes.multiplayer.join.prototype.addOptionsBtns = function () {
 	this._optionsWindow.setHandler(MATTIE.CmdManager.joinGame, (() => {
 		this._inputWin.close();
 		const inputVal = (this._inputWin.getInput()).trim();
-		
+
 		// Regex to detect IP addresses (IP, IP:Port, IP_Suffix, IP:Port_Suffix)
 		const ipRegex = /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}(:\d+)?(_[\w]+)?$/;
 		let decodedHostId = inputVal;
@@ -98,7 +98,7 @@ MATTIE.scenes.multiplayer.join.prototype.addOptionsBtns = function () {
 				decodedHostId = inputVal;
 			}
 		}
-		
+
 		MATTIE.multiplayer.clientController.hostId = decodedHostId;
 
 		// Auto-detect IP format if no user override is set
@@ -138,9 +138,9 @@ MATTIE.scenes.multiplayer.join.prototype.addOptionsBtns = function () {
 };
 
 // Ensure event listeners are cleaned up when leaving the scene
-MATTIE.scenes.multiplayer.join.prototype.terminate = function() {
-    if (this._inputWin) {
-        this._inputWin.close();
-    }
-    MATTIE.scenes.multiplayer.base.prototype.terminate.call(this);
+MATTIE.scenes.multiplayer.join.prototype.terminate = function () {
+	if (this._inputWin) {
+		this._inputWin.close();
+	}
+	MATTIE.scenes.multiplayer.base.prototype.terminate.call(this);
 };

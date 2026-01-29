@@ -1,14 +1,16 @@
 MATTIE.devTools = MATTIE.devTools || {};
 //
 (() => {
-	if (!MATTIE.isDev)
-	Input.addKeyBind('', () => {
-		SceneManager.push(MATTIE.scenes.Scene_Dev);
-	}, 'CHEAT', 1, 'p', 'p');
-	if (MATTIE.isDev)
-	Input.addKeyBind('', () => {
-		SceneManager.push(MATTIE.scenes.Scene_Dev);
-	}, 'CHEAT', 0, 'p', 'p');
+	if (!MATTIE.isDev) {
+		Input.addKeyBind('', () => {
+			SceneManager.push(MATTIE.scenes.Scene_Dev);
+		}, 'CHEAT', 1, 'p', 'p');
+	}
+	if (MATTIE.isDev) {
+		Input.addKeyBind('', () => {
+			SceneManager.push(MATTIE.scenes.Scene_Dev);
+		}, 'CHEAT', 0, 'p', 'p');
+	}
 
 	Input.addKeyBind('', () => {
 		SceneManager.push(MATTIE.scenes.Scene_Dev);

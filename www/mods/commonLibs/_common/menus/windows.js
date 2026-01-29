@@ -186,16 +186,16 @@ MATTIE.windows.TextInput.prototype.initialize = function (x, y, width, height, h
 	MATTIE.windows.TextDisplay.prototype.initialize.call(this, x, y, width, height, '');
 	this.updatePlacement();
 	this.initEventHandler();
-	
+
 	// Track open state
 	this._isClosed = false;
 
-    // Clean up if the window is destroyed
-    var _destroy = this.destroy || function(){};
-    this.destroy = function(options) {
-        this.close();
-        if (_destroy) _destroy.call(this, options);
-    }.bind(this);
+	// Clean up if the window is destroyed
+	var _destroy = this.destroy || function () {};
+	this.destroy = function (options) {
+		this.close();
+		if (_destroy) _destroy.call(this, options);
+	}.bind(this);
 };
 MATTIE.windows.TextInput.prototype.close = function () {
 	// Safety check to prevent double-closing or errors if already closed
@@ -209,24 +209,24 @@ MATTIE.windows.TextInput.prototype.close = function () {
 	}
 };
 
-MATTIE.windows.TextInput.prototype._fallbackPaste = function() {
-    try {
-        var textarea = document.createElement('textarea');
-        textarea.style.position = 'fixed'; // prevent scrolling
-        textarea.style.left = '-9999px';
-        textarea.style.top = '0';
-        document.body.appendChild(textarea);
-        textarea.focus();
-        document.execCommand('paste');
-        var content = textarea.value;
-        document.body.removeChild(textarea);
-        if (content) {
-            this._text += content;
-            this.updateText();
-        }
-    } catch(e) {
-        console.error('Fallback paste failed', e);
-    }
+MATTIE.windows.TextInput.prototype._fallbackPaste = function () {
+	try {
+		var textarea = document.createElement('textarea');
+		textarea.style.position = 'fixed'; // prevent scrolling
+		textarea.style.left = '-9999px';
+		textarea.style.top = '0';
+		document.body.appendChild(textarea);
+		textarea.focus();
+		document.execCommand('paste');
+		var content = textarea.value;
+		document.body.removeChild(textarea);
+		if (content) {
+			this._text += content;
+			this.updateText();
+		}
+	} catch (e) {
+		console.error('Fallback paste failed', e);
+	}
 };
 
 MATTIE.windows.TextInput.prototype.initEventHandler = function () {
@@ -272,14 +272,14 @@ MATTIE.windows.TextInput.prototype.initEventHandler = function () {
 											if (isCtrl) {
 												// Use the centralized (and fixed) clipboard handler
 												var clipResult = MATTIE.clipboard.get();
-												
+
 												if (clipResult instanceof Promise) {
-													clipResult.then(text => {
+													clipResult.then((text) => {
 														if (text) {
 															this._text += text;
 															this.updateText();
 														}
-													}).catch(e => console.error(e));
+													}).catch((e) => console.error(e));
 												} else if (clipResult) {
 													// Synchronous result (NW.js)
 													this._text += clipResult;

@@ -38,9 +38,9 @@ class NodeTcpTransport extends EventEmitter {
 
 	generateId() {
 		try {
-            // Append random suffix to Ensure uniqueness even on same machine
-            // This fixes "Same IP" loopback issues where PeerIDs collided
-            const randomSuffix = Math.floor(Math.random() * 10000).toString(16);
+			// Append random suffix to Ensure uniqueness even on same machine
+			// This fixes "Same IP" loopback issues where PeerIDs collided
+			const randomSuffix = Math.floor(Math.random() * 10000).toString(16);
 
 			if (os) {
 				const nets = os.networkInterfaces();
@@ -48,7 +48,7 @@ class NodeTcpTransport extends EventEmitter {
 					for (const netObj of nets[name]) {
 						if (netObj.family === 'IPv4' && !netObj.internal) {
 							const id = `${netObj.address}:${this.port}_${randomSuffix}`;
-                            console.log('NodeTcpTransport: Generated Unique IP ID: ', id);
+							console.log('NodeTcpTransport: Generated Unique IP ID: ', id);
 							return id;
 						}
 					}
@@ -65,7 +65,7 @@ class NodeTcpTransport extends EventEmitter {
 	}
 
 	async getPublicIp() {
-        // Method 1: OpenDNS via DNS (No HTTP)
+		// Method 1: OpenDNS via DNS (No HTTP)
 		const tryDns = () => new Promise((resolve, reject) => {
 			try {
 				const resolver = new Resolver();
@@ -94,31 +94,31 @@ class NodeTcpTransport extends EventEmitter {
 			}
 		});
 
-        // Method 2: AWS CheckIP via HTTP (Fallback)
-        const tryHttp = () => new Promise((resolve, reject) => {
-            const req = http.get('http://checkip.amazonaws.com/', (res) => {
-                if (res.statusCode !== 200) {
-                    res.resume();
-                    reject(new Error(`HTTP Status: ${res.statusCode}`));
-                    return;
-                }
-                let data = '';
-                res.on('data', chunk => data += chunk);
-                res.on('end', () => resolve(data.trim()));
-            });
-            req.on('error', reject);
-            req.setTimeout(3000, () => {
-                req.destroy();
-                reject(new Error('HTTP timeout'));
-            });
-        });
+		// Method 2: AWS CheckIP via HTTP (Fallback)
+		const tryHttp = () => new Promise((resolve, reject) => {
+			const req = http.get('http://checkip.amazonaws.com/', (res) => {
+				if (res.statusCode !== 200) {
+					res.resume();
+					reject(new Error(`HTTP Status: ${res.statusCode}`));
+					return;
+				}
+				let data = '';
+				res.on('data', (chunk) => data += chunk);
+				res.on('end', () => resolve(data.trim()));
+			});
+			req.on('error', reject);
+			req.setTimeout(3000, () => {
+				req.destroy();
+				reject(new Error('HTTP timeout'));
+			});
+		});
 
-        try {
-            return await tryDns();
-        } catch (dnsError) {
-            console.warn('NodeTcpTransport: DNS lookup failed, trying HTTP fallback...', dnsError.message);
-            return await tryHttp();
-        }
+		try {
+			return await tryDns();
+		} catch (dnsError) {
+			console.warn('NodeTcpTransport: DNS lookup failed, trying HTTP fallback...', dnsError.message);
+			return await tryHttp();
+		}
 	}
 
 	open() {
@@ -154,31 +154,31 @@ class NodeTcpTransport extends EventEmitter {
 			const attemptListen = (retries = 3, delay = 1000, maxPortAttempts = 10) => {
 				this.server.listen(this.port, async () => {
 					console.log(`TCP Host listening on port ${this.port}`);
-					
-                    if (this.port !== 6878 && typeof window !== 'undefined' && window.alert) {
-                        window.alert(`port 6878 was taken, the next free avalible port was ${this.port}, if having connection issues allow this port through your network.`);
-                    }
 
-                    // Try to resolve Public IP for the Host ID
-                    try {
-                        console.log('NodeTcpTransport: Attempting to resolve Public IP...');
-                        const publicIp = await this.getPublicIp();
-                        if (publicIp) {
-                            const randomSuffix = Math.floor(Math.random() * 10000).toString(16);
-                            this.id = `${publicIp}:${this.port}_${randomSuffix}`;
-                            console.log('NodeTcpTransport: Successfully resolved Public IP ID:', this.id);
-                        } else {
-                            throw new Error("No IP returned");
-                        }
-                    } catch (e) {
-                         console.warn('NodeTcpTransport: Failed to get Public IP, falling back to Local IP.', e.message);
-                         // Regenerate ID with correct port (Local fallback)
+					if (this.port !== 6878 && typeof window !== 'undefined' && window.alert) {
+						window.alert(`port 6878 was taken, the next free avalible port was ${this.port}, if having connection issues allow this port through your network.`);
+					}
+
+					// Try to resolve Public IP for the Host ID
+					try {
+						console.log('NodeTcpTransport: Attempting to resolve Public IP...');
+						const publicIp = await this.getPublicIp();
+						if (publicIp) {
+							const randomSuffix = Math.floor(Math.random() * 10000).toString(16);
+							this.id = `${publicIp}:${this.port}_${randomSuffix}`;
+							console.log('NodeTcpTransport: Successfully resolved Public IP ID:', this.id);
+						} else {
+							throw new Error('No IP returned');
+						}
+					} catch (e) {
+						console.warn('NodeTcpTransport: Failed to get Public IP, falling back to Local IP.', e.message);
+						// Regenerate ID with correct port (Local fallback)
 					     this.id = this.generateId();
 
-                         if (typeof window !== 'undefined' && window.alert) {
-                             window.alert(`UNABLE TO DETECT PUBLIC IP.\n(DNS and HTTP checks failed)\n\nFalling back to Local Private IP: ${this.id}\n\nPlayers outside your local network may not be able to join unless you manually Port Forward and provide your Public IP.`);
-                         }
-                    }
+						if (typeof window !== 'undefined' && window.alert) {
+							window.alert(`UNABLE TO DETECT PUBLIC IP.\n(DNS and HTTP checks failed)\n\nFalling back to Local Private IP: ${this.id}\n\nPlayers outside your local network may not be able to join unless you manually Port Forward and provide your Public IP.`);
+						}
+					}
 
 					this.emit('open', this.id);
 				});
@@ -200,7 +200,7 @@ class NodeTcpTransport extends EventEmitter {
 							setTimeout(() => attemptListen(3, delay, maxPortAttempts - 1), delay);
 						});
 					} else if (err.code === 'EADDRINUSE' && maxPortAttempts === 0) {
-						console.error(`Failed to bind after trying multiple ports. All ports in range appear to be in use.`);
+						console.error('Failed to bind after trying multiple ports. All ports in range appear to be in use.');
 						this.emit('error', err);
 					} else {
 						this.emit('error', err);
@@ -219,17 +219,17 @@ class NodeTcpTransport extends EventEmitter {
 		if (this.isHost) return null;
 
 		// Handle address format if needed (e.g. "127.0.0.1:6878" or just "127.0.0.1")
-        // If connecting to a PeerID with suffix (e.g. 192.168.1.5:6878_a1b2), strip the suffix for the actual TCP connection
+		// If connecting to a PeerID with suffix (e.g. 192.168.1.5:6878_a1b2), strip the suffix for the actual TCP connection
 		let host = hostAddress;
 		let port = this.port;
-        
-        let targetPeerId = hostAddress; // The ID we expect to talk to (or just the IP if user typed short)
 
-        // Remove suffix for connection parsing
-        let connectString = hostAddress;
-        if (hostAddress.includes('_')) {
-             connectString = hostAddress.split('_')[0];
-        }
+		const targetPeerId = hostAddress; // The ID we expect to talk to (or just the IP if user typed short)
+
+		// Remove suffix for connection parsing
+		let connectString = hostAddress;
+		if (hostAddress.includes('_')) {
+			connectString = hostAddress.split('_')[0];
+		}
 
 		if (connectString.includes(':')) {
 			const parts = connectString.split(':');
