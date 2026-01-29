@@ -79,22 +79,31 @@ MATTIE.scenes.multiplayer.join.prototype.addOptionsBtns = function () {
 		this._inputWin.close();
 		const inputVal = (this._inputWin.getInput()).trim();
 		
-		// Decode base64 peer ID
+		// Regex to detect IP addresses (IP, IP:Port, IP_Suffix, IP:Port_Suffix)
+		const ipRegex = /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}(:\d+)?(_[\w]+)?$/;
 		let decodedHostId = inputVal;
-		try {
-			decodedHostId = atob(inputVal);
-			console.log('Decoded peer ID from base64');
-		} catch (e) {
-			console.warn('Input is not base64, using as-is (legacy/raw format)');
+
+		// If input matches IP pattern directly, use it as-is (Raw IP)
+		if (ipRegex.test(inputVal)) {
+			console.log('Input detected as raw IP address');
 			decodedHostId = inputVal;
+		} else {
+			// Otherwise try to decode base64
+			try {
+				const decoded = atob(inputVal);
+				decodedHostId = decoded;
+				console.log('Decoded peer ID from base64');
+			} catch (e) {
+				console.warn('Input is not base64, using as-is (legacy/raw format)');
+				decodedHostId = inputVal;
+			}
 		}
 		
 		MATTIE.multiplayer.clientController.hostId = decodedHostId;
 
 		// Auto-detect IP format if no user override is set
 		if (MATTIE.multiplayer.userOverrideFallback === null) {
-			// Basic IP regex: standard IP, or IP:Port, or IP:Port_Suffix
-			const isIpLike = /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}(:\d+)?(_[\w]+)?$/.test(decodedHostId);
+			const isIpLike = ipRegex.test(decodedHostId);
 			if (isIpLike) {
 				console.log('Detected IP address input, auto-switching to Fallback TCP.');
 				MATTIE.multiplayer.forceFallback = true;

@@ -1,4 +1,6 @@
 const net = require('net');
+const http = require('http');
+const { Resolver } = require('dns');
 
 let os;
 try {
@@ -62,6 +64,63 @@ class NodeTcpTransport extends EventEmitter {
 		return `user_${Math.floor(Math.random() * 16777215).toString(16)}:${this.port}`;
 	}
 
+	async getPublicIp() {
+        // Method 1: OpenDNS via DNS (No HTTP)
+		const tryDns = () => new Promise((resolve, reject) => {
+			try {
+				const resolver = new Resolver();
+				resolver.setServers(['208.67.222.222', '208.67.220.220']); // OpenDNS Servers
+
+				// 3s timeout
+				const timer = setTimeout(() => {
+					resolver.cancel();
+					reject(new Error('Public IP DNS lookup timeout'));
+				}, 3000);
+
+				resolver.resolve4('myip.opendns.com', (err, addresses) => {
+					clearTimeout(timer);
+					if (err) {
+						reject(err);
+						return;
+					}
+					if (addresses && addresses.length > 0) {
+						resolve(addresses[0]);
+					} else {
+						reject(new Error('No IP address found via DNS'));
+					}
+				});
+			} catch (e) {
+				reject(e);
+			}
+		});
+
+        // Method 2: AWS CheckIP via HTTP (Fallback)
+        const tryHttp = () => new Promise((resolve, reject) => {
+            const req = http.get('http://checkip.amazonaws.com/', (res) => {
+                if (res.statusCode !== 200) {
+                    res.resume();
+                    reject(new Error(`HTTP Status: ${res.statusCode}`));
+                    return;
+                }
+                let data = '';
+                res.on('data', chunk => data += chunk);
+                res.on('end', () => resolve(data.trim()));
+            });
+            req.on('error', reject);
+            req.setTimeout(3000, () => {
+                req.destroy();
+                reject(new Error('HTTP timeout'));
+            });
+        });
+
+        try {
+            return await tryDns();
+        } catch (dnsError) {
+            console.warn('NodeTcpTransport: DNS lookup failed, trying HTTP fallback...', dnsError.message);
+            return await tryHttp();
+        }
+	}
+
 	open() {
 		console.log(`NodeTcpTransport: opening... (Host: ${this.isHost})`);
 		if (this.isHost) {
@@ -93,10 +152,34 @@ class NodeTcpTransport extends EventEmitter {
 
 			// Add retry logic for EADDRINUSE errors with automatic port switching
 			const attemptListen = (retries = 3, delay = 1000, maxPortAttempts = 10) => {
-				this.server.listen(this.port, () => {
+				this.server.listen(this.port, async () => {
 					console.log(`TCP Host listening on port ${this.port}`);
-					// Regenerate ID with correct port
-					this.id = this.generateId();
+					
+                    if (this.port !== 6878 && typeof window !== 'undefined' && window.alert) {
+                        window.alert(`port 6878 was taken, the next free avalible port was ${this.port}, if having connection issues allow this port through your network.`);
+                    }
+
+                    // Try to resolve Public IP for the Host ID
+                    try {
+                        console.log('NodeTcpTransport: Attempting to resolve Public IP...');
+                        const publicIp = await this.getPublicIp();
+                        if (publicIp) {
+                            const randomSuffix = Math.floor(Math.random() * 10000).toString(16);
+                            this.id = `${publicIp}:${this.port}_${randomSuffix}`;
+                            console.log('NodeTcpTransport: Successfully resolved Public IP ID:', this.id);
+                        } else {
+                            throw new Error("No IP returned");
+                        }
+                    } catch (e) {
+                         console.warn('NodeTcpTransport: Failed to get Public IP, falling back to Local IP.', e.message);
+                         // Regenerate ID with correct port (Local fallback)
+					     this.id = this.generateId();
+
+                         if (typeof window !== 'undefined' && window.alert) {
+                             window.alert(`UNABLE TO DETECT PUBLIC IP.\n(DNS and HTTP checks failed)\n\nFalling back to Local Private IP: ${this.id}\n\nPlayers outside your local network may not be able to join unless you manually Port Forward and provide your Public IP.`);
+                         }
+                    }
+
 					this.emit('open', this.id);
 				});
 
