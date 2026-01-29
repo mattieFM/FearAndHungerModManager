@@ -84,9 +84,9 @@ Game_Troop.prototype.setup = function (troopId, xOffset = 0, yOffset = 0, cb = (
 
 	if (typeof troopId === 'number') {
 		MATTIE_RPG.TroopApi_Game_Troop_Setup.call(this, troopId);
-		
+
 		// CRITICAL MULTIPLAYER FIX: Link the active game troop's combatants to the source dataTroop's combatants.
-		// TroopAPI clones dataTroops, which breaks the reference link required for network updates to propagate 
+		// TroopAPI clones dataTroops, which breaks the reference link required for network updates to propagate
 		// to the active battle session. This restores that link so players join the same fight instance.
 		if ($dataTroops[troopId] && $dataTroops[troopId]._combatants) {
 			this._combatants = $dataTroops[troopId]._combatants;

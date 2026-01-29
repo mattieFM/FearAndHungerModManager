@@ -45,25 +45,25 @@ class BattleController extends EventEmitter {
      */
 	emitTurnEndEvent() {
 		this.emit('turnEnd');
-		if ($gameParty.leader().isDead() || ($gameTroop.isAllDead() && !$dataTroops[$gameTroop._troopId].isBoss) ) {
+		if ($gameParty.leader().isDead() || ($gameTroop.isAllDead() && !$dataTroops[$gameTroop._troopId].isBoss)) {
 			MATTIE.multiplayer.getCurrentNetController().emitBattleEndEvent($gameTroop._troopId, MATTIE.multiplayer.currentBattleEnemy);
 		}
 		// Include enemy ID and index for proper sync matching
 		const enemyHps = $gameTroop.members().map((enemy) => ({
 			hp: enemy._hp,
 			enemyId: enemy.enemyId(),
-			index: enemy.index()
+			index: enemy.index(),
 		}));
-        const enemyMhps = $gameTroop.members().map((enemy) => ({
+		const enemyMhps = $gameTroop.members().map((enemy) => ({
 			mhp: enemy.mhp,
 			enemyId: enemy.enemyId(),
-			index: enemy.index()
+			index: enemy.index(),
 		}));
 		// console.log($gameTroop.members());
 		const enemyStates = $gameTroop.members().map((enemy) => ({
 			states: enemy.states().map((state) => state.id),
 			enemyId: enemy.enemyId(),
-			index: enemy.index()
+			index: enemy.index(),
 		}));
 		const actorData = $gameParty.battleMembers().map((actor) => {
 			const obj = {};

@@ -39,20 +39,20 @@ MATTIE.preCompiler.precompilePage = function (page) {
 		case 355: // SCRIPT
 			// Look ahead for continued lines (code 655)
 			// eslint-disable-next-line no-case-declarations
-			let script = command.parameters[0] + '\n';
+			let script = `${command.parameters[0]}\n`;
 			// eslint-disable-next-line no-case-declarations
 			let j = index + 1;
 			while (j < page.list.length && page.list[j].code === 655) {
-				script += page.list[j].parameters[0] + '\n';
+				script += `${page.list[j].parameters[0]}\n`;
 				j++;
 			}
-			
+
 			// we pre compile our eval statements when loading the data map
 			try {
 				command.script = eval(`(__)=>{\n${script}\n}`);
 			} catch (e) {
-				console.error("Precompile Error (Script):", e);
-				console.error("Script Content:", script);
+				console.error('Precompile Error (Script):', e);
+				console.error('Script Content:', script);
 			}
 			break;
 

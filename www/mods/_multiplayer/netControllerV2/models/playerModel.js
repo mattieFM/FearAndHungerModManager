@@ -315,12 +315,12 @@ MATTIE.multiplayer.Secondary_Player.prototype.initialize = function (netActors) 
 	Game_Player.prototype.initialize.call(this);
 	// Explicitly bind 'this' and ensure robust active check
 	const self = this;
-	
+
 	// DEBUG: Always active for testing if torchIsLit() is flaky
 	const debugForceLight = false;
-	
+
 	MATTIE.fxAPI.addLightObject(
-		() => self, 
+		() => self,
 		() => {
 			const active = self.torchIsLit();
 			// Minimal logging to avoid spam but confirm state
@@ -329,13 +329,16 @@ MATTIE.multiplayer.Secondary_Player.prototype.initialize = function (netActors) 
 			}
 			return active || debugForceLight;
 		},
-		50, 350, '#FFFFFF', 'black' // White light to match standard torch
+		50,
+		350,
+		'#FFFFFF',
+		'black', // White light to match standard torch
 	);
 };
 
 /**
  * @description Update loop for secondary player. Includes a watchdog for torch state.
- * @param {boolean} sceneActive 
+ * @param {boolean} sceneActive
  */
 MATTIE.multiplayer.Secondary_Player.prototype.update = function (sceneActive) {
 	Game_Player.prototype.update.call(this, sceneActive);

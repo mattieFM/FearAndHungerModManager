@@ -98,9 +98,9 @@ MATTIE.multiplayer.Conversations.prototype.nameSpeak = function (name, msg) {
  * @param {*} n index that was chosen
  */
 MATTIE.multiplayer.Conversations.prototype.talkOptionsCb = function (n) {
-    if (n === undefined || n === null) {
-        return;
-    }
+	if (n === undefined || n === null) {
+		return;
+	}
 	switch (n) {
 	case 0: // Talk
 		this.greeting();
@@ -123,20 +123,20 @@ MATTIE.multiplayer.Conversations.prototype.talkOptionsCb = function (n) {
 		MATTIE.multiplayer.getCurrentNetController().emitMarriageRequest([this.target.peerId]);
 		break;
 	case 5: // assist
-		console.log(`[Conversations] Assist selected. Target:`, this.target);
+		console.log('[Conversations] Assist selected. Target:', this.target);
 		console.log(`[Conversations] Target combat troop: ${this.target ? this.target.troopInCombatWith : 'N/A'}`);
-		
+
 		if (this.target && this.target.troopInCombatWith) {
 			const eventId = this.target.eventInCombatWith || 0;
 			console.log(`[Conversations] Calling startFightWith(${this.target.troopInCombatWith}, Event: ${eventId})`);
 			if (MATTIE.simpleBattleAPI && MATTIE.simpleBattleAPI.startFightWith) {
 				MATTIE.simpleBattleAPI.startFightWith(this.target.troopInCombatWith, eventId);
 			} else {
-				console.error("[Conversations] MATTIE.simpleBattleAPI.startFightWith is missing!");
+				console.error('[Conversations] MATTIE.simpleBattleAPI.startFightWith is missing!');
 			}
 		} else {
-			MATTIE.msgAPI.displayMsg("Cannot assist: Player is not in combat.");
-			console.warn("[Assist] Target player has no troopInCombatWith set or target invalid.");
+			MATTIE.msgAPI.displayMsg('Cannot assist: Player is not in combat.');
+			console.warn('[Assist] Target player has no troopInCombatWith set or target invalid.');
 		}
 		break;
 	case 6: // cancel
@@ -149,7 +149,7 @@ MATTIE.multiplayer.Conversations.prototype.talkOptionsCb = function (n) {
  * @description display the main choices
  */
 MATTIE.multiplayer.Conversations.prototype.talkOptions = function () {
-	console.log("[Conversations] Opening talk options.");
+	console.log('[Conversations] Opening talk options.');
 	MATTIE.msgAPI.showChoices(
 		[
 			'Talk',
@@ -178,11 +178,11 @@ MATTIE.multiplayer.Conversations.prototype.greeting = function () {
 
 // Fix for ALOE_ConditionalChoices plugin compatibility with msgAPI
 if (Imported.ALOE_ConditionalChoices) {
-    Window_ChoiceList.prototype.callOkHandler = function () {
-        var index = $gameMessage._visibleChoiceIndexes[this.index()];
-        if (index === undefined) index = this.index();
-        $gameMessage.onChoice(index);
-        this._messageWindow.terminateMessage();
-        this.close();
-    };
+	Window_ChoiceList.prototype.callOkHandler = function () {
+		var index = $gameMessage._visibleChoiceIndexes[this.index()];
+		if (index === undefined) index = this.index();
+		$gameMessage.onChoice(index);
+		this._messageWindow.terminateMessage();
+		this.close();
+	};
 }
