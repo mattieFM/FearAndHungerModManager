@@ -44,7 +44,6 @@ class HostController extends BaseNetController {
 			} else {
 				console.error('FATAL: NodeTcpTransport is not defined globally.');
 			}
-			if (this.self) this.peerId = this.self.id;
 		} else {
 			this.self = new Peer();
 		}

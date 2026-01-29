@@ -190,18 +190,39 @@ MATTIE.scenes.multiplayer.host.prototype.addOptionsBtns = function () {
 
 	this._optionsWindow.setHandler(MATTIE.CmdManager.copy, (() => {
 		const rawPeerId = MATTIE.multiplayer.hostController.peerId;
-		const encodedPeerId = rawPeerId ? btoa(rawPeerId) : '';
+		const encodedPeerId = rawPeerId ? btoa(rawPeerId) : 'Generating ID';
 		MATTIE.clipboard.put(encodedPeerId);
 		this._optionsWindow.activate();
 	}));
 
 	this._optionsWindow.setHandler('TOGGLE_FALLBACK', () => {
 		const newState = !MATTIE.multiplayer.forceFallback;
+
+		if (newState === true) {
+			const ignored = MATTIE.DataManager.global.get('ignoreTCPWarning');
+			if (!ignored) {
+				window.alert("TCP directly reveals your ip only send this code to trusted friends.");
+				const disableFuture = window.confirm("Would you like to stop seeing the TCP IP warning?");
+				if (disableFuture) {
+					MATTIE.DataManager.global.set('ignoreTCPWarning', true);
+				}
+			}
+		}
+
 		MATTIE.multiplayer.forceFallback = newState;
 		MATTIE.multiplayer.userOverrideFallback = newState;
 
 		// Immediately update button state (also handled by animateTick if running)
 		this.updateFallbackButtonState();
+
+        // Clear the displayed code immediately
+        if (this._peerWindow) {
+            this._peerWindow.updateText([
+                'People can join using this number:',
+                'Generating ID'
+            ]);
+        }
+        MATTIE.multiplayer.hostController.peerId = null;
 
 		this._optionsWindow.activate();
 
