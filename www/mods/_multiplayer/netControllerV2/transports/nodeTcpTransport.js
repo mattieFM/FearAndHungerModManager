@@ -103,7 +103,7 @@ class NodeTcpTransport extends EventEmitter {
 					return;
 				}
 				let data = '';
-				res.on('data', (chunk) => data += chunk);
+				res.on('data', (chunk) => { data += chunk; });
 				res.on('end', () => resolve(data.trim()));
 			});
 			req.on('error', reject);
@@ -117,7 +117,7 @@ class NodeTcpTransport extends EventEmitter {
 			return await tryDns();
 		} catch (dnsError) {
 			console.warn('NodeTcpTransport: DNS lookup failed, trying HTTP fallback...', dnsError.message);
-			return await tryHttp();
+			return tryHttp();
 		}
 	}
 
@@ -156,7 +156,8 @@ class NodeTcpTransport extends EventEmitter {
 					console.log(`TCP Host listening on port ${this.port}`);
 
 					if (this.port !== 6878 && typeof window !== 'undefined' && window.alert) {
-						window.alert(`port 6878 was taken, the next free avalible port was ${this.port}, if having connection issues allow this port through your network.`);
+						window.alert(`port 6878 was taken, the next free avalible port was ${this.port},`
+						+ ' if having connection issues allow this port through your network.');
 					}
 
 					// Try to resolve Public IP for the Host ID
@@ -173,10 +174,11 @@ class NodeTcpTransport extends EventEmitter {
 					} catch (e) {
 						console.warn('NodeTcpTransport: Failed to get Public IP, falling back to Local IP.', e.message);
 						// Regenerate ID with correct port (Local fallback)
-					     this.id = this.generateId();
+						this.id = this.generateId();
 
 						if (typeof window !== 'undefined' && window.alert) {
-							window.alert(`UNABLE TO DETECT PUBLIC IP.\n(DNS and HTTP checks failed)\n\nFalling back to Local Private IP: ${this.id}\n\nPlayers outside your local network may not be able to join unless you manually Port Forward and provide your Public IP.`);
+							window.alert(`UNABLE TO DETECT PUBLIC IP.\n(DNS and HTTP checks failed)\n\nFalling back to Local Private IP: ${this.id}`
+							+ '\n\nPlayers outside your local network may not be able to join unless you manually Port Forward and provide your Public IP.');
 						}
 					}
 

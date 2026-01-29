@@ -13,7 +13,7 @@
 		const packageData = JSON.parse(fs.readFileSync(packagePath, 'utf8'));
 
 		// Get current version number from name
-		let currentVersion = parseInt(packageData.name) || 0;
+		let currentVersion = parseInt(packageData.name, 10) || 0;
 
 		// Increment and loop at 100
 		currentVersion = (currentVersion + 1) % 101;
