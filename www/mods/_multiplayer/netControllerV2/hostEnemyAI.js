@@ -55,7 +55,7 @@ MATTIE.multiplayer.HostEnemyAI = {
 	 * Called during turn start phase on host only
 	 */
 	makeEnemyActions() {
-		if (!MATTIE.multiplayer.getCurrentNetController().isHost) return;
+		if (!MATTIE.multiplayer.getCurrentNetController().isHost) return [];
 
 		const enemies = $gameTroop.members();
 		const enemyActions = [];

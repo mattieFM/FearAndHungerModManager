@@ -119,7 +119,9 @@ class HostController extends BaseNetController {
 					conn.send(correctionPacket);
 				}
 
-				if (MATTIE.multiplayer.devTools.dataLogger) console.log(`[Host] Injected Projected Scaling Factor: ${projectedFactor} (Count: ${projectedCount})`);
+				if (MATTIE.multiplayer.devTools.dataLogger) {
+					console.log(`[Host] Injected Projected Scaling Factor: ${projectedFactor} (Count: ${projectedCount})`);
+				}
 			}
 		}
 

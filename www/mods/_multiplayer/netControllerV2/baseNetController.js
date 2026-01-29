@@ -624,25 +624,6 @@ class BaseNetController extends EventEmitter {
 	}
 
 	/**
-	 * @description receive and process enemy actions from host
-	 * @param {Array} enemyActions array of enemy actions from host
-	 * @param {string} id sender id (should be host)
-	 */
-	onEnemyActionsData(enemyActions, id) {
-		console.log('[HostAI] Received enemy actions:', enemyActions);
-
-		if (!enemyActions || !Array.isArray(enemyActions)) {
-			console.error('[HostAI] Invalid enemy actions data');
-			return;
-		}
-
-		// Process each enemy action
-		enemyActions.forEach((actionData) => {
-			this.processHostEnemyAction(actionData, id);
-		});
-	}
-
-	/**
      *
      * @param {*} data the turnEnd obj, for now just contains an array of enemy healths
      */
@@ -684,7 +665,8 @@ class BaseNetController extends EventEmitter {
 				if (netPlayer && netPlayer.$netActors) {
 					// Check if we can find it by base ID (e.g. "Mercenary" instead of specific instance)
 					// The actorData might contain baseId if we added it to the packet, but failing that we can try matching by other means
-					console.warn(`[ActorSync] Could not find actor ${actorData.actorId} in party ${partyId}. Available: ${party.map((a) => a.actorId()).join(',')}`);
+					const avail = party.map((a) => a.actorId()).join(',');
+					console.warn(`[ActorSync] Could not find actor ${actorData.actorId} in party ${partyId}. Available: ${avail}`);
 
 					// Force refresh of that player's party composition from followers?
 					// This might be risky during battle
@@ -746,13 +728,14 @@ class BaseNetController extends EventEmitter {
 			if (enemy && remoteData.states && Array.isArray(remoteData.states)) {
 				for (let j = 0; j < remoteData.states.length; j++) {
 					const state = remoteData.states[j];
-					if (typeof state !== 'number') continue;
-					if (!enemy.isStateAffected(state)) {
-						// Log death syncing for diagnosis
-						if (state === enemy.deathStateId()) {
-							console.warn(`[NetSync] Applying DEATH state to enemy ${remoteData.index} ID:${remoteData.enemyId} (Current HP: ${enemy.hp})`);
+					if (typeof state === 'number') {
+						if (!enemy.isStateAffected(state)) {
+							// Log death syncing for diagnosis
+							if (state === enemy.deathStateId()) {
+								console.warn(`[NetSync] Applying DEATH state to enemy ${remoteData.index} ID:${remoteData.enemyId} (Current HP: ${enemy.hp})`);
+							}
+							enemy.addState(state);
 						}
-						enemy.addState(state);
 					}
 				}
 			}
@@ -800,7 +783,8 @@ class BaseNetController extends EventEmitter {
 					//  adjustedRemoteHp = Math.floor(orgMhp * remotePercent);
 
 					//  if (MATTIE.multiplayer.devTools.battleLogger) {
-					//      console.log(`[NetSync] MHP Mismatch detected for Enemy ${index}. LocalMHP: ${orgMhp}, RemoteMHP: ${remoteMaxHp}. Adjusting RemoteHP ${remoteHp} -> ${adjustedRemoteHp}`);
+					//      console.log(`[NetSync] MHP Mismatch detected for Enemy ${index}. LocalMHP:
+					// // ${orgMhp}, RemoteMHP: ${remoteMaxHp}. Adjusting RemoteHP ${remoteHp} -> ${adjustedRemoteHp}`);
 					//  }
 				} else if (!remoteMaxHp && MATTIE.multiplayer.config.scaling.scaleHp) {
 					// Fallback: If remote MHP not provided, but we are scaling, and remoteHP == unscaled MHP??
@@ -810,7 +794,7 @@ class BaseNetController extends EventEmitter {
 				// [Safety Fix] - Prevent 0 HP kills unless supported by Death State
 				if (adjustedRemoteHp <= 0 && orgHp > 0) {
 					// ... (Keep existing death checks) ...
-                	// STRICT VERIFICATION: If States are missing, we cannot trust 0 HP.
+					// STRICT VERIFICATION: If States are missing, we cannot trust 0 HP.
 					// We only proceed if we have state data AND it confirms death.
 					let isVerifiedKill = false;
 
@@ -819,17 +803,15 @@ class BaseNetController extends EventEmitter {
 						const remoteStates = remoteStateEntry ? remoteStateEntry.states : [];
 						if (remoteStates.includes(enemy.deathStateId())) {
 							isVerifiedKill = true;
-						} else {
+						} else if (MATTIE.multiplayer.devTools.battleLogger) {
 							// States exist, but no death state -> Living 0 HP glitch -> Ignore
-							if (MATTIE.multiplayer.devTools.battleLogger) {
-								console.warn(`[NetSync] Ignored suspicious 0 HP for Enemy ${remoteData.index} (No Death State in sync packet). OrgHP: ${orgHp}`);
-							}
+							const msg = `[NetSync] Ignored suspicious 0 HP for Enemy ${remoteData.index} (No Death State in sync packet). OrgHP: ${orgHp}`;
+							console.warn(msg);
 						}
-					} else {
+					} else if (MATTIE.multiplayer.devTools.battleLogger) {
 						// Missing State Data -> Unverified Kill -> Ignore
-						if (MATTIE.multiplayer.devTools.battleLogger) {
-							console.warn(`[NetSync] Ignored suspicious 0 HP for Enemy ${remoteData.index} (No State Data provided). OrgHP: ${orgHp}`);
-						}
+						const msg = `[NetSync] Ignored suspicious 0 HP for Enemy ${remoteData.index} (No State Data provided). OrgHP: ${orgHp}`;
+						console.warn(msg);
 					}
 
 					if (!isVerifiedKill) {
@@ -973,7 +955,8 @@ class BaseNetController extends EventEmitter {
 										if (aliveTarget) {
 											action.forcedTargets.push(aliveTarget);
 											if (MATTIE.multiplayer.devTools.battleLogger) {
-												console.warn(`[NetAction] Original target index ${action._targetIndex} invalid, redirecting to ${targetedNetParty.indexOf(aliveTarget)}`);
+												const newIdx = targetedNetParty.indexOf(aliveTarget);
+												console.warn(`[NetAction] Original target index ${action._targetIndex} invalid, redirecting to ${newIdx}`);
 											}
 										} else {
 											console.warn(`[NetAction] No valid targets in party ${action.netPartyId}`);
@@ -1118,11 +1101,13 @@ class BaseNetController extends EventEmitter {
 		} else {
 			// Find which netplayer has this actor in their party
 			for (const netPlayerId in this.netPlayers) {
-				const netPlayer = this.netPlayers[netPlayerId];
-				const netActorObj = netPlayer.$netActors.baseActor(baseTargetActorId);
-				if (netActorObj && netPlayer.battleMembers().includes(netActorObj)) {
-					targetActor = netActorObj;
-					break;
+				if (Object.prototype.hasOwnProperty.call(this.netPlayers, netPlayerId)) {
+					const netPlayer = this.netPlayers[netPlayerId];
+					const netActorObj = netPlayer.$netActors.baseActor(baseTargetActorId);
+					if (netActorObj && netPlayer.battleMembers().includes(netActorObj)) {
+						targetActor = netActorObj;
+						break;
+					}
 				}
 			}
 		}
@@ -1488,7 +1473,9 @@ class BaseNetController extends EventEmitter {
 				states,
 				turnCount,
 				mhps,
-				scalingFactor: (MATTIE.multiplayer.config.scaling && MATTIE.multiplayer.config.scaling.hpScaling) ? MATTIE.multiplayer.config.scaling.hpScaling() : 1.0,
+				scalingFactor: (MATTIE.multiplayer.config.scaling && MATTIE.multiplayer.config.scaling.hpScaling)
+					? MATTIE.multiplayer.config.scaling.hpScaling()
+					: 1.0,
 			},
 		};
 		this.sendViaMainRoute(obj);
@@ -1531,7 +1518,9 @@ class BaseNetController extends EventEmitter {
 					eventId,
 					mapId,
 					troopId,
-					scalingFactor: (MATTIE.multiplayer.config.scaling && MATTIE.multiplayer.config.scaling.hpScaling) ? MATTIE.multiplayer.config.scaling.hpScaling() : 1.0,
+					scalingFactor: (MATTIE.multiplayer.config.scaling && MATTIE.multiplayer.config.scaling.hpScaling)
+						? MATTIE.multiplayer.config.scaling.hpScaling()
+						: 1.0,
 				},
 			};
 
@@ -2623,7 +2612,7 @@ class BaseNetController extends EventEmitter {
 		// handle torch logic
 		// Check both the assigned actorId and the current one on the gamePlayer to be safe
 		const isMainActor = (actorId == netPlayer.actorId)
-		                    || (netPlayer.$gamePlayer && netPlayer.$gamePlayer.actor() && netPlayer.$gamePlayer.actor().actorId() == actorId);
+			|| (netPlayer.$gamePlayer && netPlayer.$gamePlayer.actor() && netPlayer.$gamePlayer.actor().actorId() == actorId);
 
 		if (isMainActor) {
 			if (charName && charName.toLowerCase().includes('torch')) {
@@ -2631,11 +2620,9 @@ class BaseNetController extends EventEmitter {
 				if (netPlayer.$gamePlayer && netPlayer.$gamePlayer.setTorch) {
 					netPlayer.$gamePlayer.setTorch(true);
 				}
-			} else {
+			} else if (netPlayer.$gamePlayer && netPlayer.$gamePlayer.setTorch) {
 				// console.log('PLAYER HAS NO TORCH');
-				if (netPlayer.$gamePlayer && netPlayer.$gamePlayer.setTorch) {
-					netPlayer.$gamePlayer.setTorch(false);
-				}
+				netPlayer.$gamePlayer.setTorch(false);
 			}
 		} else {
 			console.log(`[NetController] Ignoring torch update for non-main actor: ${actorId} (Main: ${netPlayer.actorId})`);

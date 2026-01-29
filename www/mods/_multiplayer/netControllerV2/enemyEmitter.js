@@ -64,7 +64,7 @@ Game_Action.prototype.targetsForOpponents = function () {
 
 	// Only apply for enemy actions in multiplayer
 	if (!this.subject() || !this.subject().isEnemy || !this.subject().isEnemy()
-	    || !netController || !netController.netPlayers || Object.keys(netController.netPlayers).length === 0) {
+		|| !netController || !netController.netPlayers || Object.keys(netController.netPlayers).length === 0) {
 		return MATTIE.multiplayer.Game_Action_targetsForOpponents_Original.call(this);
 	}
 
@@ -150,7 +150,7 @@ Game_Action.prototype.apply = function (target) {
 
 	// If this is an enemy action and we're in multiplayer
 	if (this.subject() && this.subject().isEnemy && this.subject().isEnemy()
-	    && netController && netController.netPlayers && Object.keys(netController.netPlayers).length > 0) {
+		&& netController && netController.netPlayers && Object.keys(netController.netPlayers).length > 0) {
 		// Check if target is in a netplayer's party (not local)
 		let isNetPlayerActor = false;
 		let matchingPeer = '';
@@ -179,7 +179,7 @@ Game_Action.prototype.apply = function (target) {
 	}
 
 	// Proceed with normal damage application
-	return MATTIE.multiplayer.Game_Action_apply_Original.call(this, target);
+	MATTIE.multiplayer.Game_Action_apply_Original.call(this, target);
 };
 
 // event battle emitters

@@ -382,7 +382,9 @@ MATTIE.multiplayer.config.scaling.applyTroopScaling = function (updateAction) {
 				const localCalc = MATTIE.multiplayer.config.scaling.hpScaling(!MATTIE.getCurrentNetController().isHost);
 				if (localCalc !== currentGlobalFactor) {
 					assumedFactor = localCalc;
-					if (MATTIE.multiplayer.devTools.battleLogger) console.log(`[Scaling] Enemy ${idx} uninitialized. Assuming transition from Local (${localCalc}) -> Host (${currentGlobalFactor})`);
+					if (MATTIE.multiplayer.devTools.battleLogger) {
+						console.log(`[Scaling] Enemy ${idx} uninitialized. Assuming transition from Local (${localCalc}) -> Host (${currentGlobalFactor})`);
+					}
 				}
 			}
 
@@ -432,7 +434,9 @@ MATTIE.multiplayer.config.scaling.applyTroopScaling = function (updateAction) {
 
 			// Log for debug before changing
 			if (MATTIE.multiplayer.devTools.battleLogger) {
-				console.log(`[Scaling] Enemy ${index} HP Scaled: ${oldMhp} -> ${newMhp} (${(hpPercent * 100).toFixed(1)}%). HP: ${enemy._hp + diff} -> ${newHp}`);
+				const percent = (hpPercent * 100).toFixed(1);
+				const oldHp = enemy._hp + diff;
+				console.log(`[Scaling] Enemy ${index} HP Scaled: ${oldMhp} -> ${newMhp} (${percent}%). HP: ${oldHp} -> ${newHp}`);
 			}
 
 			// Updates HUD if needed
