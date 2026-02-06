@@ -359,13 +359,20 @@ Game_Action.prototype.makeTargets = function () {
 		return this.forcedTargets;
 	}
 
-	if (this.netPartyId !== MATTIE.multiplayer.getCurrentNetController().peerId) { // host targeting net player
+	// Only process netPartyId if it's defined and different from current peer
+	if (this.netPartyId && this.netPartyId !== MATTIE.multiplayer.getCurrentNetController().peerId) { // host targeting net player
 		const net = MATTIE.multiplayer.getCurrentNetController().netPlayers[this.netPartyId];
 		let netParty = [];
-		if (net) {
+		if (net && typeof net.battleMembers === 'function') {
 			netParty = net.battleMembers();
-			return netParty;
+			// Filter out dead/null members
+			netParty = netParty.filter((m) => m && !m.isDead());
+			if (netParty.length > 0) {
+				return netParty;
+			}
 		}
+		// Fallback to default if net party not found or empty
+		console.warn(`[NetAction] Could not find valid targets for netPartyId ${this.netPartyId}`);
 	}
 
 	return MATTIE.maketargets.call(this);
@@ -404,6 +411,10 @@ BattleManager.update = function () {
 			break;
 
 		case 'input':
+			if (this.checkSomeExtraTurn() && !Galv.EXTURN.active) {
+				this.ready();
+				break;
+			}
 			if (!$gameParty.canInput()) { // if the game party cannot input then they are ready
 				this.ready();
 			}
@@ -458,7 +469,7 @@ BattleManager.update = function () {
 		case 'doneSyncing':
 			if (MATTIE.multiplayer.combatEmitter.netExTurn) {
 				MATTIE.multiplayer.combatEmitter.netExTurn = false; // turn of net extra turn
-				this.ready(); // re enter the ready state
+				this.updateTurnEnd();
 			} else {
 				this.updateTurnEnd();
 			}

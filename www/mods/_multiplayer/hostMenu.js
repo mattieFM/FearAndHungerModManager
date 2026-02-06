@@ -27,19 +27,58 @@ MATTIE.scenes.multiplayer.host.prototype.constructor = MATTIE.scenes.multiplayer
 MATTIE.scenes.multiplayer.host.prototype.create = function () {
 	MATTIE.scenes.multiplayer.base.prototype.create.call(this);
 	this.createWindowLayer();
+
+	// Determine correct fallback state before opening controller
+	if (MATTIE.multiplayer.userOverrideFallback === true) {
+		MATTIE.multiplayer.forceFallback = true;
+	} else if (MATTIE.multiplayer.userOverrideFallback === false) {
+		MATTIE.multiplayer.forceFallback = false;
+	}
+	// If null (no override), allow auto-switch logic or defaults effectively.
+	// But host open() is what initiates connections.
+
 	MATTIE.multiplayer.hostController.open();
 	this.addPlayerListWindow();
 	this.addOptionsBtns();
+	// this.addFallbackToggle(); // Removed separate toggle
 	this.addPeerDisplayWindow();
-	const loadingAnimInterval = setInterval(() => {
+
+	this._loadingInterval = setInterval(() => {
 		this.animateTick();
 	}, 500);
 
-	MATTIE.multiplayer.hostController.self.on('open', () => {
-		this.initListController();
-		clearInterval(loadingAnimInterval);
-		this.showHideCode(true);
-	});
+	// Setup fallback detection if not already forced
+	if (!MATTIE.multiplayer.forceFallback && !MATTIE.multiplayer.fallbackAutoSwitched && MATTIE.multiplayer.userOverrideFallback === null) {
+		this._connectionTimeout = setTimeout(() => {
+			if (!MATTIE.multiplayer.hostController.peerId) {
+				console.log('Connection timed out. Auto-switching to Fallback TCP.');
+				MATTIE.multiplayer.fallbackAutoSwitched = true;
+				MATTIE.multiplayer.forceFallback = true;
+				MATTIE.multiplayer.hostController.open(); // Re-open with new settings
+
+				// Re-bind to the new self instance
+				this.bindToHostEvents();
+			}
+		}, 10000); // 10 seconds
+	}
+
+	this.bindToHostEvents();
+};
+
+MATTIE.scenes.multiplayer.host.prototype.bindToHostEvents = function () {
+	if (MATTIE.multiplayer.hostController.self) {
+		MATTIE.multiplayer.hostController.self.on('open', () => {
+			if (this._connectionTimeout) clearTimeout(this._connectionTimeout);
+			this.initListController();
+
+			if (this._loadingInterval) {
+				clearInterval(this._loadingInterval);
+				this._loadingInterval = null;
+			}
+
+			this.showHideCode(true);
+		});
+	}
 };
 
 MATTIE.scenes.multiplayer.host.prototype.addPlayerListWindow = function () {
@@ -66,9 +105,14 @@ MATTIE.scenes.multiplayer.host.prototype.initListController = function () {
 };
 
 MATTIE.scenes.multiplayer.host.prototype.showHideCode = function (hidden) {
+	const rawPeerId = MATTIE.multiplayer.hostController.peerId;
+	const encodedPeerId = rawPeerId ? btoa(rawPeerId) : null;
+
 	const text = [
 		'People can join using this number:',
-		hidden ? '*'.repeat(MATTIE.multiplayer.hostController.peerId.length) : MATTIE.multiplayer.hostController.peerId,
+		hidden && encodedPeerId
+			? '*'.repeat(encodedPeerId.length)
+			: (encodedPeerId || 'Error getting ID'),
 	];
 
 	if (this._peerWindow) this._peerWindow.updateText(text);
@@ -79,6 +123,32 @@ MATTIE.scenes.multiplayer.host.prototype.animateTick = function () {
 	text[1] = text[1].endsWith('...') ? text[1].replace('...', '') : `${text[1]}.`;
 
 	if (this._peerWindow) this._peerWindow.updateText(text);
+
+	// Ensure fallback button text matches the variable state
+	this.updateFallbackButtonState();
+};
+
+MATTIE.scenes.multiplayer.host.prototype.updateFallbackButtonState = function () {
+	if (!this._optionsWindow || !this._optionsWindow._mattieBtns) return;
+
+	// Determine target state string
+	const targetText = `TCP: ${MATTIE.multiplayer.forceFallback ? 'ON' : 'OFF'}`;
+
+	// Check if backing data needs update
+	let currentKey = null;
+	for (const key in this._optionsWindow._mattieBtns) {
+		if (this._optionsWindow._mattieBtns[key] === 'TOGGLE_FALLBACK') {
+			currentKey = key;
+			break;
+		}
+	}
+
+	// If key is missing or different, update and refresh
+	if (currentKey && currentKey !== targetText) {
+		delete this._optionsWindow._mattieBtns[currentKey];
+		this._optionsWindow._mattieBtns[targetText] = 'TOGGLE_FALLBACK';
+		this._optionsWindow.refresh();
+	}
 };
 
 MATTIE.scenes.multiplayer.host.prototype.addPeerDisplayWindow = function () {
@@ -97,7 +167,10 @@ MATTIE.scenes.multiplayer.host.prototype.addOptionsBtns = function () {
 	btns[MATTIE.TextManager.show] = MATTIE.CmdManager.show;
 	btns['Close Server'] = MATTIE.CmdManager.returnToMultiplayer;
 
-	this._optionsWindow = new MATTIE.windows.HorizontalBtns(175 + 300 + 10, btns, 4);
+	const fallbackText = `TCP: ${MATTIE.multiplayer.forceFallback ? 'ON' : 'OFF'}`;
+	btns[fallbackText] = 'TOGGLE_FALLBACK';
+
+	this._optionsWindow = new MATTIE.windows.HorizontalBtns(175 + 300 + 10, btns, 5);
 	this._optionsWindow.setHandler(MATTIE.CmdManager.startGame, (() => {
 		MATTIE.multiplayer.hostController.startGame();
 		MATTIE.menus.multiplayer.openGame();
@@ -116,9 +189,54 @@ MATTIE.scenes.multiplayer.host.prototype.addOptionsBtns = function () {
 	}));
 
 	this._optionsWindow.setHandler(MATTIE.CmdManager.copy, (() => {
-		MATTIE.clipboard.put(MATTIE.multiplayer.hostController.peerId || '');
+		const rawPeerId = MATTIE.multiplayer.hostController.peerId;
+		const encodedPeerId = rawPeerId ? btoa(rawPeerId) : 'Generating ID';
+		MATTIE.clipboard.put(encodedPeerId);
 		this._optionsWindow.activate();
 	}));
+
+	this._optionsWindow.setHandler('TOGGLE_FALLBACK', () => {
+		const newState = !MATTIE.multiplayer.forceFallback;
+
+		if (newState === true) {
+			const ignored = MATTIE.DataManager.global.get('ignoreTCPWarning');
+			if (!ignored) {
+				window.alert('TCP directly reveals your ip only send this code to trusted friends.');
+				const disableFuture = window.confirm('Would you like to stop seeing the TCP IP warning?');
+				if (disableFuture) {
+					MATTIE.DataManager.global.set('ignoreTCPWarning', true);
+				}
+			}
+		}
+
+		MATTIE.multiplayer.forceFallback = newState;
+		MATTIE.multiplayer.userOverrideFallback = newState;
+
+		// Immediately update button state (also handled by animateTick if running)
+		this.updateFallbackButtonState();
+
+		// Clear the displayed code immediately
+		if (this._peerWindow) {
+			this._peerWindow.updateText([
+				'People can join using this number:',
+				'Generating ID',
+			]);
+		}
+		MATTIE.multiplayer.hostController.peerId = null;
+
+		this._optionsWindow.activate();
+
+		MATTIE.multiplayer.hostController.open();
+
+		// Restart loading animation while we wait for new connection
+		if (!this._loadingInterval) {
+			this._loadingInterval = setInterval(() => {
+				this.animateTick();
+			}, 500);
+		}
+
+		this.bindToHostEvents();
+	});
 
 	this.addWindow(this._optionsWindow);
 	this._optionsWindow.updateWidth(600);

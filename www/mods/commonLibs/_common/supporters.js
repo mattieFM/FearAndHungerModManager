@@ -8,8 +8,8 @@ MATTIE.supporters.list = [
 	'Zank',
 	'Payton',
 	'Reaper130',
-	"Liz",
-	"Liz",
+	'Liz',
+	'Liz',
 
 ];
 
@@ -21,13 +21,14 @@ MATTIE.supporters.alphaTestersList = [
 	'Chuckle',
 	'Ruuppa',
 	'Wayne',
-	'Mattie',
+	'Maddie',
 	'David',
 	'Casca :3',
 	'Guts ;/',
 	'Skwelletwn Knwight UwU',
 	'Grwiffith ;3',
 	'Moonless <3',
+	'Liz',
 ];
 
 /**

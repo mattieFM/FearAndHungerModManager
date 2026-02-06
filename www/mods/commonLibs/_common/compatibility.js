@@ -26,15 +26,15 @@ MATTIE.compat.setEncryptedImagesInSystemJson = function (bool) {
 	const fs = require('fs');
 	sysJsonPath = `${MATTIE.DataManager.localGamePath()}/data/System.json`;
 	Decrypter.hasEncryptedImages = bool;
-	console.log('system.json loading');
+	// console.log('system.json loading');
 	if (fs.existsSync(sysJsonPath)) {
-		console.log('system.json found');
+		// console.log('system.json found');
 		contents = JSON.parse(fs.readFileSync(sysJsonPath));
 		contents.hasEncryptedImages = bool;
 		contents = JSON.stringify(contents);
 		fs.writeFileSync(sysJsonPath, contents);
 	}
-	console.log('system.json updated');
+	// console.log('system.json updated');
 };
 
 Bitmap.prototype.decryptAndSave = function (url) {
@@ -54,7 +54,7 @@ Bitmap.prototype.decryptAndSave = function (url) {
 	this._loadingState = 'decrypting';
 	Decrypter.decryptImg(pngUrl, this);
 	// MATTIE.imageAPI.saveBitmapToFile(this,pngUrl)
-	console.log('image decrypted');
+	// console.log('image decrypted');
 };
 
 /**
@@ -79,20 +79,20 @@ Bitmap.prototype.compatabilityLoad = function (url, force = false) {
 		// pngUrl = decodeURIComponent(pngUrl);
 		// rpgMVPUrl = decodeURIComponent(rpgMVPUrl);
 
-		console.log(rpgMVPUrl);
+		// console.log(rpgMVPUrl);
 
 		rpgmakerWantsToDecrypt = !Decrypter.checkImgIgnore(url) && Decrypter.hasEncryptedImages;
 		modmanagerWantsToDecrypt = fs.existsSync(rpgMVPUrl) && !MATTIE.compat.pauseDecrypt;
 		cannotUseEncrypted = !fs.existsSync(rpgMVPUrl) && fs.existsSync(pngUrl);
 
-		console.log(`modmanger want to decrypt:${modmanagerWantsToDecrypt}\nrpgmakerwantstodecrypt${rpgmakerWantsToDecrypt}`);
+		/// /console.log(`modmanger want to decrypt:${modmanagerWantsToDecrypt}\nrpgmakerwantstodecrypt${rpgmakerWantsToDecrypt}`);
 		if (((rpgmakerWantsToDecrypt) || force || (fs.existsSync(rpgMVPUrl) && !fs.existsSync(pngUrl))) && !MATTIE.compat.pauseDecrypt && !cannotUseEncrypted) {
 			if (Utils.isNwjs()) {
 				this._loadingState = 'decrypting';
 				Decrypter.decryptImg(pngUrl, this);
-				console.log(pngUrl);
+				// console.log(pngUrl);
 				if (MATTIE.compat.runtime_decrypt) MATTIE.imageAPI.saveBitmapToFile(this, pngUrl);
-				console.log('image decrypted');
+				/// /console.log('image decrypted');
 			}
 		} else if (pngUrl) {
 		// this line will fix the issue with caching images and let us update files during runtime.
@@ -105,13 +105,13 @@ Bitmap.prototype.compatabilityLoad = function (url, force = false) {
 			this._image.addEventListener('error', this._errorListener = this._loader || Bitmap.prototype._onError.bind(this));
 		}
 	} catch (error) {
-		console.log(`caught error:${error}`);
+		// console.log(`caught error:${error}`);
 	}
 };
 
 // override this so that when we request an image it will not try to decrypt it.
 Bitmap.prototype._requestImage = function (url) {
-	console.log(url);
+	// console.log(url);
 	if (Bitmap._reuseImages.length !== 0) {
 		this._image = Bitmap._reuseImages.pop();
 	} else {
@@ -272,10 +272,11 @@ Game_Party.prototype.armors = function () {
 // fixes the gitpixel not defined bug
 //-----------------------------------------
 Window_Base.prototype.textColor = function (n) {
+	if (!this.windowskin) return '#ffffff'; // Fallback if windowskin is missing
 	var px = 96 + (n % 8) * 12 + 6;
 	var py = 144 + Math.floor(n / 8) * 12 + 6;
-	const bitMap = this.windowskin || new Bitmap(px + 2, py + 2);
-	return bitMap.getPixel(px, py);
+	if (this.windowskin.width < px || this.windowskin.height < py) return '#ffffff'; // Fallback if skin too small
+	return this.windowskin.getPixel(px, py);
 };
 
 Window_Base.prototype.pendingColor = function () {

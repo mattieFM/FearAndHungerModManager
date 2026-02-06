@@ -4,6 +4,7 @@
     "parameters": {},
     "dependencies": [
         "_common/lodash",
+        "_common/versionIncrementer",
         "_common/yanflyChecker",
         "_common/betterPhysAtkAnim",
         "_common/systemEvents",

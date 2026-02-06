@@ -281,6 +281,7 @@ class PlayerModel {
 		obj.marriageHost = this.marriageHost;
 		obj.isMarried = this.isMarried;
 		obj.marriedTo = this.marriedTo;
+		obj.troopInCombatWith = this.troopInCombatWith;
 		return obj;
 	}
 
@@ -312,7 +313,54 @@ MATTIE.multiplayer.Secondary_Player.prototype.initialize = function (netActors) 
 	this.ctrlDir4 = 0; // start standing still
 	this.$netActors = netActors;
 	Game_Player.prototype.initialize.call(this);
-	MATTIE.fxAPI.addLightObject(() => this, () => this.torchIsLit());
+	// Explicitly bind 'this' and ensure robust active check
+	const self = this;
+
+	// DEBUG: Always active for testing if torchIsLit() is flaky
+	const debugForceLight = false;
+
+	MATTIE.fxAPI.addLightObject(
+		() => self,
+		() => {
+			const active = self.torchIsLit();
+			// Minimal logging to avoid spam but confirm state
+			if (Math.random() < 0.005) {
+				// console.log(`[PlayerModel] Actor ${self.actorId} Light Check: ${active}`);
+			}
+			return active || debugForceLight;
+		},
+		50,
+		350,
+		'#FFFFFF',
+		'black', // White light to match standard torch
+	);
+};
+
+/**
+ * @description Update loop for secondary player. Includes a watchdog for torch state.
+ * @param {boolean} sceneActive
+ */
+MATTIE.multiplayer.Secondary_Player.prototype.update = function (sceneActive) {
+	Game_Player.prototype.update.call(this, sceneActive);
+
+	// Auto-refresh torch state every ~5 seconds (300 frames) to catch state desyncs or load events
+	if (!this._torchUpdateTimer) this._torchUpdateTimer = 0;
+	this._torchUpdateTimer++;
+
+	if (this._torchUpdateTimer >= 300) {
+		this._torchUpdateTimer = 0;
+		if (this.actorId && this.$netActors) {
+			const actor = this.$netActors.baseActor(this.actorId);
+			if (actor) {
+				const charName = actor.characterName();
+				const hasTorch = charName && charName.toLowerCase().includes('torch');
+				if (hasTorch !== this.torchIsLit()) {
+					// console.log(`[PlayerModel] Watchdog: Correcting torch state to ${hasTorch} for actor ${this.actorId}`);
+					this.setTorch(hasTorch);
+				}
+			}
+		}
+	}
 };
 
 /**
@@ -403,6 +451,17 @@ MATTIE.multiplayer.Secondary_Player.prototype.refresh = function () {
 	var characterName = actor ? actor.characterName() : '';
 	var characterIndex = actor ? actor.characterIndex() : 0;
 	this.setImage(characterName, characterIndex);
+
+	// Log torch change for debugging
+	const shouldHaveTorch = characterName && characterName.toLowerCase().includes('torch');
+	if (shouldHaveTorch) {
+		if (!this.torchIsLit()) console.log(`[PlayerModel] Refresh: Setting torch ON for actor ${this.actorId}`);
+		this.setTorch(true);
+	} else {
+		if (this.torchIsLit()) console.log(`[PlayerModel] Refresh: Setting torch OFF for actor ${this.actorId}`);
+		this.setTorch(false);
+	}
+
 	this._followers.refresh();
 };
 
