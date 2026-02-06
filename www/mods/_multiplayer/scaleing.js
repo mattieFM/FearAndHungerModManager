@@ -11,7 +11,7 @@ MATTIE.multiplayer.config = MATTIE.multiplayer.config || {};
  * @description the number of net packets the client is allowed to send per second,
  * turn this up if you are having a lot of lag (to like 50 don't go above 200),
  * turn this down if you are getting packet drops. NOTE: if you change this value and hit 'enter'
- * and it seems to have little effect, try restarting your game once, then ensure this value remained 
+ * and it seems to have little effect, try restarting your game once, then ensure this value remained
  * what you set it to. and try to play again, some changes from this require a restart. (f5 is fine)
  * @default 50
  */
@@ -208,12 +208,12 @@ Object.defineProperties(MATTIE.multiplayer.config.scaling, {
 	},
 
 	hpScaler: {
-		get: () => MATTIE.configGet('hpScaler', 1.3),
+		get: () => MATTIE.configGet('hpScaler', 1.0),
 		set: (value) => { MATTIE.configSet('hpScaler', value); },
 	},
 
 	hpPlayerDivisor: {
-		get: () => MATTIE.configGet('hpPlayerDivisor', 1.2),
+		get: () => MATTIE.configGet('hpPlayerDivisor', 1.0),
 		set: (value) => { MATTIE.configSet('hpPlayerDivisor', value); },
 	},
 });
@@ -258,7 +258,13 @@ MATTIE.multiplayer.config.scaling.resurrectionCost = () => {
  * @returns {number} the scaler for the enemies' hp
  * !!DANGER!! only edit this if you know what you are doing
  */
-MATTIE.multiplayer.config.scaling.hpScaling = () => {
+MATTIE.multiplayer.config.scaling.hpScaling = (forceLocal = false) => {
+	// If we are a client and have received a strict scaling factor from the Host, use it ALWAYS.
+	// unless forceLocal is true (used for calculating the "Before" state during transitions)
+	if (!forceLocal && !MATTIE.multiplayer.isHost && MATTIE.multiplayer.hostScalingFactor) {
+		return MATTIE.multiplayer.hostScalingFactor;
+	}
+
 	if (!MATTIE.multiplayer.config.scaling.scaleHp) return MATTIE.multiplayer.config.scaling.hpScaler;
 	const totalCombatants = $gameTroop.totalCombatants();
 	const playerScaler = totalCombatants > 1 ? totalCombatants / MATTIE.multiplayer.config.scaling.hpPlayerDivisor : 1;
@@ -321,16 +327,124 @@ Game_Map.prototype.checkPassage = function (x, y, bit) {
 };
 
 // all of this is deprecated as it doesnt work properly for hpscaling
-// // MATTIE_RPG.Game_Enemy_Param = Game_Enemy.prototype.param;
-// // Game_Enemy.prototype.param = function (paramId) {
-// // 	let val = MATTIE_RPG.Game_Enemy_Param.call(this, paramId);
-// // 	if (paramId === 0) {
-// // 		// max HP
-// // 		val *= MATTIE.multiplayer.config.scaling.hpScaling();
-// // 	}
+var _Game_Enemy_param = Game_Enemy.prototype.param;
+Game_Enemy.prototype.param = function (paramId) {
+	let val = _Game_Enemy_param.call(this, paramId);
+	if (paramId === 0) {
+		// max HP
+		// Use cached scaling factor if available (Stable), otherwise dynamic (Volatile)
+		const scaler = (this._scalingFactor !== undefined) ? this._scalingFactor : MATTIE.multiplayer.config.scaling.hpScaling();
 
-// // 	return val;
-// // };
+		// Initialize _scalingFactor if undefined (first call)
+		if (this._scalingFactor === undefined) {
+			this._scalingFactor = scaler;
+			if (MATTIE.multiplayer.devTools.battleLogger && MATTIE.multiplayer.hostScalingFactor) {
+				console.log(`[Scaling] Enemy ${this.index()} initialized with factor: ${scaler}`);
+			}
+		}
+
+		val *= scaler;
+	}
+
+	return val;
+};
+
+/**
+ * @description Helper to update combatants while preserving enemy HP percentages/absolute values relative to scaling changes.
+ * @param {Function} updateAction The function to execute that modifies the combatant count.
+ */
+MATTIE.multiplayer.config.scaling.applyTroopScaling = function (updateAction) {
+	// If no enemies exist yet, just update and return.
+	// We check members length instead of inBattle() to catch edge cases during initialization.
+	// if ($gameTroop.members().length  0) {
+	// 	updateAction();
+	// 	return;
+	// }
+
+	var enemies = $gameTroop.members();
+
+	// 1. Lock Initial State
+	// If enemies lack a cached factor, pin them to the *current* global logic (before update changes the count)
+	// This fixes the "2000/3000" bug where initialization happens at Factor 1.0, but scaling logic sees Factor 1.5 immediately.
+	var currentGlobalFactor = MATTIE.multiplayer.config.scaling.hpScaling();
+
+	enemies.forEach((e, idx) => {
+		if (e.isEnemy() && e._scalingFactor === undefined) {
+			// If undefined, we assume it was using the Local Calculation logic
+			// But if we are a client connecting to a host, our Local Logic (1.0) is the "Old" state.
+			// If hpScaling() returns 2.0 (because we set hostScalingFactor), we should lock to 1.0 (local).
+			// BUT only if we believe we were truly local.
+
+			let assumedFactor = currentGlobalFactor;
+			if (!MATTIE.multiplayer.isHost && MATTIE.multiplayer.hostScalingFactor) {
+				// We are client, and we have a host factor.
+				// Did we just get it? Inspect `forceLocal`.
+				const localCalc = MATTIE.multiplayer.config.scaling.hpScaling(!MATTIE.getCurrentNetController().isHost);
+				if (localCalc !== currentGlobalFactor) {
+					assumedFactor = localCalc;
+					if (MATTIE.multiplayer.devTools.battleLogger) {
+						console.log(`[Scaling] Enemy ${idx} uninitialized. Assuming transition from Local (${localCalc}) -> Host (${currentGlobalFactor})`);
+					}
+				}
+			}
+
+			e._scalingFactor = assumedFactor;
+		}
+	});
+
+	// 2. Snapshot current MHPs using the locked factor
+	var oldMhps = enemies.map((e) => e.param(0));
+
+	// 3. Perform the update (add/remove combatant)
+	updateAction();
+
+	// 4. Determine NEW Scaling Factor based on new combatant count
+	var newGlobalFactor = MATTIE.multiplayer.config.scaling.hpScaling();
+
+	// 5. Apply Proportional Scaling to Current HP
+	enemies.forEach((enemy, index) => {
+		if (!enemy.isEnemy()) return; // safety
+
+		// Update the cached scaling factor for this enemy to the new stable value
+		enemy._scalingFactor = newGlobalFactor;
+
+		var oldMhp = oldMhps[index];
+		// If getting param failed or is weird, fallback to base
+		if (typeof oldMhp !== 'number' || oldMhp <= 0) oldMhp = enemy.paramBase(0);
+
+		// Get new MHP (will use the _scalingFactor we just set)
+		var newMhp = enemy.param(0);
+
+		// Safety check against zero division
+		if (oldMhp <= 0) oldMhp = 1;
+
+		// CRITICAL: optimization to avoid micro-rounding errors triggers "damage" logic
+		if (Math.abs(oldMhp - newMhp) < 1) return;
+
+		var hpPercent = enemy._hp / oldMhp;
+		var newHp = Math.floor(newMhp * hpPercent);
+
+		// Prevent accidental scaling death if HP > 0
+		if (enemy._hp > 0 && newHp <= 0) newHp = 1;
+
+		var diff = newHp - enemy._hp;
+
+		if (diff !== 0) {
+			enemy._hp = newHp;
+
+			// Log for debug before changing
+			if (MATTIE.multiplayer.devTools.battleLogger) {
+				const percent = (hpPercent * 100).toFixed(1);
+				const oldHp = enemy._hp + diff;
+				console.log(`[Scaling] Enemy ${index} HP Scaled: ${oldMhp} -> ${newMhp} (${percent}%). HP: ${oldHp} -> ${newHp}`);
+			}
+
+			// Updates HUD if needed
+			if (typeof enemy.refresh === 'function') enemy.refresh();
+		}
+	});
+};
+
 /**
  * @description edit the dataEnemies obj of a set enemy to have its scaled amount of health as determined by scaling and config above
  * @param {*} enemyId the id of the data enemy
@@ -348,13 +462,13 @@ function updateHpOfEnemy(enemyId) {
  * !!DANGER!! don't edit this unless you know what your doing.
  */
 
-setTimeout(() => {
-	$dataEnemies.forEach((enemy) => {
-		if (enemy) {
-			updateHpOfEnemy(enemy.id);
-		}
-	});
-}, 5000);
+// setTimeout(() => {
+// 	$dataEnemies.forEach((enemy) => {
+// 		if (enemy) {
+// 			updateHpOfEnemy(enemy.id);
+// 		}
+// 	});
+// }, 5000);
 // deprecated runtime solution.
 // // MATTIE_RPG.Game_Enemy_Setup = Game_Enemy.prototype.setup;
 // // Game_Enemy.prototype.setup = function (enemyId, x, y) {

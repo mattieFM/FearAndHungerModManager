@@ -31,15 +31,31 @@ DataManager.onLoad = function (object) {
 };
 
 MATTIE.preCompiler.precompilePage = function (page) {
-	index = 0;
-	page.list.forEach((command) => {
+	for (let index = 0; index < page.list.length; index++) {
+		const command = page.list[index];
 		command.script = false;
 
 		switch (command.code) {
 		case 355: // SCRIPT
+			// Look ahead for continued lines (code 655)
+			// eslint-disable-next-line no-case-declarations
+			let script = `${command.parameters[0]}\n`;
+			// eslint-disable-next-line no-case-declarations
+			let j = index + 1;
+			while (j < page.list.length && page.list[j].code === 655) {
+				script += `${page.list[j].parameters[0]}\n`;
+				j++;
+			}
+
 			// we pre compile our eval statements when loading the data map
-			command.script = eval(`(__)=>{\n${command.parameters[0]}\n}`);
+			try {
+				command.script = eval(`(__)=>{\n${script}\n}`);
+			} catch (e) {
+				console.error('Precompile Error (Script):', e);
+				console.error('Script Content:', script);
+			}
 			break;
+
 		case 411: // jump
 		case 402: // when
 		case 111: // Conditional Branch
@@ -47,15 +63,12 @@ MATTIE.preCompiler.precompilePage = function (page) {
 		case 602: // escape
 		case 603: // lose
 			MATTIE.preCompiler.findJumpIndex(page.list, index);
-
+			/* falls through */
 		case 113:
-
 		default:
 			break;
 		}
-
-		index++;
-	});
+	}
 };
 // // Break Loop
 // Game_Interpreter.prototype.command113 = function () {

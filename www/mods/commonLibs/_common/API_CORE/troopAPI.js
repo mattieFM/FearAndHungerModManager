@@ -57,6 +57,16 @@ Game_Troop.prototype.cloneData = function () {
 	};
 };
 
+/** @description the base function to clear a game troop */
+MATTIE_RPG.TroopApi_Game_Troop_Clear = Game_Troop.prototype.clear;
+/**
+ * @description overrides the clear function to also clear additional troops
+ */
+Game_Troop.prototype.clear = function () {
+	MATTIE_RPG.TroopApi_Game_Troop_Clear.call(this);
+	this._additionalTroops = {};
+};
+
 /** @description the base function to setup a game troop */
 MATTIE_RPG.TroopApi_Game_Troop_Setup = Game_Troop.prototype.setup;
 /**
@@ -74,6 +84,18 @@ Game_Troop.prototype.setup = function (troopId, xOffset = 0, yOffset = 0, cb = (
 
 	if (typeof troopId === 'number') {
 		MATTIE_RPG.TroopApi_Game_Troop_Setup.call(this, troopId);
+
+		// CRITICAL MULTIPLAYER FIX: Link the active game troop's combatants to the source dataTroop's combatants.
+		// TroopAPI clones dataTroops, which breaks the reference link required for network updates to propagate
+		// to the active battle session. This restores that link so players join the same fight instance.
+		if ($dataTroops[troopId] && $dataTroops[troopId]._combatants) {
+			this._combatants = $dataTroops[troopId]._combatants;
+		} else if ($dataTroops[troopId]) {
+			// Ensure the container exists on the source if not yet present
+			$dataTroops[troopId]._combatants = {};
+			this._combatants = $dataTroops[troopId]._combatants;
+		}
+
 		this._interpreter.setTroop(this);
 	} else {
 		this.setupMultiCombat(troopId, cb);

@@ -38,7 +38,23 @@ class ClientController extends BaseNetController {
 		this.initEmitterOverrides(); // override stuff for interceptors
 		this.setIsClient();
 		if (!this.lastHostId.includes(this.hostId) || !this.canTryToReconnect) {
-			this.self = new Peer();
+			if (this.self && this.self.destroy) {
+				this.self.destroy();
+			}
+
+			if (MATTIE.multiplayer.forceFallback) {
+				console.log('Forcing Fallback TCP Transport (Client)');
+				if (typeof NodeTcpTransport !== 'undefined') {
+					this.self = new NodeTcpTransport(false);
+					console.log('Client Transport created via global NodeTcpTransport');
+				} else {
+					console.error('FATAL: NodeTcpTransport is not defined globally.');
+				}
+				if (this.self) this.peerId = this.self.id;
+			} else {
+				this.self = new Peer();
+			}
+
 			this.self.on('open', () => {
 				this.peerId = this.self.id;
 				this.player.setPeerId(this.peerId);
@@ -51,20 +67,58 @@ class ClientController extends BaseNetController {
 		}
 	}
 
-	connect(hostId = this.hostId, patch = true) {
+	connect(hostId = this.hostId, patch = true, retryCount = 0) {
 		if (!this.lastHostId) this.lastHostId = '';
-		if (this.lastHostId.includes(hostId) && this.canTryToReconnect) {
+		if (retryCount === 0 && this.lastHostId.includes(hostId) && this.canTryToReconnect) {
 			this.reconnectAllConns();
 			this.sendPlayerInfo();
 			this.lastHostId = hostId;
 			return;
 		}
 
+		console.info(`Attempting to connect to ${hostId} (Attempt ${retryCount + 1})`);
 		this.conn = this.self.connect(hostId);
+
+		let isConnected = false;
+		let failureHandled = false;
+
+		const handleFailure = (reason) => {
+			if (isConnected || failureHandled) return;
+			failureHandled = true;
+
+			if (retryCount < 5) { // Max 5 retries
+				console.warn(`Connection attempt ${retryCount + 1} failed: ${reason}. Retrying in 2s...`);
+				setTimeout(() => {
+					this.connect(hostId, patch, retryCount + 1);
+				}, 2000);
+			} else {
+				console.error(`Failed to connect to host ${hostId} after multiple attempts.`);
+			}
+		};
+
+		// 5 second timeout for connection
+		const timeoutId = setTimeout(() => {
+			if (!isConnected && (!this.conn || !this.conn.open)) {
+				handleFailure('Timeout');
+			}
+		}, 5000);
+
 		this.conn.on('open', () => {
+			isConnected = true;
+			clearTimeout(timeoutId);
 			console.info('Client Connected to the host');
 			this.sendPlayerInfo();
 			this.emit('clientConnectedToHost');
+		});
+
+		this.conn.on('error', (err) => {
+			clearTimeout(timeoutId);
+			handleFailure(err);
+		});
+
+		this.conn.on('close', () => {
+			clearTimeout(timeoutId);
+			if (!isConnected) handleFailure('Closed immediately');
 		});
 
 		this.conn.on('data', (data) => {
