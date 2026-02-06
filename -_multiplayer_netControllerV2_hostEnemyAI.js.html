@@ -4,7 +4,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Source: _multiplayer/netControllerV2/models/playerInteractions.js | 19</title>
+    <title>Source: _multiplayer/netControllerV2/hostEnemyAI.js | 19</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -66,191 +66,183 @@
             <pre class="prettyprint source linenums"><code>var MATTIE = MATTIE || {};
 MATTIE.multiplayer = MATTIE.multiplayer || {};
 
-MATTIE.multiplayer.Conversations = function () {
-	this.firstContact = true;
-	this.targetName = '';
-	this.targetPeerId = null;
-	/** @type {PlayerModel} */
-	this.target = null;
-};
-
-MATTIE.multiplayer.Conversations.prototype.greetings = [
-	'Hello there',
-	'The Dungeons of Fear and hunger truly are beautiful today',
-
-];
 /**
- * @description the main talk option that handles all conversation
- * @param {int} localId the id of the local player
- * @param {PlayerModel} target the target player
+ * @description Host-authoritative enemy AI system
+ * Enemies make action decisions ONLY on the host, including target selection from ALL parties
+ * Results (hit/miss/damage) are pre-calculated and broadcast to clients
  */
-MATTIE.multiplayer.Conversations.prototype.talk = function (localId, target) {
-	this.targetName = target.name;
-	this.targetPeerId = target.peerId;
-	this.target = target;
-	if (this.firstContact) {
-		this.firstContactMsg();
-	} else {
-		this.talkOptions();
-	}
-};
+MATTIE.multiplayer.HostEnemyAI = {
+	/**
+	 * Get all possible targets across all parties (local + netplayers)
+	 * @returns {Array&lt;{battler: Game_Actor, ownerId: string, index: number}>}
+	 */
+	getAllPossibleTargets() {
+		const targets = [];
+		const netController = MATTIE.multiplayer.getCurrentNetController();
 
-/**
- * @description a function to either try to resurrect the player or say they are not dead
- */
-MATTIE.multiplayer.Conversations.prototype.resurrect = function () {
-	if (this.target.canResurrect()) {
-		setTimeout(() => {
-			// eslint-disable-next-line no-nested-ternary
-			const msg = MATTIE.multiplayer.config.scaling.resurrectionActorCost
-				? 'An Unknown God demands a sacrifice and a soul.'
-				: MATTIE.multiplayer.config.scaling.resurrectionItemCost
-					? 'An Unknown God demands a soul in return'
-					: 'An Unknown God seems to offer some kindness, perhaps in another world, you showed it kindness.';
-
-			MATTIE.msgAPI.showChoices(['Continue', 'Cancel'], 1, 1, (n) => {
-				if (n == 0) {
-					if (MATTIE.multiplayer.config.scaling.resurrectionCost()) {
-						this.target.resurrect();
-						this.nameSpeak('An Unknown God', 'I bring life');
-					} else if (MATTIE.multiplayer.config.scaling.resurrectionActorCost) {
-						this.nameSpeak('An Unknown God', 'Life is not cheep, do not take it lightly');
-					} else if (MATTIE.multiplayer.config.scaling.resurrectionItemCost) {
-						this.nameSpeak('An Unknown God', 'Life is not cheep, a soul for a soul');
-					}
-				}
-			}, msg);
-		}, 100);
-	} else {
-		this.speak('I am not dead.');
-	}
-};
-/**
- * @description form a marriage with the target player or display they are not willing if they don't concent
- * @param {*} otherPlayerIsWilling whether the other player concents or not.
- * @param {boolean} isHost whether this player initiated the conversation
- * @param {boolean} spawn whether to spawn the marriage event or not
- */
-MATTIE.multiplayer.Conversations.prototype.marry = function (otherPlayerIsWilling, spawn = false) {
-	if (otherPlayerIsWilling) {
-		MATTIE.msgAPI.displayMsg('They are willing.');
-		MATTIE.fxAPI.hidePlayer(10000);
-		MATTIE.fxAPI.lockPlayer(10000);
-		if (spawn) {
-			// eslint-disable-next-line max-len
-			MATTIE.eventAPI.marriageAPI.displayMarriage($gameParty.leader().actorId(), this.target.$gamePlayer.actorId, true, $gamePlayer.x, $gamePlayer.y);
-		}
-
-		MATTIE.actorAPI.changePartyLeader(MATTIE.static.actors.marriageId);
-	} else {
-		MATTIE.msgAPI.displayMsg('They are NOT willing.');
-	}
-};
-
-MATTIE.multiplayer.Conversations.prototype.speak = function (msg) {
-	setTimeout(() => {
-		MATTIE.msgAPI.displayMsgWithTitle(this.targetName, msg);
-	}, 100);
-};
-
-MATTIE.multiplayer.Conversations.prototype.nameSpeak = function (name, msg) {
-	setTimeout(() => {
-		MATTIE.msgAPI.displayMsgWithTitle(name, msg);
-	}, 100);
-};
-/**
- * @description the cb of the main talk options
- * @param {*} n index that was chosen
- */
-MATTIE.multiplayer.Conversations.prototype.talkOptionsCb = function (n) {
-	if (n === undefined || n === null) {
-		return;
-	}
-	switch (n) {
-	case 0: // Talk
-		this.greeting();
-		break;
-	case 1: // Trade
-		SceneManager.push(Scene_Menu);
-		SceneManager.push(MATTIE.scenes.Scene_DropItem);
-		break;
-	case 2: // Resurrect
-		this.resurrect();
-		break;
-	case 3: // Attack
-		this.nameSpeak('Mattie', 'You try to attack');
-		MATTIE.multiplayer.pvp.PvpController.emitCombatStartWith(this.targetPeerId);
-		MATTIE.multiplayer.pvp.PvpController.startCombatWith(this.targetPeerId);
-		break;
-	case 4: // Show Love
-		// trigger net event for proccessing marriage concent
-		// eslint-disable-next-line no-case-declarations
-		MATTIE.multiplayer.getCurrentNetController().emitMarriageRequest([this.target.peerId]);
-		break;
-	case 5: // assist
-		console.log('[Conversations] Assist selected. Target:', this.target);
-		console.log(`[Conversations] Target combat troop: ${this.target ? this.target.troopInCombatWith : 'N/A'}`);
-
-		if (this.target &amp;&amp; this.target.troopInCombatWith) {
-			const eventId = this.target.eventInCombatWith || 0;
-			console.log(`[Conversations] Calling startFightWith(${this.target.troopInCombatWith}, Event: ${eventId})`);
-			if (MATTIE.simpleBattleAPI &amp;&amp; MATTIE.simpleBattleAPI.startFightWith) {
-				MATTIE.simpleBattleAPI.startFightWith(this.target.troopInCombatWith, eventId);
-			} else {
-				console.error('[Conversations] MATTIE.simpleBattleAPI.startFightWith is missing!');
+		// Add local party members
+		$gameParty.battleMembers().forEach((member, index) => {
+			if (member &amp;&amp; member.isAlive()) {
+				targets.push({
+					battler: member,
+					ownerId: netController.peerId,
+					index,
+					isLocal: true,
+				});
 			}
-		} else {
-			MATTIE.msgAPI.displayMsg('Cannot assist: Player is not in combat.');
-			console.warn('[Assist] Target player has no troopInCombatWith set or target invalid.');
+		});
+
+		// Add netplayer party members
+		if (netController.netPlayers) {
+			Object.keys(netController.netPlayers).forEach((playerId) => {
+				const netPlayer = netController.netPlayers[playerId];
+				if (netPlayer &amp;&amp; netPlayer.battleMembers) {
+					netPlayer.battleMembers().forEach((member, index) => {
+						if (member &amp;&amp; member.isAlive()) {
+							targets.push({
+								battler: member,
+								ownerId: playerId,
+								index,
+								isLocal: false,
+								dataActorId: member.actorId(), // Store the netactor's dataActorId
+							});
+						}
+					});
+				}
+			});
 		}
-		break;
-	case 6: // cancel
-		break;
-	default:
-		break;
-	}
-};
-/**
- * @description display the main choices
- */
-MATTIE.multiplayer.Conversations.prototype.talkOptions = function () {
-	console.log('[Conversations] Opening talk options.');
-	MATTIE.msgAPI.showChoices(
-		[
-			'Talk',
-			'Trade',
-			'Resurrect',
-			'Attack',
-			'Show Love',
-			'Assist',
-			'Cancel',
-		],
-		0,
-		6, // Changed from 5 to 6 (Cancel index)
-		(n) => this.talkOptionsCb(n),
-		`You talk to ${this.targetName}`,
-	);
-};
 
-MATTIE.multiplayer.Conversations.prototype.firstContactMsg = function () {
-	MATTIE.msgAPI.displayMsgWithTitle(this.targetName, 'Hello there');
-	this.firstContact = false;
-};
+		return targets;
+	},
 
-MATTIE.multiplayer.Conversations.prototype.greeting = function () {
-	MATTIE.msgAPI.displayMsgWithTitle(this.targetName, 'Hello there');
-};
+	/**
+	 * Host-side enemy action generation
+	 * Called during turn start phase on host only
+	 */
+	makeEnemyActions() {
+		if (!MATTIE.multiplayer.getCurrentNetController().isHost) return [];
 
-// Fix for ALOE_ConditionalChoices plugin compatibility with msgAPI
-if (Imported.ALOE_ConditionalChoices) {
-	Window_ChoiceList.prototype.callOkHandler = function () {
-		var index = $gameMessage._visibleChoiceIndexes[this.index()];
-		if (index === undefined) index = this.index();
-		$gameMessage.onChoice(index);
-		this._messageWindow.terminateMessage();
-		this.close();
-	};
-}
+		const enemies = $gameTroop.members();
+		const enemyActions = [];
+
+		enemies.forEach((enemy) => {
+			if (!enemy || !enemy.isAlive()) return;
+
+			// Let enemy make actions naturally (this sets up the action list)
+			enemy.makeActions();
+
+			// Process each action the enemy wants to take
+			enemy._actions.forEach((action) => {
+				if (!action || !action.item()) return;
+
+				// Select target from ALL available parties
+				const targetInfo = this.selectEnemyTarget(enemy, action);
+				if (!targetInfo) return;
+
+				// Pre-calculate results
+				const results = this.precalculateActionResults(enemy, action, targetInfo);
+
+				enemyActions.push({
+					enemyIndex: enemy.index(),
+					enemyId: enemy.enemyId(),
+					skillId: action.item().id,
+					itemType: action.isSkill() ? 'skill' : 'item',
+					targetOwnerId: targetInfo.ownerId,
+					targetIndex: targetInfo.index,
+					targetDataActorId: targetInfo.dataActorId,
+					results,
+				});
+			});
+		});
+
+		return enemyActions;
+	},
+
+	/**
+	 * Select target for enemy action from ALL available parties
+	 * @param {Game_Enemy} enemy
+	 * @param {Game_Action} action
+	 */
+	selectEnemyTarget(enemy, action) {
+		const allTargets = this.getAllPossibleTargets();
+		if (allTargets.length === 0) return null;
+
+		// Handle different target scopes
+		if (action.isForAll()) {
+			// For AoE, return a marker to hit all
+			return { all: true };
+		}
+
+		if (action.isForRandom()) {
+			// Random target from all available
+			const randomIndex = Math.floor(Math.random() * allTargets.length);
+			return allTargets[randomIndex];
+		}
+
+		// Default: single target selection
+		// Use enemy AI to pick target index, but apply it to our expanded target pool
+		let targetIndex = enemy.index() % allTargets.length; // Fallback
+
+		// Try to use game's target selection if available
+		if (action.decideRandomTarget) {
+			// Some enemies have custom target selection
+			targetIndex = Math.floor(Math.random() * allTargets.length);
+		} else {
+			// Standard selection: alive target
+			targetIndex = Math.floor(Math.random() * allTargets.length);
+		}
+
+		return allTargets[targetIndex];
+	},
+
+	/**
+	 * Pre-calculate hit/miss/damage for an enemy action
+	 * @param {Game_Enemy} enemy
+	 * @param {Game_Action} action
+	 * @param {Object} targetInfo
+	 */
+	precalculateActionResults(enemy, action, targetInfo) {
+		if (targetInfo.all) {
+			// Calculate for all targets
+			const allTargets = this.getAllPossibleTargets();
+			const results = {};
+			allTargets.forEach((t) => {
+				const key = `${t.ownerId}_${t.index}`;
+				results[key] = this.calculateSingleResult(action, t.battler);
+			});
+			return { all: true, results };
+		}
+		// Calculate for single target
+		return this.calculateSingleResult(action, targetInfo.battler);
+	},
+
+	/**
+	 * Calculate hit/miss/damage for a single target
+	 * @param {Game_Action} action
+	 * @param {Game_Actor} target
+	 */
+	calculateSingleResult(action, target) {
+		const hitRate = action.itemHit(target);
+		const missed = Math.random() >= hitRate;
+		const evaded = !missed &amp;&amp; Math.random() &lt; action.itemEva(target);
+		const critical = !missed &amp;&amp; !evaded &amp;&amp; Math.random() &lt; action.itemCri(target);
+
+		let damage = 0;
+		if (!missed &amp;&amp; !evaded) {
+			// Calculate damage
+			const baseDamage = action.makeDamageValue(target, critical);
+			damage = Math.floor(baseDamage);
+		}
+
+		return {
+			missed,
+			evaded,
+			critical,
+			damage,
+			hit: !missed &amp;&amp; !evaded,
+		};
+	},
+};
 </code></pre>
         </article>
     </section>
