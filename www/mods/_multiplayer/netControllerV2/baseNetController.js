@@ -74,6 +74,53 @@ class BaseNetController extends EventEmitter {
 		/** @type {Object.<string, number[]>} */
 		this.pendingMoveTimeouts = {};
 
+		// PACKET COMPRESSION MAPPING
+        this.compressMap = {
+            move: 'm',
+            updateNetPlayers: 'uNP',
+            playerInfo: 'pI',
+            startGame: 'sG',
+            syncedVars: 'sV',
+            syncedSwitches: 'sS',
+            requestedVarSync: 'rVS',
+            transfer: 't',
+            ctrlSwitch: 'cS',
+            cmd: 'c',
+            event: 'e',
+            battleStart: 'bS',
+            battleSyncReq: 'bSR',
+            battleSyncData: 'bSD',
+            battleEnd: 'bE',
+            ready: 'r',
+            enemyActions: 'eA',
+            turnEnd: 'tE',
+            equipChange: 'eC',
+            spawnEvent: 'sE',
+            transformEnemy: 'trE',
+            appearEnemy: 'aE',
+            enemyState: 'eS',
+            saveEvent: 'saE',
+            spectate: 'sp',
+            runTimeTroopSpawn: 'rTE',
+            pvpEvent: 'pvp',
+            transparentEvent: 'tpE',
+            setCharImgEvent: 'sCI',
+            dashEvent: 'dE',
+            moveSpeedEvent: 'mSE',
+            marriageReq: 'mReq',
+            marriageResponse: 'mRes',
+            saveEventLocationEvent: 'sLE',
+            id: 'id', // Keep id, or optimize it too? 'id' is short enough.
+            uid: 'u', // Reliability ID
+            excludedIds: 'ex'
+        };
+
+        // Create reverse map for expansion
+        this.expandMap = {};
+        for(let key in this.compressMap) {
+            this.expandMap[this.compressMap[key]] = key;
+        }
+
 		// Reliability: Deduplication Cache
 		/** @type {Map<string, number>} uid -> timestamp */
 		this._receivedUids = new Map();
@@ -211,10 +258,10 @@ class BaseNetController extends EventEmitter {
 			obj.priority = 1001;
 		}
 		if (data.syncedVars && MATTIE.multiplayer.isClient) { // used only by client
-			obj.priority = 1;
+			obj.priority = 1999;
 		}
 		if (data.syncedSwitches) {
-			obj.priority = 1;
+			obj.priority = 1999;
 		}
 		if (data.requestedVarSync && MATTIE.multiplayer.isHost) { // used only by host
 			obj.priority = 1000;
@@ -311,12 +358,12 @@ class BaseNetController extends EventEmitter {
 			// separate delays ensure we bridge gaps in packet loss
 			setTimeout(() => this.sendOrQueue({ ...obj }, excludedIds), 150);
 			setTimeout(() => this.sendOrQueue({ ...obj }, excludedIds), 300);
-			setTimeout(() => this.sendOrQueue({ ...obj }, excludedIds), 600);
-			setTimeout(() => this.sendOrQueue({ ...obj }, excludedIds), 1200);
-			// Verify extreme loss conditions
-			if (MATTIE.multiplayer.simulation && MATTIE.multiplayer.simulation.packetLoss > 0.2) {
-				setTimeout(() => this.sendOrQueue({ ...obj }, excludedIds), 600);
-			}
+			// setTimeout(() => this.sendOrQueue({ ...obj }, excludedIds), 600);
+			// setTimeout(() => this.sendOrQueue({ ...obj }, excludedIds), 1200);
+			// // Verify extreme loss conditions
+			// if (MATTIE.multiplayer.simulation && MATTIE.multiplayer.simulation.packetLoss > 0.2) {
+			// 	setTimeout(() => this.sendOrQueue({ ...obj }, excludedIds), 600);
+			// }
 		}
 
 		// MOVEMENT: Sequencing
@@ -389,15 +436,44 @@ class BaseNetController extends EventEmitter {
 	}
 
 	send(obj, excludedIds = []) {
+        // Compress Packet Keys before wire transmission
+        const compressedObj = this.compressPacket(obj);
+
 		if (MATTIE.multiplayer.isClient) {
-			this.sendHost(obj);
+			this.sendHost(compressedObj);
 		} else if (MATTIE.multiplayer.isHost) {
-			this.sendAll(obj, excludedIds);
+			this.sendAll(compressedObj, excludedIds);
 		}
 	}
 
+    compressPacket(obj) {
+        if (!obj || typeof obj !== 'object') return obj;
+        const newObj = {};
+        for (const key in obj) {
+            if (Object.prototype.hasOwnProperty.call(obj, key)) {
+                const newKey = this.compressMap[key] || key;
+                // Recursive compression (if needed? usually nested objects don't use these specific keys as root props, but safety check)
+                // For now, only top level compression as defined by our critical packet structure
+                newObj[newKey] = obj[key];
+            }
+        }
+        return newObj;
+    }
+
+    expandPacket(obj) {
+        if (!obj || typeof obj !== 'object') return obj;
+        const newObj = {};
+        for (const key in obj) {
+            if (Object.prototype.hasOwnProperty.call(obj, key)) {
+                const newKey = this.expandMap[key] || key;
+                newObj[newKey] = obj[key];
+            }
+        }
+        return newObj;
+    }
+
 	/**
-     * @description a function that will preprocess the data for onData, before it is read/
+     * @description a function that will preprocess the data for oneData, before it is read/
      * this is overridden by host and client
      * @param data the data that was sent
      * @param conn the connection that is sending the data
@@ -429,6 +505,9 @@ class BaseNetController extends EventEmitter {
 	}
 
 	_processData(data, conn) {
+        // Expand Packet Keys
+        data = this.expandPacket(data);
+
 		// console.log(data);
 
 		// RELIABILITY: Deduplication
@@ -1292,25 +1371,27 @@ class BaseNetController extends EventEmitter {
      * @param {*} id optional peer id to track and clear timeouts
 	 */
 	smoothMoveNetPlayer(numSteps, player, location, delayPerStep = 150, id = null) {
-		// Optimization: Clear existing timeouts for this player to prevent movement stacking during lag spikes
-		if (id && this.pendingMoveTimeouts[id]) {
-			this.pendingMoveTimeouts[id].forEach((t) => clearTimeout(t));
-			this.pendingMoveTimeouts[id] = [];
-		} else if (id) {
-			this.pendingMoveTimeouts[id] = [];
-		}
+        // [Optimization] - Use Delta Time Interpolation instead of setTimeout
+        // We set the target and the update loop in PlayerEmitter (Scene_Map) handles the rest
+        if (!player._netTargetPos) player._netTargetPos = { x: player._x, y: player._y };
+        
+        // Define target real coordinates
+        const targetX = location.x;
+        const targetY = location.y;
 
-		for (let index = 0; index < numSteps; index++) {
-			const t = setTimeout(() => {
-				try {
-					if (SceneManager._scene instanceof Scene_Map) { player.moveTowardCharacter(location); }
-				} catch (error) {
-					console.warn('player smooth move being bad');
-				}
-			}, delayPerStep * index);
+        // If distance is huge, just snap
+        if (Math.abs(targetX - player._x) > 5 || Math.abs(targetY - player._y) > 5) {
+             player._x = targetX;
+             player._y = targetY;
+             player._realX = targetX;
+             player._realY = targetY;
+             player._netMoveActive = false;
+             return;
+        }
 
-			if (id) this.pendingMoveTimeouts[id].push(t);
-		}
+        // Set movement intent
+        player._netTargetPos = { x: targetX, y: targetY };
+        player._netMoveActive = true;
 	}
 
 	/**

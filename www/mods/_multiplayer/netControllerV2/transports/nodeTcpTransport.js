@@ -131,6 +131,7 @@ class NodeTcpTransport extends EventEmitter {
 
 				// socket.id is not set yet. waiting for handshake.
 				console.log('Client connected (TCP level), waiting for handshake...');
+				socket.setNoDelay(true); // Disable Nagle's algorithm for lower latency
 				this.sockets.push(socket);
 
 				socket.on('data', (chunk) => {
@@ -243,6 +244,7 @@ class NodeTcpTransport extends EventEmitter {
 		this.clientSocket = socket;
 		socket.id = targetPeerId; // Set the peer ID (initially just the target address)
 
+		socket.setNoDelay(true); // Disable Nagle's algorithm for lower latency
 		socket._buffer = '';
 		socket._handshakeDone = true; // Client assumes host is ready
 

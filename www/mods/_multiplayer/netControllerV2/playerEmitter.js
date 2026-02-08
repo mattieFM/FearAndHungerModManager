@@ -99,6 +99,36 @@ MATTIE.multiplayer.gamePlayer.override = function () {
 				const localPlayer = netPlayer.$gamePlayer;
 				if (localPlayer) {
 					localPlayer.update(SceneManager._scene.isActive());
+
+                    // [Optimization] NetPlayer Interpolation Update
+                    if (localPlayer._netMoveActive) {
+                       const speed = 0.15; // Smooth speed
+                       const target = localPlayer._netTargetPos;
+                       if (target) {
+                           // Interpolate X
+                           if (Math.abs(localPlayer._x - target.x) > 0.05) {
+                               localPlayer._x = localPlayer._x + (target.x - localPlayer._x) * speed;
+                           } else {
+                               localPlayer._x = target.x;
+                           }
+
+                           // Interpolate Y
+                           if (Math.abs(localPlayer._y - target.y) > 0.05) {
+                               localPlayer._y = localPlayer._y + (target.y - localPlayer._y) * speed;
+                           } else {
+                               localPlayer._y = target.y;
+                           }
+                           
+                           // Update Real Coordinates for Rendering
+                           localPlayer._realX = localPlayer._x;
+                           localPlayer._realY = localPlayer._y;
+
+                           // Check if done
+                           if (localPlayer._x === target.x && localPlayer._y === target.y) {
+                               localPlayer._netMoveActive = false;
+                           }
+                       }
+                    }
 				}
 			}
 		}

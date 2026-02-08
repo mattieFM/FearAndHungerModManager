@@ -15,7 +15,7 @@ MATTIE.multiplayer.config = MATTIE.multiplayer.config || {};
  * what you set it to. and try to play again, some changes from this require a restart. (f5 is fine)
  * @default 50
  */
-MATTIE.multiplayer.config.maxPacketsPerSecond = 50;
+MATTIE.multiplayer.config.maxPacketsPerSecond = 120; // Increased to 120 for smoother TCP response
 
 /**
  * @namespace MATTIE.multiplayer.config.scaling

@@ -263,6 +263,8 @@ class PlayerModel {
 
 	updateSelfCoreData() {
 		this.setActorId($gameParty.leader().actorId());
+		// Essential: Sync Map ID so joiners know where we are immediately
+		if (typeof $gameMap !== 'undefined' && $gameMap) this.setMap($gameMap.mapId());
 		this.getFollowers();
 	}
 
@@ -274,6 +276,7 @@ class PlayerModel {
 		}
 		const obj = {};
 		obj.name = this.name;
+		obj.map = this.map;
 		obj.actorId = this.actorId;
 		obj.peerId = this.peerId;
 		obj.followerIds = this.followerIds;
