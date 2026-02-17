@@ -505,6 +505,9 @@ class BaseNetController extends EventEmitter {
 		if (data.battleEnd) {
 			this.onBattleEndData(data.battleEnd, id);
 		}
+		if (data.extraTurnBroadcast) {
+			this.onExtraTurnBroadcast();
+		}
 		if (data.ready) {
 			this.onReadyData(data.ready, id);
 		}
@@ -858,6 +861,32 @@ class BaseNetController extends EventEmitter {
 	}
 
 	//-----------------------------------------------------
+	// Extra Turn Broadcast
+	//-----------------------------------------------------
+
+	/**
+	 * @description Broadcast to all peers that a local extra turn is starting.
+	 * Recipients should also enter extra turn mode so all players participate.
+	 */
+	emitExtraTurnBroadcast() {
+		const obj = {};
+		obj.extraTurnBroadcast = true;
+		this.sendViaMainRoute(obj);
+	}
+
+	/**
+	 * @description Handle receiving an extra turn broadcast from a peer.
+	 * Sets Galv.EXTURN.active so localparty either inputs (if they have exTurn actors) or auto-readies.
+	 */
+	onExtraTurnBroadcast() {
+		if (MATTIE.multiplayer.inBattle) {
+			Galv.EXTURN.active = true;
+			MATTIE.multiplayer.combatEmitter.inExtraTurn = true;
+			console.log('[Net] Extra turn broadcast received — entering extra turn state');
+		}
+	}
+
+	//-----------------------------------------------------
 	// Ready Event
 	//-----------------------------------------------------
 
@@ -873,7 +902,7 @@ class BaseNetController extends EventEmitter {
 		obj.ready.val = true;
 		obj.ready.actions = actions;
 		obj.ready.isExtraTurn = Galv.EXTURN.active;
-		$gameTroop.setReadyIfExists(MATTIE.multiplayer.getCurrentNetController().peerId, 1); // set the player as ready in combat arr
+		$gameTroop.setReadyIfExists(MATTIE.multiplayer.getCurrentNetController().peerId, 1, Galv.EXTURN.active); // set the player as ready in combat arr
 		this.sendViaMainRoute(obj);
 	}
 
@@ -887,7 +916,7 @@ class BaseNetController extends EventEmitter {
 		obj.ready = {};
 		obj.ready.val = false;
 		obj.ready.isExtraTurn = Galv.EXTURN.active;
-		$gameTroop.setReadyIfExists(MATTIE.multiplayer.getCurrentNetController().peerId, 0); // set the player as unready in combat arr
+		$gameTroop.setReadyIfExists(MATTIE.multiplayer.getCurrentNetController().peerId, 0, Galv.EXTURN.active); // set the player as unready in combat arr
 		this.sendViaMainRoute(obj);
 	}
 
