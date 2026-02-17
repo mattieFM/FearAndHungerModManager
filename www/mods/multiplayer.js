@@ -176,11 +176,19 @@ MATTIE.multiplayer.hasController = () => MATTIE.multiplayer.isClient || MATTIE.m
 	setTimeout(async () => {
 		// create ghost char
 		MATTIE.static.actors.ghost = new MATTIE.actorAPI.Data_Actor_Wrapper();
-		MATTIE.static.actors.ghost.buildDataActorFromEventAndTroop(
-			await MATTIE.eventAPI.getEventOnMap(185, 20),
-			$dataTroops[174],
-			7,
-		); // add miner ghost as actor
+		if (MATTIE.global.isTermina()) {
+			MATTIE.static.actors.ghost.buildDataActorFromEventAndTroop(
+				await MATTIE.eventAPI.getEventOnMap(21, 93),
+				$dataTroops[195],
+				0,
+			); // add miner ghost as actor (Termina - Spirit troop)
+		} else {
+			MATTIE.static.actors.ghost.buildDataActorFromEventAndTroop(
+				await MATTIE.eventAPI.getEventOnMap(185, 20),
+				$dataTroops[174],
+				7,
+			); // add miner ghost as actor (FH1)
+		}
 		// MATTIE.static.actors.ghost._data.characterName = "$shadow_people"
 		MATTIE.static.actors.ghost.create();
 	}, 1000);

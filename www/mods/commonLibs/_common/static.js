@@ -140,7 +140,101 @@ MATTIE.static.maps.levelFiveMinesB = 39;
 MATTIE.static.maps.levelFiveMinesC = 184;
 
 MATTIE.static.maps.termina = {
-	oldHouse:11
+	oldHouse: 11,
+	start: 10,
+	charCreation: 3,
+	introTrain: 19,
+	introMoonScene: 8,
+	path1: 4,
+	outskirts1: 15,
+	outskirtPath: 114,
+	abandonedHouse: 5,
+	cottage: 13,
+	trainCabins: 14,
+	oldTown1: 16,
+	oldTown2: 9,
+	oldTown3: 41,
+	prehevil: {
+		staircase: 36,
+		east: 37,
+		central: 38,
+		west: 39,
+		west2: 156,
+		backAlleys: 55,
+		backAlleys2: 79,
+		northWest: 57,
+		shoppingStreet: 58,
+		templeSite: 59,
+		mausoleumAlley: 80,
+		eastOutskirts: 138,
+		alleyway: 177,
+	},
+	church: 44,
+	churchLevel2: 51,
+	churchPassageway: 81,
+	confessional: 109,
+	school: 77,
+	school2: 87,
+	schoolyard: 88,
+	schoolBasement: 108,
+	riverside: 40,
+	lake: 42,
+	devilsIsland: 112,
+	forest: 23,
+	deepWoods: 64,
+	deeperWoods: 65,
+	deepestWoods: 113,
+	hiddenWoods: 145,
+	cavern: 92,
+	tunnel7: 24,
+	tunnel6: 104,
+	tunnel5: 50,
+	tunnel4: 167,
+	tunnel1Entrance: 115,
+	tunnel1: 116,
+	tunnel0Entrance: 125,
+	tunnel0Level1: 127,
+	tunnel0Level2: 134,
+	tunnel0Level3: 137,
+	tunnel0Level4: 136,
+	sewers1: 78,
+	sewers2: 98,
+	sewers3: 101,
+	sewers4: 106,
+	sewersEntrance: 123,
+	sewagePlant: 96,
+	mayorsManor: 20,
+	manorBasement: 103,
+	twoStoryHouse: 21,
+	restaurant: 53,
+	bookStore: 54,
+	museum: 84,
+	museumBallroom: 117,
+	speakeasy: 105,
+	renkaCafe: 56,
+	clothingStore: 66,
+	departmentStore: 83,
+	occultStore: 89,
+	newsAgency: 131,
+	oldHotel: 94,
+	apartments1F: 69,
+	apartmentsBasement: 70,
+	apartments2F: 71,
+	apartments3F: 75,
+	apartmentsSmall: 95,
+	hexen: 31,
+	moonTower: 32,
+	hollowTower: 119,
+	hollowTower2: 120,
+	otherside: 82,
+	otherside2: 148,
+	workshop: 17,
+	crypt: 170,
+	ruinedCity: 60,
+	grandHallFinal: 139,
+	splashScreen: 72,
+	dayChange: 129,
+	endings: 151,
 }
 
 // items
@@ -1363,7 +1457,52 @@ MATTIE.static.update = function () {
 
 		MATTIE.static.teleports = [
 			{
-				id: 11, name: 'Old House', cmd: () => MATTIE.tpAPI.terminaOldHouse(), bool: () => true, btn: true,
+				id: 0, name: 'Old House', cmd: () => MATTIE.tpAPI.terminaOldHouse(), bool: () => true, btn: true,
+			},
+			{
+				id: 1, name: 'Train Cabins', cmd: () => MATTIE.tpAPI.terminaTrainCabins(), bool: () => true, btn: true,
+			},
+			{
+				id: 2, name: 'Outskirts', cmd: () => MATTIE.tpAPI.terminaOutskirts(), bool: () => true, btn: true,
+			},
+			{
+				id: 3, name: 'Old Town', cmd: () => MATTIE.tpAPI.terminaOldTown(), bool: () => true, btn: true,
+			},
+			{
+				id: 4, name: 'Central Prehevil', cmd: () => MATTIE.tpAPI.terminaPrehevil(), bool: () => true, btn: true,
+			},
+			{
+				id: 5, name: 'Prehevil East - Church', cmd: () => MATTIE.tpAPI.terminaPrehEast(), bool: () => true, btn: true,
+			},
+			{
+				id: 6, name: 'Prehevil West - School', cmd: () => MATTIE.tpAPI.terminaPrehWest(), bool: () => true, btn: true,
+			},
+			{
+				id: 7, name: 'Deep Woods', cmd: () => MATTIE.tpAPI.terminaDeepWoods(), bool: () => true, btn: true,
+			},
+			{
+				id: 8, name: 'Riverside / Lake', cmd: () => MATTIE.tpAPI.terminaRiverside(), bool: () => true, btn: true,
+			},
+			{
+				id: 9, name: 'Mayor\'s Manor', cmd: () => MATTIE.tpAPI.terminaMayorsManor(), bool: () => true, btn: true,
+			},
+			{
+				id: 10, name: 'Tunnel 7', cmd: () => MATTIE.tpAPI.terminaTunnel7(), bool: () => true, btn: true,
+			},
+			{
+				id: 11, name: 'Tunnel 0', cmd: () => MATTIE.tpAPI.terminaTunnel0(), bool: () => true, btn: true,
+			},
+			{
+				id: 12, name: 'Sewers', cmd: () => MATTIE.tpAPI.terminaSewers(), bool: () => true, btn: true,
+			},
+			{
+				id: 13, name: 'Hollow Tower', cmd: () => MATTIE.tpAPI.terminaHollowTower(), bool: () => true, btn: true,
+			},
+			{
+				id: 14, name: 'Speakeasy', cmd: () => MATTIE.tpAPI.terminaSpeakeasy(), bool: () => true, btn: true,
+			},
+			{
+				id: 15, name: 'Hexen Village', cmd: () => MATTIE.tpAPI.terminaHexen(), bool: () => true, btn: true,
 			},
 		];
 
@@ -1835,6 +1974,647 @@ MATTIE.static.update = function () {
 		];
 
 		MATTIE.static.switch.ignoredSwitches = MATTIE.static.rangeParser(MATTIE.static.switch.ignoredSwitches);
+
+		//-------------------------------------------------------
+		//          Teleports (for debug menu & multiplayer TP)
+		//-------------------------------------------------------
+		MATTIE.static.teleports = [
+			{
+				id: 0, name: 'Old House (Start)', cmd: () => MATTIE.tpAPI.terminaOldHouse(), bool: () => true, btn: true,
+			},
+			{
+				id: 1, name: 'Train Cabins', cmd: () => MATTIE.tpAPI.terminaTrainCabins(), bool: () => true, btn: true,
+			},
+			{
+				id: 2, name: 'Outskirts', cmd: () => MATTIE.tpAPI.terminaOutskirts(), bool: () => true, btn: true,
+			},
+			{
+				id: 3, name: 'Old Town', cmd: () => MATTIE.tpAPI.terminaOldTown(), bool: () => true, btn: true,
+			},
+			{
+				id: 4, name: 'Prehevil - Central', cmd: () => MATTIE.tpAPI.terminaPrehevil(), bool: () => true, btn: true,
+			},
+			{
+				id: 5, name: 'Prehevil - East (Church)', cmd: () => MATTIE.tpAPI.terminaPrehEast(), bool: () => true, btn: true,
+			},
+			{
+				id: 6, name: 'Prehevil - West (School)', cmd: () => MATTIE.tpAPI.terminaPrehWest(), bool: () => true, btn: true,
+			},
+			{
+				id: 7, name: 'Deep Woods', cmd: () => MATTIE.tpAPI.terminaDeepWoods(), bool: () => true, btn: true,
+			},
+			{
+				id: 8, name: 'Riverside / Lake', cmd: () => MATTIE.tpAPI.terminaRiverside(), bool: () => true, btn: true,
+			},
+			{
+				id: 9, name: "Mayor's Manor", cmd: () => MATTIE.tpAPI.terminaMayorsManor(), bool: () => true, btn: true,
+			},
+			{
+				id: 10, name: 'Tunnel 7', cmd: () => MATTIE.tpAPI.terminaTunnel7(), bool: () => true, btn: true,
+			},
+			{
+				id: 11, name: 'Tunnel 0 Entrance', cmd: () => MATTIE.tpAPI.terminaTunnel0(), bool: () => true, btn: true,
+			},
+			{
+				id: 12, name: 'Sewers', cmd: () => MATTIE.tpAPI.terminaSewers(), bool: () => true, btn: true,
+			},
+			{
+				id: 13, name: 'Hollow Tower', cmd: () => MATTIE.tpAPI.terminaHollowTower(), bool: () => true, btn: true,
+			},
+			{
+				id: 14, name: 'Speakeasy', cmd: () => MATTIE.tpAPI.terminaSpeakeasy(), bool: () => true, btn: true,
+			},
+			{
+				id: 15, name: 'Hexen', cmd: () => MATTIE.tpAPI.terminaHexen(), bool: () => true, btn: true,
+			},
+		];
+
+		//-------------------------------------------------------
+		//          Actor IDs
+		//-------------------------------------------------------
+		MATTIE.static.actors.emptyActorSlotId = 23; // empty "character" slot
+		MATTIE.static.actors.mercenaryId = 1; // Levi (uses %mercenary sprite)
+		MATTIE.static.actors.girlId = 3; // Marina (uses %occultist sprite)
+		MATTIE.static.actors.knightId = 4; // Daan
+		MATTIE.static.actors.darkPriestId = 6; // O'saa
+		MATTIE.static.actors.outlanderId = 5; // Abella
+		MATTIE.static.actors.leGardeId = 13; // Marcoh
+		MATTIE.static.actors.demonKidId = 8; // Kid Demon
+		MATTIE.static.actors.marriageId = 9; // Marriage
+		MATTIE.static.actors.abominableMarriage = 11; // Marriage (abominable)
+		MATTIE.static.actors.nashrahId = 14; // Karin
+
+		// Termina-specific actor IDs
+		MATTIE.static.actors.leviId = 1;
+		MATTIE.static.actors.marinaId = 3;
+		MATTIE.static.actors.daanId = 4;
+		MATTIE.static.actors.abellaId = 5;
+		MATTIE.static.actors.osaaId = 6;
+		MATTIE.static.actors.blackKalevId = 7;
+		MATTIE.static.actors.marcohId = 13;
+		MATTIE.static.actors.karinId = 14;
+		MATTIE.static.actors.oliviaId = 15;
+
+		//-------------------------------------------------------
+		//          Map IDs
+		//-------------------------------------------------------
+		MATTIE.static.maps.charCreationMap = 3; // Character_creation
+		MATTIE.static.maps.startMap = 155; // start_the_game
+
+		MATTIE.static.maps.menuMaps = [
+			10, // start
+			3, // Character_creation
+			72, // Splash_Screen
+			8, // Intro_Moon_scene
+			19, // Intro_Train_cabins
+			35, // start_screen
+			129, // day_change
+			132, // pocketcat_scene
+			133, // character_check
+			141, // transform
+			151, // endings
+			152, // fall_scene
+			154, // ending1
+			155, // start_the_game
+			161, // head_count
+			162, // final_falling
+			163, // ending1_free
+		];
+
+		MATTIE.static.blockingMaps = [
+			10, // start
+			3, // Character_creation
+			72, // Splash_Screen
+			8, // Intro_Moon_scene
+			19, // Intro_Train_cabins
+			35, // start_screen
+			6, // testmap
+			7, // MAP007
+			12, // MAP012
+			43, // test
+			61, // Lake_test
+			62, // tv_set
+			63, // club_test
+			102, // prehevil_view
+			129, // day_change
+			132, // pocketcat_scene
+			133, // character_check
+			141, // transform
+			151, // endings
+			152, // fall_scene
+			154, // ending1
+			155, // start_the_game
+			161, // head_count
+			162, // final_falling
+			163, // ending1_free
+			178, // Otherside_test
+		];
+
+		MATTIE.static.maps.menuMaps = MATTIE.static.rangeParser(MATTIE.static.maps.menuMaps);
+
+		//-------------------------------------------------------
+		//          Character Limb Switches
+		//-------------------------------------------------------
+		MATTIE.static.switch.characterLimbs = [
+			'252-255', // doctor arms/legs
+			'256-259', // mechanic arms/legs
+		];
+		MATTIE.static.switch.characterLimbs = MATTIE.static.rangeParser(MATTIE.static.switch.characterLimbs);
+
+		//-------------------------------------------------------
+		//          Logical / Cheat Switches
+		//-------------------------------------------------------
+		MATTIE.static.switch.logical = [
+			{ id: 2190, name: 'HARD MODE' },
+			{ id: 4818, name: 'EASY MODE' },
+			{ id: 4819, name: 'HARD MODE (new)' },
+			{ id: 667, name: 'NOT Hard Mode' },
+			{ id: 1900, name: 'Won The Game' },
+			{ id: 1507, name: 'TIME UP' },
+			{ id: 2751, name: 'KILLED EVERYONE' },
+			{ id: 3273, name: 'SACRIFICE ALL' },
+		];
+
+		//-------------------------------------------------------
+		//          Items
+		//-------------------------------------------------------
+		MATTIE.static.items.emptyScroll = $dataItems[88];
+		MATTIE.static.items.silverCoin = $dataItems[206]; // Silver shilling
+		MATTIE.static.items.icons.bookIcon = 261; // Book of enlightenment icon
+
+		//-------------------------------------------------------
+		//          Self Switch Sync IDs (for multiplayer)
+		//-------------------------------------------------------
+		MATTIE.static.switch.syncedSelfSwitches = [];
+		MATTIE.static.switch.syncedSelfSwitches = MATTIE.static.switch.syncedSelfSwitches.map((arr) => JSON.stringify(arr));
+
+		MATTIE.static.switch.ignoredSelfSwitches = [
+			// char creation menu switches
+			[10, 1, 'A'],
+		];
+		MATTIE.static.switch.ignoredSelfSwitches = MATTIE.static.switch.ignoredSelfSwitches.map((arr) => JSON.stringify(arr));
+
+		//-------------------------------------------------------
+		//          Synced Switches (multiplayer state propagation)
+		//-------------------------------------------------------
+		MATTIE.static.switch.syncedSwitches = [
+			//---------------------------
+			// difficulty sync
+			//---------------------------
+			2190, // !!_HARD_MODE_!!
+			4818, // EASY_MODE
+			4819, // HARD_MODE
+
+			//---------------------------
+			// day progression (must be synced)
+			//---------------------------
+			'1501-1520', // DAY times
+			3082, // day_text
+			3093, // day_change
+
+			//---------------------------
+			// blood portal vars
+			//---------------------------
+			'3141-3163', // bloodportal_open and variants
+			'3242-3246', // bloodportal_c_3
+			'4867-4871', // bloodportal_sp1
+
+			//---------------------------
+			// door switches (shared world state)
+			//---------------------------
+			58, // 2door_2
+			67, // Train_door1
+			'74-78', // door1_1-4, chains_opened
+			104, // Basement_Opened
+			'190-193', // door2_1-4
+			'221-227', // door3_1-4, Hatch_open, Elevator_door_crash
+			350, // GATE_chains1
+			'591-593', // door3_1-3
+			600, // door_upstaris_open
+			624, // doorway_door
+			1169, // door_downstairs
+			1461, // church_keys_found
+			'1635-1637', // school_door1-3
+			'1661-1673', // door_school variants
+			'1681-1687', // main_doors variants
+			'1741-1746', // gate_passage_open1-6
+			'1761-1767', // doorway1-7
+			'1791-1800', // door_school2 variants
+			'1874-1875', // main_doors_school6/7
+			'2261-2268', // door/gate apartment5-6
+			'2274-2276', // old_hotel_doors, sewer_gate
+			'2361-2396', // gate_passage2-4, gate_main
+			'2661-2669', // Wall2_1-8, short_circuit_door2
+			'2932-2967', // celldoor, gate_open, elevator_door
+			3049, // cabin_door1
+			'3132-3134', // gate1_1-3
+			'3254-3256', // restaurant_door1-3
+			3260, // short_circuit_door1
+			3263, // short_circuit_door2
+			'3311-3318', // toilet_door variants
+			'3323-3325', // gate_church1-3
+			'3334-3340', // door_apartment variants
+			'3354-3368', // door_apartment7-13
+			'3375-3378', // gate_apartment1-4
+			3393, // sewer_gate2
+			3420, // sewer_lid3
+			'3455-3456', // door1/2
+			'3454-3461', // tunnel6_gate variants
+			3475, // doors_locked
+			'3581-3593', // door_alt, school2_door
+			'3709-3714', // schooldoor_basement1-4
+			'3717-3719', // door_school1-3
+			4064, // short_circuit_door_tunnel1
+			4075, // tunnel1_door
+			4079, // Museum_maindoors
+			'4145-4146', // short_circuit/door tunnel1
+			4158, // tunnel1_door
+			4160, // apartment_door1
+			'4333-4334', // apartment_door2/3
+			4437, // sewer_entrance_door
+			'4441-4458', // vault_door1-18
+			'4737-4739', // news_agency_door1-3
+			'4745-4746', // news_agency_doors
+
+			//---------------------------
+			// lighting / candle switches (shared world)
+			//---------------------------
+			2, // Light on
+			9, // light1
+			'121-140', // Candle1-20
+			'701-720', // Candle21-41, Bonfire30, bloodportals
+			'1641-1660', // Candle42-61
+			'4101-4120', // candle62-82
+			'4774-4780', // butterfly_light, candles
+			'4849-4860', // candle83-84, light85-94
+
+			//---------------------------
+			// container / shelf switches (items already taken)
+			//---------------------------
+			31, // necronomicon_got
+			'32-35', // bookshelf4, chest1, table1, crate1
+			60, // shelf2
+			'68-70', // Luggage1-3
+			'150-153', // Crates1-4_town
+			189, // bookshelf6
+			'208-209', // books1, mockupshelf2
+			'452-460', // crate/chest variants
+			'581-582', // cupboard1/2
+			590, // bookshelf_basement
+			'616-623', // termina_bookshelf variants
+			'679-680', // crate1, barrel1
+			'866-867', // basement/fortress_crate1
+			1000, // shoe_shop_layered
+			'1689-1696', // north_west_crates, trash
+			'1798-1799', // school_shelf1/2
+			1820, // diary_pick
+			'1864-1873', // locker1-10
+			'2234-2235', // food_crates_mayor1/2
+			'2358-2359', // shelves_basement1/2
+			2398, // shelves_basement3
+			'2601-2617', // crates_sewer1-7
+			2875, // Pile_of_crates2
+			'2920-2922', // bookshelf2, abandoned_house_bookshelf, fridge3
+			'2925-2930', // crates_south/center
+			'2936-2954', // church_crates, gate variants
+			'2972-2974', // old_town3_crates
+			3005, // old_town3_crates3
+			3009, // church_crates3
+			'3010-3011', // snail1, town_crate69
+			'3106-3130', // tunnel_shelf/restaurant/wine/crates
+			'3181-3185', // bookstore_shelf1-5
+			'3257-3258', // tunnel_shelf
+			'3261-3262', // tunnel7_shelf1/2
+			'3445-3453', // tunnel6_shelf1-7
+			3462, // tunnel5_shelf
+			'3712-3722', // basement_shelf variants
+			3937, // crates_center4
+			'4065-4074', // t1_locker1-10
+			'4076-4077', // tunnel1/2_shelf
+			'4121-4122', // tunnel1_shelf2
+			'4147-4153', // tunnel1_shelf3
+			'4156-4157', // tunnel1_locker
+			4325, // small_apartment_fridge1
+			'4351-4352', // sewers4_crates
+			'4430-4436', // sewer4_crates/entrance_shelf
+			'4438-4439', // storage_crates
+			4465, // tunnel0_shelf1
+			'4493-4496', // t0_locker1-4
+			'4585-4586', // crates_tunnel0
+			'4606-4610', // tunnel0_shelf variants
+
+			//---------------------------
+			// elevator / mechanism state
+			//---------------------------
+			'195-199', // elevator1/2, elevator_active, generator_active, Gasoline1
+			'652-654', // Tunnel4_UPLINK/monitor
+			'2327-2329', // control_panel1-3
+			'2345-2351', // Mechanism_used/1-6
+			3004, // Elevator_activated
+			3101, // elevator2
+			'4123-4138', // Tunnel elevator, UPLINK, machines
+
+			//---------------------------
+			// wall / barrier switches
+			//---------------------------
+			'421-432', // Wall1-11, Wallcrash
+
+			//---------------------------
+			// character kill / body flags (world state)
+			//---------------------------
+			'230-238', // butterflykill through GERINGOBODY
+			'274-284', // MERCENARYKILLED through Yellow_MageBODY
+			395, // KIDDEMONKILLED
+			398, // KIDDEMONBODY
+			742, // MoonlessKILLED
+			'853-861', // SKELETON_KILLED/BODY
+			3096, // SALARYMAN_DEAD
+			'4466-4477', // Thug/Journalist/Botanist/Villager BODY/KILLED
+			'4527-4550', // Villager arm/leg/BODY/KILLED
+			875, // Big_boy_dead
+
+			//---------------------------
+			// NPC character events / story state (world state)
+			//---------------------------
+			// these are key NPC progression states that all players should see
+			'2906-2912', // levi1-7
+			'2913-2917', // Marina1-5
+			'2608-2609', // marina_nod
+			469, // marina_joined_manor
+			470, // marina_joined_streets
+			655, // Marina_DEAD_BOOK_STORE
+			'2672-2674', // marcoh introduced
+			'2703-2710', // tanaka scenes
+			'2724-2728', // pav scenes
+
+			//---------------------------
+			// tower location flags
+			//---------------------------
+			'561-571', // Tower locations
+
+			//---------------------------
+			// Machina puzzle state
+			//---------------------------
+			'1296-1297', // Gear1_1/2
+			'1301-1318', // Machina1/2/3_A-F
+
+			//---------------------------
+			// misc world state
+			//---------------------------
+			'3348-3352', // floor_crash1-5
+			3369, // down_in_the_well
+			3370, // master_key_got
+			2330, // box_moved
+			4350, // box_pushed
+			2255, // Shop_open
+			2606, // box_set
+			3200, // old_town2_house_locked
+			'3277-3280', // fence_Change, shopping/mannequin/statue_layered
+			3319, // box_water
+			'3321-3322', // Inquisitor bell
+			'3394-3396', // rat1/2, rats_on_the_move
+			'1768-1770', // rats_on_the_move 1-3
+			'4700-4706', // alarm_system, shutter, alarm_light, alarm_done
+			'4721-4735', // bucket/chair/doll puzzles
+			'4741-4744', // doll puzzles
+
+			//---------------------------
+			// pig / execution scenes (shared)
+			//---------------------------
+			'433-439', // BigboyON, Pig_execution
+			'641-651', // execution events
+
+			//---------------------------
+			// boat state
+			//---------------------------
+			'3281-3296', // boat1-3 variants
+
+			//---------------------------
+			// misc NPC alive / world flags
+			//---------------------------
+			120, // Mayor_dead
+			265, // cocoon1
+			'218-220', // black_kalev_recruit/gone/later
+			339, // black_kalev_join
+			868, // Skeleton1_STOLENALREADY
+		];
+		MATTIE.static.switch.syncedSwitches = MATTIE.static.rangeParser(MATTIE.static.switch.syncedSwitches);
+
+		//-------------------------------------------------------
+		//          God Affinity Switches & Vars
+		//-------------------------------------------------------
+		MATTIE.static.switch.godAffinitySwitches = [
+			'2169-2172', // gro-goroth/sylvian/alll-mer prayed
+			1397, // Sylvian_statue
+			1396, // Gro-goroth_statue
+			2043, // (affinity)
+			2042, // (affinity)
+			'406-408', // RitualCircle1 prayers
+			409, // RitualCircle1 exhausted
+			'479-481', // RitualCircle2 prayers
+			476, // RitualCircle2 exhausted
+			'488-490', // RitualCircle3 prayers
+			486, // RitualCircle3 exhausted
+			'2053-2055', // RitualCircle4 prayers
+			2046, // RitualCircle4 exhausted
+			'2452-2454', // RitualCircle5 prayers
+			2445, // RitualCircle5 exhausted
+			3509, // orgy
+			2747, // Alll-mer_affinity_gained
+		];
+		MATTIE.static.variable.godAffinityAndPrayerVars = [
+			33, // LoveCorner
+			'35-38', // GOD vars (GRO-GOROTH, SYLVIAN, Alll-MER, GOD_DEPTHS)
+			79, // GodOfTheDepths_var
+			'162-165', // Affinity_Gro-goroth/Sylvian/Alll-mer/depths
+		];
+		MATTIE.static.switch.godAffinitySwitches = MATTIE.static.rangeParser(MATTIE.static.switch.godAffinitySwitches);
+		MATTIE.static.variable.godAffinityAndPrayerVars = MATTIE.static.rangeParser(MATTIE.static.variable.godAffinityAndPrayerVars);
+
+		//-------------------------------------------------------
+		//          Ignored Variables (client-side only)
+		//-------------------------------------------------------
+		MATTIE.static.variable.ignoredVars = [
+			1, // Lightswitch
+			2, // DaynightSave
+			'5-8', // charHP, charMaxHP, char x, char y
+			9, // MENU_position
+			10, // Daynight cycle
+			11, // hours
+			12, // seconds
+			13, // class_select
+			14, // coin_flip
+			'15-16', // random_item, random_parallel
+			'17-18', // bleeding, anal_bleeding
+			19, // battleturns
+			27, // HUNGER
+			30, // PLAYER_MP
+			34, // PartySize
+			'39-40', // arrow_playerX/Y
+			'41-51', // monster pos vars
+			'52-55', // bearTrap vars
+			'56-57', // monster5X/Y
+			58, // Lurch_leap_var
+			59, // COIN_PICK
+			60, // beartrap_GOT
+			61, // FOG_ZOOM
+			62, // FOG_TRANSPARENCY
+			'63-64', // CharacterX_2, CharacterY_2
+			65, // Attack_RANDOM
+			66, // Ghoul
+			67, // CharacterNAME
+			'70-75', // AFFECTION_mercenary, fear_corner, monster pos
+			80, // coin_flip2
+			81, // Pocketcat
+
+			// map / location tracking
+			91, // MapID
+			'92-95', // MapX, MapY, monster pos
+			'102-103', // MapID, MapX
+
+			// crippled vars (per player)
+			'107-119', // MERC through GHOUL3_Crippled
+			120, // Bear_trap_random
+
+			// hunger vars (per player)
+			'137-150', // Paranoia_ran, HUNGER per character
+
+			// consciousness / HP
+			'151-153', // Primarypain, Secondarypain, Consciousness
+
+			// heroin/withdrawal (per player)
+			'158-159', // Mercenary_heroin/withdrawal
+			'170-171', // (FH1 equiv)
+
+			// map passage
+			207, // MAPID_passage
+
+			// fire traps (per player position)
+			'212-227', // fire1-8 X/Y vars
+
+			// infection vars (per player)
+			'230-250', // infection arm/leg all characters
+
+			// ammo (per player)
+			'252-254', // AMMO_VARIABLE, AMMO_ONES, AMMO_TENS
+			255, // CharacterHP_check
+
+			// monster position vars
+			'256-259', // monster11-12 X/Y
+			'321-332', // monster13-18 X/Y
+
+			// affliction (per player)
+			'261-266', // Fear/Alll-mer/Rher/sylvian/vinushka/grogoroth_affliction
+
+			// affection (per player)
+			'303-313', // char affections (Day_1 overlap, Cahara through Chambara)
+			'334-343', // Occultist/yellowmage/rifleman shot pos, Nashrah/Chambara, pocketcat
+
+			// search/loot vars
+			351, // Searching_crate
+			352, // Searching_barrel
+			354, // Searching_urn
+			356, // Searching_trash
+			'357-359', // searching/random vars
+
+			// game timer / torch (per player)
+			'155-157', // GAME_TIMER 1-3
+			158, // PlayerMP_fear
+
+			// shooting vars (per player)
+			'176-180', // PISTOL/RIFLE/SHOTGUN_SHOOTING, MP, Gun_type
+
+			// party member (client-side tracking)
+			'396-397', // HEAD_TOTAL/TEMP
+			'398-402', // Zoom, statue pos
+			'403-410', // floor pos vars, Party_Member
+
+			// coin flip (per player)
+			353, // COIN_VARIABLE
+
+			// sawing (per player)
+			204, // SAWING_OFF
+			205, // SAWING_SKELETON
+			206, // SAWING_GHOUL
+			1031, // SAWING_VILLAGER
+
+			// enemy positioning / NPC waiting (local)
+			'159-160', // Monster10X/Y
+			172, // Floor_creak_random
+			173, // Cube_stacks
+			174, // pendulum_variable
+			175, // voices_random
+
+			// present tracking
+			'586-594', // marina_got_out through levi_piano
+
+			// club bunk (per player)
+			545, // club_bunk
+
+			// grab / tied up (per player)
+			'721-740', // grabbed_by, assist, smoking, tied_up, already_came, visit, shadow
+
+			// logic (per player)
+			1016, // secondary_battleturn
+			1017, // logic_secondform
+
+			// final scenes (per player)
+			'1021-1029', // karin/abella/levi/daan/marcoh/marina/osaa/olivia/kalev_final_scene
+
+			// god affinity per character (per player)
+			'1032-1061', // ghoul/villager god affinities
+
+			// speaking/conversation state (per player)
+			'777-795', // talking, first_time, around, not_around, etc.
+
+			// misc per-player vars
+			400, // SYSTEM_MENU_BACKGROUND
+			425, // random_yell
+			426, // letterD
+			435, // left_souls
+			436, // right_souls
+			439, // sparkle_random
+			481, // nevertouched
+			484, // toilet_jump
+			498, // sewer_system_curser
+			525, // hole1
+			526, // washing_machine
+			527, // letter_Ouija
+			606, // hurting_var
+
+			// map-specific position/state (local)
+			'630-633', // jump var X/Y
+			650, // box_push1
+			692, // monster_arms
+
+			// heartbeat (local effect)
+			800, // heartbeat
+			990, // adrenaline_rush
+
+			// school bed (per player)
+			'909-921', // school_bed1-12
+
+			// lighting (per player)
+			970, // lighting_set
+			871, // white_layer_gfx
+		];
+		MATTIE.static.variable.ignoredVars = MATTIE.static.rangeParser(MATTIE.static.variable.ignoredVars);
+
+		if (MATTIE.multiplayer) {
+			if (MATTIE.multiplayer.params) {
+				if (MATTIE.multiplayer.params.sharedAffinity) {
+					MATTIE.static.switch.syncedSwitches = MATTIE.static.switch.syncedSwitches.concat(MATTIE.static.switch.godAffinitySwitches);
+					MATTIE.static.variable.syncedVars = MATTIE.static.variable.syncedVars.concat(MATTIE.static.variable.godAffinityAndPrayerVars);
+				} else {
+					MATTIE.static.switch.ignoredSwitches = MATTIE.static.switch.ignoredSwitches.concat(MATTIE.static.switch.godAffinitySwitches);
+					MATTIE.static.variable.ignoredVars = MATTIE.static.variable.ignoredVars.concat(MATTIE.static.variable.godAffinityAndPrayerVars);
+				}
+			}
+		}
+
+		// event images
+		MATTIE.static.events.images.shiny = () => MapEvent.generateImage(0, '!Flame', 6, 0, 0);
+		MATTIE.static.events.images.coin = MATTIE.static.events.images.shiny;
 
 		MATTIE.static.variable.secondarySyncedVars = [
 			// these are vars that will be synced based on a cooldown when the map is loaded.

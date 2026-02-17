@@ -1,24 +1,39 @@
 var MATTIE = MATTIE || {};
 MATTIE.multiplayer.charCreationRenderer = MATTIE.multiplayer.charCreationRenderer || {};
 
-MATTIE.multiplayer.charCreationRenderer.mapIdToDisplayName = {
-	1: 'intro_cahara1',
-	2: 'intro_girl1',
-	3: 'intro_knight1',
-	4: 'intro_enki1',
-	5: 'intro_outlander1',
-	6: 'intro_legarde1',
-	7: 'intro_moonless1',
-	8: 'intro_kid1',
-	9: 'intro_marriage1',
-	11: 'intro_fusion1',
-	16: 'intro_ghoul1',
-	17: 'intro_ghoul1',
-	18: 'intro_ghoul1',
-	19: 'intro_skeleton1',
-	20: 'intro_skeleton1',
-	21: 'intro_skeleton1',
-};
+MATTIE.multiplayer.charCreationRenderer.mapIdToDisplayName = {};
+
+if (MATTIE.global.isTermina()) {
+	MATTIE.multiplayer.charCreationRenderer.mapIdToDisplayName = {
+		1: 'face_levi',
+		3: 'face_marina',
+		4: 'face_daan',
+		5: 'face_abella',
+		6: 'face_osaa',
+		13: 'face_marcoh',
+		14: 'face_karin',
+		15: 'face_olivia',
+	};
+} else {
+	MATTIE.multiplayer.charCreationRenderer.mapIdToDisplayName = {
+		1: 'intro_cahara1',
+		2: 'intro_girl1',
+		3: 'intro_knight1',
+		4: 'intro_enki1',
+		5: 'intro_outlander1',
+		6: 'intro_legarde1',
+		7: 'intro_moonless1',
+		8: 'intro_kid1',
+		9: 'intro_marriage1',
+		11: 'intro_fusion1',
+		16: 'intro_ghoul1',
+		17: 'intro_ghoul1',
+		18: 'intro_ghoul1',
+		19: 'intro_skeleton1',
+		20: 'intro_skeleton1',
+		21: 'intro_skeleton1',
+	};
+}
 
 MATTIE.multiplayer.charCreationRenderer.rendered = false;
 /** @description render portraits of all net players on the screen */

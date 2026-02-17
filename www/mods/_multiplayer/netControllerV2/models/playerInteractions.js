@@ -11,7 +11,9 @@ MATTIE.multiplayer.Conversations = function () {
 
 MATTIE.multiplayer.Conversations.prototype.greetings = [
 	'Hello there',
-	'The Dungeons of Fear and hunger truly are beautiful today',
+	MATTIE.global.isTermina()
+		? 'The streets of Prehevil truly are beautiful today'
+		: 'The Dungeons of Fear and hunger truly are beautiful today',
 
 ];
 /**
