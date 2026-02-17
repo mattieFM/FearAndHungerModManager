@@ -40,11 +40,6 @@ BattleManager.startAfterReady = function () {
  *
 */
 BattleManager.unready = function () {
-	// Block unready during an extra turn — players cannot escape extra rounds
-	if (MATTIE.multiplayer.combatEmitter.inExtraTurn) {
-		BattleLog('Cannot cancel during extra turn');
-		return;
-	}
 	BattleManager.startInput();
 	this._phase = 'input';
 	BattleLog('unready!');
@@ -274,7 +269,6 @@ BattleManager.getNextSubject = function () {
 MATTIE.multiplayer.battlemanageronStart = BattleManager.startBattle;
 BattleManager.startBattle = function () {
 	MATTIE.multiplayer.combatEmitter.netExTurn = false;
-	MATTIE.multiplayer.combatEmitter.inExtraTurn = false;
 	MATTIE.multiplayer.ready = false;
 	MATTIE.multiplayer.waitingOnAllies = false;
 	MATTIE.multiplayer.battlemanageronStart.call(this);
@@ -469,8 +463,6 @@ BattleManager.update = function () {
 				MATTIE.multiplayer.BattleController.emitUnreadyEvent();
 				MATTIE.multiplayer.BattleController.emitTurnEndEvent();
 			}
-			// Clear extra turn tracking when turn finishes
-			MATTIE.multiplayer.combatEmitter.inExtraTurn = false;
 			BattleManager.sync();
 			break;
 		case 'syncing':
@@ -489,50 +481,6 @@ BattleManager.update = function () {
 			MATTIE.multiplayer.BattleController.emitTurnEndEvent();
 			this.updateBattleEnd();
 			break;
-		}
-	}
-};
-
-// ---- Multiplayer Extra Turn Hooks ----
-
-/** @description Wrap startInput to broadcast extra turn state to all peers and suppress enemy extra turns in multiplayer */
-MATTIE.multiplayer.combatEmitter.battleManagerStartInput = BattleManager.startInput;
-BattleManager.startInput = function () {
-	// Clear stale combatant isExtraTurn flags at the start of each input phase
-	if ($gameTroop._combatants) {
-		Object.keys($gameTroop._combatants).forEach((key) => {
-			$gameTroop._combatants[key].isExtraTurn = false;
-		});
-	}
-
-	// Call the wrapped startInput (Galv's version which calls setupExTurn)
-	MATTIE.multiplayer.combatEmitter.battleManagerStartInput.call(this);
-
-	// After setupExTurn has run, handle multiplayer-specific extra turn logic
-	if (MATTIE.multiplayer.inBattle && $gameTroop.totalCombatants && $gameTroop.totalCombatants() > 1) {
-		// In multiplayer, enemies should NOT act during extra turns
-		if (this._exBattlers) {
-			this._exBattlers = this._exBattlers.filter((b) => b instanceof Game_Actor);
-		}
-		if ($gameTroop.members) {
-			$gameTroop.members().forEach((enemy) => { enemy._exTurn = false; });
-		}
-
-		// If no player actors remain with extra turn after removing enemies, deactivate
-		if (this._exBattlers && this._exBattlers.length === 0 && Galv.EXTURN.active) {
-			BattleManager.setExTurn(false);
-		}
-
-		// Track and broadcast extra turn state
-		if (Galv.EXTURN.active) {
-			MATTIE.multiplayer.combatEmitter.inExtraTurn = true;
-			try {
-				MATTIE.multiplayer.getCurrentNetController().emitExtraTurnBroadcast();
-			} catch (e) {
-				console.warn('NodeTcpTransport: Failed to broadcast extra turn', e);
-			}
-		} else {
-			MATTIE.multiplayer.combatEmitter.inExtraTurn = false;
 		}
 	}
 };
