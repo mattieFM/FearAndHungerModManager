@@ -17,7 +17,6 @@ class NodeTcpTransport extends EventEmitter {
 		this.server = null;
 		this.sockets = []; // For host: all connected clients
 		this.clientSocket = null; // For client: connection to host
-		this.tunnelProvider = null; // SSHTunnelProvider instance (host only)
 
 		try {
 			this.id = this.generateId(); // Identify self
@@ -161,58 +160,25 @@ class NodeTcpTransport extends EventEmitter {
 						+ ' if having connection issues allow this port through your network.');
 					}
 
-					// === Tunnel-first strategy ===
-					// Try an SSH tunnel so the host doesn't need port forwarding.
-					// Falls back to direct public/local IP if tunneling fails.
-					let tunnelEstablished = false;
-
-					if (typeof SSHTunnelProvider !== 'undefined') {
-						try {
-							console.log('NodeTcpTransport: Attempting SSH tunnel (no port forwarding needed)...');
-							this.tunnelProvider = new SSHTunnelProvider(this.port);
-							const tunnelAddress = await this.tunnelProvider.tryEstablish();
-							if (tunnelAddress) {
-								const randomSuffix = Math.floor(Math.random() * 10000).toString(16);
-								this.id = `${tunnelAddress}_${randomSuffix}`;
-								tunnelEstablished = true;
-								console.log(`NodeTcpTransport: Tunnel active via ${this.tunnelProvider.serviceName}! ID: ${this.id}`);
-							}
-						} catch (e) {
-							console.warn('NodeTcpTransport: Tunnel attempt error:', e.message);
+					// Try to resolve Public IP for the Host ID
+					try {
+						console.log('NodeTcpTransport: Attempting to resolve Public IP...');
+						const publicIp = await this.getPublicIp();
+						if (publicIp) {
+							const randomSuffix = Math.floor(Math.random() * 10000).toString(16);
+							this.id = `${publicIp}:${this.port}_${randomSuffix}`;
+							console.log('NodeTcpTransport: Successfully resolved Public IP ID:', this.id);
+						} else {
+							throw new Error('No IP returned');
 						}
+					} catch (e) {
+						console.warn('NodeTcpTransport: Failed to get Public IP, falling back to Local IP.', e.message);
+						// Regenerate ID with correct port (Local fallback)
+						this.id = this.generateId();
 
-						if (!tunnelEstablished && this.tunnelProvider) {
-							this.tunnelProvider.destroy();
-							this.tunnelProvider = null;
-						}
-					} else {
-						console.warn('NodeTcpTransport: SSHTunnelProvider not loaded, skipping tunnel attempt.');
-					}
-
-					// === Direct IP fallback ===
-					if (!tunnelEstablished) {
-						console.log('NodeTcpTransport: No tunnel available. Falling back to direct IP (port forwarding may be required).');
-						try {
-							console.log('NodeTcpTransport: Attempting to resolve Public IP...');
-							const publicIp = await this.getPublicIp();
-							if (publicIp) {
-								const randomSuffix = Math.floor(Math.random() * 10000).toString(16);
-								this.id = `${publicIp}:${this.port}_${randomSuffix}`;
-								console.log('NodeTcpTransport: Successfully resolved Public IP ID:', this.id);
-							} else {
-								throw new Error('No IP returned');
-							}
-						} catch (e) {
-							console.warn('NodeTcpTransport: Failed to get Public IP, falling back to Local IP.', e.message);
-							this.id = this.generateId();
-
-							if (typeof window !== 'undefined' && window.alert) {
-								window.alert('UNABLE TO ESTABLISH TUNNEL OR DETECT PUBLIC IP.\n\n'
-								+ `Falling back to Local Private IP: ${this.id}\n\n`
-								+ 'Players outside your local network will not be able to join unless you manually Port Forward.\n\n'
-								+ 'To enable automatic tunneling, install OpenSSH Client:\n'
-								+ 'Windows: Settings → Apps → Optional Features → OpenSSH Client');
-							}
+						if (typeof window !== 'undefined' && window.alert) {
+							window.alert(`UNABLE TO DETECT PUBLIC IP.\n(DNS and HTTP checks failed)\n\nFalling back to Local Private IP: ${this.id}`
+							+ '\n\nPlayers outside your local network may not be able to join unless you manually Port Forward and provide your Public IP.');
 						}
 					}
 
@@ -310,11 +276,6 @@ class NodeTcpTransport extends EventEmitter {
 
 	destroy() {
 		console.log('NodeTcpTransport: Destroying...');
-		if (this.tunnelProvider) {
-			console.log('NodeTcpTransport: Tearing down SSH tunnel...');
-			this.tunnelProvider.destroy();
-			this.tunnelProvider = null;
-		}
 		if (this.server) {
 			// Unref to allow process to exit cleanly
 			if (this.server.unref) this.server.unref();
