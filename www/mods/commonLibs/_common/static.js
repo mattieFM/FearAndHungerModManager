@@ -1836,6 +1836,201 @@ MATTIE.static.update = function () {
 
 		MATTIE.static.switch.ignoredSwitches = MATTIE.static.rangeParser(MATTIE.static.switch.ignoredSwitches);
 
+		MATTIE.static.variable.secondarySyncedVars = [
+			// these are vars that will be synced based on a cooldown when the map is loaded.
+			// put anything in here that needs to be synced, but not immediately.
+			// things like random map variants, enemy spawn randoms, NPC location randoms etc...
+
+			//---------------------------
+			// map / level random vars
+			//---------------------------
+			897, // murders_random
+			775, // random_window_shadow
+			776, // random_window_shadow2
+			1287, // beekeeper_random
+			1290, // statue_var
+			2463, // hard_mode_random
+
+			//---------------------------
+			// enemy / NPC random vars
+			//---------------------------
+			374, // bobby_random
+			381, // needles_random
+			383, // ATTENTION_random
+			386, // kalev_random
+			412, // pillarman_random
+			413, // pillarman_ab
+			685, // caligura_monster_variable
+			693, // soldier_variable
+			2058, // rher_random
+			2060, // moonless_random
+			2064, // blue_vial_random
+			2189, // run_away_switch_random
+			2365, // ambush_random_northwest
+			2380, // ambush_random
+			2613, // gull_random
+			2615, // death_mask_variable
+			2796, // chaugnar_random
+
+			//---------------------------
+			// ambush location vars
+			//---------------------------
+			2362, // enemy_ambush_northwest
+			2374, // enemy_ambush_west
+			2375, // enemy_ambush_backalleys
+			2376, // enemy_ambush_backalleys2
+			2377, // enemy_ambush_staircase
+			2378, // enemy_ambush_ruined_city
+			2379, // enemy_ambush_school
+
+			//---------------------------
+			// character location / state vars
+			//---------------------------
+			696, // LOCATION_VAR
+			697, // osaa_location_change
+			698, // domek_dead
+			'761-774', // character dead states (daan_dead through tanaka_dead)
+
+			//---------------------------
+			// spirit board / ghost randoms
+			//---------------------------
+			898, // spirit_board_ghost
+			1119, // spirit_board_ghost2
+			1123, // spirit_board_ghost3
+			1128, // spirit_board_ghost4
+
+			//---------------------------
+			// NPC position / join vars
+			//---------------------------
+			411, // Party_Member
+			389, // SPAWN_ID
+			390, // SPAWN_X
+			391, // SPAWN_Y
+			'2121-2135', // character in_party vars (levi through villager3)
+			554, // Marcoh_Tanaka_training
+			555, // Marcoh_Tanaka_training2
+
+			//---------------------------
+			// enemy overworld HP vars (need sync so enemies stay dead)
+			//---------------------------
+			181, // Woodsman1_HP
+			'182-184', // Villager1-3_HP
+			185, // Vile1_HP
+			186, // Villager4_HP
+			188, // Villager5_HP
+			200, // Villager6_HP
+			'361-370', // moonscorched1-3_HP, moonscorched2_1-5_HP, moonscorched3_1-2_HP
+			371, // moonscorched4_HP
+			'372-380', // crimson_father1-3_HP, bobby1-5_HP
+			382, // tormented_on_HP
+			384, // rifleman3_HP
+			385, // villager7_HP
+			414, // Bellend1_HP
+			415, // Infantry1_HP
+			416, // Inquisitor1_HP
+			'417-418', // fecal_hound1-2_HP
+			419, // sew_job1_HP
+			'421-434', // fallen_cherub1-14_HP
+			496, // neighbour2_HP
+			'499-524', // crimson_father4-7_HP, pillarman4_HP, various HPs
+			'530-532', // ratkin1_HP, rat_lady1/2_HP
+			'536-537', // half_cocooned_HPs
+			538, // infantry2_HP
+			'541-543', // Henryk_HP, Abella_HP (these are NPC HPs that matter)
+			'546-553', // Marcoh through Pav HPs
+			556, // Giant_HP
+			557, // Judgement_HP
+			558, // Mechanical_dance_HP
+			'562-571', // Daan through levi HPs
+			'572-573', // half_cocooned3_HP
+			'577-582', // inquisitor2-3_HP, sew_job2-3_HP
+			'595-604', // fallen_cherub12-15_HP, priest3_HP
+			608, // yellow_mage_HP
+			609, // rifleman4_HP
+			611, // mastermind_HP
+			'614-642', // bellend2-12_HP, stitches_HP, living_flesh_HP
+			'648-660', // half_cocooned4_HP, moonscorched6-12_HP
+			700, // samarie_HP
+			'701-714', // owl_cultist1-3_HP, fecal_hound3_1-2_HP, headless3-4_HP
+
+			//---------------------------
+			// loot / container search vars
+			//---------------------------
+			353, // COIN_VARIABLE
+			355, // shilling_variable
+			'1700-1701', // shilling_count (both instances)
+
+			//---------------------------
+			// misc sync vars
+			//---------------------------
+			1456, // half_cocooned6_random
+			1478, // radio_random
+			2454, // centaur_voice_random
+			2668, // pinecone_variable
+		];
+		MATTIE.static.variable.secondarySyncedVars = MATTIE.static.rangeParser(MATTIE.static.variable.secondarySyncedVars);
+
+		MATTIE.static.variable.syncedVars = [
+			// these are vars that will always be synced
+			// these ignore silenced interpreters, so be very careful adding something.
+			// if something is changed constantly in here it will be forwarded along net, and take up a lot of bandwidth.
+
+			//---------------------------
+			// clock puzzle vars (must be identical)
+			//---------------------------
+			1466, // clock_puzzle
+			1467, // pointer_minutes
+			1468, // pointer_hours
+			1469, // pointer_moon
+			'1470-1472', // pointer moves
+			1473, // clock_cursor
+
+			//---------------------------
+			// eye of rher vars
+			//---------------------------
+			2197, // EYE_OF_RHER_ACTIVE
+			2198, // EYE_OF_RHER
+			2199, // eye_of_rher_variable
+
+			//---------------------------
+			// elevator / generator state
+			//---------------------------
+			889, // generator_active
+			890, // elevator_active
+			891, // short_circuit_door1
+			2025, // elevator1
+			2026, // elevator2
+			2027, // elevator2_traverse
+			2028, // elevator_crypt
+			2029, // elevator_church
+
+			//---------------------------
+			// tunnel door vars
+			//---------------------------
+			863, // tunnel0_door
+			864, // tunnel0_door_activate
+			1350, // tunnel7_door_unlocked
+			1351, // courtyard_door_unlocked
+
+			//---------------------------
+			// death mask on/off state
+			//---------------------------
+			'2281-2286', // death_mask1-6_ON
+
+			//---------------------------
+			// ritual location vars
+			//---------------------------
+			'941-957', // ritual_manor and ritual_church god variants
+
+			//---------------------------
+			// sewer state vars
+			//---------------------------
+			2240, // sewer_lid_west
+			2287, // sewer_winch
+			2288, // sewer_winch2
+		];
+		MATTIE.static.variable.syncedVars = MATTIE.static.rangeParser(MATTIE.static.variable.syncedVars);
+
 		// skills
 		MATTIE.static.skills.hurting = $dataSkills[12];
 

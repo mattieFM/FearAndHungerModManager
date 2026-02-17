@@ -18,10 +18,6 @@ class NodeTcpTransport extends EventEmitter {
 		this.sockets = []; // For host: all connected clients
 		this.clientSocket = null; // For client: connection to host
 
-		// NAT Traversal state
-		this._upnpMapper = null;
-		this._holePuncher = null;
-
 		try {
 			this.id = this.generateId(); // Identify self
 		} catch (e) {
@@ -187,10 +183,6 @@ class NodeTcpTransport extends EventEmitter {
 					}
 
 					this.emit('open', this.id);
-
-					// ── NAT Traversal (non-blocking, fire-and-forget) ──
-					this._tryUPnPMapping();
-					this._registerHostAtRendezvous(createConnectionHandler);
 				});
 
 				this.server.once('error', (err) => {
@@ -228,264 +220,54 @@ class NodeTcpTransport extends EventEmitter {
 	connect(hostAddress) {
 		if (this.isHost) return null;
 
-		// ── Parse address ──
-		// Handle format: "192.168.1.5:6878_a1b2" → host=192.168.1.5, port=6878
+		// Handle address format if needed (e.g. "127.0.0.1:6878" or just "127.0.0.1")
+		// If connecting to a PeerID with suffix (e.g. 192.168.1.5:6878_a1b2), strip the suffix for the actual TCP connection
 		let host = hostAddress;
 		let port = this.port;
-		const targetPeerId = hostAddress;
 
+		const targetPeerId = hostAddress; // The ID we expect to talk to (or just the IP if user typed short)
+
+		// Remove suffix for connection parsing
 		let connectString = hostAddress;
 		if (hostAddress.includes('_')) {
 			connectString = hostAddress.split('_')[0];
 		}
+
 		if (connectString.includes(':')) {
 			const parts = connectString.split(':');
 			host = parts[0];
 			port = parseInt(parts[1], 10);
 		}
 
-		// ── Create connection wrapper (returned immediately) ──
-		// The underlying socket is attached once a connection method succeeds.
-		const connectionWrapper = new EventEmitter();
-		connectionWrapper.peer = targetPeerId;
-		connectionWrapper._activeSocket = null;
-		connectionWrapper.send = (data) => {
-			try {
-				if (connectionWrapper._activeSocket && !connectionWrapper._activeSocket.destroyed) {
-					connectionWrapper._activeSocket.write(`${JSON.stringify(data)}\n`);
-				}
-			} catch (e) {
-				console.error('Send error', e);
-			}
-		};
-		connectionWrapper.close = () => {
-			if (connectionWrapper._activeSocket) connectionWrapper._activeSocket.destroy();
-		};
+		const socket = new net.Socket();
+		this.clientSocket = socket;
+		socket.id = targetPeerId; // Set the peer ID (initially just the target address)
 
-		// ── Begin async connection with fallback ──
-		this._connectWithFallback(host, port, targetPeerId, connectionWrapper);
+		socket._buffer = '';
+		socket._handshakeDone = true; // Client assumes host is ready
+
+		socket.connect(port, host, () => {
+			console.log('Connected to host, sending handshake...');
+
+			// 1. Send Handshake
+			const handshake = `${JSON.stringify({ type: 'HANDSHAKE', peerId: this.id })}\n`;
+			socket.write(handshake);
+
+			// 2. Emit open for wrapper
+			const connectionWrapper = this.createConnectionWrapper(socket);
+			connectionWrapper.emit('open');
+		});
+
+		const connectionWrapper = this.createConnectionWrapper(socket);
+
+		socket.on('data', (chunk) => {
+			this.handleIncomingData(socket, chunk);
+		});
+
+		socket.on('close', () => { connectionWrapper.emit('close'); });
+		socket.on('error', (err) => { connectionWrapper.emit('error', err); });
 
 		return connectionWrapper;
-	}
-
-	// ═══════════════════════════════════════════════════════════════════
-	//  Connection Strategies (Direct → Hole Punch)
-	// ═══════════════════════════════════════════════════════════════════
-
-	/**
-	 * Try direct TCP, then fall back to hole punching if it fails.
-	 * @private
-	 */
-	async _connectWithFallback(host, port, targetPeerId, connectionWrapper) {
-		// Check if hole punching is forced (skips direct connect entirely)
-		const forceHP = (typeof MATTIE !== 'undefined'
-			&& MATTIE.multiplayer
-			&& MATTIE.multiplayer.forceHolePunch === true);
-
-		// ── Phase 1: Direct connection (8 s timeout) — skipped when forceHolePunch is on ──
-		if (!forceHP) {
-			console.log(`NodeTcpTransport: Trying direct connection to ${host}:${port}...`);
-			const directSocket = await this._attemptDirectConnect(host, port, 8000);
-
-			if (directSocket) {
-				console.log('NodeTcpTransport: Direct connection succeeded');
-				this._bindSocketToWrapper(directSocket, targetPeerId, connectionWrapper);
-				return;
-			}
-		} else {
-			console.log('NodeTcpTransport: forceHolePunch is ON — skipping direct connection');
-		}
-
-		// ── Phase 2: TCP Hole Punch ──
-		console.warn('NodeTcpTransport: ' + (forceHP ? 'Forced' : 'Direct connection failed —') + ' attempting NAT hole punch...');
-		const hpSocket = await this._attemptHolePunch(host, port, targetPeerId);
-
-		if (hpSocket) {
-			console.log('NodeTcpTransport: Hole punch connection succeeded!');
-			this._bindSocketToWrapper(hpSocket, targetPeerId, connectionWrapper);
-			return;
-		}
-
-		// ── All methods exhausted ──
-		console.error('NodeTcpTransport: All connection methods failed (direct + hole punch)');
-		connectionWrapper.emit('error', new Error('Unable to connect — direct connection and hole punch both failed. The host may need to enable UPnP or set up port forwarding.'));
-	}
-
-	/**
-	 * Attempt a plain TCP connect with a hard timeout.
-	 * Resolves with the connected socket, or null on failure.
-	 * @private
-	 */
-	_attemptDirectConnect(host, port, timeout) {
-		return new Promise((resolve) => {
-			const socket = new net.Socket();
-			let settled = false;
-
-			const finish = (result) => {
-				if (settled) return;
-				settled = true;
-				clearTimeout(timer);
-				if (!result && !socket.destroyed) socket.destroy();
-				resolve(result);
-			};
-
-			const timer = setTimeout(() => {
-				console.warn(`NodeTcpTransport: Direct connect timed out after ${timeout}ms`);
-				finish(null);
-			}, timeout);
-
-			socket.on('connect', () => finish(socket));
-			socket.on('error', (err) => {
-				console.warn('NodeTcpTransport: Direct connect error:', err.message);
-				finish(null);
-			});
-
-			socket.connect(port, host);
-		});
-	}
-
-	/**
-	 * Attach a connected socket to the wrapper, send handshake, wire events.
-	 * @private
-	 */
-	_bindSocketToWrapper(socket, targetPeerId, connectionWrapper) {
-		this.clientSocket = socket;
-		socket.id = targetPeerId;
-		socket._buffer = '';
-		socket._handshakeDone = true;
-		socket._wrapper = connectionWrapper;
-		connectionWrapper._activeSocket = socket;
-
-		// Handshake
-		console.log('Connected to host, sending handshake...');
-		socket.write(`${JSON.stringify({ type: 'HANDSHAKE', peerId: this.id })}\n`);
-
-		// Wire events
-		socket.on('data', (chunk) => this.handleIncomingData(socket, chunk));
-		socket.on('close', () => connectionWrapper.emit('close'));
-		socket.on('error', (err) => connectionWrapper.emit('error', err));
-
-		// Signal success to the caller
-		connectionWrapper.emit('open');
-	}
-
-	/**
-	 * Attempt TCP hole punching via a rendezvous server.
-	 * Returns a connected socket or null.
-	 * @private
-	 */
-	async _attemptHolePunch(host, port, targetPeerId) {
-		// Require the TcpHolePuncher class (loaded globally by natTraversal.js)
-		if (typeof TcpHolePuncher === 'undefined') {
-			console.warn('NodeTcpTransport: TcpHolePuncher not available (natTraversal.js not loaded)');
-			return null;
-		}
-
-		// Check for rendezvous URL in config
-		const rendezvousUrl = (typeof MATTIE !== 'undefined'
-			&& MATTIE.multiplayer
-			&& MATTIE.multiplayer.config
-			&& MATTIE.multiplayer.config.rendezvousUrl) || null;
-
-		if (!rendezvousUrl) {
-			console.warn('NodeTcpTransport: No rendezvous URL configured — hole punching unavailable.');
-			console.warn('NodeTcpTransport: To enable, set MATTIE.multiplayer.config.rendezvousUrl = "http://your-server:9999"');
-			return null;
-		}
-
-		try {
-			const puncher = new TcpHolePuncher(rendezvousUrl);
-			const publicIp = await this.getPublicIp();
-			const localPort = this.port;
-			const roomId = targetPeerId;
-
-			console.log(`NodeTcpTransport: Hole punch — our IP ${publicIp}, local port ${localPort}, room ${roomId}`);
-			return await puncher.attemptHolePunch(roomId, host, port, publicIp, localPort, 15000);
-		} catch (err) {
-			console.error('NodeTcpTransport: Hole punch error:', err.message || err);
-			return null;
-		}
-	}
-
-	// ═══════════════════════════════════════════════════════════════════
-	//  Host-Side NAT Traversal (UPnP + Rendezvous)
-	// ═══════════════════════════════════════════════════════════════════
-
-	/**
-	 * Try to automatically forward the port via UPnP / IGD.
-	 * Runs in the background — never blocks host startup.
-	 * @private
-	 */
-	async _tryUPnPMapping() {
-		if (typeof UPnPMapper === 'undefined') {
-			console.log('NodeTcpTransport: UPnPMapper not available — skipping auto port-forward');
-			return;
-		}
-		try {
-			this._upnpMapper = new UPnPMapper();
-			const success = await this._upnpMapper.mapPort(this.port, this.port);
-			if (success) {
-				console.log('NodeTcpTransport: ★ UPnP port forwarding active — NAT traversal configured automatically');
-			} else {
-				console.warn('NodeTcpTransport: UPnP mapping returned false (router may not support UPnP)');
-			}
-		} catch (e) {
-			console.warn('NodeTcpTransport: UPnP attempt failed (non-critical):', e.message);
-		}
-	}
-
-	/**
-	 * Register this host at the rendezvous server so clients can discover it
-	 * for hole punching. Also polls for clients that registered and initiates
-	 * reverse connections to them.
-	 * @private
-	 */
-	async _registerHostAtRendezvous(connectionHandler) {
-		if (typeof TcpHolePuncher === 'undefined') return;
-
-		const rendezvousUrl = (typeof MATTIE !== 'undefined'
-			&& MATTIE.multiplayer
-			&& MATTIE.multiplayer.config
-			&& MATTIE.multiplayer.config.rendezvousUrl) || null;
-
-		if (!rendezvousUrl) return;
-
-		try {
-			this._holePuncher = new TcpHolePuncher(rendezvousUrl);
-
-			// Extract public IP from our generated ID (format: "ip:port_suffix")
-			const idBase = this.id.includes('_') ? this.id.split('_')[0] : this.id;
-			const publicIp = idBase.includes(':') ? idBase.split(':')[0] : idBase;
-
-			await this._holePuncher.registerEndpoint(this.id, 'host', publicIp, this.port);
-			console.log('NodeTcpTransport: Host registered at rendezvous for hole punching');
-
-			// Poll for clients and attempt reverse connections
-			this._holePuncher.startHostPolling(this.id, (clientIp, clientPort) => {
-				console.log(`NodeTcpTransport: Hole punch — connecting to client at ${clientIp}:${clientPort}`);
-				const reverseSocket = new net.Socket();
-
-				reverseSocket.connect(clientPort, clientIp, () => {
-					console.log('NodeTcpTransport: Hole punch reverse connection to client succeeded!');
-					connectionHandler(reverseSocket);
-				});
-
-				reverseSocket.on('error', (err) => {
-					console.warn('NodeTcpTransport: Hole punch reverse connection failed:', err.message);
-				});
-
-				// Don't let this socket hang forever
-				setTimeout(() => {
-					if (!reverseSocket.destroyed && !reverseSocket.connecting === false) {
-						// connected successfully — don't touch it
-					} else if (reverseSocket.connecting) {
-						reverseSocket.destroy();
-					}
-				}, 10000);
-			}, 3000);
-		} catch (e) {
-			console.warn('NodeTcpTransport: Rendezvous registration failed (non-critical):', e.message);
-		}
 	}
 
 	disconnect() {
@@ -494,18 +276,6 @@ class NodeTcpTransport extends EventEmitter {
 
 	destroy() {
 		console.log('NodeTcpTransport: Destroying...');
-
-		// Clean up NAT traversal resources
-		if (this._upnpMapper) {
-			this._upnpMapper.unmapAll().catch(() => {});
-			this._upnpMapper = null;
-		}
-		if (this._holePuncher) {
-			this._holePuncher.stopPolling();
-			try { this._holePuncher.unregister(this.id).catch(() => {}); } catch (e) { /* ignore */ }
-			this._holePuncher = null;
-		}
-
 		if (this.server) {
 			// Unref to allow process to exit cleanly
 			if (this.server.unref) this.server.unref();

@@ -16,9 +16,6 @@ MATTIE.multiplayer.forceFallback = false;
 MATTIE.multiplayer.fallbackAutoSwitched = false; // Tracks if we already tried swapping automatically
 MATTIE.multiplayer.userOverrideFallback = null; // null = no preference, true = force TCP, false = force PeerJS
 
-// Hole-punch override: when true, skip direct TCP and go straight to hole punching
-MATTIE.multiplayer.forceHolePunch = false;
-
 // Initialize default state if not set (reloads)
 if (MATTIE.multiplayer.userOverrideFallback === undefined) MATTIE.multiplayer.userOverrideFallback = null;
 
