@@ -139,6 +139,10 @@ MATTIE.static.maps.levelFiveMinesA = 11;
 MATTIE.static.maps.levelFiveMinesB = 39;
 MATTIE.static.maps.levelFiveMinesC = 184;
 
+MATTIE.static.maps.termina = {
+	oldHouse:11
+}
+
 // items
 MATTIE.static.items.emptyScroll = null;
 MATTIE.static.items.icons = {};
@@ -1357,217 +1361,476 @@ MATTIE.static.update = function () {
 		// static values specific to funger 2
 		// switches
 
+		MATTIE.static.teleports = [
+			{
+				id: 11, name: 'Old House', cmd: () => MATTIE.tpAPI.terminaOldHouse(), bool: () => true, btn: true,
+			},
+		];
+
 		MATTIE.static.switch.ignoredSwitches = [
-			// --limbs
-			'2069-2078', // journalist arms
-			// sawing off
-			'1327-1330',
-			'1333-1334',
-			'1335-1398',
+			//-------------------------------------------------------
+			//          Character Selection / Class Switches
+			//-------------------------------------------------------
+			'2-15', // menus, lights, heroin use
+			'239-240', // MALE_CLASS, FEMALE_CLASS
+			'2401-2414', // NAMES_SELECT (YELLOW_MAGE, BOTANIST, THUG, etc.)
+			2420, // HEXEN_GFX
+			'661-664', // INITIAL_MERCENARY/KNIGHT/DARKPRIEST/OUTLANDER
 
-			// char mentioned
-			'1486-1498',
-			'1521-1529',
+			//-------------------------------------------------------
+			//          Intro / System / Global Meta
+			//-------------------------------------------------------
+			'213-214', // INTRO_playing, INTRO_enter_name (also in 212-217)
+			'295-297', // INTRO, Introchoose, player_arrow
+			411, // INTRO_SKIPPING IS OKAY
+			'2843-2858', // INTRO1-5, SHADOWS, STRONG_STATIC
+			'2859-2860', // Perkele_talking, Grand_hall_trigger
+			'2861-2863', // Sleep1-3
+			2880, // Intro_reila
+			'2881-2884', // Intro_reila2-5
+			2885, // SMALL_STATIC
+			2918, // DEMO_DONE
+			2919, // Wake_up
+			1540, // <Global Meta>Movies_enabled
+			2245, // <Global Meta>double_tap_run
+			3353, // <Global Meta>First_time_switch
+			3397, // <Global Meta>Message_sounds
+			3398, // SYSTEM_MESSAGE_BACKGROUND
+			3399, // FiltersSet
+			3400, // <Global Meta>Filter Effects
+			'3679-3680', // <Global Meta>Static Effects/Set
 
-			// --Area--
-			'1601-1613', // area_names
-			'4317-4320',
+			//-------------------------------------------------------
+			//          Area / Location Tracking
+			//-------------------------------------------------------
+			'1601-1613', // AREA_TRAIN through AREA_CHURCH_BASEMENT
+			'4317-4321', // IN_THE_BASEMENT, UPSTAIRS, HOUSE1, HOUSE1_BASEMENT, RESTAURANT_BASEMENT
 
-			// --menus
-			'2401-2414', // NAMES_SELECT
-			2420, // hexxen_gfk
-			'2843-2858', // intros
-			3400, // filter effects
-			3397, // message?
-			'3679-3680', // global meta
+			//-------------------------------------------------------
+			//          Movement / Facing / Action Switches
+			//-------------------------------------------------------
+			203, // CLIMBING
+			'215-216', // Run!, Steal! (also in 212-217 below)
+			241, // coming_UP_LADDERS
+			410, // CANNOTUSE_BOW!
+			'2243-2244', // run_meter_cooldown, run_meter_disappear
+			'2250-2251', // dash_ok, GUN_OK
+			2259, // AMMO_HUD_OFF
+			3259, // AMMO_HUD_OFF (duplicate)
+			4139, // ButtonDown
+			4140, // Engarde
+			4180, // En_Garde_cooldown
+			4820, // run_exhaust
 
-			203, // climbing
-			410, // cannot use bow
-			'2-15', // menus and lights
-			'45-51', // janitor sawing cut scene
-			'96-97', // janitor cut scene
-			'181-194', // lights
-			'195-196', // elevator
-			'201-202', // suicide
-			'210-211', // lights
-			'212-217', // misc
-			229, // love corner merc
-			241, // coming up ladder
-			260, // suicide skill learned
-			'287-294', // sawing
-			'295-297', // intro stuff
-			'299-301', // misc
-			340, // necromancy no mp
-			371, // fear
-			'373-379', // blood golam stuff
-			380, // fusion
-			410, // cannot use bow
-			411, // intro
+			//-------------------------------------------------------
+			//          Menu / UI Switches
+			//-------------------------------------------------------
+			'45-51', // janitor sawing cut scene (SAWING_janitor1-7)
+			'96-97', // Janitor_scene/notice
+			'181-194', // lights (light15-16, door2_1-4, Mayor switches)
+			'195-196', // elevator1/2
+			'201-202', // SUICIDE, suicide_inprocess
+			'210-211', // light3_3, light4_4
+			'212-217', // NO_OUTFITCHECK, INTRO_playing/enter_name, Run!, Steal!, Bonesaw_CRACK
+			'299-301', // Player_whileBow_used, player_arrow2, bearTREP
+			4708, // skip_day_text
+			4712, // day_change_text
+			4750, // map_locations_ON
+			4815, // failsafe_switch
 
-			// ronteal?
-			'414-418',
+			//-------------------------------------------------------
+			//          Difficulty / Game Mode
+			//-------------------------------------------------------
+			667, // NOT_Hard_Mode
+			1413, // ENDING_A_HARD
+			1414, // ENDING_B_HARD
+			2190, // !!_HARD_MODE_!!
+			'4818-4819', // EASY_MODE, HARD_MODE
 
-			// withdrawl
-			420,
-			'876-878', // heroin
-			'3186-3187', // doctor and mechanic heroin
+			//-------------------------------------------------------
+			//          Dismemberment / Limbs / Sawing
+			//-------------------------------------------------------
+			'2069-2078', // journalist arms and god affinities
+			'1298-1300', // SSAWING_OFF 1-3
+			'1327-1330', // sawing
+			'1333-1334', // sawing
+			'1335-1398', // sawing (Merc/Outlander/Skeleton/Ghoul/etc.)
+			'287-294', // Journalist/Botanist_sawing
 
-			// blocking cutscenes
-			437, // pigs eating
-			447, // pig scene 2
-			462, // pig eating 2
-			463, // sleeping
-			540,
-			'743-749',
-			'839-840', // talking
-			'952-953',
-			972, // first time in dark
-			980, // marina orphanage scene
-			997, // resting
-			'1298-1300',
-			'1595-1596', // dark preist scenes
-			'1597-1598', // run away
-			1599, // flute1
-			'2319-2326', // ladders
-			'4010-4013', // misc arrive, travel, ladders
-			'2346-2351', // mechanisms
-			4056,
-			4061,
-			'4062-4064',
-			4078,
-			4139,
-			4140,
-			4180, // engarde
-			4187, // tounge out
-			'4251-4260',
+			//-------------------------------------------------------
+			//          Status Effect Switches
+			//-------------------------------------------------------
+			25, // ROT
+			28, // DEMONSEED_AVAILABLE
+			'29-30', // ENEMY_ATTENTION1, ENEMY_HURT
+			66, // Smoke_TREP
+			100, // WORKSHOP
+			101, // hangingDARKNESS
+			105, // Black_vomit
+			154, // IKI_TURSO
+			'268-269', // struggling_tied_up, Struggling
+			371, // FEAR_EFFECT
+			491, // demonseedAVAILABLE
+			559, // Grasp_of_a_giant
+			'677-678', // Child_of_light, Child_of_darkness
+			695, // DEMONBABY_GROWING
+			'814-816', // Small_PARANOIA, RAPANOIA, BLINDNESS
+			837, // FEAR_EFFECT
+			862, // HALLUCINATIONS
+			863, // FEAR_EFFECT_RESET
+			901, // HALLUCINATIONS2
+			972, // First time in dark
+			1172, // Black_vomit
+			1292, // MOONSCORCHED
+			2062, // Blind_for_the_first_time
+			'2081-2082', // pistol/rifle_for_the_first_time
+			2103, // PLANTING_FLOWERS
+			2166, // PICTURE_fade_in
+			2895, // IKI_TURSO2
+			3276, // SATURATION_CHANGE
+			4600, // Medicinal!
+			4840, // SCORCHED_EARTH!
+			4990, // monster_nausea
 
-			// non blocking but might be bad
-			'1748-1752', // bar tender drinks
-			'2716-2723', // tanaka scenes
-			2723, // pav scene
-			'2725-2729', // pav
-			2740,
-			2739,
-			'2741-2743',
-			'2861-2863', // sleep
-			2878, // coming back from hexen
-			'2888-2890', // falling
-			2891, // olivia talk
-			2894, // no more talking
-			2900, // got no offering
-			'3031-3048', // eating
-			'3097-3099', // needles scene
-			3131, // anallyze!
-			3135, // tower view scene
-			'3381-3392', // umbrella decenbt
-			'3226-3235', // mechanic scenes
-			'3542-3550',
-			'3881-3886', // bellend jump
-			4000, // partner
-			'4625-4644', // umbrella
-			// "4821-4849",
+			//-------------------------------------------------------
+			//          Crippled Switches
+			//-------------------------------------------------------
+			'817-835', // NOTCRIPPLED (Merc/Girl/Occultist/Doctor/etc.)
 
-			/// -in party
-			'4761-4768', // in party
+			//-------------------------------------------------------
+			//          Battle Logic Switches
+			//-------------------------------------------------------
+			1, // Disable npc
+			52, // TALK
+			79, // START
+			200, // SKILLS_BATTLE
+			'1456-1457', // single_attack, double_attack
+			'1483-1485', // ENEMIES_ACTIVE, ENEMIES_ACTIVE2, ENEMIES_GETUP
+			1281, // GUARD_BATTLE
+			2225, // CHARACTERS_HOSTILE
+			4665, // monster_first_turn_has_gone
+			'4666-4671', // monster_arm1-6
+			'4672-4673', // cocoon_considering, calling_little
 
-			// --skills--
-			729, // lockpicking
-			'731-733', // skills avalible
-			766, // devour
-			801, // demon seed learned
-			802, // greater blood magic
-			803, // blood sacrivice
-			864, // greater necromancy ok?
-			871, // counter magic
-			1025, // leg sweep
-			1045, // backstab
-			'1041-1044', // backstab misc
+			//-------------------------------------------------------
+			//          Armor / Outfit Switches
+			//-------------------------------------------------------
+			106, // GHOUL_OUTFIT
+			107, // GUARD_OUTFIT
+			298, // CALL_OUTFITCHECK
+			657, // sergal_mask
+			'2269-2272', // og_filters, OUTSIDE, INSIDE, Set_filters
+
+			//-------------------------------------------------------
+			//          Skill Switches
+			//-------------------------------------------------------
+			260, // SuicideLEARNED
+			729, // LockpickingAVAILABLE
+			'731-733', // Marksmanship/Executioner/GunslingerAVAILABLE
+			766, // DevourAVAILABLE
+			801, // DemonSeedLEARNED
+			802, // GREATERBloodMagicAVAILABLE
+			803, // BloodsacrificeAVAILABLE
+			864, // Greater_NecromancyOK?
+			871, // Counter-magicAVAILABLE
+			874, // Counter-magic
+			1025, // LEG SWEEP
+			1045, // BACKSTAB
+			'1041-1044', // Backstab_weaponOK/player_backstab
 			1061, // new god rising
-			1167, // learned portal
-			'1185-1211', // a lot of skills
-			'1223-1241',
+			1098, // shield_bash
+			1167, // PORTAL_LEARNED
+			'1185-1211', // SKILL_Lockpicking through HEXEN_CURSOR, SKILL_fast_stance
+			'1221-1241', // SKILL_rot through various skills
 			1248,
 			1250,
 			1253,
 			'1267-1268',
-			'1448-1455',
-			'1541-1552',
-			'1923-2045', // so very many skills
-			'2079-2099', // skils
-			'2201-2214',
-			2399, // attacked wheelchair
-			2766,
-			2787,
+			'1448-1455', // text/SKILL lunar_storm, lunar_meteorite, moth_swarm, red_arc
+			'1541-1552', // SKILL/text medicinal, analyze, wrench_toss, short_circuit, trapcraft, weaponcraft
+			'1923-2045', // text/SKILL gun_proficiency through heart_flower (massive skill block)
+			'2079-2099', // SKILL/text Perfect_guard through blood_spear_return
+			'2201-2214', // text/SKILL defence_plus through poison_tip
+			2399, // ATTACKED_wheelchair
+			2411, // CANT_LEARN
+			2766, // Escape_plan!
+			2787, // marcoh speech/skill
 
-			// --crafting maybe drop chance--
-			'2064-2067', // maybe needs?
+			//-------------------------------------------------------
+			//          Necromancy State
+			//-------------------------------------------------------
+			340, // Necromancy_noMP
+			341, // NECROMANCY_available
+			'781-795', // Necromancy1-15
+			'3240-3241', // necromancy_Done/1
 
-			// --equips--
-			'2252-2254', // gun equiped
+			//-------------------------------------------------------
+			//          Item / Equip Switches
+			//-------------------------------------------------------
+			'2064-2067', // needs_cloth_fragment/white_vial crafting
+			'2252-2254', // RIFLE/SHOTGUN/PISTOL_EQUIPPED
 			2750, // wheelchair
 			2899, // gasoline1
-			2924, // knife
+			2924, // SWITCH_TO_KNIFE
+			3272, // NEED_Cloth!
 
-			// --effects---
-			'814-816', // parania, blindness and rapanoia
-			837, // fear effect
-			862, // hallucinations
-			901, // hallucinations
-			2062, // blind for first time
-			3276,
+			//-------------------------------------------------------
+			//          Withdrawal / Drug Switches
+			//-------------------------------------------------------
+			420, // withdrawals
+			'876-879', // Yellow_Mage/Journalist/Thug/Botanist_HEROIN
+			'3186-3187', // Doctor/Mechanic_HEROIN
 
-			// cipple
-			'817-835',
+			//-------------------------------------------------------
+			//          Party Member State
+			//-------------------------------------------------------
+			'4761-4768', // levi/marina/daan/abella/osaa/olivia/karin/marcoh_in_party
+			'4781-4796', // going_crazy / going_crazy2 for all party members
+			812, // PARTY_TALK
+			813, // DON'T ACTIVATE!
+			1498, // RIDING_STAIRS
 
-			// sacrifice circle / gods
-			'396-397',
-			'472-490', // a lot more sacrifice
-			588, // talk scene
-			625, // first talk
-			'641-651', // execution
-			694,
-			'856-858', // skelleton
-			1062, // ritual new gods
-			'1401-1406', // ritual1
-			'1415-1420',
-			'1421-1427', // sigils
-			'1533-1538',
-			'1561-1563', // ritual0
-			'2047-2055', // circle4
-			2360, // no other gods
-			'2445-2455', // circle5
-			'3178-3180', // ritual church2
-			'3218-3220', // church
-			'3817-3823', // sins/confession
-			'3998-3999',
+			//-------------------------------------------------------
+			//          Max HP Tracking (per player)
+			//-------------------------------------------------------
+			'2781-2782', // Mercenary_MaxHP1/2
+			'4501-4526', // Thug/Journalist/Botanist/Occultist/etc. MaxHP
+			'4531-4548', // Villager1/2/3 MaxHP
 
-			// -- endings --
-			// 1413 ending a hard
-			// 1414 ending b hard
-			'1428-1442',
-			'1889-1892', // endings b c n and a
-			1900, // won the game
+			//-------------------------------------------------------
+			//          Soul Tracking (per player)
+			//-------------------------------------------------------
+			'493-500', // botanist/exsoldier/Occultist/doctor/mechanic/journalist/fighter/yellow_mage_SOUL
+			'734-739', // apprentice/hunter/chef/mobster/salaryman/lieutenant_SOUL
+			1121, // Moonless_soul
+			'1154-1155', // skeleton1/2_soul
+			'1181-1184', // Domination/Endless/tormented/Enlightened_soul
+			'1257-1261', // DEMON_KID/LEGARDE/Moonless/Girl_soul
 
-			// portal
-			// "1157-1166"
-			// 1168
-			// 1178
-			// 1173
-			// 1219
-			// 2056-2060
-			// 3146-3160
+			//-------------------------------------------------------
+			//          Char Mentioned / God Affinities
+			//-------------------------------------------------------
+			'1486-1498', // character god affinities (Merc/Occultist/etc.)
+			'1521-1529', // Doctor/Mechanic god affinities
+			'601-610', // Merc/Occultist/ghoul/kalev god affinity gro/rher
+			'4081-4099', // thug/botanist/doctor/mechanic god affinities
 
-			// carving
-			'611-615', // carving
-			'668-675',
-			'1135-1136',
+			//-------------------------------------------------------
+			//          Blood Golem / Fusion / Marriage
+			//-------------------------------------------------------
+			'373-379', // Blood_golem/Blood_golemINPARTY/dismemberment
+			380, // FUSION_SELECT
+			375, // MARRIAGE_SELECT
 
-			// love
-			'399-405',
-			440,
+			//-------------------------------------------------------
+			//          Sacrifice Circle / Gods / Rituals
+			//-------------------------------------------------------
+			'396-397', // Sacrificecircle_moonless/demonkid
+			'406-409', // RitualCircle1 prayers/exhausted
+			'472-490', // sacrifice/ritual circle 2/3 variants
+			588, // talk_scene_done
+			625, // FIRST_TALK
+			'641-651', // execution1-7
+			694, // tv_flash2
+			'856-858', // SKELETON_KILLED/BODY
+			1062, // NEWGOD_TAINTED
+			'1401-1406', // Ritual1 statues/prayers
+			'1415-1420', // Ritual circles sacrificed/on
+			'1421-1427', // SIGIL_GRO_GOROTH/SYLVIAN/ALLL-MER/etc.
+			'1533-1538', // SKILL/ritual
+			'1561-1563', // Ritual0_gro_goroth/alll_mer/moon
+			'2047-2055', // RitualCircle4 variants
+			2360, // no_other_gods
+			'2445-2455', // RitualCircle5 variants
+			'3141-3163', // bloodportal_open, ritual_book variants
+			'3178-3180', // Ritual_church2/church
+			'3201-3203', // Ritual2_gro_goroth/moon/alllmer
+			'3218-3220', // Ritual_church_alllmer/moon/gro_goroth
+			'3817-3823', // confessional/sins/absolved
+			'3911-3916', // confessional_killed, lusted, with_a_friend, forbidden_love
+			'3997-3999', // alll-mer_condemns, dishonest, confessional_DONE
+			'4021-4046', // Ritual2/0/1 vinushka/fear_hunger/sylvian, ritual4 variants
 
-			// affinity
-			'406-409',
+			//-------------------------------------------------------
+			//          Fear Statues / Ritual Locations
+			//-------------------------------------------------------
+			'4821-4848', // fear_statue1-6, circle/crack variants
+			'4861-4866', // Ritual_speakeasy variants
+
+			//-------------------------------------------------------
+			//          New Gods
+			//-------------------------------------------------------
+			'761-765', // newgod4-8
+			'1046-1066', // newgod_circle/rising/type variants
+
+			//-------------------------------------------------------
+			//          Endings
+			//-------------------------------------------------------
+			1413, // ENDING_A_HARD
+			1414, // ENDING_B_HARD
+			'1428-1442', // <Global Meta> ENDING per character
+			'1889-1892', // !!_ENDING_D/C/B/A
+			1900, // won_the_game
+			2249, // !!_ENDING_S
+
+			//-------------------------------------------------------
+			//          Carving Flags
+			//-------------------------------------------------------
+			'611-615', // Mercenary/Occultist/Kalev/Ghoul1/Ghoul2_CARVING
+			'668-675', // Villager/Ghoul3/Journalist/Thug/Botanist/Yellow_CARVING
+			'1135-1136', // Mechanic/Doctor_CARVING
+
+			//-------------------------------------------------------
+			//          Love / Relationship
+			//-------------------------------------------------------
+			229, // LoveCornerMercenary
+			'399-405', // LOVE_captain_knight through LOVE_marriage_mercenary
+			440, // LoveCornerMarriage
+			471, // LOVE_darkpriest_merce
+			4000, // partner
+
+			//-------------------------------------------------------
+			//          Portals (per player learned/activated state)
+			//-------------------------------------------------------
+			// "1157-1178", // Portal activation states
+			// 1219, // PORTAL6_ON
+			// "2056-2061", // Portal4 variants
+			// 2444, // PORTAL5_ON
+
+			//-------------------------------------------------------
+			//          Hangman Minigame (per player)
+			//-------------------------------------------------------
+			'1881-1888', // hangman1-6, letterG/O, HANGMAN_OVER
+			'1898-1899', // hangman6/7
+			'2976-2980', // Arms_cut, hangman_FALL variants
+
+			//-------------------------------------------------------
+			//          Tower Mechanisms (view scenes, per player)
+			//-------------------------------------------------------
+			'4181-4194', // tower_door1-7, tower_rise1-3, tower_rising, tower_sounds_OFF, tower_gfx
+
+			//-------------------------------------------------------
+			//          Blocking Cutscenes / Events
+			//-------------------------------------------------------
+			'433-439', // BigboyON, Pig_execution, eaten, eating, go
+			447, // Pig_scene2
+			462, // pig2_eating
+			463, // SLEEPING
+			540, // Big_boy_execution
+			560, // Big_boy_attack
+			'573-580', // front_leg, hind_leg, platoon, surprise
+			'583-589', // redhair1, blonde1, botanist scenes, talk_scene_done
+			'658-660', // chandelier7, chandelier_on, tv_flash
+			'743-749', // Waves1-7
+			'839-840', // henryk/tanaka_comes_to_club
+			'952-953', // ENDING_SCENE, NOT USED
+			980, // Marina_orphanage_scene
+			997, // Resting
+			'1114-1119', // kaiser/heavy_trooper poses/gone
+			'1150-1156', // tormented_one events, ATTACKED_ON_TRAIN
+			'1179-1180', // ATTACKED_ON_TRAIN/2
+			1220, // text_unknown
+			1256, // Trapped_OVER
+			'1269-1270', // woodsman_rope variants
+			'1319-1320', // shopping_layered/2
+			'1595-1596', // dark_priest_scene
+			'1597-1598', // RUN_AWAY
+			1599, // flute1
+			1600, // tv_off
+			1699, // different_static
+			'1748-1752', // Bartender1-5 drinks
+			'2319-2326', // ladder1-8
+			'2341-2344', // fallscene1/2, toilet1, food_storage_found
+			'2346-2351', // Mechanism_used, MECHANISM1-6
+			2570, // Ouija_board_active
+			2746, // DAY_BREAK
+			2828, // Fall_scene3
+			2878, // Coming_back_from_hexen / Mayor_done
+			'2888-2890', // Falling1-3
+			2891, // Olivia_talk
+			2894, // no_more_talking
+			2900, // GotNO_offering
+			'3001-3003', // kaiser_scene/shot, heavy_trooper_shoot
+			3030, // execution_start
+			'3031-3048', // black_kalev_eating scenes
+			'3050-3081', // red_shadow events, chain events
+			3082, // day_text
+			'3083-3086', // dark_priest1-4
+			3093, // day_change
+			'3097-3099', // NEEDLES tunnel scenes
+			3131, // Analyze!
+			3135, // Tower_view_scene
+			'3226-3235', // Needles_scene/mechanic scenes
+			'3237-3238', // reported_the_man, going_up
+			'3265-3266', // REMOVE/NO_ASSISTS
+			3297, // first_talk_moon_tower
+			'3301-3310', // swing1-4, swings_active, TV_SCENE1, club/cafe_layered_gfx
+			3320, // tv_watched
+			'3341-3392', // umbrella descent/falling variants (full range)
+			'3414-3430', // coming_from_up, levi/caligura/pocketcat scenes
+			'3476-3505', // levi/caligura scenes
+			3508, // SUSPICIONS1
+			3535, // soldier1_shooting
+			'3539-3541', // sniper_scene/danger/cooldown
+			'3542-3550', // weeping_scope
+			'3565-3567', // shot_sounds1-3
+			'3576-3585', // weeping_scope locations
+			'3597-3598', // weeping_scope in_alt/killed_alt
+			'3660-3678', // bartender/marina/church scenes
+			'3881-3893', // bellend_jump/shadow/surprise
+			3905, // BELLENDS_UNLEASHED
+			'3921-3929', // bellend2_jump variants, shadow2
+			'4010-4013', // arrive, first_time_travelled, return, ladders
+			4056, // NOT_IN_USE
+			4061, // Gasoline2
+			'4062-4064', // elevator2_active, generator2_active, short_circuit_door_tunnel1
+			4078, // WHEELCHAIR_IN_USE
+			4093, // NOT_IN_USE
+			'4176-4179', // arm_tense, tongue_out, stitches_activate
+			4187, // giant_elevator_moving
+			4230, // RELEASE_GFX
+			'4251-4260', // august scenes
+			'4440-4441', // hide_kaiser_pav_scene, vault
+			'4551-4564', // caligura_monster variants
+			'4565-4572', // monster_spot1-8
+			'4573-4584', // august going/gone, temple_scene, valkyrie active/flight
+			'4587-4605', // giant animations/scenes/active/killed
+			'4625-4644', // umbrella4 variants
+			'4645-4649', // crows_shoo1-4, crows_backalleys3
+			'4650-4654', // giant_persuade, rage
+			4681, // soldiers_activate
+			'4696-4699', // valkyrie_flight_island, greatsword/yggaegetsu/chac_chac_glass
+			'4748-4751', // judgement_moving/appear, map_locations, mechanical_dance_appear
+			'4752-4758', // Pocketdaan_appear, pocketcat scenes, dark_priest3, dysmorphia_flower
+			'4797-4808', // samarie/pocketcat_OG_killed, horse, platoon, temple positions
+			'4872-4906', // domek scenes
+			'4914-4924', // caligura creeping/killed scenes
+
+			//-------------------------------------------------------
+			//          Filter / Visual Effect Switches
+			//-------------------------------------------------------
+			1667, // school_layered_gfx
+			1688, // north_west_layered_gfx
+			'1696-1699', // shopping_layered3-5, different_static
+			'2269-2272', // og_filters, OUTSIDE, INSIDE, Set_filters
+			3278, // shopping_layered_gfx
+			3279, // mannequin_toggle
+			3280, // statue_layered_gfx
+			'3308-3310', // club/cafe_layered_gfx
+			3371, // apartment_layered_gfx
+			4009, // island_layered_gfx
+			4459, // light_switches_first
+			'4461-4464', // tunnel0 monitor/layered_gfx
+
+			//-------------------------------------------------------
+			//          Misc / Weird Switches
+			//-------------------------------------------------------
+			41, // disabled
+			80, // wizard_summon
+			'81-86', // Making_cube1-5, Making_cube_scene
+			228, // black_kalev_switch
+			880, // perkele_wing
+			1880, // burn
 
 		];
 

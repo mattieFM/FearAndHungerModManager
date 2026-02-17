@@ -568,7 +568,12 @@ Window_Base.prototype.drawIcon = function (iconIndex, x, y) {
 		const runtimeIcon = iconIndex;
 
 		var bitmap = ImageManager.loadSystem(runtimeIcon.file);
-		console.log(bitmap);
+		// check if bitmap is ready
+		if (!bitmap.isReady()) {
+			bitmap.addLoadListener(this.drawIcon.bind(this, iconIndex, x, y));
+			return;
+		}
+
 		var pw = Window_Base._iconWidth;
 		var ph = Window_Base._iconHeight;
 		this.contents.blt(bitmap, 0, 0, pw, ph, x, y);

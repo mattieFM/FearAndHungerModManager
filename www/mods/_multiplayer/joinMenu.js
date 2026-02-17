@@ -68,12 +68,35 @@ MATTIE.scenes.multiplayer.join.prototype.addOptionsBtns = function () {
 	btns[MATTIE.TextManager.joinGame] = MATTIE.CmdManager.joinGame;
 	btns[MATTIE.TextManager.returnToMultiplayer] = MATTIE.CmdManager.returnToMultiplayer;
 	btns[MATTIE.TextManager.reconnect] = MATTIE.CmdManager.reconnect;
+
+	const hpText = `Hole Punch: ${MATTIE.multiplayer.forceHolePunch ? 'ON' : 'OFF'}`;
+	btns[hpText] = 'TOGGLE_HOLEPUNCH';
+
 	const enabled = {};
 	enabled[MATTIE.TextManager.reconnect] = {};
 	const netCont = MATTIE.multiplayer.getCurrentNetController();
 	enabled[MATTIE.TextManager.reconnect].val = netCont ? netCont.canTryToReconnect : false;
 
-	this._optionsWindow = new MATTIE.windows.HorizontalBtns(175 + 300 + 10, btns, 3, enabled);
+	this._optionsWindow = new MATTIE.windows.HorizontalBtns(175 + 300 + 10, btns, 4, enabled);
+
+	this._optionsWindow.setHandler('TOGGLE_HOLEPUNCH', () => {
+		MATTIE.multiplayer.forceHolePunch = !MATTIE.multiplayer.forceHolePunch;
+
+		const targetText = `Hole Punch: ${MATTIE.multiplayer.forceHolePunch ? 'ON' : 'OFF'}`;
+		let currentKey = null;
+		for (const key in this._optionsWindow._mattieBtns) {
+			if (this._optionsWindow._mattieBtns[key] === 'TOGGLE_HOLEPUNCH') {
+				currentKey = key;
+				break;
+			}
+		}
+		if (currentKey && currentKey !== targetText) {
+			delete this._optionsWindow._mattieBtns[currentKey];
+			this._optionsWindow._mattieBtns[targetText] = 'TOGGLE_HOLEPUNCH';
+			this._optionsWindow.refresh();
+		}
+		this._optionsWindow.activate();
+	});
 
 	this._optionsWindow.setHandler(MATTIE.CmdManager.joinGame, (() => {
 		this._inputWin.close();
