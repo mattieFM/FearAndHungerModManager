@@ -7,7 +7,6 @@
         "sharedAffinity": false
     },
     "dependencies": [
-        "_multiplayer/netControllerV2/transports/natTraversal",
         "_multiplayer/netControllerV2/transports/nodeTcpTransport",
         "_multiplayer/peerjs.min",
         "_multiplayer/netControllerV2/runTimeTroopEmitter",

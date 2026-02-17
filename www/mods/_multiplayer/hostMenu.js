@@ -151,26 +151,6 @@ MATTIE.scenes.multiplayer.host.prototype.updateFallbackButtonState = function ()
 	}
 };
 
-MATTIE.scenes.multiplayer.host.prototype.updateHolePunchButtonState = function () {
-	if (!this._optionsWindow || !this._optionsWindow._mattieBtns) return;
-
-	const targetText = `Hole Punch: ${MATTIE.multiplayer.forceHolePunch ? 'ON' : 'OFF'}`;
-
-	let currentKey = null;
-	for (const key in this._optionsWindow._mattieBtns) {
-		if (this._optionsWindow._mattieBtns[key] === 'TOGGLE_HOLEPUNCH') {
-			currentKey = key;
-			break;
-		}
-	}
-
-	if (currentKey && currentKey !== targetText) {
-		delete this._optionsWindow._mattieBtns[currentKey];
-		this._optionsWindow._mattieBtns[targetText] = 'TOGGLE_HOLEPUNCH';
-		this._optionsWindow.refresh();
-	}
-};
-
 MATTIE.scenes.multiplayer.host.prototype.addPeerDisplayWindow = function () {
 	const text = [
 		'People can join using this number:',
@@ -190,10 +170,7 @@ MATTIE.scenes.multiplayer.host.prototype.addOptionsBtns = function () {
 	const fallbackText = `TCP: ${MATTIE.multiplayer.forceFallback ? 'ON' : 'OFF'}`;
 	btns[fallbackText] = 'TOGGLE_FALLBACK';
 
-	const hpText = `Hole Punch: ${MATTIE.multiplayer.forceHolePunch ? 'ON' : 'OFF'}`;
-	btns[hpText] = 'TOGGLE_HOLEPUNCH';
-
-	this._optionsWindow = new MATTIE.windows.HorizontalBtns(175 + 300 + 10, btns, 6);
+	this._optionsWindow = new MATTIE.windows.HorizontalBtns(175 + 300 + 10, btns, 5);
 	this._optionsWindow.setHandler(MATTIE.CmdManager.startGame, (() => {
 		MATTIE.multiplayer.hostController.startGame();
 		MATTIE.menus.multiplayer.openGame();
@@ -217,12 +194,6 @@ MATTIE.scenes.multiplayer.host.prototype.addOptionsBtns = function () {
 		MATTIE.clipboard.put(encodedPeerId);
 		this._optionsWindow.activate();
 	}));
-
-	this._optionsWindow.setHandler('TOGGLE_HOLEPUNCH', () => {
-		MATTIE.multiplayer.forceHolePunch = !MATTIE.multiplayer.forceHolePunch;
-		this.updateHolePunchButtonState();
-		this._optionsWindow.activate();
-	});
 
 	this._optionsWindow.setHandler('TOGGLE_FALLBACK', () => {
 		const newState = !MATTIE.multiplayer.forceFallback;
