@@ -421,6 +421,7 @@ MATTIE.windows.ModListWin.prototype.makeCommandList = function () {
 
 	MATTIE_ModManager.modManager.getAllMods().forEach((mod) => {
 		const { name } = mod;
+		if (MATTIE.compat && MATTIE.compat.shouldBlockModOnTermina && MATTIE.compat.shouldBlockModOnTermina(name)) return;
 		const status = MATTIE_ModManager.modManager.getModActive(name);
 		const modInfo = MATTIE_ModManager.modManager.getModInfo(MATTIE_ModManager.modManager.getPath(), name);
 
@@ -479,6 +480,7 @@ MATTIE.windows.ModListWin.prototype.setUpHandlers = function () {
 
 	MATTIE_ModManager.modManager.getAllMods().forEach((mod) => {
 		const { name } = mod;
+		if (MATTIE.compat && MATTIE.compat.shouldBlockModOnTermina && MATTIE.compat.shouldBlockModOnTermina(name)) return;
 		const { status } = mod;
 		this.setHandler(`MATTIE_${name}`, (() => {
 			MATTIE_ModManager.modManager.switchStatusOfMod(name);

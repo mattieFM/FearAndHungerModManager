@@ -135,6 +135,10 @@ MATTIE.tpAPI.levelSixCaveVillage = function () {
 	this.genericTp(MATTIE.static.maps.levelSixMines, 60, 48);
 };
 
+MATTIE.tpAPI.terminaOldHouse = function () {
+	this.genericTp(MATTIE.static.maps.termina.oldHouse, 22, 43);
+}
+
 /**
  * @description teleport to the level 6 cave village inside room cube of the depths
  */
