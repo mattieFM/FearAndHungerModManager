@@ -11,7 +11,9 @@ MATTIE.multiplayer.Conversations = function () {
 
 MATTIE.multiplayer.Conversations.prototype.greetings = [
 	'Hello there',
-	'The Dungeons of Fear and hunger truly are beautiful today',
+	MATTIE.global.isTermina()
+		? 'The streets of Prehevil truly are beautiful today'
+		: 'The Dungeons of Fear and hunger truly are beautiful today',
 
 ];
 /**
@@ -176,13 +178,13 @@ MATTIE.multiplayer.Conversations.prototype.greeting = function () {
 	MATTIE.msgAPI.displayMsgWithTitle(this.targetName, 'Hello there');
 };
 
-// Fix for ALOE_ConditionalChoices plugin compatibility with msgAPI
-if (Imported.ALOE_ConditionalChoices) {
-	Window_ChoiceList.prototype.callOkHandler = function () {
-		var index = $gameMessage._visibleChoiceIndexes[this.index()];
-		if (index === undefined) index = this.index();
-		$gameMessage.onChoice(index);
-		this._messageWindow.terminateMessage();
-		this.close();
-	};
-}
+// // Fix for ALOE_ConditionalChoices plugin compatibility with msgAPI
+// if (Imported.ALOE_ConditionalChoices) {
+// 	Window_ChoiceList.prototype.callOkHandler = function () {
+// 		var index = $gameMessage._visibleChoiceIndexes[this.index()];
+// 		if (index === undefined) index = this.index();
+// 		$gameMessage.onChoice(index);
+// 		this._messageWindow.terminateMessage();
+// 		this.close();
+// 	};
+// }

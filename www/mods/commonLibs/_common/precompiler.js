@@ -56,43 +56,48 @@ MATTIE.preCompiler.precompilePage = function (page) {
 			}
 			break;
 
-		case 411: // jump
+		case 411: // else
 		case 402: // when
+		case 403: // when cancel
 		case 111: // Conditional Branch
 		case 601: // win
 		case 602: // escape
 		case 603: // lose
 			MATTIE.preCompiler.findJumpIndex(page.list, index);
-			/* falls through */
-		case 113:
+			break;
+		case 113: // Break Loop
+			MATTIE.preCompiler.findBreakLoopJumpIndex(page.list, index);
+			break;
+		case 108: // Comment
+			MATTIE.preCompiler.findCommentEndIndex(page.list, index);
+			break;
 		default:
 			break;
 		}
 	}
 };
-// // Break Loop
-// Game_Interpreter.prototype.command113 = function () {
-//     var depth = 0;
-//     while (this._index < this._list.length - 1) {
-//         this._index++;
-//         var command = this.currentCommand();
+MATTIE.preCompiler.findBreakLoopJumpIndex = function (list, indexOfBreak) {
+	let index = indexOfBreak;
+	let depth = 0;
+	while (index < list.length - 1) {
+		index++;
+		const command = list[index];
+		if (command.code === 112) depth++;
+		if (command.code === 413 && command.indent < list[indexOfBreak].indent) {
+			if (depth > 0) depth--;
+			else break;
+		}
+	}
+	list[indexOfBreak].jumpToIndex = index;
+};
 
-//         if (command.code === 112)
-//             depth++;
-
-//         if (command.code === 413 && command.indent < this._indent) {
-//             if (depth > 0)
-//                 depth--;
-//             else
-//                 break;
-//         }
-//     }
-//     return true;
-// };
-
-// MATTIE.preCompiler.findBreakLoopJumpIndex = function(list, indexOfBreakLoop){
-//     let index = indexOfBreakLoop;
-// }
+MATTIE.preCompiler.findCommentEndIndex = function (list, indexOfComment) {
+	let index = indexOfComment;
+	while (index + 1 < list.length && list[index + 1].code === 408) {
+		index++;
+	}
+	list[indexOfComment].jumpToIndex = index;
+};
 
 MATTIE.preCompiler.findJumpIndex = function (list, indexOfElse) {
 	let index = indexOfElse;
@@ -209,4 +214,45 @@ Game_Interpreter.prototype.skipBranch = function () {
 			this._index++;
 		}
 	}
+};
+
+// Break Loop - precomputed jump
+MATTIE.preCompiler.Base_Game_Interpreter_Command113 = Game_Interpreter.prototype.command113;
+Game_Interpreter.prototype.command113 = function () {
+	if (this.currentCommand().jumpToIndex) {
+		this._index = this.currentCommand().jumpToIndex;
+	} else {
+		// fallback to original behavior
+		var depth = 0;
+		while (this._index < this._list.length - 1) {
+			this._index++;
+			var command = this.currentCommand();
+			if (command.code === 112) depth++;
+			if (command.code === 413 && command.indent < this._indent) {
+				if (depth > 0) depth--;
+				else break;
+			}
+		}
+	}
+	return true;
+};
+
+// Comment - precomputed jump past comment block
+MATTIE.preCompiler.Base_Game_Interpreter_Command108 = Game_Interpreter.prototype.command108;
+Game_Interpreter.prototype.command108 = function () {
+	this._comments = [this._params[0]];
+	if (this.currentCommand().jumpToIndex) {
+		var endIndex = this.currentCommand().jumpToIndex;
+		while (this._index < endIndex) {
+			this._index++;
+			this._comments.push(this.currentCommand().parameters[0]);
+		}
+	} else {
+		// fallback to original behavior
+		while (this.nextEventCode() === 408) {
+			this._index++;
+			this._comments.push(this.currentCommand().parameters[0]);
+		}
+	}
+	return true;
 };

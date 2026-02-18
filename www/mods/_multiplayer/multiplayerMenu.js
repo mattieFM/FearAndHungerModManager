@@ -228,9 +228,17 @@ Window_MenuCommand.prototype.drawItem = function (index) {
 			this.changeTextColor(normalColor);
 		}
 		this.changePaintOpacity(this.isCommandEnabled(index));
+		var iconIndex = 0;
+		if (symbol === 'MATTIE_DROP') iconIndex = 123; // Placeholder icon index
+		if (iconIndex > 0) {
+			this.drawIcon(iconIndex, rect.x, rect.y + 2);
+			rect.x += Window_Base._iconWidth + 4;
+			rect.width -= Window_Base._iconWidth + 4;
+		}
 		this.drawText(this.commandName(index), rect.x, rect.y, rect.width, align);
 	} else {
-		_Window_MenuCommand_drawItem.call(this, index);
+		// Use Window_Command.prototype.drawItem directly so it picks up ARP_CommandIcons or other plugin overrides
+		Window_Command.prototype.drawItem.call(this, index);
 	}
 };
 

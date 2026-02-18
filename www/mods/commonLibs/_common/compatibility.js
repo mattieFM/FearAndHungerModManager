@@ -6,6 +6,12 @@
  * @description the name space used for compatibility changes
  * */
 MATTIE.compat = MATTIE.compat || {};
+MATTIE.compat.terminaBlockedMods = ['bossRushOfTheEndless'];
+
+MATTIE.compat.shouldBlockModOnTermina = function (modName) {
+	const isTermina = MATTIE.global && MATTIE.global.version === 2;
+	return isTermina && MATTIE.compat.terminaBlockedMods.includes(modName);
+};
 
 /** @description whether decryption of images should be forcibly stopped or not */
 MATTIE.compat.pauseDecrypt = false;
@@ -272,15 +278,16 @@ Game_Party.prototype.armors = function () {
 // fixes the gitpixel not defined bug
 //-----------------------------------------
 Window_Base.prototype.textColor = function (n) {
-	if (!this.windowskin) return '#ffffff'; // Fallback if windowskin is missing
+	if (!this.windowskin || !this.windowskin.isReady()) return '#ffffff'; // Fallback if windowskin is missing
 	var px = 96 + (n % 8) * 12 + 6;
 	var py = 144 + Math.floor(n / 8) * 12 + 6;
 	if (this.windowskin.width < px || this.windowskin.height < py) return '#ffffff'; // Fallback if skin too small
-	return this.windowskin.getPixel(px, py);
+	return this.windowskin.getPixel(px, py); // This line is likely the source of the error
 };
 
 Window_Base.prototype.pendingColor = function () {
 	const bitMap = this.windowskin || new Bitmap(120 + 2, 120 + 2);
+	if (!bitMap.isReady()) return '#ffffff';
 	return bitMap.getPixel(120, 120);
 };
 
@@ -298,3 +305,99 @@ Game_Character.prototype.updateRoutineMove = function () {
 		}
 	}
 };
+
+//-----------------------------------------
+// Fixes invisible cursor/pause sign/arrows
+//-----------------------------------------
+
+/**
+ * @description Fix to ensure windowskin is ready before refreshing cursor
+ */
+MATTIE.compat.Window_refreshCursor = Window.prototype._refreshCursor;
+Window.prototype._refreshCursor = function () {
+	if (this._windowskin && !this._windowskin.isReady()) {
+		this._windowskin.addLoadListener(this._refreshCursor.bind(this));
+		return;
+	}
+	MATTIE.compat.Window_refreshCursor.call(this);
+};
+
+/**
+ * @description Fix to ensure windowskin is ready before refreshing pause sign
+ */
+MATTIE.compat.Window_refreshPauseSign = Window.prototype._refreshPauseSign;
+Window.prototype._refreshPauseSign = function () {
+	if (this._windowskin && !this._windowskin.isReady()) {
+		this._windowskin.addLoadListener(this._refreshPauseSign.bind(this));
+		return;
+	}
+	MATTIE.compat.Window_refreshPauseSign.call(this);
+};
+
+/**
+ * @description Fix to ensure windowskin is ready before refreshing arrows
+ */
+MATTIE.compat.Window_refreshArrows = Window.prototype._refreshArrows;
+Window.prototype._refreshArrows = function () {
+	if (this._windowskin && !this._windowskin.isReady()) {
+		this._windowskin.addLoadListener(this._refreshArrows.bind(this));
+		return;
+	}
+	MATTIE.compat.Window_refreshArrows.call(this);
+};
+
+//-----------------------------------------
+// Termina menu icon compatibility
+//-----------------------------------------
+
+/**
+ * @description In Termina, some modded menu paths call Window_Command.drawItem directly,
+ * which can pick up ARP legacy icon mappings intended for F&H1.
+ * For menu command windows, draw default text-only commands to preserve Termina behavior.
+ */
+MATTIE.compat.Window_Command_drawItem = Window_Command.prototype.drawItem;
+Window_Command.prototype.drawItem = function (index) {
+	const isTermina = MATTIE.global && MATTIE.global.version === 2;
+	const isMenuCommandWindow = this instanceof Window_MenuCommand || this instanceof Window_GameEnd;
+	if (isTermina && isMenuCommandWindow) {
+		var rect = this.itemRectForText(index);
+		var align = this.itemTextAlign();
+		var symbol = this.commandSymbol(index);
+		var iconMap = {
+			item: 1,
+			equip: 2,
+			synthesis: 3,
+			skill: 4,
+			status: 5,
+			gameEnd: 6,
+			options: 7,
+		};
+		this.resetTextColor();
+		this.changePaintOpacity(this.isCommandEnabled(index));
+		if (iconMap[symbol]) {
+			this.drawIcon(iconMap[symbol], rect.x - 4, rect.y + 2);
+			rect.x += 30;
+			rect.width -= 30;
+		}
+		this.drawText(this.commandName(index), rect.x, rect.y, rect.width, align);
+		return;
+	}
+	MATTIE.compat.Window_Command_drawItem.call(this, index);
+};
+
+//-----------------------------------------
+// Termina incompatible mod blocking
+//-----------------------------------------
+if (typeof ModManager !== 'undefined') {
+	MATTIE.compat.ModManager_getModActive = ModManager.prototype.getModActive;
+	ModManager.prototype.getModActive = function (modName) {
+		if (MATTIE.compat.shouldBlockModOnTermina(modName)) return false;
+		return MATTIE.compat.ModManager_getModActive.call(this, modName);
+	};
+
+	MATTIE.compat.ModManager_switchStatusOfMod = ModManager.prototype.switchStatusOfMod;
+	ModManager.prototype.switchStatusOfMod = function (modName) {
+		if (MATTIE.compat.shouldBlockModOnTermina(modName)) return;
+		MATTIE.compat.ModManager_switchStatusOfMod.call(this, modName);
+	};
+}
