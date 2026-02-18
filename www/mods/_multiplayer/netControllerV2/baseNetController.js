@@ -505,6 +505,9 @@ class BaseNetController extends EventEmitter {
 		if (data.battleEnd) {
 			this.onBattleEndData(data.battleEnd, id);
 		}
+		if (data.extraTurnBroadcast) {
+			this.onExtraTurnBroadcast();
+		}
 		if (data.ready) {
 			this.onReadyData(data.ready, id);
 		}
@@ -855,6 +858,32 @@ class BaseNetController extends EventEmitter {
 				}
 			}
 		});
+	}
+
+	//-----------------------------------------------------
+	// Extra Turn Broadcast
+	//-----------------------------------------------------
+
+	/**
+	 * @description Broadcast to all peers that a local extra turn is starting.
+	 * Recipients should also enter extra turn mode so all players participate.
+	 */
+	emitExtraTurnBroadcast() {
+		const obj = {};
+		obj.extraTurnBroadcast = true;
+		this.sendViaMainRoute(obj);
+	}
+
+	/**
+	 * @description Handle receiving an extra turn broadcast from a peer.
+	 * Sets Galv.EXTURN.active so localparty either inputs (if they have exTurn actors) or auto-readies.
+	 */
+	onExtraTurnBroadcast() {
+		if (MATTIE.multiplayer.inBattle) {
+			Galv.EXTURN.active = true;
+			MATTIE.multiplayer.combatEmitter.inExtraTurn = true;
+			console.log('[Net] Extra turn broadcast received — entering extra turn state');
+		}
 	}
 
 	//-----------------------------------------------------

@@ -40,6 +40,11 @@ BattleManager.startAfterReady = function () {
  *
 */
 BattleManager.unready = function () {
+	// Block unready during an extra turn — players cannot escape extra rounds
+	if (MATTIE.multiplayer.combatEmitter.inExtraTurn) {
+		BattleLog('Cannot cancel during extra turn');
+		return;
+	}
 	BattleManager.startInput();
 	this._phase = 'input';
 	BattleLog('unready!');
@@ -269,6 +274,7 @@ BattleManager.getNextSubject = function () {
 MATTIE.multiplayer.battlemanageronStart = BattleManager.startBattle;
 BattleManager.startBattle = function () {
 	MATTIE.multiplayer.combatEmitter.netExTurn = false;
+	MATTIE.multiplayer.combatEmitter.inExtraTurn = false;
 	MATTIE.multiplayer.ready = false;
 	MATTIE.multiplayer.waitingOnAllies = false;
 	MATTIE.multiplayer.battlemanageronStart.call(this);
@@ -413,6 +419,32 @@ BattleManager.update = function () {
 			break;
 
 		case 'input':
+			// --- Multiplayer extra turn handling ---
+			// If the local Galv extra turn just activated, broadcast it to peers,
+			// strip enemies from _exBattlers (enemies don't act during extra turns in MP),
+			// and set the inExtraTurn lock so ESC is blocked.
+			if (Galv.EXTURN.active && !MATTIE.multiplayer.combatEmitter.inExtraTurn
+				&& MATTIE.multiplayer.inBattle && $gameTroop.totalCombatants && $gameTroop.totalCombatants() > 1) {
+				// Remove enemies from extra turn battlers — only player actors get extra turns in MP
+				if (this._exBattlers) {
+					this._exBattlers = this._exBattlers.filter((b) => b instanceof Game_Actor);
+				}
+				if ($gameTroop.members) {
+					$gameTroop.members().forEach((enemy) => { enemy._exTurn = false; });
+				}
+				// If no player actors actually qualify, deactivate extra turn
+				if (this._exBattlers && this._exBattlers.length === 0) {
+					BattleManager.setExTurn(false);
+				} else {
+					MATTIE.multiplayer.combatEmitter.inExtraTurn = true;
+					try {
+						MATTIE.multiplayer.getCurrentNetController().emitExtraTurnBroadcast();
+					} catch (e) {
+						console.warn('[ExTurn] Failed to broadcast extra turn', e);
+					}
+				}
+			}
+
 			if (this.checkSomeExtraTurn() && !Galv.EXTURN.active) {
 				this.ready();
 				break;
@@ -463,6 +495,8 @@ BattleManager.update = function () {
 				MATTIE.multiplayer.BattleController.emitUnreadyEvent();
 				MATTIE.multiplayer.BattleController.emitTurnEndEvent();
 			}
+			// Clear extra turn tracking when turn finishes
+			MATTIE.multiplayer.combatEmitter.inExtraTurn = false;
 			BattleManager.sync();
 			break;
 		case 'syncing':
