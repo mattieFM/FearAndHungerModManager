@@ -135,6 +135,115 @@ MATTIE.tpAPI.levelSixCaveVillage = function () {
 	this.genericTp(MATTIE.static.maps.levelSixMines, 60, 48);
 };
 
+MATTIE.tpAPI.terminaOldHouse = function () {
+	this.genericTp(MATTIE.static.maps.termina.oldHouse, 22, 43);
+};
+
+/**
+ * @description teleport to the Termina train cabins
+ */
+MATTIE.tpAPI.terminaTrainCabins = function () {
+	this.genericTp(MATTIE.static.maps.termina.trainCabins, 6, 6);
+};
+
+/**
+ * @description teleport to the Termina outskirts area
+ */
+MATTIE.tpAPI.terminaOutskirts = function () {
+	this.genericTp(MATTIE.static.maps.termina.outskirts, 32, 30);
+};
+
+/**
+ * @description teleport to Old Town in Termina
+ */
+MATTIE.tpAPI.terminaOldTown = function () {
+	this.genericTp(MATTIE.static.maps.termina.oldTown, 25, 30);
+};
+
+/**
+ * @description teleport to Prehevil central in Termina
+ */
+MATTIE.tpAPI.terminaPrehevil = function () {
+	this.genericTp(MATTIE.static.maps.termina.prehevil, 20, 25);
+};
+
+/**
+ * @description teleport to Prehevil East (Church area)
+ */
+MATTIE.tpAPI.terminaPrehEast = function () {
+	this.genericTp(MATTIE.static.maps.termina.prehEast, 15, 20);
+};
+
+/**
+ * @description teleport to Prehevil West (School area)
+ */
+MATTIE.tpAPI.terminaPrehWest = function () {
+	this.genericTp(MATTIE.static.maps.termina.prehWest, 15, 20);
+};
+
+/**
+ * @description teleport to the Deep Woods in Termina
+ */
+MATTIE.tpAPI.terminaDeepWoods = function () {
+	this.genericTp(MATTIE.static.maps.termina.deepWoods, 15, 20);
+};
+
+/**
+ * @description teleport to the Riverside / Lake area in Termina
+ */
+MATTIE.tpAPI.terminaRiverside = function () {
+	this.genericTp(MATTIE.static.maps.termina.riverside, 20, 20);
+};
+
+/**
+ * @description teleport to the Mayor's Manor in Termina
+ */
+MATTIE.tpAPI.terminaMayorsManor = function () {
+	this.genericTp(MATTIE.static.maps.termina.mayorsManor, 10, 15);
+};
+
+/**
+ * @description teleport to Tunnel 7 in Termina
+ */
+MATTIE.tpAPI.terminaTunnel7 = function () {
+	this.genericTp(MATTIE.static.maps.termina.tunnel7, 10, 10);
+};
+
+/**
+ * @description teleport to Tunnel 0 entrance in Termina
+ */
+MATTIE.tpAPI.terminaTunnel0 = function () {
+	this.genericTp(MATTIE.static.maps.termina.tunnel0, 10, 10);
+};
+
+/**
+ * @description teleport to the Sewers in Termina
+ */
+MATTIE.tpAPI.terminaSewers = function () {
+	this.genericTp(MATTIE.static.maps.termina.sewers, 10, 10);
+};
+
+/**
+ * @description teleport to the Hollow Tower in Termina
+ */
+MATTIE.tpAPI.terminaHollowTower = function () {
+	this.genericTp(MATTIE.static.maps.termina.hollowTower, 10, 10);
+};
+
+/**
+ * @description teleport to the Speakeasy bar in Termina
+ */
+MATTIE.tpAPI.terminaSpeakeasy = function () {
+	this.genericTp(MATTIE.static.maps.termina.speakeasy, 10, 10);
+};
+
+/**
+ * @description teleport to Hexen village in Termina
+ */
+MATTIE.tpAPI.terminaHexen = function () {
+	this.genericTp(MATTIE.static.maps.termina.hexen, 15, 15);
+};
+
 /**
  * @description teleport to the level 6 cave village inside room cube of the depths
  */

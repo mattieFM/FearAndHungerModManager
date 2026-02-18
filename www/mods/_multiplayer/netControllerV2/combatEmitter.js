@@ -12,6 +12,8 @@ MATTIE.BattleManagerStartTurn = BattleManager.startTurn;
 MATTIE.multiplayer.combatEmitter.netExTurn = false;
 MATTIE.multiplayer.ready = false;
 MATTIE.multiplayer.waitingOnAllies = false;
+/** @description true when the local client is in an extra turn (local or received from net) */
+MATTIE.multiplayer.combatEmitter.inExtraTurn = false;
 
 /** log info with the proper conditionals */
 function BattleLog(str) {

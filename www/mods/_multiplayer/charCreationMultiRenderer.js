@@ -1,28 +1,59 @@
 var MATTIE = MATTIE || {};
 MATTIE.multiplayer.charCreationRenderer = MATTIE.multiplayer.charCreationRenderer || {};
 
-MATTIE.multiplayer.charCreationRenderer.mapIdToDisplayName = {
-	1: 'intro_cahara1',
-	2: 'intro_girl1',
-	3: 'intro_knight1',
-	4: 'intro_enki1',
-	5: 'intro_outlander1',
-	6: 'intro_legarde1',
-	7: 'intro_moonless1',
-	8: 'intro_kid1',
-	9: 'intro_marriage1',
-	11: 'intro_fusion1',
-	16: 'intro_ghoul1',
-	17: 'intro_ghoul1',
-	18: 'intro_ghoul1',
-	19: 'intro_skeleton1',
-	20: 'intro_skeleton1',
-	21: 'intro_skeleton1',
-};
+MATTIE.multiplayer.charCreationRenderer.mapIdToDisplayName = {};
+
+if (MATTIE.global.isTermina()) {
+	MATTIE.multiplayer.charCreationRenderer.mapIdToDisplayName = {
+		1: 'face_levi',
+		3: 'face_marina',
+		4: 'face_daan',
+		5: 'face_abella',
+		6: 'face_osaa',
+		13: 'face_marcoh',
+		14: 'face_karin',
+		15: 'face_olivia',
+	};
+} else {
+	MATTIE.multiplayer.charCreationRenderer.mapIdToDisplayName = {
+		1: 'intro_cahara1',
+		2: 'intro_girl1',
+		3: 'intro_knight1',
+		4: 'intro_enki1',
+		5: 'intro_outlander1',
+		6: 'intro_legarde1',
+		7: 'intro_moonless1',
+		8: 'intro_kid1',
+		9: 'intro_marriage1',
+		11: 'intro_fusion1',
+		16: 'intro_ghoul1',
+		17: 'intro_ghoul1',
+		18: 'intro_ghoul1',
+		19: 'intro_skeleton1',
+		20: 'intro_skeleton1',
+		21: 'intro_skeleton1',
+	};
+}
 
 MATTIE.multiplayer.charCreationRenderer.rendered = false;
+/** @description tracks which picture IDs are currently shown so they can be cleaned up */
+MATTIE.multiplayer.charCreationRenderer._activePictureIds = [];
+
+/** @description erase all portraits currently rendered on screen */
+MATTIE.multiplayer.charCreationRenderer.clearPortraits = function () {
+	const ids = MATTIE.multiplayer.charCreationRenderer._activePictureIds;
+	for (let i = 0; i < ids.length; i++) {
+		$gameScreen.erasePicture(ids[i]);
+	}
+	MATTIE.multiplayer.charCreationRenderer._activePictureIds = [];
+	MATTIE.multiplayer.charCreationRenderer.rendered = false;
+};
+
 /** @description render portraits of all net players on the screen */
 MATTIE.multiplayer.charCreationRenderer.renderNetPlayerPortraitsOnScreen = function () {
+	// Clear any leftover portraits first
+	MATTIE.multiplayer.charCreationRenderer.clearPortraits();
+
 	setTimeout(() => {
 		MATTIE.multiplayer.charCreationRenderer.rendered = true;
 		const netCont = MATTIE.multiplayer.getCurrentNetController();
@@ -41,6 +72,7 @@ MATTIE.multiplayer.charCreationRenderer.renderNetPlayerPortraitsOnScreen = funct
 						const xVal = 250 + ((x * 100) * (i % 2 == 0 ? 1 : -1));
 						const yVal = 200 + yInc;
 						MATTIE.fxAPI.showImage(MATTIE.multiplayer.charCreationRenderer.mapIdToDisplayName[id], i, xVal, yVal);
+						MATTIE.multiplayer.charCreationRenderer._activePictureIds.push(i);
 						i++;
 						x += 1 * (i % 2 == 0 ? 1 : 0);
 						yInc += 25 * (i % 2 == 0 ? 1 : 0);
@@ -48,16 +80,16 @@ MATTIE.multiplayer.charCreationRenderer.renderNetPlayerPortraitsOnScreen = funct
 				});
 			}
 		}
-		setTimeout(() => {
-			for (let index = 10; index <= i; index++) {
-				$gameScreen.erasePicture(index);
-			}
-		}, 60000);
 	}, 5000);
 };
 
 MATTIE.multiplayer.charCreationRenderer.onMapLoad = Scene_Map.prototype.onMapLoaded;
 Scene_Map.prototype.onMapLoaded = function () {
+	// If we left the start map, clear any lingering portraits
+	if (!MATTIE.static.maps.onStartMap() && MATTIE.multiplayer.charCreationRenderer.rendered) {
+		MATTIE.multiplayer.charCreationRenderer.clearPortraits();
+	}
+
 	if (!MATTIE.multiplayer.varSyncer.syncedOnce) {
 		if (MATTIE.static.maps.onStartMap()) MATTIE.multiplayer.charCreationRenderer.renderNetPlayerPortraitsOnScreen();
 	}
