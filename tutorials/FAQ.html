@@ -3,30 +3,461 @@
     This page contains all common issues and their solutions, starting with connection issues. Please read fully and if you still need help feel free to DM me @Mattiefm or join the discord.
 </p>
 
+<!-- ============================================================ -->
+<!-- NETWORKING & CONNECTIONS: COMPREHENSIVE GUIDE                 -->
+<!-- ============================================================ -->
 
-<h2>Not Connecting to server</h2>
-If you have been sent here by the game, then it is taking a while to connect and it should not take this long. Feel free to wait a little while (5 or so min any more is excessive). 
-If waiting does not resolve it please refer to the list of factors that might effect connections below:
-<h3>Broker server status</h3>
+<hr>
+<h1 style="color: #c75050;">Networking &amp; Connection Guide</h1>
 <p>
-    Despite the mod being peer to peer we do rely on a small server for initializing connections this is called a broker server and is used to slight obscure ip adresses and make things
-    generally easier. It rarely goes down as all it needs to do is send the key and map said key to the other peers ip. once connected it does nothing. If it remains down for a while please 
-    message me and I will look into hosting one myself, but for the time being I have no need to do so. That said, first and foremost ensure it is up. if it is not wait a while. Msg me if its
-    down for more than a day or 2 consistently.
+    This section covers <strong>everything</strong> about how the multiplayer mod connects players, what connection methods exist,
+    why connections fail, and how to fix every known issue. Read the section relevant to your problem, or read the whole thing
+    for a full understanding.
 </p>
-<iframe src="https://status.peerjs.com/ib0l" id="peerJsIFRAME" title="description" width="70%", height="20%"></iframe>
+
+<!-- ==================== HOW THE MOD CONNECTS =================== -->
+<h2>How the Multiplayer Mod Connects Players</h2>
+<p>
+    The Fear &amp; Hunger Multiplayer Mod is <strong>peer-to-peer</strong> (P2P). There is no central game server that players connect to.
+    Instead, one player acts as the <strong>Host</strong> and other players connect directly to them as <strong>Clients</strong>.
+    The mod supports two connection methods: <strong>PeerJS (WebRTC)</strong> and <strong>TCP Direct Connect (Fallback)</strong>.
+</p>
+
+<h3>Connection Flow Overview</h3>
 <ol>
-    <li>Check the broker server status above</li>
-    <li>Ensure you copied the code correctly. Ensure you copied it into the "connection key" field and not the "username" field</li>
-    <li>reload/relaunch your client</li>
-    <li>reload/relaunch your server. Try switching who is hosting vs connecting. IE if you were connecting to your friend's server, try hosting and having them connect.</li>
-    <li>Ensure your PC's firewall is not blocking fear and hunger.</li>
-    <li>Enure you are not on a wifi hotspot, these tend to mess with IPs and might cause issues. if you need to use one, try using a vpn to hopefully fix the ip issues.</li>
-    <li>Ensure your router firewall is not blocking your server/connection</li>
-    <li>Enable/Disable your vpn, turn it on and off try with both, sometimes this can bypass poorly configured firewalls.</li>
-    <li>Reinstall the game.</li>
-    <li>Ask in the discord for more help.</li>
+    <li>The <strong>Host</strong> clicks "Host Game" in the multiplayer menu. The mod opens a connection and generates a connection code.</li>
+    <li>The Host shares the connection code with friends (via Discord, text message, etc.).</li>
+    <li>The <strong>Client</strong> clicks "Join Game" and pastes the connection code into the "Connection Key" field.</li>
+    <li>The client's game establishes a direct connection to the host.</li>
+    <li>Once connected, both players appear in the lobby. The host clicks "Start Game" to begin.</li>
 </ol>
+
+<!-- ==================== CONNECTION METHODS ===================== -->
+<h2>Connection Methods Explained</h2>
+
+<h3>Method 1: PeerJS / WebRTC (Default)</h3>
+<p>
+    This is the <strong>default and recommended</strong> connection method. It uses a technology called <strong>WebRTC</strong> 
+    (Web Real-Time Communication) through a library called <strong>PeerJS</strong>.
+</p>
+<h4>How it works:</h4>
+<ol>
+    <li><strong>Broker Server</strong>: When you host, the mod contacts the PeerJS broker server (a free public server at <code>0.peerjs.com</code>).
+        This server does NOT relay your game data. It only helps the two players <em>find each other</em> by exchanging connection information.
+        Think of it as a matchmaker &mdash; once players are introduced, the broker steps aside.</li>
+    <li><strong>STUN/TURN Servers</strong>: After the broker introduces the two peers, the mod uses STUN and TURN servers to establish the actual connection:
+        <ul>
+            <li><strong>STUN</strong> (<code>stun:stun.l.google.com:19302</code>): Helps each player discover their own public IP address and the type of NAT (Network Address Translation) they are behind. This is used in most successful connections.</li>
+            <li><strong>TURN</strong> (<code>turn:eu-0.turn.peerjs.com:3478</code> and <code>turn:us-0.turn.peerjs.com:3478</code>): If a direct connection fails (usually due to strict NAT/firewall), the data is <em>relayed</em> through a TURN server. This is slower but works through most firewalls.</li>
+        </ul>
+    </li>
+    <li><strong>Direct P2P</strong>: Once the handshake completes, data flows directly between the two players' computers. The broker and STUN servers are no longer involved.</li>
+</ol>
+<h4>Connection Code Format:</h4>
+<p>
+    The connection code you share is a <strong>Base64-encoded PeerJS ID</strong>. It looks like a random string of letters and numbers.
+    It does <strong>not</strong> contain your IP address directly &mdash; the broker server handles the IP mapping behind the scenes.
+</p>
+<h4>Pros:</h4>
+<ul>
+    <li>Does not expose your IP address to the other player (the broker handles the mapping).</li>
+    <li>Works through most NAT configurations automatically thanks to STUN/TURN.</li>
+    <li>No port forwarding required in most cases.</li>
+    <li>Easiest to use &mdash; just share the code and connect.</li>
+</ul>
+<h4>Cons:</h4>
+<ul>
+    <li>Requires the PeerJS broker server to be online for the initial connection.</li>
+    <li>May fail on very restrictive networks (corporate, university, some mobile hotspots).</li>
+    <li>If both the STUN and TURN servers are unavailable or blocked, connection will fail.</li>
+    <li>Slightly higher latency if the connection is being relayed through a TURN server.</li>
+</ul>
+
+<h3>Method 2: TCP Direct Connect (Fallback)</h3>
+<p>
+    TCP Direct Connect is the <strong>fallback</strong> connection method. It bypasses PeerJS entirely and creates a raw TCP socket
+    connection between the host and client on <strong>port 6878</strong> (by default).
+</p>
+<h4>How it works:</h4>
+<ol>
+    <li>The Host's game starts a TCP server listening on port 6878.</li>
+    <li>The mod attempts to detect the host's <strong>public IP address</strong> automatically using DNS lookup (OpenDNS) or HTTP fallback (AWS CheckIP).</li>
+    <li>The connection code displayed is a <strong>Base64-encoded IP address</strong> with port and a random suffix (e.g., <code>203.0.113.50:6878_a1b2</code> encoded).</li>
+    <li>The Client decodes the code and connects directly to that IP and port via TCP.</li>
+    <li>A handshake is exchanged to identify the client, then data flows directly over TCP.</li>
+</ol>
+<h4>Connection Code Format:</h4>
+<p>
+    The TCP connection code, when decoded, looks like an IP address: <code>203.0.113.50:6878_a1b2</code>. 
+    The mod auto-detects whether a code is an IP address or a PeerJS ID and switches modes accordingly.
+</p>
+<h4>When TCP is used:</h4>
+<ul>
+    <li><strong>Manually</strong>: You can toggle TCP mode using the "TCP: ON/OFF" button in the host menu.</li>
+    <li><strong>Automatically by host</strong>: If the PeerJS broker does not respond within <strong>10 seconds</strong>, the host automatically switches to TCP.</li>
+    <li><strong>Automatically by client</strong>: If the connection code looks like an IP address, the client automatically enables TCP mode.</li>
+</ul>
+<h4>Pros:</h4>
+<ul>
+    <li>Does not depend on any external broker, STUN, or TURN servers.</li>
+    <li>Works when PeerJS is completely down or blocked.</li>
+    <li>Can offer lower latency on local networks (LAN play).</li>
+    <li>Useful for playing on networks that block WebRTC (some corporate/school networks).</li>
+</ul>
+<h4>Cons:</h4>
+<ul>
+    <li><strong style="color: #c75050;">Exposes the host's IP address</strong> to anyone who receives the connection code. Only share TCP codes with people you trust.</li>
+    <li>Requires <strong>port forwarding</strong> on the host's router if players are on different networks (not on the same LAN).</li>
+    <li>The host's operating system firewall must allow inbound connections on port 6878.</li>
+    <li>If the mod cannot detect the public IP (DNS and HTTP lookups fail), it will fall back to the <strong>local/private IP</strong>, which only works on the same local network.</li>
+    <li>If port 6878 is already in use, the mod will automatically try the next port (6879, 6880, etc.) and will alert you. You must then forward <em>that</em> port instead.</li>
+</ul>
+
+<h4>TCP IP Warning:</h4>
+<p>
+    The first time you enable TCP mode, the game will display a warning: <strong>"TCP directly reveals your IP &mdash; only send this code to trusted friends."</strong>
+    You can choose to suppress this warning for future sessions.
+</p>
+
+<!-- ==================== QUICK COMPARISON TABLE ================= -->
+<h3>Quick Comparison: PeerJS vs TCP</h3>
+<table border="1" cellpadding="8" cellspacing="0" style="border-collapse: collapse; width: 100%; max-width: 800px;">
+    <thead style="background-color: #333; color: #fff;">
+        <tr>
+            <th>Feature</th>
+            <th>PeerJS (WebRTC)</th>
+            <th>TCP Direct Connect</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr><td>Default mode</td><td>Yes</td><td>No (fallback)</td></tr>
+        <tr><td>IP exposed to other player</td><td>No</td><td><strong>Yes</strong></td></tr>
+        <tr><td>Requires external servers</td><td>Broker + STUN/TURN (for setup only)</td><td>None</td></tr>
+        <tr><td>Port forwarding needed</td><td>Usually no (TURN relay handles it)</td><td>Yes (for internet play)</td></tr>
+        <tr><td>Works on LAN without internet</td><td>No</td><td>Yes</td></tr>
+        <tr><td>Works through strict firewalls</td><td>Usually (via TURN relay)</td><td>Only if port is forwarded</td></tr>
+        <tr><td>Default port</td><td>N/A (uses WebRTC data channels)</td><td>6878 (TCP)</td></tr>
+        <tr><td>Auto-fallback</td><td>N/A</td><td>Auto-enables after 10s PeerJS timeout</td></tr>
+    </tbody>
+</table>
+
+<!-- ==================== NOT CONNECTING ========================= -->
+<h2>Not Connecting? Step-by-Step Troubleshooting</h2>
+<p>
+    If you have been sent here by the game, your connection is taking longer than expected. Work through the following checklist
+    <strong>in order</strong>. Each step resolves the most common cause before moving to the next.
+</p>
+
+<h3>Step 0: Check the Broker Server Status (PeerJS mode only)</h3>
+<p>
+    The PeerJS broker server is a free public service that helps players find each other. If it is offline, PeerJS connections
+    will not work until it comes back. This does <strong>not</strong> affect TCP Direct Connect.
+</p>
+<iframe src="https://status.peerjs.com/ib0l" id="peerJsIFRAME" title="PeerJS Broker Server Status" width="70%" height="150" style="border: 1px solid #555;"></iframe>
+<p>
+    <strong>If the broker is down:</strong> Wait 1-2 hours and try again, or switch to TCP Direct Connect (see the section below on how to enable it).
+    If it stays down for more than a day, check the project Discord or message @Mattiefm.
+</p>
+
+<h3>Step 1: Verify the Connection Code</h3>
+<ul>
+    <li>Make sure the host clicked <strong>"Copy Code"</strong> in the host lobby and sent the full code to the client.</li>
+    <li>The client must paste the code into the <strong>"Connection Key"</strong> field &mdash; <strong>NOT</strong> the "Username" field.</li>
+    <li>Make sure no extra spaces, line breaks, or characters were added when copying/pasting.</li>
+    <li>After pasting the code, press <strong>Enter</strong> to submit it. Do NOT press "Z" or other keys &mdash; some keybinds will type a letter into the field instead of submitting. If your accept key is bound to a letter key, the letter may be appended to the code and break it.</li>
+    <li>If using TCP, make sure the host sent the code generated <em>after</em> enabling TCP mode, not an old PeerJS code.</li>
+</ul>
+
+<h3>Step 2: Ensure Both Players Are Using the Same Connection Method</h3>
+<ul>
+    <li>The <strong>host</strong> and <strong>client</strong> must be using the same connection method. If the host has TCP enabled, the code will be an IP-based code, and the client's game should auto-detect this and switch to TCP.</li>
+    <li>If auto-detection is not working, you can see the mode in the host menu where it says "TCP: ON" or "TCP: OFF".</li>
+    <li>If you are unsure, have the host generate a new code after confirming TCP is ON or OFF, and share that new code.</li>
+</ul>
+
+<h3>Step 3: Restart the Game</h3>
+<ul>
+    <li>Close Fear &amp; Hunger completely (not just return to menu &mdash; close the game window).</li>
+    <li>Have <strong>both</strong> the host and client restart the game.</li>
+    <li>Have the host create a new lobby and generate a fresh code.</li>
+</ul>
+
+<h3>Step 4: Switch Who Is Hosting</h3>
+<ul>
+    <li>Networking issues are often caused by the host's network configuration. Have the other player try hosting instead.</li>
+    <li>If Player A cannot host but Player B can, then Player A's network likely has restrictive NAT or firewall settings.</li>
+</ul>
+
+<h3>Step 5: Check Your PC Firewall</h3>
+<p>
+    Your operating system's firewall may be blocking Fear &amp; Hunger from accepting incoming connections.
+</p>
+<h4>Windows:</h4>
+<ol>
+    <li>Open <strong>Windows Security</strong> &rarr; <strong>Firewall &amp; network protection</strong> &rarr; <strong>Allow an app through firewall</strong>.</li>
+    <li>Click <strong>"Change settings"</strong>, then <strong>"Allow another app..."</strong>.</li>
+    <li>Browse to your Fear &amp; Hunger <code>Game.exe</code> (or <code>nw.exe</code> / <code>nwjs.exe</code> in the game folder) and add it.</li>
+    <li>Ensure both <strong>Private</strong> and <strong>Public</strong> network checkboxes are enabled.</li>
+    <li>If you are using TCP mode, also make sure <strong>port 6878</strong> (TCP) is not blocked. You can create an inbound rule in Windows Defender Firewall with Advanced Security for port 6878.</li>
+</ol>
+<h4>Mac / Linux:</h4>
+<ul>
+    <li>Ensure your firewall allows the game executable to accept inbound connections.</li>
+    <li>On macOS, you may see a system prompt asking to allow incoming connections the first time &mdash; click "Allow".</li>
+    <li>On Linux, check <code>ufw</code> or <code>iptables</code> rules if applicable.</li>
+</ul>
+
+<h3>Step 6: Check Your Router Firewall &amp; NAT</h3>
+<p>
+    Your home router also has a firewall and uses NAT (Network Address Translation) which can block incoming connections.
+</p>
+<ul>
+    <li><strong>PeerJS mode</strong>: Usually works without router changes due to STUN/TURN. If it still fails, your router may have
+        "Strict NAT" (also called "Symmetric NAT"). Try enabling <strong>UPnP</strong> (Universal Plug and Play) in your router settings.</li>
+    <li><strong>TCP mode</strong>: You <strong>must port forward</strong> port 6878 on the host's router to the host's local IP address.
+        <ol>
+            <li>Find your local IP: Open a command prompt and type <code>ipconfig</code> (Windows) or <code>ifconfig</code> / <code>ip addr</code> (Mac/Linux). Look for your IPv4 address (e.g., 192.168.1.50).</li>
+            <li>Log into your router (usually at <code>192.168.1.1</code> or <code>192.168.0.1</code> in a browser).</li>
+            <li>Find the Port Forwarding section (varies by router brand).</li>
+            <li>Add a rule: External port <strong>6878</strong>, Internal port <strong>6878</strong>, Protocol <strong>TCP</strong>, Internal IP = your local IP.</li>
+            <li>Save and restart the router if necessary.</li>
+        </ol>
+    </li>
+    <li>If the game told you a different port was used (e.g., "port 6878 was taken, the next free available port was 6879"), forward <em>that</em> port instead.</li>
+</ul>
+
+<h3>Step 7: WiFi Hotspot / Mobile Data Issues</h3>
+<p>
+    Mobile hotspots and cellular networks frequently use <strong>Carrier-Grade NAT (CGNAT)</strong>, which makes direct connections 
+    extremely difficult or impossible.
+</p>
+<ul>
+    <li>If you are on a mobile hotspot, try switching to a regular WiFi / wired connection.</li>
+    <li>If you <em>must</em> use a hotspot, try using a <strong>VPN</strong> (see below). A VPN can sometimes bypass CGNAT by routing traffic through a VPN server that has a proper public IP.</li>
+    <li>Another option: have the person on the hotspot be the <strong>Client</strong> (not the Host), as connecting outbound is easier than accepting inbound connections on CGNAT.</li>
+</ul>
+
+<h3>Step 8: VPN Troubleshooting</h3>
+<p>
+    VPNs can both <strong>help</strong> and <strong>hurt</strong> connectivity:
+</p>
+<ul>
+    <li><strong>VPN helps when</strong>: Your ISP or network has strict NAT/CGNAT, or blocks WebRTC/TCP ports. A VPN routes your traffic through a server with a proper public IP, potentially bypassing these restrictions.</li>
+    <li><strong>VPN hurts when</strong>: The VPN itself blocks P2P connections, adds too much latency, or interferes with the attempt to detect your public IP. Some free VPNs actively block peer-to-peer traffic.</li>
+    <li><strong>Try both states</strong>: If you have a VPN, try connecting with it ON and with it OFF. See which works.</li>
+    <li>If using a VPN with TCP mode, the other player will see the VPN server's IP, not your real IP.</li>
+</ul>
+
+<h3>Step 9: Antivirus / Security Software</h3>
+<ul>
+    <li>Some antivirus programs (Norton, Kaspersky, Bitdefender, etc.) have their own firewalls that work independently of the Windows firewall.</li>
+    <li>Temporarily disable the antivirus firewall to test if it is the cause. If it is, add Fear &amp; Hunger as an exception.</li>
+    <li>Check if your antivirus has a "gaming mode" or "do not disturb" mode that relaxes firewall restrictions.</li>
+</ul>
+
+<h3>Step 10: Try TCP Direct Connect</h3>
+<p>
+    If PeerJS simply will not connect (broker down, WebRTC blocked, strict campus/corporate network), switch to TCP:
+</p>
+<ol>
+    <li>On the <strong>Host</strong> menu, click the <strong>"TCP: OFF"</strong> button to toggle it to <strong>"TCP: ON"</strong>.</li>
+    <li>The first time you do this, you will see a warning that TCP exposes your IP address. Acknowledge it.</li>
+    <li>Wait for the new connection code to generate. Copy and share it with the client.</li>
+    <li>The client pastes the new code and joins. The client's game should auto-detect the TCP code format.</li>
+    <li>Remember: TCP mode requires port 6878 to be forwarded on the host's router for internet play (not needed for LAN).</li>
+</ol>
+
+<h3>Step 11: Try PeerJS Mode (if you were on TCP)</h3>
+<p>
+    If TCP is not working for you, switch back to PeerJS:
+</p>
+<ol>
+    <li>On the host menu, click "TCP: ON" to toggle it to "TCP: OFF".</li>
+    <li>A new PeerJS code will be generated. Share it with the client.</li>
+    <li>PeerJS does not require port forwarding for most users.</li>
+</ol>
+
+<h3>Step 12: University / Corporate / Public WiFi Networks</h3>
+<p>
+    These networks frequently block P2P connections of all kinds. Common restrictions:
+</p>
+<ul>
+    <li>WebRTC entirely blocked (PeerJS will fail).</li>
+    <li>All non-standard ports blocked (TCP on 6878 will fail).</li>
+    <li>Only HTTP/HTTPS traffic allowed (port 80/443).</li>
+    <li>P2P traffic detected and throttled/dropped by Deep Packet Inspection.</li>
+</ul>
+<p><strong>Solutions:</strong></p>
+<ul>
+    <li>Use a <strong>VPN</strong> to tunnel all traffic through an encrypted connection that bypasses network restrictions.</li>
+    <li>If possible, use a personal mobile hotspot instead of the campus network.</li>
+    <li>Try having both players use the same VPN service and connect via PeerJS mode.</li>
+</ul>
+
+<h3>Step 13: Reinstall the Mod / Game</h3>
+<ul>
+    <li>If nothing else works, try a clean reinstall of the multiplayer mod.</li>
+    <li>Verify your game files are decrypted properly (see the <a href="./install.html">Install Guide</a>).</li>
+    <li>Re-download the latest release and install it fresh.</li>
+</ul>
+
+<h3>Step 14: Ask in the Discord</h3>
+<p>
+    If you have exhausted all the above steps, join the project Discord and ask for help. Provide the following information:
+</p>
+<ul>
+    <li>What connection method you tried (PeerJS, TCP, or both).</li>
+    <li>Whether the broker server status shows online.</li>
+    <li>What network type you are on (home WiFi, university, mobile hotspot, VPN, etc.).</li>
+    <li>Whether you tried switching who is host.</li>
+    <li>Any error messages you saw (check the game console with F12 or F8 if available).</li>
+    <li>Your operating system (Windows, Mac, Linux).</li>
+</ul>
+
+<!-- ==================== KNOWN ERROR MESSAGES =================== -->
+<h2>Known Connection Error Messages &amp; What They Mean</h2>
+
+<h3>"NOT CONNECTED, Taking longer than expected..."</h3>
+<p>
+    Appears after <strong>15 seconds</strong> of the client lobby being open without a connection. This is a warning, not a failure.
+    The connection may still succeed. If it persists for more than a minute, the connection has likely failed.
+</p>
+
+<h3>"NOT CONNECTED!"</h3>
+<p>
+    Appears after <strong>25 seconds</strong>. The connection has almost certainly failed. The game will automatically open the
+    connection help page. Follow the troubleshooting steps above.
+</p>
+
+<h3>"Please wait for connection to broker"</h3>
+<p>
+    The host is waiting for the PeerJS broker server to assign an ID. If this message stays for more than 10 seconds,
+    the broker may be unreachable. The mod will <strong>automatically switch to TCP</strong> after 10 seconds if the broker doesn't respond.
+</p>
+
+<h3>"Error getting ID"</h3>
+<p>
+    The mod was unable to get an ID from the PeerJS broker. This means the broker is likely down or unreachable. Switch to TCP mode.
+</p>
+
+<h3>"port 6878 was taken, the next free available port was XXXX"</h3>
+<p>
+    (TCP mode) Another application or a previous instance of the game is already using port 6878. The mod automatically found
+    the next available port. If you are port forwarding, update your router rule to forward the new port number shown.
+</p>
+
+<h3>"UNABLE TO DETECT PUBLIC IP" / "Falling back to Local Private IP"</h3>
+<p>
+    (TCP mode) The mod tried to detect your public IP address via DNS (OpenDNS) and HTTP (AWS CheckIP), but both failed.
+    This usually means you have no internet connection, or your network blocks those services. The code generated will only
+    work for <strong>LAN play</strong> (same local network). For internet play, you will need to manually find your public IP
+    (search "what is my IP" in a browser) and share it along with the port to your friend.
+</p>
+
+<h3>"TCP directly reveals your IP &mdash; only send this code to trusted friends."</h3>
+<p>
+    This is a safety warning shown the first time you enable TCP mode. The TCP connection code contains your IP address. Only
+    share it with people you trust.
+</p>
+
+<h3>"Failed to connect to host after multiple attempts"</h3>
+<p>
+    The client tried to connect to the host 5 times (with 2-second intervals and 5-second timeouts each) and all attempts failed.
+    The host is either unreachable, the code is wrong, or a firewall/NAT is blocking the connection.
+</p>
+
+<!-- ==================== SPECIAL SCENARIOS ====================== -->
+<h2>Special Connection Scenarios</h2>
+
+<h3>LAN Play (Same Local Network)</h3>
+<p>
+    If both players are on the same local network (same WiFi, same house), connections are much easier:
+</p>
+<ul>
+    <li><strong>PeerJS</strong>: Works normally, the connection will be routed locally after the broker introduces the peers.</li>
+    <li><strong>TCP</strong>: Works without port forwarding. The local IP in the code is sufficient to connect. You do not need internet for this.</li>
+</ul>
+
+<h3>Playing Across the Internet (Different Networks)</h3>
+<ul>
+    <li><strong>PeerJS</strong>: Usually works out of the box. STUN discovers public IPs, and TURN relays if needed.</li>
+    <li><strong>TCP</strong>: Requires port forwarding on the host's router. The host must forward port 6878 to their local machine.</li>
+</ul>
+
+<h3>Local Co-Op (Two Instances on the Same PC)</h3>
+<p>See the Local CO-OP section below for instructions on running two instances on one machine.</p>
+
+<h3>Reconnecting After a Disconnect</h3>
+<ul>
+    <li>If you get disconnected mid-game, go to the Join menu. The <strong>"Reconnect"</strong> button will be enabled if the mod has a previous connection to try.</li>
+    <li>If Reconnect doesn't work, have the host check if their lobby is still active. The client may need to re-enter the connection code.</li>
+    <li>In some cases, the host may need to restart the lobby entirely and generate a new code.</li>
+</ul>
+
+<!-- ==================== NETWORK CHECKLIST ====================== -->
+<h2>Quick Connection Checklist</h2>
+<table border="1" cellpadding="6" cellspacing="0" style="border-collapse: collapse; width: 100%; max-width: 800px;">
+    <tr style="background-color: #333; color: #fff;">
+        <th>#</th>
+        <th>Check</th>
+        <th>Applies To</th>
+    </tr>
+    <tr><td>1</td><td>PeerJS broker server is online</td><td>PeerJS only</td></tr>
+    <tr><td>2</td><td>Connection code is correct and pasted into the right field</td><td>Both</td></tr>
+    <tr><td>3</td><td>Both players are on the same connection mode (PeerJS or TCP)</td><td>Both</td></tr>
+    <tr><td>4</td><td>Pressed Enter (not Z or another game key) to submit the code</td><td>Both</td></tr>
+    <tr><td>5</td><td>PC firewall allows Fear &amp; Hunger (Game.exe / nw.exe)</td><td>Both</td></tr>
+    <tr><td>6</td><td>Port 6878 (TCP) is forwarded on host's router</td><td>TCP internet play</td></tr>
+    <tr><td>7</td><td>Not on a mobile hotspot / CGNAT network</td><td>Both (especially Host)</td></tr>
+    <tr><td>8</td><td>VPN tested on/off</td><td>Both</td></tr>
+    <tr><td>9</td><td>Antivirus firewall is not blocking the game</td><td>Both</td></tr>
+    <tr><td>10</td><td>Tried switching who is Host vs Client</td><td>Both</td></tr>
+    <tr><td>11</td><td>Game was fully restarted (not just returned to menu)</td><td>Both</td></tr>
+</table>
+
+<!-- ==================== TECHNICAL DETAILS ====================== -->
+<h2>Technical Details (Advanced)</h2>
+<p>This section is for users who want deeper understanding or are debugging non-standard setups.</p>
+
+<h3>PeerJS Configuration</h3>
+<ul>
+    <li><strong>Broker</strong>: Public PeerJS cloud broker at <code>0.peerjs.com</code></li>
+    <li><strong>STUN Server</strong>: <code>stun:stun.l.google.com:19302</code> (Google's free STUN server)</li>
+    <li><strong>TURN Servers</strong>: <code>turn:eu-0.turn.peerjs.com:3478</code> (Europe), <code>turn:us-0.turn.peerjs.com:3478</code> (US), credentials: <code>peerjs/peerjsp</code></li>
+    <li><strong>SDP Semantics</strong>: unified-plan</li>
+</ul>
+
+<h3>TCP Direct Connect Configuration</h3>
+<ul>
+    <li><strong>Default Port</strong>: 6878 (TCP)</li>
+    <li><strong>Port Retry</strong>: If 6878 is in use, the mod retries 3 times, then tries the next port (6879, 6880, ...) up to 10 port increments.</li>
+    <li><strong>Public IP Detection</strong>: First tries DNS (OpenDNS resolver at 208.67.222.222/208.67.220.220 resolving myip.opendns.com), falls back to HTTP GET to <code>http://checkip.amazonaws.com</code>. Both have a 3-second timeout.</li>
+    <li><strong>Handshake</strong>: On TCP connect, the client sends a JSON <code>{"type":"HANDSHAKE","peerId":"..."}</code> message. The host validates this before accepting the connection.</li>
+    <li><strong>Data Format</strong>: Newline-delimited JSON over TCP.</li>
+</ul>
+
+<h3>Auto-Fallback Behavior</h3>
+<ul>
+    <li>If the host is in PeerJS mode and the broker does not assign a peer ID within <strong>10 seconds</strong>, the mod automatically switches to TCP and reopens the connection.</li>
+    <li>This auto-switch only happens <strong>once</strong> per session (tracked by <code>fallbackAutoSwitched</code> flag).</li>
+    <li>If the user manually sets a preference (TCP ON or OFF), auto-switching is disabled and the user's choice is respected.</li>
+    <li>On the client side, if the pasted code looks like an IP address (e.g., <code>192.168.1.5:6878_abc</code>), TCP mode is automatically enabled.</li>
+</ul>
+
+<h3>Client Retry Logic</h3>
+<ul>
+    <li>When a client tries to connect: each attempt has a <strong>5-second timeout</strong>.</li>
+    <li>If connection fails (timeout, error, or immediate close), the client retries up to <strong>5 times</strong> with a <strong>2-second delay</strong> between attempts.</li>
+    <li>Total maximum wait before final failure: approximately 35 seconds (5 attempts × 7 seconds each).</li>
+</ul>
+
+<h3>Network Packet Rate</h3>
+<ul>
+    <li>The mod limits outgoing packets to <strong>50 packets per second</strong> by default (configurable).</li>
+    <li>Movement packets are sent immediately (not queued). Critical game-state packets (battle events, switches, etc.) are sent with redundancy (up to 4 extra copies at staggered intervals) and deduplication on the receiver side.</li>
+</ul>
+
+<hr>
 
 <h1>Getting UnStuck</h1>
 <ul>
