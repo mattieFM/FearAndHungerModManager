@@ -1442,6 +1442,100 @@ MATTIE_ModManager.setupConfig = function () {
 };
 
 /**
+ * @description Load all .js files from a game-modules directory.
+ * Files prefixed with _ are loaded first (library/loader files).
+ * Each script is expected to call MATTIE.static.registerGameModule() on load.
+ * @param {string} dirPath - Path relative to www/, e.g. "mods/game-modules/"
+ * @returns {Promise} Resolves when all scripts have loaded (or directory is missing).
+ */
+MATTIE_ModManager.loadGameModules = function (dirPath) {
+	return new Promise((resolve) => {
+		try {
+			const fs = require('fs');
+			const nodePath = require('path');
+			const fullPath = nodePath.join(process.cwd(), 'www', dirPath);
+
+			if (!fs.existsSync(fullPath)) {
+				resolve();
+				return;
+			}
+
+			const files = fs.readdirSync(fullPath)
+				.filter((f) => f.endsWith('.js'))
+				.sort((a, b) => {
+					// _ prefixed files (loaders/libs) load before game module files
+					const aLib = a.startsWith('_');
+					const bLib = b.startsWith('_');
+					if (aLib && !bLib) return -1;
+					if (!aLib && bLib) return 1;
+					return a.localeCompare(b);
+				});
+
+			if (files.length === 0) {
+				resolve();
+				return;
+			}
+
+			console.log('[GameModules] Loading', files.length, 'file(s):', files.join(', '));
+
+			let loaded = 0;
+			const onLoad = () => {
+				loaded++;
+				if (loaded >= files.length) resolve();
+			};
+
+			files.forEach((file) => {
+				const script = document.createElement('script');
+				script.src = dirPath + file;
+				script.onload = onLoad;
+				script.onerror = (e) => {
+					console.error('[GameModules] Failed to load:', file, e);
+					onLoad();
+				};
+				document.body.appendChild(script);
+			});
+		} catch (e) {
+			console.error('[GameModules] Error scanning directory:', e);
+			resolve();
+		}
+	});
+};
+
+/**
+ * @description Load the dependency scripts declared by the selected game module.
+ * Called after game-modules are registered but before MATTIE.static.update().
+ * @param {string} commonLibsPath - Path prefix for commonLibs, e.g. "mods/commonLibs/"
+ * @returns {Promise} Resolves when all dependency scripts have loaded.
+ */
+MATTIE_ModManager.loadGameModuleDependencies = function (commonLibsPath) {
+	return new Promise((resolve) => {
+		if (typeof MATTIE.static._selectGameModule !== 'function') { resolve(); return; }
+		const module = MATTIE.static._selectGameModule();
+		if (!module || !module.dependencies || module.dependencies.length === 0) { resolve(); return; }
+
+		const deps = module.dependencies;
+		console.log('[GameModules] Loading dependencies for', module.name, ':', deps.join(', '));
+
+		let loaded = 0;
+		const onLoad = () => {
+			loaded++;
+			if (loaded >= deps.length) resolve();
+		};
+
+		deps.forEach((dep) => {
+			const script = document.createElement('script');
+			script.src = `${commonLibsPath + dep}.js`;
+			script.onload = onLoad;
+			script.onerror = (e) => {
+				console.error('[GameModules] Failed to load dependency:', dep, e);
+				onLoad();
+			};
+			document.body.appendChild(script);
+		});
+	});
+};
+
+/**
  * @description load the mod manager
  */
 MATTIE_ModManager.init = async function () {
@@ -1452,6 +1546,7 @@ MATTIE_ModManager.init = async function () {
 	const defaultPath = PluginManager._path;
 	const path = 'mods/';
 	const commonLibsPath = `${path}commonLibs/`;
+	const gameModulesPath = `${path}game-modules/`;
 	const modManager = new ModManager(path);
 	MATTIE_ModManager.modManager = modManager;
 	modManager.generateDefaultJsonForModsWithoutJsons();
@@ -1460,10 +1555,14 @@ MATTIE_ModManager.init = async function () {
 
 	new Promise((res) => {
 		PluginManager._path = commonLibsPath;
-		commonModManager.setup(commonMods).then(() => {
+		commonModManager.setup(commonMods).then(async () => {
 			// common mods loaded
 			MATTIE_ModManager.overrideErrorLoggers();
 			PluginManager._path = defaultPath;
+			// Load game modules before static.update() so modules are registered
+			await MATTIE_ModManager.loadGameModules(gameModulesPath);
+			// Load game-specific dependencies declared by the matched module
+			await MATTIE_ModManager.loadGameModuleDependencies(commonLibsPath);
 			MATTIE.static.update();
 			res();
 		});

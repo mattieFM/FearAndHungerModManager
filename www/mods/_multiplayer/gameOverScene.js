@@ -43,23 +43,16 @@ MATTIE.scenes.multiplayer.Scene_GameOver.prototype.create = function () {
 	btns[MATTIE.TextManager.spectate] = MATTIE.CmdManager.spectate;
 	btns[MATTIE.TextManager.bornAnew] = MATTIE.CmdManager.bornAnew;
 
-	const isTermina = MATTIE.global.isTermina();
-	const text = isTermina
-		? `
-	You have died, the streets of Prehevil have 
-	\nclaimed one more soul. 
+	const got = (MATTIE.static._activeModule && MATTIE.static._activeModule.multiplayer && MATTIE.static._activeModule.multiplayer.gameOverText) || {};
+	const death = got.death || 'the dungeons of fear and hunger';
+	const place = got.place || 'these dungeons';
+	const text = `
+	You have died, ${death} have
+	\nclaimed one more soul.
 	\n\nAnd yet...
 	\n\nWithout a body, you remain.
 	\nSome aspect of your mind, preserved.
-	\nEven in death the forces at work in this city can 
-	\nstill reach you.`
-		: `
-	You have died, the dungeons of fear and hunger have 
-	\nclaimed one more soul. 
-	\n\nAnd yet...
-	\n\nWithout a body, you remain.
-	\nSome aspect of your mind, preserved.
-	\nEven in death the forces at work in these dungeons can 
+	\nEven in death the forces at work in ${place} can
 	\nstill reach you.`;
 	this._textWin = new MATTIE.windows.TextDisplay(0, 0, 700, 300, '');
 
@@ -71,9 +64,7 @@ MATTIE.scenes.multiplayer.Scene_GameOver.prototype.create = function () {
 	this._optionsWindow.updatePlacement(175 + 300 + 10);
 
 	this._optionsWindow.setHandler(MATTIE.CmdManager.returnToTitle, (() => {
-		const stopText = isTermina
-			? 'You quiet your mind, and over time cease to be.\nBut whether your soul ever escaped this city... '
-			: 'You quiet your mind, and over time cease to be.\nBut whether your soul ever escaped these dungeons... ';
+		const stopText = `You quiet your mind, and over time cease to be.\nBut whether your soul ever escaped ${place}... `;
 		this.animateText(stopText, 0.1);
 		setTimeout(() => {
 			SceneManager.goto(Scene_Title);
@@ -81,9 +72,7 @@ MATTIE.scenes.multiplayer.Scene_GameOver.prototype.create = function () {
 	}));
 
 	this._optionsWindow.setHandler(MATTIE.CmdManager.spectate, (() => {
-		const spectateText = isTermina
-			? 'Your body was claimed by the city, but your soul\n roams freely, may you live again.'
-			: 'Your body was claimed by the dungeons, but your soul\n roams freely, may you live again.';
+		const spectateText = got.spectate || `Your body was claimed by ${place}, but your soul\n roams freely, may you live again.`;
 		this.animateText(spectateText, 0.5);
 		setTimeout(() => {
 			MATTIE.multiplayer.getCurrentNetController().player.setSpectate(true);
@@ -91,9 +80,7 @@ MATTIE.scenes.multiplayer.Scene_GameOver.prototype.create = function () {
 	}));
 
 	this._optionsWindow.setHandler(MATTIE.CmdManager.bornAnew, (() => {
-		const rebirthText = isTermina
-			? 'The city distorts and warps everything that you are, \neverything that you were ceases to be. Now, be born anew.'
-			: 'The dungeons distort and warp everything that you are, \neverything that you were ceases to be. Now, be born anew.';
+		const rebirthText = got.rebirth || `The dungeons distort and warp everything that you are, \neverything that you were ceases to be. Now, be born anew.`;
 		this.animateText(rebirthText, 0.5);
 		setTimeout(() => {
 			SceneManager.goto(MATTIE.scenes.multiplayer.newGame);

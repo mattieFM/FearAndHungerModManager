@@ -21,7 +21,6 @@
         "_common/menus/devMenu",
         "_common/clipboard",
         "_common/API_CORE/inputAPI",
-        "_common/API_CORE/heSoBBGirlAPI",
         "_common/API_CORE/itemAPI",
         "_common/API_CORE/vfxAPI",
         "_common/API_CORE/actorAPI",
@@ -41,8 +40,6 @@
         "_common/util",
         "_common/API_CORE/preFabAPI",
         "_common/betterDebugMenu",
-        "_common/betterCrowMauler",
-        "_common/commonitems/costumes",
         "_common/gameEmitter",
         "_common/tas",
         "_common/dataMapModel"

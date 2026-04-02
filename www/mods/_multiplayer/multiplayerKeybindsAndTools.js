@@ -5,12 +5,11 @@ MATTIE.multiplayer.keybinds = MATTIE.multiplayer.keybinds || {};
 MATTIE.multiplayer.keybinds.currentIndex = 0;
 
 MATTIE.multiplayer.keybinds.tpToSpawn = function () {
-	// teleport the player to the spawn map
+	// teleport the player to the spawn map — config from active game module
+	const spawn = MATTIE.static._activeModule && MATTIE.static._activeModule.multiplayer && MATTIE.static._activeModule.multiplayer.spawnMap;
 	SceneManager.goto(Scene_Map);
-	if (MATTIE.global.isTermina()) {
-		$gamePlayer.reserveTransfer(MATTIE.static.maps.termina.oldHouse, 22, 43, 0, 2);
-	} else {
-		$gamePlayer.reserveTransfer(MATTIE.static.maps.fortress, 15, 11, 0, 2);
+	if (spawn) {
+		$gamePlayer.reserveTransfer(spawn.mapId, spawn.x, spawn.y, 0, 2);
 	}
 	setTimeout(() => {
 		$gamePlayer.performTransfer();

@@ -6,11 +6,12 @@
  * @description the name space used for compatibility changes
  * */
 MATTIE.compat = MATTIE.compat || {};
-MATTIE.compat.terminaBlockedMods = ['bossRushOfTheEndless'];
+// blockedMods is populated by the active game module via MATTIE.static._applyGameModule()
+MATTIE.compat.blockedMods = MATTIE.compat.blockedMods || [];
 
 MATTIE.compat.shouldBlockModOnTermina = function (modName) {
-	const isTermina = MATTIE.global && MATTIE.global.version === 2;
-	return isTermina && MATTIE.compat.terminaBlockedMods.includes(modName);
+	if (!MATTIE.compat.blockedMods || MATTIE.compat.blockedMods.length === 0) return false;
+	return MATTIE.compat.blockedMods.includes(modName);
 };
 
 /** @description whether decryption of images should be forcibly stopped or not */
@@ -357,25 +358,16 @@ Window.prototype._refreshArrows = function () {
  */
 MATTIE.compat.Window_Command_drawItem = Window_Command.prototype.drawItem;
 Window_Command.prototype.drawItem = function (index) {
-	const isTermina = MATTIE.global && MATTIE.global.version === 2;
+	const menuIconMap = MATTIE.compat.menuIconMap;
 	const isMenuCommandWindow = this instanceof Window_MenuCommand || this instanceof Window_GameEnd;
-	if (isTermina && isMenuCommandWindow) {
+	if (menuIconMap && isMenuCommandWindow) {
 		var rect = this.itemRectForText(index);
 		var align = this.itemTextAlign();
 		var symbol = this.commandSymbol(index);
-		var iconMap = {
-			item: 1,
-			equip: 2,
-			synthesis: 3,
-			skill: 4,
-			status: 5,
-			gameEnd: 6,
-			options: 7,
-		};
 		this.resetTextColor();
 		this.changePaintOpacity(this.isCommandEnabled(index));
-		if (iconMap[symbol]) {
-			this.drawIcon(iconMap[symbol], rect.x - 4, rect.y + 2);
+		if (menuIconMap[symbol]) {
+			this.drawIcon(menuIconMap[symbol], rect.x - 4, rect.y + 2);
 			rect.x += 30;
 			rect.width -= 30;
 		}

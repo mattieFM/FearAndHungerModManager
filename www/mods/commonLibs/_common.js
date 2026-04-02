@@ -39,14 +39,17 @@ MATTIE.GameInfo.getCharName = (data = $gameParty) => data.menuActor()._name;
  * @param {Object} data
  * @returns {boolean} is hardmode
  */
-MATTIE.GameInfo.isHardMode = (data = $gameSwitches) => data._data[2190] === true;
+MATTIE.GameInfo.isHardMode = (data = $gameSwitches) => data._data[MATTIE.static.switch.hardMode] === true;
 
 /**
  * @description provided with a same object check if it is t&s
  * @param {Object} data
  * @returns {boolean} is t&s
  */
-MATTIE.GameInfo.isTerrorAndStarvation = (data = $gameSwitches) => (!data._data[2190] && data._data[3153] === true);
+MATTIE.GameInfo.isTerrorAndStarvation = (data = $gameSwitches) => {
+	if (!MATTIE.static.switch.starvation) return false;
+	return (!data._data[MATTIE.static.switch.hardMode] && data._data[MATTIE.static.switch.starvation] === true);
+};
 
 // --UTIL--
 function updateKeys(keys) {
