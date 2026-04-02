@@ -128,7 +128,7 @@ MATTIE.actorAPI.Data_Actor_Wrapper = class {
      */
 	getDefaultTraits() {
 		const fearAndHunger1 = $dataActors[1].traits;
-		if (MATTIE.global.version === 1) return fearAndHunger1;
+		if (!MATTIE.global.isTermina()) return fearAndHunger1;
 		return [];
 	}
 
@@ -138,7 +138,7 @@ MATTIE.actorAPI.Data_Actor_Wrapper = class {
      */
 	getDefaultEquip() {
 		const fearAndHunger1 = $dataActors[1].equips;
-		if (MATTIE.global.version === 1) return fearAndHunger1;
+		if (!MATTIE.global.isTermina()) return fearAndHunger1;
 		return [];
 	}
 

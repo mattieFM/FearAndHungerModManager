@@ -11,9 +11,15 @@ MATTIE.multiplayer.Conversations = function () {
 
 MATTIE.multiplayer.Conversations.prototype.greetings = [
 	'Hello there',
-	MATTIE.global.isTermina()
-		? 'The streets of Prehevil truly are beautiful today'
-		: 'The Dungeons of Fear and hunger truly are beautiful today',
+	(() => {
+		const mp = MATTIE.static._activeModule && MATTIE.static._activeModule.multiplayer;
+		const place = mp && mp.gameOverText ? mp.gameOverText.place : null;
+		if (place === 'this city') return 'The streets of Prehevil truly are beautiful today';
+		if (place === 'these dungeons') return 'The Dungeons of Fear and hunger truly are beautiful today';
+		return MATTIE.global.isTermina()
+			? 'The streets of Prehevil truly are beautiful today'
+			: 'The Dungeons of Fear and hunger truly are beautiful today';
+	})(),
 
 ];
 /**

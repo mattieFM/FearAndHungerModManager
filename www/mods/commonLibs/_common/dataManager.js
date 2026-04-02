@@ -13,17 +13,13 @@ MATTIE.DataManager = MATTIE.DataManager || {};
 MATTIE.DataManager.dataPath = '/modData/';
 MATTIE.multiplayer = MATTIE.multiplayer || {};
 
-const funger1IgnoredPlugins = [];
-const terminaIgnoredPlugins = [];
 const ignoredPlugins = ['HIME_PreTitleEvents', 'physical_attack_animation'];
 
+// Per-game ignored plugins are declared in each game module's compat.ignoredPlugins
+// and applied to MATTIE.compat.moduleIgnoredPlugins by MATTIE.static._applyGameModule().
 MATTIE.ignoredPlugins = (() => {
-	if (MATTIE.global.isTermina()) {
-		return terminaIgnoredPlugins.concat(ignoredPlugins);
-	} if (MATTIE.global.isFunger()) {
-		return funger1IgnoredPlugins.concat(ignoredPlugins);
-	}
-	return ignoredPlugins;
+	const modulePlugins = (MATTIE.compat && MATTIE.compat.moduleIgnoredPlugins) ? MATTIE.compat.moduleIgnoredPlugins : [];
+	return modulePlugins.concat(ignoredPlugins);
 });
 
 //----------------------------------------------

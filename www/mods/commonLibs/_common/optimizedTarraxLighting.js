@@ -1814,7 +1814,8 @@ if (typeof Terrax_tint_speed === 'undefined') {
 		}
 
 		if (MATTIE.global.hasLoadedOnce) {
-			if (!MATTIE.global.isTermina()) {
+			const hasLighting = MATTIE.static._activeModule ? MATTIE.static._activeModule.features.hasLighting !== false : !MATTIE.global.isTermina();
+			if (hasLighting) {
 				init();
 			}
 		}

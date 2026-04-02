@@ -3,10 +3,16 @@ MATTIE.multiplayer = MATTIE.multiplayer || {};
 MATTIE.multiplayer.pvp = MATTIE.multiplayer.pvp || {};
 /** @description a dictionary with actor id mapped to troopid if there is one applicable */
 MATTIE.multiplayer.pvp.supportedActors = {};
-MATTIE.multiplayer.pvp.supportedActors[MATTIE.static.actors.mercenaryId] = 67;
-MATTIE.multiplayer.pvp.supportedActors[MATTIE.static.actors.knightId] = 119;
-MATTIE.multiplayer.pvp.supportedActors[MATTIE.static.actors.darkPriestId] = 69;
-MATTIE.multiplayer.pvp.supportedActors[MATTIE.static.actors.outlanderId] = 120;
+
+// Populated at runtime by initSupportedActors() after the game module applies its pvpActorTroopMap.
+MATTIE.multiplayer.pvp.initSupportedActors = function () {
+	const mp = MATTIE.static._activeModule && MATTIE.static._activeModule.multiplayer;
+	const map = (mp && mp.pvpActorTroopMap) ? mp.pvpActorTroopMap : {};
+	MATTIE.multiplayer.pvp.supportedActors = {};
+	Object.keys(map).forEach(function (actorId) {
+		MATTIE.multiplayer.pvp.supportedActors[parseInt(actorId, 10)] = map[actorId];
+	});
+};
 
 MATTIE.multiplayer.pvp.inPVP = false;
 

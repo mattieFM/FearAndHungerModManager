@@ -174,28 +174,32 @@ MATTIE.multiplayer.hasController = () => MATTIE.multiplayer.isClient || MATTIE.m
 	MATTIE.menus.mainMenu.removeBtnFromMainMenu('Continue Suspended Run', 'suspend');
 
 	setTimeout(async () => {
-		// create ghost char
+		// create ghost char — config read from active game module
+		const ghostCfg = MATTIE.static._activeModule && MATTIE.static._activeModule.multiplayer && MATTIE.static._activeModule.multiplayer.ghost;
 		MATTIE.static.actors.ghost = new MATTIE.actorAPI.Data_Actor_Wrapper();
-		if (MATTIE.global.isTermina()) {
+		if (ghostCfg) {
 			MATTIE.static.actors.ghost.buildDataActorFromEventAndTroop(
-				await MATTIE.eventAPI.getEventOnMap(21, 93),
-				$dataTroops[195],
-				0,
-			); // add miner ghost as actor (Termina - Spirit troop)
-		} else {
-			MATTIE.static.actors.ghost.buildDataActorFromEventAndTroop(
-				await MATTIE.eventAPI.getEventOnMap(185, 20),
-				$dataTroops[174],
-				7,
-			); // add miner ghost as actor (FH1)
+				await MATTIE.eventAPI.getEventOnMap(ghostCfg.mapId, ghostCfg.eventId),
+				$dataTroops[ghostCfg.troopId],
+				ghostCfg.troopIndex,
+			);
 		}
 		// MATTIE.static.actors.ghost._data.characterName = "$shadow_people"
 		MATTIE.static.actors.ghost.create();
 	}, 1000);
 
 	MATTIE.static.update();
-	if (MATTIE.global.isFunger()) {
-		console.log('crow init');
-		MATTIE.betterCrowMauler.betterCrowMaulerInit();
-	} // setup crow mauler if not termina
+
+	// init pvp actor-to-troop map from active game module
+	if (MATTIE.multiplayer.pvp && typeof MATTIE.multiplayer.pvp.initSupportedActors === 'function') {
+		MATTIE.multiplayer.pvp.initSupportedActors();
+	}
+
+	// init crow mauler if the active game module declares it
+	if (MATTIE.static._activeModule && MATTIE.static._activeModule.features && MATTIE.static._activeModule.features.hasCrowMauler) {
+		if (MATTIE.betterCrowMauler) {
+			console.log('crow init');
+			MATTIE.betterCrowMauler.betterCrowMaulerInit();
+		}
+	}
 })();

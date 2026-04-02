@@ -490,7 +490,8 @@ class BaseNetController extends EventEmitter {
 				});
 			} else {
 				MATTIE.multiplayer.hostScalingFactor = data.scalingCorrection.factor;
-				// If enemies don't exist yet, they'll pick up this factor when created
+				// Invalidate per-enemy scaling caches so they re-read the host factor
+				$gameTroop.members().forEach((e) => { e._scalingFactor = undefined; });
 				if (MATTIE.multiplayer.devTools.battleLogger && $gameTroop.members().length === 0) {
 					console.log('[Net] No enemies exist yet. Factor will be applied during enemy initialization.');
 				}
@@ -726,18 +727,24 @@ class BaseNetController extends EventEmitter {
 			const enemy = $gameTroop.members().find((e) => e.index() === remoteData.index && e.enemyId() === remoteData.enemyId);
 
 			if (enemy && remoteData.states && Array.isArray(remoteData.states)) {
-				for (let j = 0; j < remoteData.states.length; j++) {
-					const state = remoteData.states[j];
-					if (typeof state === 'number') {
-						if (!enemy.isStateAffected(state)) {
-							// Log death syncing for diagnosis
-							if (state === enemy.deathStateId()) {
-								console.warn(`[NetSync] Applying DEATH state to enemy ${remoteData.index} ID:${remoteData.enemyId} (Current HP: ${enemy.hp})`);
-							}
-							enemy.addState(state);
-						}
+				const deathStateId = enemy.deathStateId();
+
+				// Add missing states (skip death state — handled by HP sync in syncEnemyHealths)
+				remoteData.states.forEach((stateId) => {
+					if (typeof stateId === 'number' && stateId !== deathStateId && !enemy.isStateAffected(stateId)) {
+						enemy.addState(stateId);
 					}
-				}
+				});
+
+				// Remove states that remote no longer has (skip death state)
+				enemy.states().slice().forEach((state) => {
+					if (state.id !== deathStateId && !remoteData.states.includes(state.id)) {
+						if (MATTIE.multiplayer.devTools.battleLogger) {
+							console.log(`[NetSync] Removing expired state ${state.id} from enemy ${remoteData.index}`);
+						}
+						enemy.removeState(state.id);
+					}
+				});
 			}
 		});
 	}
@@ -774,21 +781,16 @@ class BaseNetController extends EventEmitter {
 				// If Remote MHP Differs from our MHP, we must normalize the Remote HP before applying damage.
 				// Scenario: We = 3000 MHP. Remote = 1500 MHP. Remote HP = 1500.
 				// If we blindly take 1500, we halve our HP for no reason.
-				const adjustedRemoteHp = remoteHp;
+				let adjustedRemoteHp = remoteHp;
 
 				if (remoteMaxHp && remoteMaxHp !== orgMhp && remoteMaxHp > 0) {
-					//  // Calculate Remote Health Percentage
-					//  const remotePercent = remoteHp / remoteMaxHp;
-					//  // Convert that to OUR scale
-					//  adjustedRemoteHp = Math.floor(orgMhp * remotePercent);
+					// Calculate Remote Health Percentage and convert to our scale
+					const remotePercent = remoteHp / remoteMaxHp;
+					adjustedRemoteHp = Math.floor(orgMhp * remotePercent);
 
-					//  if (MATTIE.multiplayer.devTools.battleLogger) {
-					//      console.log(`[NetSync] MHP Mismatch detected for Enemy ${index}. LocalMHP:
-					// // ${orgMhp}, RemoteMHP: ${remoteMaxHp}. Adjusting RemoteHP ${remoteHp} -> ${adjustedRemoteHp}`);
-					//  }
-				} else if (!remoteMaxHp && MATTIE.multiplayer.config.scaling.scaleHp) {
-					// Fallback: If remote MHP not provided, but we are scaling, and remoteHP == unscaled MHP??
-					// Dangerous guess work. Skipping for now.
+					if (MATTIE.multiplayer.devTools.battleLogger) {
+						console.log(`[NetSync] MHP Mismatch detected for Enemy ${remoteData.index}. LocalMHP: ${orgMhp}, RemoteMHP: ${remoteMaxHp}. Adjusting RemoteHP ${remoteHp} -> ${adjustedRemoteHp}`);
+					}
 				}
 
 				// [Safety Fix] - Prevent 0 HP kills unless supported by Death State
@@ -827,15 +829,12 @@ class BaseNetController extends EventEmitter {
 				let limitHp = Math.min(orgHp, adjustedRemoteHp);
 
 				// Detect Unscaled Initialization Trap
-				// If Local is stuck at BaseMHP (e.g. 1000) but Real MHP is Scaled (e.g. 1500)
-				// And Remote says 1500.
-				// We should take 1500.
+				// If local enemy never had scaling applied (factor 1.0 or undefined)
+				// and remote is sending scaled values, accept the remote value
 				if (orgHp < adjustedRemoteHp) {
-					// Check if orgHp is suspiciously close to Base Param
-					const baseMhp = enemy.paramBase(0);
-					if (Math.abs(orgHp - baseMhp) < 5 && adjustedRemoteHp > orgHp) {
+					if (!enemy._scalingFactor || enemy._scalingFactor === 1.0) {
 						if (MATTIE.multiplayer.devTools.battleLogger) {
-							console.log(`[NetSync] Detected Unscaled Local HP (${orgHp}). Allowing sync UP to ${adjustedRemoteHp}`);
+							console.log(`[NetSync] Detected Unscaled Local HP (${orgHp}, factor: ${enemy._scalingFactor}). Allowing sync UP to ${adjustedRemoteHp}`);
 						}
 						limitHp = adjustedRemoteHp;
 					}
@@ -925,6 +924,11 @@ class BaseNetController extends EventEmitter {
 
 						/** @type {PlayerModel} */
 						const netPlayer = this.netPlayers[senderId];
+						if (!netPlayer) {
+							console.warn(`[NetAction] netPlayer not found for sender ${senderId}`);
+							shouldAddAction = false;
+							return;
+						}
 						/** @type {Game_Actor} */
 						const actor = netPlayer.$netActors.baseActor(action._subjectActorId);
 
@@ -1486,6 +1490,8 @@ class BaseNetController extends EventEmitter {
 			// [Sync Scaling]
 			if (data.scalingFactor && !MATTIE.multiplayer.isHost) {
 				MATTIE.multiplayer.hostScalingFactor = data.scalingFactor;
+				// Invalidate per-enemy scaling caches so they re-read the host factor
+				$gameTroop.members().forEach((e) => { e._scalingFactor = undefined; });
 			}
 
 			if (MATTIE.multiplayer.devTools.battleLogger) console.info('[Net] Applying Battle Sync Data');
@@ -1564,6 +1570,8 @@ class BaseNetController extends EventEmitter {
 					});
 				} else {
 					MATTIE.multiplayer.hostScalingFactor = battleStartObj.scalingFactor;
+					// Invalidate per-enemy scaling caches so they re-read the host factor
+					$gameTroop.members().forEach((e) => { e._scalingFactor = undefined; });
 				}
 			}
 
@@ -2404,8 +2412,10 @@ class BaseNetController extends EventEmitter {
      */
 	onRuntimeTroopEvent(troopId, id) {
 		if ($gameTroop.getIdsInCombatWithExSelf().includes(id)) {
-			if (troopId === MATTIE.static.troops.crowMauler) {
-				MATTIE.betterCrowMauler.crowCont.invadeBattle(true);
+			if (MATTIE.static.troops.crowMauler && troopId === MATTIE.static.troops.crowMauler) {
+				if (MATTIE.betterCrowMauler && MATTIE.betterCrowMauler.crowCont) {
+					MATTIE.betterCrowMauler.crowCont.invadeBattle(true);
+				}
 			}
 		}
 	}

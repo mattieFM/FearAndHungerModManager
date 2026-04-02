@@ -354,19 +354,19 @@ Game_Enemy.prototype.param = function (paramId) {
  * @param {Function} updateAction The function to execute that modifies the combatant count.
  */
 MATTIE.multiplayer.config.scaling.applyTroopScaling = function (updateAction) {
-	// If no enemies exist yet, just update and return.
-	// We check members length instead of inBattle() to catch edge cases during initialization.
-	// if ($gameTroop.members().length  0) {
-	// 	updateAction();
-	// 	return;
-	// }
-
 	var enemies = $gameTroop.members();
+	if (!enemies || enemies.length === 0) {
+		updateAction();
+		return;
+	}
 
 	// 1. Lock Initial State
 	// If enemies lack a cached factor, pin them to the *current* global logic (before update changes the count)
 	// This fixes the "2000/3000" bug where initialization happens at Factor 1.0, but scaling logic sees Factor 1.5 immediately.
 	var currentGlobalFactor = MATTIE.multiplayer.config.scaling.hpScaling();
+	if (typeof currentGlobalFactor !== 'number' || !isFinite(currentGlobalFactor) || currentGlobalFactor <= 0) {
+		currentGlobalFactor = 1;
+	}
 
 	enemies.forEach((e, idx) => {
 		if (e.isEnemy() && e._scalingFactor === undefined) {
@@ -388,32 +388,52 @@ MATTIE.multiplayer.config.scaling.applyTroopScaling = function (updateAction) {
 				}
 			}
 
+			if (typeof assumedFactor !== 'number' || !isFinite(assumedFactor) || assumedFactor <= 0) {
+				assumedFactor = currentGlobalFactor;
+			}
+
 			e._scalingFactor = assumedFactor;
 		}
 	});
 
 	// 2. Snapshot current MHPs using the locked factor
-	var oldMhps = enemies.map((e) => e.param(0));
+	var oldMhps = enemies.map((e) => {
+		var mhp = e.param(0);
+		if (typeof mhp === 'number' && isFinite(mhp) && mhp > 0) return mhp;
+		mhp = e.paramBase(0);
+		if (typeof mhp === 'number' && isFinite(mhp) && mhp > 0) return mhp;
+		return 1;
+	});
 
 	// 3. Perform the update (add/remove combatant)
 	updateAction();
 
 	// 4. Determine NEW Scaling Factor based on new combatant count
 	var newGlobalFactor = MATTIE.multiplayer.config.scaling.hpScaling();
+	if (typeof newGlobalFactor !== 'number' || !isFinite(newGlobalFactor) || newGlobalFactor <= 0) {
+		newGlobalFactor = currentGlobalFactor;
+	}
 
 	// 5. Apply Proportional Scaling to Current HP
 	enemies.forEach((enemy, index) => {
-		if (!enemy.isEnemy()) return; // safety
+		if (!enemy || !enemy.isEnemy()) return; // safety
 
 		// Update the cached scaling factor for this enemy to the new stable value
 		enemy._scalingFactor = newGlobalFactor;
 
 		var oldMhp = oldMhps[index];
 		// If getting param failed or is weird, fallback to base
-		if (typeof oldMhp !== 'number' || oldMhp <= 0) oldMhp = enemy.paramBase(0);
+		if (typeof oldMhp !== 'number' || !isFinite(oldMhp) || oldMhp <= 0) oldMhp = enemy.paramBase(0);
+		if (typeof oldMhp !== 'number' || !isFinite(oldMhp) || oldMhp <= 0) oldMhp = 1;
 
 		// Get new MHP (will use the _scalingFactor we just set)
 		var newMhp = enemy.param(0);
+		if (typeof newMhp !== 'number' || !isFinite(newMhp) || newMhp <= 0) {
+			newMhp = enemy.paramBase(0);
+		}
+		if (typeof newMhp !== 'number' || !isFinite(newMhp) || newMhp <= 0) {
+			newMhp = oldMhp;
+		}
 
 		// Safety check against zero division
 		if (oldMhp <= 0) oldMhp = 1;
@@ -422,12 +442,16 @@ MATTIE.multiplayer.config.scaling.applyTroopScaling = function (updateAction) {
 		if (Math.abs(oldMhp - newMhp) < 1) return;
 
 		var hpPercent = enemy._hp / oldMhp;
+		if (!isFinite(hpPercent)) hpPercent = 0;
+		hpPercent = Math.max(0, Math.min(1, hpPercent));
 		var newHp = Math.floor(newMhp * hpPercent);
 
 		// Prevent accidental scaling death if HP > 0
 		if (enemy._hp > 0 && newHp <= 0) newHp = 1;
+		newHp = Math.max(0, Math.min(newHp, newMhp));
 
-		var diff = newHp - enemy._hp;
+		var oldHp = enemy._hp;
+		var diff = newHp - oldHp;
 
 		if (diff !== 0) {
 			enemy._hp = newHp;
@@ -435,7 +459,6 @@ MATTIE.multiplayer.config.scaling.applyTroopScaling = function (updateAction) {
 			// Log for debug before changing
 			if (MATTIE.multiplayer.devTools.battleLogger) {
 				const percent = (hpPercent * 100).toFixed(1);
-				const oldHp = enemy._hp + diff;
 				console.log(`[Scaling] Enemy ${index} HP Scaled: ${oldMhp} -> ${newMhp} (${percent}%). HP: ${oldHp} -> ${newHp}`);
 			}
 
