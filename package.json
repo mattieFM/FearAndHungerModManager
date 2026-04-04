@@ -1,5 +1,5 @@
 {
-  "name": "36",
+  "name": "83",
   "main": "www/index.html",
   "js-flags": "--expose-gc",
   "node-remote": true,
@@ -29,7 +29,7 @@
     "lint:mods": "eslint -c ./.eslintrc.js --ignore-path ./.eslintignore www/mods/ --fix**"
   },
   "description": "Welcome to MATTIE's Fear And Hunger Mod Manager. This mod manager works for both F&H 1 and 2.",
-  "version": "1.1.7",
+  "version": "1.2.4",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/mattieFM/FearAndHungerModManager.git"

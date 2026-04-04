@@ -9,7 +9,7 @@ MATTIE.multiplayer.pvp.initSupportedActors = function () {
 	const mp = MATTIE.static._activeModule && MATTIE.static._activeModule.multiplayer;
 	const map = (mp && mp.pvpActorTroopMap) ? mp.pvpActorTroopMap : {};
 	MATTIE.multiplayer.pvp.supportedActors = {};
-	Object.keys(map).forEach(function (actorId) {
+	Object.keys(map).forEach((actorId) => {
 		MATTIE.multiplayer.pvp.supportedActors[parseInt(actorId, 10)] = map[actorId];
 	});
 };

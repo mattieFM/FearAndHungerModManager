@@ -51,11 +51,68 @@ MATTIE.multiplayer.currentBattleEnemy = {};
 MATTIE.multiplayer.currentBattleEvent = {};
 MATTIE.multiplayer.inBattle = false;
 
+// Host-authoritative scaling factor (null until received from host)
+MATTIE.multiplayer.hostScalingFactor = null;
+
 // spectating var
 MATTIE.multiplayer.isSpectator = false;
 
 MATTIE.multiplayer._interpreter = new Game_Interpreter();
 MATTIE.multiplayer.params = PluginManager.parameters('multiplayer');
+
+MATTIE.multiplayer.getVersionString = function () {
+	let detectedVersion = null;
+
+	// Prefer root package.json version to avoid stale in-memory/manifest values.
+	try {
+		const fs = require('fs');
+		const path = require('path');
+		const packagePath = path.join(process.cwd(), 'package.json');
+		const packageData = JSON.parse(fs.readFileSync(packagePath, 'utf8'));
+		detectedVersion = packageData.version || null;
+	} catch (error) {
+		detectedVersion = null;
+	}
+
+	if (!detectedVersion) {
+		try {
+			detectedVersion = (typeof nw !== 'undefined' && nw.App && nw.App.manifest)
+				? nw.App.manifest.version
+				: null;
+		} catch (error) {
+			detectedVersion = null;
+		}
+	}
+
+	if (!detectedVersion) detectedVersion = MATTIE.multiplayer.version || 'unknown';
+	MATTIE.multiplayer.version = detectedVersion;
+	return `Multiplayer v${detectedVersion}`;
+};
+
+MATTIE.multiplayer.addVersionToTitle = function (scene) {
+	if (!scene || scene._multiplayerVersionSprite) return;
+
+	const bitmap = new Bitmap(320, 36);
+	bitmap.fontSize = 18;
+	bitmap.outlineWidth = 4;
+	bitmap.textColor = '#f2eed8';
+	bitmap.drawText(MATTIE.multiplayer.getVersionString(), 0, 0, 320, 36, 'left');
+
+	const versionSprite = new Sprite(bitmap);
+	versionSprite.x = 12;
+	versionSprite.y = scene._commandWindow ? scene._commandWindow.y - 30 : Graphics.height - 72;
+
+	scene._multiplayerVersionSprite = versionSprite;
+	scene.addChild(versionSprite);
+};
+
+MATTIE.multiplayer.Scene_Title_Create = Scene_Title.prototype.create;
+Scene_Title.prototype.create = function () {
+	MATTIE.multiplayer.Scene_Title_Create.call(this);
+	if (this.constructor !== Scene_Title) return;
+	MATTIE.multiplayer.addVersionToTitle(this);
+};
+
 let lastmsg = Date.now();
 MATTIE.multiplayer.devTools.slowLog = function (data) {
 	if (Math.abs(lastmsg - Date.now()) > 500) {
@@ -64,38 +121,30 @@ MATTIE.multiplayer.devTools.slowLog = function (data) {
 	}
 };
 MATTIE.multiplayer.setEnemyHost = function () {
-	if ($gameMap.mapId() !== MATTIE.multiplayer.lastEnemyHostMapId) {
-		const netController = MATTIE.multiplayer.getCurrentNetController();
-		var shouldBeHost = true;
-		const keys = Object.keys(netController.netPlayers);
-		for (let index = 0; index < keys.length; index++) {
-			const key = keys[index];
-			const player = netController.netPlayers[key];
-			if (player.map === $gameMap.mapId()) {
-				shouldBeHost = false;
-			}
+	const netController = MATTIE.multiplayer.getCurrentNetController();
+	if (!netController) return;
+	const currentMap = $gameMap.mapId();
+	const selfId = netController.peerId;
+
+	// Collect all peer IDs on this map (including self)
+	var peersOnMap = [selfId];
+	const keys = Object.keys(netController.netPlayers);
+	for (let index = 0; index < keys.length; index++) {
+		const key = keys[index];
+		const player = netController.netPlayers[key];
+		if (player.map === currentMap && !player._enemyHostPaused) {
+			peersOnMap.push(key);
 		}
-		MATTIE.multiplayer.isEnemyHost = shouldBeHost;
-		if (MATTIE.multiplayer.devTools.enemyHostLogger)console.log(`is enemy host? ${MATTIE.multiplayer.isEnemyHost}`);
 	}
-	MATTIE.multiplayer.lastEnemyHostMapId = $gameMap.mapId();
+
+	// Deterministic election: lowest peerId among active players on this map wins
+	peersOnMap.sort();
+	MATTIE.multiplayer.isEnemyHost = (peersOnMap[0] === selfId);
+	if (MATTIE.multiplayer.devTools.enemyHostLogger) console.log(`[EnemyHost] setEnemyHost: map=${currentMap}, peers=${JSON.stringify(peersOnMap)}, isHost=${MATTIE.multiplayer.isEnemyHost}`);
 };
 
 MATTIE.multiplayer.updateEnemyHost = function () {
-	if (!MATTIE.multiplayer.isEnemyHost) {
-		const netController = MATTIE.multiplayer.getCurrentNetController();
-		var shouldBeHost = true;
-		const keys = Object.keys(netController.netPlayers);
-		for (let index = 0; index < keys.length; index++) {
-			const key = keys[index];
-			const player = netController.netPlayers[key];
-			if (player.map === $gameMap.mapId()) {
-				shouldBeHost = false;
-			}
-		}
-		MATTIE.multiplayer.isEnemyHost = shouldBeHost;
-		if (MATTIE.multiplayer.devTools.enemyHostLogger)console.log(`is enemy host? ${MATTIE.multiplayer.isEnemyHost}`);
-	}
+	MATTIE.multiplayer.setEnemyHost(); // always re-evaluate using same election logic
 };
 
 MATTIE.multiplayer.devTools.randBetween = function (min, max) {

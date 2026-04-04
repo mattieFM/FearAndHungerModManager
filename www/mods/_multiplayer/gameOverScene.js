@@ -80,7 +80,7 @@ MATTIE.scenes.multiplayer.Scene_GameOver.prototype.create = function () {
 	}));
 
 	this._optionsWindow.setHandler(MATTIE.CmdManager.bornAnew, (() => {
-		const rebirthText = got.rebirth || `The dungeons distort and warp everything that you are, \neverything that you were ceases to be. Now, be born anew.`;
+		const rebirthText = got.rebirth || 'The dungeons distort and warp everything that you are, \neverything that you were ceases to be. Now, be born anew.';
 		this.animateText(rebirthText, 0.5);
 		setTimeout(() => {
 			SceneManager.goto(MATTIE.scenes.multiplayer.newGame);

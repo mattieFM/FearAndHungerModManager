@@ -102,25 +102,15 @@ class HostController extends BaseNetController {
 		// Host enforces Scaling Authority
 		if (data.battleStart) {
 			if (MATTIE.multiplayer.config.scaling && MATTIE.multiplayer.config.scaling.hpScaling) {
-				// Project the new combatant count (Current + 1 for the sender)
-				// This ensures clients receive the "Future" scaling factor immediately, avoiding the 1.0 -> 1.5 jump
+				// Project scaling for the new combatant count (current + 1 for the sender)
 				const projectedCount = $gameTroop.totalCombatants() + 1;
 				const hpPlayerDivisor = MATTIE.multiplayer.config.scaling.hpPlayerDivisor || 1.0;
 				const hpScaler = MATTIE.multiplayer.config.scaling.hpScaler || 1.0;
-
-				const playerScaler = projectedCount > 1 ? projectedCount / hpPlayerDivisor : 1;
-				const projectedFactor = (playerScaler * hpScaler);
+				const projectedFactor = (projectedCount > 1 ? projectedCount / hpPlayerDivisor : 1) * hpScaler;
 
 				data.battleStart.scalingFactor = projectedFactor;
-				// Send correction back to the sender so they scale their local troop immediately
-				// This fixes the issue where the Joiner initializes with Factor 1.0 while others get Factor X.
 				if (conn) {
-					const correctionPacket = { scalingCorrection: { factor: projectedFactor } };
-					conn.send(correctionPacket);
-				}
-
-				if (MATTIE.multiplayer.devTools.dataLogger) {
-					console.log(`[Host] Injected Projected Scaling Factor: ${projectedFactor} (Count: ${projectedCount})`);
+					conn.send({ scalingCorrection: { factor: projectedFactor } });
 				}
 			}
 		}
@@ -138,8 +128,12 @@ class HostController extends BaseNetController {
 		});
 	}
 
-	/** send all connections the startGame command */
+	/** send all connections the startGame command and authoritative config */
 	startGame() {
+		// Broadcast host config to all clients before starting
+		if (MATTIE.multiplayer.config.getGameplaySnapshot) {
+			this.sendAll({ configSync: MATTIE.multiplayer.config.getGameplaySnapshot() });
+		}
 		const obj = {};
 		obj.startGame = 'y';
 		this.started = true;
@@ -163,6 +157,11 @@ class HostController extends BaseNetController {
 	handleConnection(conn) {
 		const id = conn.peer; // get the id of the peer that is on the other side of the connection
 		this.connections.push(conn);
+
+		// Send host gameplay config to the new client
+		if (MATTIE.multiplayer.config.getGameplaySnapshot) {
+			conn.send({ configSync: MATTIE.multiplayer.config.getGameplaySnapshot() });
+		}
 
 		// Send initial player info to the new client so they can see the host/others immediately
 		console.log('Sending initial player info to new client:', id);

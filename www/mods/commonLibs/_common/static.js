@@ -335,7 +335,6 @@ MATTIE.static.update = function () {
 		const module = MATTIE.static._selectGameModule();
 		if (module) {
 			MATTIE.static._applyGameModule(module);
-			return;
 		}
 	}
 

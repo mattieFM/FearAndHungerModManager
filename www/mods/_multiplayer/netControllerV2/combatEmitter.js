@@ -14,11 +14,85 @@ MATTIE.multiplayer.ready = false;
 MATTIE.multiplayer.waitingOnAllies = false;
 /** @description true when the local client is in an extra turn (local or received from net) */
 MATTIE.multiplayer.combatEmitter.inExtraTurn = false;
+/** @description true when a remote player has an extra turn and local player should be blocked from input */
+MATTIE.multiplayer.combatEmitter.netExTurnPending = false;
 
 /** log info with the proper conditionals */
 function BattleLog(str) {
 	if (MATTIE.multiplayer.devTools.inBattleLogger) console.info(str);
 }
+
+//-----------------------------------------------------
+// Deterministic Seeded PRNG for Cross-Client Sync
+//-----------------------------------------------------
+
+/**
+ * @description mulberry32 — a simple, fast 32-bit seeded PRNG.
+ * Returns a function that produces deterministic floats in [0, 1).
+ * @param {number} seed unsigned 32-bit integer
+ * @returns {Function} seeded Math.random replacement
+ */
+function mulberry32(seed) {
+	var a = seed >>> 0;
+	return function () {
+		a |= 0;
+		a = (a + 0x6D2B79F5) | 0;
+		var t = Math.imul(a ^ (a >>> 15), 1 | a);
+		t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+		return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+	};
+}
+
+/**
+ * @description Create a deterministic seed from shared battle state.
+ * Both host and client derive the same seed for the same action invocation.
+ * @param {Game_Action} action
+ * @param {Game_Battler} subject
+ * @param {Game_Battler} target
+ * @param {number} callIndex per-turn invocation counter
+ * @returns {number}
+ */
+function createBattleSeed(action, subject, target, callIndex) {
+	var turnCount = $gameTroop ? $gameTroop.turnCount() : 0;
+	var troopId = $gameTroop ? $gameTroop._troopId : 0;
+	var skillId = (action && action._item) ? action._item._itemId : 0;
+	var subjectIdx = 0;
+	if (subject && typeof subject.index === 'function') subjectIdx = subject.index();
+	else if (subject && typeof subject.actorId === 'function') subjectIdx = subject.actorId();
+	var targetIdx = 0;
+	if (target && typeof target.index === 'function') targetIdx = target.index();
+	else if (target && typeof target.actorId === 'function') targetIdx = target.actorId();
+	return ((turnCount * 73856093) ^ (troopId * 19349663) ^ (skillId * 83492791)
+		^ (subjectIdx * 38197) ^ (targetIdx * 97127) ^ ((callIndex || 0) * 12582917)) >>> 0;
+}
+
+/** Per-turn counter so repeated invocations against the same target still get unique seeds */
+BattleManager._deterministicSeedCounter = 0;
+
+// Defensive input guard: block input for battlers without _exTurn during a net extra turn
+MATTIE.multiplayer.combatEmitter._galvCanInput = Game_BattlerBase.prototype.canInput;
+Game_BattlerBase.prototype.canInput = function () {
+	if ((MATTIE.multiplayer.combatEmitter.netExTurnPending
+		|| MATTIE.multiplayer.combatEmitter.netExTurn)
+		&& !this._exTurn) {
+		return false;
+	}
+	return MATTIE.multiplayer.combatEmitter._galvCanInput.call(this);
+};
+
+// Override setExTurn to immediately notify peers when an extra turn is detected.
+// This fires during setupExTurn() → BEFORE the input phase begins, so the remote
+// client can block input before the player ever sees the command window.
+MATTIE.multiplayer.combatEmitter._originalSetExTurn = BattleManager.setExTurn;
+BattleManager.setExTurn = function (status) {
+	MATTIE.multiplayer.combatEmitter._originalSetExTurn.call(this, status);
+	if (status) {
+		var nc = MATTIE.multiplayer.getCurrentNetController();
+		if (nc && $gameTroop.totalCombatants() > 1) {
+			nc.sendViaMainRoute({ exTurnNotify: { active: true } });
+		}
+	}
+};
 
 MATTIE.multiplayer.battleManagerInit = BattleManager.initMembers;
 BattleManager.initMembers = function () {
@@ -32,6 +106,7 @@ BattleManager.getNetBattlers = function () {
 };
 
 BattleManager.startAfterReady = function () {
+	BattleManager._deterministicSeedCounter = 0;
 	MATTIE.BattleManagerStartTurn.call(this);
 };
 
@@ -40,6 +115,11 @@ BattleManager.startAfterReady = function () {
  *
 */
 BattleManager.unready = function () {
+	// Block unready when a remote player has an extra turn — local player must stay locked
+	if (MATTIE.multiplayer.combatEmitter.netExTurnPending) {
+		BattleLog('unready blocked — waiting for companion extra turn');
+		return;
+	}
 	BattleManager.startInput();
 	this._phase = 'input';
 	BattleLog('unready!');
@@ -48,6 +128,9 @@ BattleManager.unready = function () {
 
 /** enter the ready state */
 BattleManager.ready = function () {
+	// Guard: prevent re-entry if already in ready phase (e.g., multiple extra-turn notifications)
+	if (this._phase === 'ready') return;
+
 	this._phase = 'ready';
 
 	BattleLog('ready!');
@@ -362,6 +445,22 @@ Game_Action.prototype.findTargetResult = function (target, id = MATTIE.multiplay
 	const targets = this.getTargetResults();
 	if (!targets) return null;
 
+	// Priority: Indexed lookup (peer-agnostic, guaranteed match if data was transmitted)
+	const indexed = this._indexedTargetResults || BattleManager._indexedTargetResults;
+	if (Array.isArray(indexed) && indexed.length > 0 && target) {
+		const isTargetActor = typeof target.isActor === 'function' && target.isActor();
+		if (isTargetActor) {
+			const tActorId = typeof target.actorId === 'function' ? target.actorId() : 0;
+			const match = indexed.find((e) => e.type === 'actor' && e.actorId === tActorId);
+			if (match) return match.result;
+		} else {
+			const tEnemyId = typeof target.enemyId === 'function' ? target.enemyId() : 0;
+			const tIndex = typeof target.index === 'function' ? target.index() : -1;
+			const match = indexed.find((e) => e.type === 'enemy' && e.enemyId === tEnemyId && e.index === tIndex);
+			if (match) return match.result;
+		}
+	}
+
 	const resultIds = this.getTargetResultLookupIds(target, id);
 	for (let i = 0; i < resultIds.length; i++) {
 		const resultId = resultIds[i];
@@ -487,8 +586,10 @@ Game_Action.prototype.getDeterministicEffectOutcome = function (target, effect) 
  */
 Game_Action.prototype.preloadRng = function (targets) {
 	BattleManager.targetResults = {};
+	BattleManager._indexedTargetResults = [];
 	this.targetResults = {};
-	targets.forEach((target) => {
+	this._indexedTargetResults = [];
+	targets.forEach((target, targetIdx) => {
 		const resultId = this.makeTargetResultsId(target);
 		const simpleResultId = this.makeSimpleTargetResultsId(target);
 		const legacyResultId = this.makeLegacyTargetResultsId(target);
@@ -516,6 +617,19 @@ Game_Action.prototype.preloadRng = function (targets) {
 		if (legacyResultId !== resultId) this.targetResults[legacyResultId] = targetResult;
 		targetResult.dmg = this.makeDamageValue(target, crit);
 
+		// Indexed lookup entry — peer-agnostic canonical identifier
+		const isTargetActor = target && typeof target.isActor === 'function' && target.isActor();
+		const indexedEntry = { result: targetResult, idx: targetIdx };
+		if (isTargetActor) {
+			indexedEntry.type = 'actor';
+			indexedEntry.actorId = typeof target.actorId === 'function' ? target.actorId() : 0;
+		} else {
+			indexedEntry.type = 'enemy';
+			indexedEntry.enemyId = typeof target.enemyId === 'function' ? target.enemyId() : 0;
+			indexedEntry.index = typeof target.index === 'function' ? target.index() : targetIdx;
+		}
+		this._indexedTargetResults.push(indexedEntry);
+
 		if (MATTIE.multiplayer.pvp.inPVP) {
 			if (targetResult.dmg >= target.hp) this.killingBlow = true;
 			this.targetName = target.name();
@@ -540,6 +654,7 @@ Game_Action.prototype.preloadRng = function (targets) {
 		}
 	});
 	BattleManager.targetResults = Object.assign(BattleManager.targetResults || {}, this.targetResults);
+	BattleManager._indexedTargetResults = (BattleManager._indexedTargetResults || []).concat(this._indexedTargetResults);
 };
 
 Game_Action.prototype.loadRng = function (results, id) {
@@ -552,6 +667,12 @@ Game_Action.prototype.loadRng = function (results, id) {
 
 	if (MATTIE.multiplayer.devTools.battleLogger && Object.keys(this.targetResults).length === 0) {
 		console.warn('[NetRNG] loadRng received no target results for action');
+	}
+};
+
+Game_Action.prototype.loadIndexedResults = function (indexedResults) {
+	if (Array.isArray(indexedResults)) {
+		this._indexedTargetResults = indexedResults;
 	}
 };
 
@@ -642,6 +763,17 @@ Game_Action.prototype.makeDamageValue = function (target, critical) {
 			if (Object.prototype.hasOwnProperty.call(targetResult, 'dmg')) return targetResult.dmg;
 		}
 	}
+	// Desync detection: if this is a net action and we failed to find preloaded results,
+	// flag it so turn-end sync can correct any drift
+	const netPeerId = this._netSubjectPeerId || this._netTarget;
+	if (!targetResult && netPeerId && netPeerId !== MATTIE.multiplayer.getCurrentNetController().peerId) {
+		this._netDamageDesyncDetected = true;
+		if (MATTIE.multiplayer.devTools.battleLogger) {
+			const targetName = target && target.name ? target.name() : 'unknown';
+			const skillId = this._item ? this._item._itemId : '?';
+			console.warn(`[NetRNG] DESYNC: No preloaded result for net action (peer=${netPeerId}, skill=${skillId}, target=${targetName}). Falling back to local calculation.`);
+		}
+	}
 	return MATTIE.multiplayer.Game_ActionmakeDamageValue.call(this, target, critical);
 };
 
@@ -680,7 +812,9 @@ Game_Action.prototype.subject = function () {
 		if (subjectPeerId != MATTIE.multiplayer.getCurrentNetController().peerId) {
 			const netPlayer = MATTIE.multiplayer.getCurrentNetController().netPlayers[subjectPeerId];
 			if (netPlayer && netPlayer.$netActors) {
-				return netPlayer.$netActors.dataActor(subjectDataActorId);
+				const actor = netPlayer.$netActors.dataActor(subjectDataActorId)
+					|| netPlayer.$netActors.baseActor(subjectDataActorId);
+				if (actor) return actor;
 			}
 		}
 	}
@@ -730,10 +864,19 @@ BattleManager.getNextSubject = function () {
 MATTIE.multiplayer.battlemanageronStart = BattleManager.startBattle;
 BattleManager.startBattle = function () {
 	MATTIE.multiplayer.combatEmitter.netExTurn = false;
+	MATTIE.multiplayer.combatEmitter.netExTurnPending = false;
 	MATTIE.multiplayer.ready = false;
 	MATTIE.multiplayer.waitingOnAllies = false;
 	MATTIE.multiplayer.battlemanageronStart.call(this);
 	this._netActors = [];
+	BattleManager._deterministicSeedCounter = 0;
+	BattleManager._indexedTargetResults = [];
+
+	// Trigger a net-battler refresh so Scene_Battle (if already created) rebuilds
+	// sprites from the current $gameTroop._combatants.  This compensates for the
+	// _netActors wipe above and ensures combatants registered between
+	// createAllWindows() and start() are not permanently lost.
+	MATTIE.multiplayer.BattleController.emitNetBattlerRefresh();
 };
 
 BattleManager.addNetActionBattler = function (battler, isExtraTurn) {
@@ -761,14 +904,18 @@ MATTIE.multiplayer.multiCombat.makeActionOrders = BattleManager.makeActionOrders
 BattleManager.makeActionOrders = function () {
 	if (!this._netActionBattlers) this._netActionBattlers = [];
 	MATTIE.multiplayer.multiCombat.makeActionOrders.call(this);
+	const isNetExPhase = MATTIE.multiplayer.combatEmitter.netExTurn || MATTIE.multiplayer.combatEmitter.netExTurnPending;
 	const currentNetBattlers = this._netActionBattlers.filter((netBattler) => {
-		if (Galv.EXTURN.active || MATTIE.multiplayer.combatEmitter.netExTurn) {
+		if (Galv.EXTURN.active || isNetExPhase) {
 			return netBattler.isExtraTurn;
 		}
 		return true;
 	}).map((netBattler) => netBattler.battler);
 	let battlers = [];
-	if (MATTIE.multiplayer.combatEmitter.netExTurn) {
+	if (isNetExPhase) {
+		// During a net extra turn, only remote extra-turn battlers act;
+		// discard local _actionBattlers (which may include enemies from
+		// asymmetric Galv detection).
 		battlers = currentNetBattlers;
 	} else {
 		battlers = this._actionBattlers.concat(currentNetBattlers);
@@ -830,6 +977,7 @@ Game_Battler.prototype.setCurrentAction = function (action) {
 	this._actions[this._actions.length - 1]._netSubjectEnemyId = action._netSubjectEnemyId;
 	this._actions[this._actions.length - 1].netPartyId = action.netPartyId;
 	this._actions[this._actions.length - 1].loadRng(action.targetResults);
+	this._actions[this._actions.length - 1].loadIndexedResults(action._indexedTargetResults);
 	this._actions[this._actions.length - 1].cb = action.cb;
 
 	console.log(action.forcedTargets);
@@ -901,7 +1049,24 @@ BattleManager.update = function () {
 			break;
 
 		case 'input':
-			if (this.checkSomeExtraTurn() && !Galv.EXTURN.active) {
+			if (MATTIE.multiplayer.combatEmitter.netExTurnPending) {
+				// A remote player has an extra turn — skip input entirely
+				var scene = SceneManager._scene;
+				if (scene && scene.endCommandSelection) {
+					scene.endCommandSelection();
+				}
+				this.ready();
+				break;
+			}
+			// If Galv detected an extra turn locally but no local ACTOR has _exTurn,
+			// only enemies or remote actors qualified (asymmetric AGI thresholds).
+			// Treat this as a net extra turn — the remote player's extra turn takes priority.
+			if (Galv.EXTURN.active && !$gameParty.battleMembers().some((m) => m._exTurn)) {
+				MATTIE.multiplayer.combatEmitter.netExTurnPending = true;
+				var scene = SceneManager._scene;
+				if (scene && scene.endCommandSelection) {
+					scene.endCommandSelection();
+				}
 				this.ready();
 				break;
 			}
@@ -915,10 +1080,13 @@ BattleManager.update = function () {
 
 			MATTIE.multiplayer.waitingOnAllies = true;
 			if (!MATTIE.multiplayer.combatEmitter.netExTurn) {
-				if (this.checkSomeExtraTurn() && !Galv.EXTURN.active) { // if someone else has an extra turn but local does not
+				if (MATTIE.multiplayer.combatEmitter.netExTurnPending) { // remote extra turn detected via packet
 					if (this.allExTurnReady() && this.checkAllPlayersReady()) {
 						// if atleast one player has an extra turn and all players with extra turn are ready.
 						MATTIE.multiplayer.combatEmitter.netExTurn = true;
+						// Ensure Galv guards fire (skip state ticks, turn count, endTurn processing)
+						// even if local setupExTurn did not detect an actor extra turn.
+						Galv.EXTURN.active = true;
 						this.startAfterReady();
 					}
 				} else if (this.checkAllPlayersReady()) { // otherwise normal check all ready
@@ -958,14 +1126,28 @@ BattleManager.update = function () {
 			break;
 		case 'doneSyncing':
 			if (MATTIE.multiplayer.combatEmitter.netExTurn) {
-				MATTIE.multiplayer.combatEmitter.netExTurn = false; // turn of net extra turn
-				this.updateTurnEnd();
+				MATTIE.multiplayer.combatEmitter.netExTurn = false;
+				MATTIE.multiplayer.combatEmitter.netExTurnPending = false;
+				MATTIE.multiplayer.waitingOnAllies = false;
+				MATTIE.multiplayer.ready = false;
+				// Clear stale isExtraTurn flags so they don't persist into
+				// the next normal turn and falsely trigger netExTurnPending.
+				$gameTroop.clearExTurnFlags();
+				// Extra turn resolved. Mirror Galv's local extra-turn endTurn:
+				// skip state ticks, regen, turn count increment (those only
+				// happen on a real full turn). Unready everyone so the
+				// combat-ready array is clean, then go straight to startInput
+				// for the next real turn.
+				MATTIE.multiplayer.BattleController.emitUnreadyEvent();
+				MATTIE.multiplayer.BattleController.emitTurnEndEvent();
+				this.startInput();
 			} else {
 				this.updateTurnEnd();
 			}
 
 			break;
 		case 'battleEnd':
+			MATTIE.multiplayer.combatEmitter.netExTurnPending = false;
 			MATTIE.multiplayer.BattleController.emitTurnEndEvent();
 			this.updateBattleEnd();
 			break;
@@ -1015,5 +1197,26 @@ BattleManager.invokeAction = function (subject, target) {
 			return;
 		}
 	}
+
+	// No preloaded result — use seeded PRNG so both clients compute identical
+	// random values for hit/miss/crit/variance/effects on this action.
+	BattleManager._deterministicSeedCounter++;
+	var seed = createBattleSeed(action, subject, target, BattleManager._deterministicSeedCounter);
+	var rng = mulberry32(seed);
+	var origRandom = Math.random;
+	var origRandomInt = Math.randomInt;
+	Math.random = rng;
+	Math.randomInt = function (max) { return Math.floor(rng() * max); };
+
+	if (MATTIE.multiplayer.devTools.battleLogger) {
+		var subName = subject && subject.name ? subject.name() : '?';
+		var tarName = target && target.name ? target.name() : '?';
+		console.log(`[NetRNG] Seeded PRNG for non-preloaded action: ${subName} -> ${tarName} (seed=${seed}, call=${BattleManager._deterministicSeedCounter})`);
+	}
+
 	MATTIE.multiplayer.combatEmitter.invokeAction.call(this, subject, target);
+
+	// Restore original random
+	Math.random = origRandom;
+	Math.randomInt = origRandomInt;
 };
