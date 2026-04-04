@@ -264,6 +264,7 @@ class PlayerModel {
 	updateSelfCoreData() {
 		this.setActorId($gameParty.leader().actorId());
 		this.getFollowers();
+		if ($gameMap && $gameMap.mapId()) this.map = $gameMap.mapId();
 	}
 
 	getCoreData() {
@@ -282,6 +283,7 @@ class PlayerModel {
 		obj.isMarried = this.isMarried;
 		obj.marriedTo = this.marriedTo;
 		obj.troopInCombatWith = this.troopInCombatWith;
+		obj.map = this.map;
 		return obj;
 	}
 

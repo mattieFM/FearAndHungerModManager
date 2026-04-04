@@ -187,19 +187,40 @@ Game_Action.prototype.apply = function (target) {
 MATTIE.multiplayer.gameSystem_OnBattleStart = Game_System.prototype.onBattleStart;
 Game_System.prototype.onBattleStart = function () {
 	MATTIE.multiplayer.inBattle = true;
+	// Relinquish enemy host so the other player on this map can control enemies
+	if (MATTIE.multiplayer.isEnemyHost && MATTIE.multiplayer.hasController()) {
+		MATTIE.multiplayer.isEnemyHost = false;
+		try {
+			MATTIE.multiplayer.getCurrentNetController().emitEnemyHostPause(true);
+		} catch (e) { console.error('[EnemyHost] Error emitting pause on battle start:', e); }
+		if (MATTIE.multiplayer.devTools.enemyHostLogger) console.log('[EnemyHost] In combat - relinquished authority');
+	}
 	enemyLog('Battle Started');
 	return MATTIE.multiplayer.gameSystem_OnBattleStart.call(this);
 };
 
 MATTIE.multiplayer.BattleManager_EndBattle = BattleManager.endBattle;
 BattleManager.endBattle = function (result) {
-	MATTIE.multiplayer.BattleController.emitBattleEnd();
-	var res = MATTIE.multiplayer.BattleManager_EndBattle.call(this, result);
-	MATTIE.multiplayer.BattleController.emitTurnEndEvent();
-	MATTIE.multiplayer.getCurrentNetController().emitBattleEndEvent($gameTroop._troopId, MATTIE.multiplayer.currentBattleEnemy);
+	var res;
+	try {
+		MATTIE.multiplayer.BattleController.emitBattleEnd();
+		res = MATTIE.multiplayer.BattleManager_EndBattle.call(this, result);
+		MATTIE.multiplayer.BattleController.emitTurnEndEvent();
+		MATTIE.multiplayer.getCurrentNetController().emitBattleEndEvent($gameTroop._troopId, MATTIE.multiplayer.currentBattleEnemy);
+		BattleManager.clearNetActionBuffer();
+		enemyLog('Battle Ended');
+	} catch (e) {
+		console.error('[Net] Error during battle end emit:', e);
+	}
 	MATTIE.multiplayer.inBattle = false;
-	BattleManager.clearNetActionBuffer();
-	enemyLog('Battle Ended');
+	// Signal we're back on the map and re-evaluate enemy host
+	if (MATTIE.multiplayer.hasController()) {
+		try {
+			MATTIE.multiplayer.getCurrentNetController().emitEnemyHostPause(false);
+		} catch (e) { console.error('[EnemyHost] Error emitting unpause on battle end:', e); }
+		MATTIE.multiplayer.setEnemyHost();
+		if (MATTIE.multiplayer.devTools.enemyHostLogger) console.log(`[EnemyHost] Battle ended - isHost=${MATTIE.multiplayer.isEnemyHost}`);
+	}
 	return res;
 };
 
@@ -230,6 +251,19 @@ Game_Interpreter.prototype.command301 = function () {
 		troopId = $gameTroop._troopId;
 	}
 	MATTIE.multiplayer.battleProcessing.call(this);
+
+	// Immediately register self in $gameTroop._combatants so that allReady()
+	// includes us from the very first frame.  Without this, a simultaneous
+	// entrant may see an empty combatant list and proceed through turns
+	// independently (the other half of the race condition).
+	try {
+		const selfId = MATTIE.multiplayer.getCurrentNetController() && MATTIE.multiplayer.getCurrentNetController().peerId;
+		if (selfId && $gameTroop && typeof $gameTroop.addIdToCombatArr === 'function') {
+			$gameTroop.addIdToCombatArr(selfId);
+		}
+	} catch (e) {
+		console.error('[Net] Error self-registering in combatants:', e);
+	}
 
 	// Sync Check: if joining an existing battle, populate BattleManager with known combatants
 	try {
@@ -298,15 +332,16 @@ MATTIE.multiplayer.gameTroopSetup = Game_Troop.prototype.setup;
 Game_Troop.prototype.setup = function (troopId) {
 	MATTIE.multiplayer.gameTroopSetup.call(this, troopId);
 
-	// Fix: Prefer existing combatants (possibly set by TroopAPI fix for multiplayer sync)
-	// or fetch from live dataTroops to ensure network updates persist.
-	// Avoid using this.troop()._combatants as it may be a disconnected clone.
-	if (!this._combatants) {
-		if ($dataTroops[troopId] && $dataTroops[troopId]._combatants) {
-			this._combatants = $dataTroops[troopId]._combatants;
-		} else {
-			this._combatants = this.troop()._combatants || {};
-		}
+	// Always refresh _combatants from $dataTroops so that combatant registrations
+	// written by battleStartAddCombatant (which updates $dataTroops directly) are
+	// visible to this Game_Troop instance. The previous "if (!this._combatants)"
+	// guard was always truthy (empty {} persists across battles), causing stale
+	// data and a race condition where simultaneous battle entrants couldn't see
+	// each other.
+	if ($dataTroops[troopId] && $dataTroops[troopId]._combatants) {
+		this._combatants = $dataTroops[troopId]._combatants;
+	} else {
+		this._combatants = {};
 	}
 
 	this.name = this.troop().name;
@@ -401,6 +436,14 @@ Game_Troop.prototype.allExTurn = function () {
 	}
 
 	return true;
+};
+
+Game_Troop.prototype.clearExTurnFlags = function () {
+	if (this._combatants) {
+		Object.keys(this._combatants).forEach((key) => {
+			this._combatants[key].isExtraTurn = false;
+		});
+	}
 };
 
 Game_Troop.prototype.getIdsInCombatWith = function () {

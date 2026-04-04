@@ -140,6 +140,18 @@ MATTIE.multiplayer.gamePlayer.override = function () {
 	Scene_Map.prototype.onMapLoaded = function () {
 		MATTIE.RPG.sceneMapOnLoaded.call(this);
 		if (MATTIE.multiplayer.isActive) {
+			MATTIE.multiplayer.inBattle = false; // safety reset
+			// Clear stale locks on events not actively in combat
+			if ($gameMap && $gameMap.events()) {
+				$gameMap.events().forEach((event) => {
+					if (event && !event.inCombat()) {
+						if (event._trueLock) {
+							event._trueLock = false;
+							event.unlock();
+						}
+					}
+				});
+			}
 			MATTIE.emitTransfer();
 			MATTIE.multiplayer.setEnemyHost();
 			MATTIE.multiplayer.getCurrentNetController().updatePlayersOnCurrentMap();

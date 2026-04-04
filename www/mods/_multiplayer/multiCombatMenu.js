@@ -91,6 +91,26 @@ Scene_Battle.prototype.createAllWindows = function () {
 	this.refreshNetBattlers();
 };
 
+// Override Scene_Battle.start to refresh net battler sprites AFTER BattleManager.startBattle()
+// completes.  startBattle() resets _netActors to [], wiping any sprites that createAllWindows()
+// populated during the create phase.  By refreshing here we rebuild from the current
+// $gameTroop._combatants state, which already contains any peer that registered via
+// battleStartAddCombatant before our scene finished loading.
+MATTIE.multiplayer.multiCombat._Scene_Battle_start = Scene_Battle.prototype.start;
+Scene_Battle.prototype.start = function () {
+	MATTIE.multiplayer.multiCombat._Scene_Battle_start.call(this);
+	// Immediate refresh to pick up combatants already known
+	this.refreshNetBattlers();
+	// Delayed safety refresh to catch battleStart packets that arrive during the
+	// scene-transition window (the other player's packet may still be in-flight)
+	var scene = this;
+	setTimeout(() => {
+		if (SceneManager._scene === scene) {
+			scene.refreshNetBattlers();
+		}
+	}, 600);
+};
+
 Spriteset_Battle.prototype.removeNetBattler = function (index) {
 	if (!this._netActorSprites) this._netActorSprites = [];
 	if (!this._netActors) this._netActors = [];
@@ -512,7 +532,9 @@ MATTIE.multiplayer.SpriteNetExTurn.prototype.createBitmap = function () {
 
 MATTIE.multiplayer.SpriteNetExTurn.prototype.update = function () {
 	Sprite.prototype.update.call(this);
-	this.opacity += MATTIE.multiplayer.combatEmitter.netExTurn ? Galv.EXTURN.fade : -Galv.EXTURN.fade;
+	var show = MATTIE.multiplayer.combatEmitter.netExTurn
+		|| MATTIE.multiplayer.combatEmitter.netExTurnPending;
+	this.opacity += show ? Galv.EXTURN.fade : -Galv.EXTURN.fade;
 };
 
 //-----------------------------------------------------------------------------
@@ -581,6 +603,42 @@ MATTIE.multiplayer.SpriteWaiting.prototype.update = function () {
 };
 
 //-----------------------------------------------------------------------------
+// SPRITE Extra Turn Waiting
+//-----------------------------------------------------------------------------
+
+MATTIE.multiplayer.SpriteExTurnWaiting = function () {
+	this.initialize.apply(this, arguments);
+};
+
+MATTIE.multiplayer.SpriteExTurnWaiting.prototype = Object.create(Sprite.prototype);
+MATTIE.multiplayer.SpriteExTurnWaiting.prototype.constructor = MATTIE.multiplayer.SpriteExTurnWaiting;
+
+MATTIE.multiplayer.SpriteExTurnWaiting.prototype.initialize = function () {
+	Sprite.prototype.initialize.call(this);
+	this.createBitmap();
+};
+
+MATTIE.multiplayer.SpriteExTurnWaiting.prototype.createBitmap = function () {
+	var w = 360;
+	var h = 48;
+	this.bitmap = new Bitmap(w, h);
+	this.bitmap.fontFace = 'GameFont';
+	this.bitmap.fontSize = 20;
+	this.bitmap.textColor = '#ffffff';
+	this.bitmap.outlineColor = 'rgba(0, 0, 0, 0.7)';
+	this.bitmap.outlineWidth = 4;
+	this.bitmap.drawText('Waiting for companion extra turn...', 0, 0, w, h, 'center');
+	this.x = Galv.EXTURN.x + 10;
+	this.y = Galv.EXTURN.y + 36;
+	this.opacity = 0;
+};
+
+MATTIE.multiplayer.SpriteExTurnWaiting.prototype.update = function () {
+	Sprite.prototype.update.call(this);
+	this.opacity += MATTIE.multiplayer.combatEmitter.netExTurnPending ? Galv.EXTURN.fade : -Galv.EXTURN.fade;
+};
+
+//-----------------------------------------------------------------------------
 // SPRITESET BATTLE
 //-----------------------------------------------------------------------------
 
@@ -590,6 +648,7 @@ Scene_Battle.prototype.createDisplayObjects = function () {
 	this.createNetExTurnImg();
 	this.createReadyImg();
 	this.createAwaitingImg();
+	this.createExTurnWaitingImg();
 };
 
 Scene_Battle.prototype.createNetExTurnImg = function () {
@@ -605,6 +664,11 @@ Scene_Battle.prototype.createReadyImg = function () {
 Scene_Battle.prototype.createAwaitingImg = function () {
 	this._netExTurnImg = new MATTIE.multiplayer.SpriteWaiting();
 	this.addChild(this._netExTurnImg);
+};
+
+Scene_Battle.prototype.createExTurnWaitingImg = function () {
+	this._exTurnWaitingImg = new MATTIE.multiplayer.SpriteExTurnWaiting();
+	this.addChild(this._exTurnWaitingImg);
 };
 
 Sprite_ExTurn.prototype.update = function () {

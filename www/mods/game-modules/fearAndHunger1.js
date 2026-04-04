@@ -11,7 +11,7 @@
 MATTIE.static.registerGameModule({
 	id: 'fearandhunger1',
 	name: 'Fear & Hunger',
-	versionMatch: function () { return MATTIE.global.isFunger(); },
+	versionMatch() { return MATTIE.global.isFunger(); },
 
 	// ─── Dependencies ──────────────────────────────────────────────────────────
 	// These commonLib scripts are loaded by _gameModuleLoader before applying this
@@ -96,17 +96,39 @@ MATTIE.static.registerGameModule({
 	// ─── Teleports ────────────────────────────────────────────────────────────
 	// cmd closures reference MATTIE.tpAPI.* functions registered in hooks.onStaticUpdate
 	teleports: [
-		{ id: 0, name: 'Spawn', cmd: () => MATTIE.tpAPI.fortressSpawn(), bool: () => true, btn: true },
-		{ id: 1, name: 'Level 1 - Dungeon Entrance', cmd: () => MATTIE.tpAPI.levelOneEntrance(), bool: () => true, btn: true },
-		{ id: 2, name: 'Level 1 - Inner Halls', cmd: () => MATTIE.tpAPI.levelOneInnerHall(), bool: () => true, btn: true },
-		{ id: 3, name: 'Level 2 - Blood Pit', cmd: () => MATTIE.tpAPI.levelTwoBloodPit(), bool: () => true, btn: true },
-		{ id: 4, name: 'Level 3 - Prisons', cmd: () => MATTIE.tpAPI.levelThreePrisons(), bool: () => true, btn: true },
-		{ id: 5, name: 'Level 5 - Mines', cmd: () => MATTIE.tpAPI.levelFiveMines(), bool: () => true, btn: true },
-		{ id: 6, name: 'Level 5 - Thickets', cmd: () => MATTIE.tpAPI.levelFiveThickets(), bool: () => true, btn: true },
-		{ id: 7, name: 'Level 6 - Cave Dweller Village', cmd: () => MATTIE.tpAPI.levelSixCaveVillage(), bool: () => true, btn: true },
-		{ id: 8, name: 'Level 6 - Cube Of The Depths', cmd: () => MATTIE.tpAPI.levelSixCaveVillageCOD(), bool: () => true, btn: true },
-		{ id: 9, name: "Level 6 - Dar'ce", cmd: () => MATTIE.tpAPI.levelSixCaveVillageDarkie(), bool: () => true, btn: true },
-		{ id: 10, name: 'Level 7 - LeGarde', cmd: () => MATTIE.tpAPI.levelSevenLegard(), bool: () => true, btn: true },
+		{
+			id: 0, name: 'Spawn', cmd: () => MATTIE.tpAPI.fortressSpawn(), bool: () => true, btn: true,
+		},
+		{
+			id: 1, name: 'Level 1 - Dungeon Entrance', cmd: () => MATTIE.tpAPI.levelOneEntrance(), bool: () => true, btn: true,
+		},
+		{
+			id: 2, name: 'Level 1 - Inner Halls', cmd: () => MATTIE.tpAPI.levelOneInnerHall(), bool: () => true, btn: true,
+		},
+		{
+			id: 3, name: 'Level 2 - Blood Pit', cmd: () => MATTIE.tpAPI.levelTwoBloodPit(), bool: () => true, btn: true,
+		},
+		{
+			id: 4, name: 'Level 3 - Prisons', cmd: () => MATTIE.tpAPI.levelThreePrisons(), bool: () => true, btn: true,
+		},
+		{
+			id: 5, name: 'Level 5 - Mines', cmd: () => MATTIE.tpAPI.levelFiveMines(), bool: () => true, btn: true,
+		},
+		{
+			id: 6, name: 'Level 5 - Thickets', cmd: () => MATTIE.tpAPI.levelFiveThickets(), bool: () => true, btn: true,
+		},
+		{
+			id: 7, name: 'Level 6 - Cave Dweller Village', cmd: () => MATTIE.tpAPI.levelSixCaveVillage(), bool: () => true, btn: true,
+		},
+		{
+			id: 8, name: 'Level 6 - Cube Of The Depths', cmd: () => MATTIE.tpAPI.levelSixCaveVillageCOD(), bool: () => true, btn: true,
+		},
+		{
+			id: 9, name: "Level 6 - Dar'ce", cmd: () => MATTIE.tpAPI.levelSixCaveVillageDarkie(), bool: () => true, btn: true,
+		},
+		{
+			id: 10, name: 'Level 7 - LeGarde', cmd: () => MATTIE.tpAPI.levelSevenLegard(), bool: () => true, btn: true,
+		},
 	],
 
 	// ─── Switches ─────────────────────────────────────────────────────────────
@@ -905,7 +927,7 @@ MATTIE.static.registerGameModule({
 
 	// ─── Items ────────────────────────────────────────────────────────────────
 	// Function called after $dataItems is loaded
-	items: function () {
+	items() {
 		return {
 			emptyScroll: $dataItems[88],
 			silverCoin: $dataItems[59],
@@ -915,7 +937,7 @@ MATTIE.static.registerGameModule({
 
 	// ─── Skills ───────────────────────────────────────────────────────────────
 	// Function called after $dataSkills is loaded
-	skills: function () {
+	skills() {
 		return {
 			bloodportal: $dataSkills[148],
 			hurting: $dataSkills[12],
@@ -928,7 +950,7 @@ MATTIE.static.registerGameModule({
 	},
 
 	// ─── Common Events ────────────────────────────────────────────────────────
-	commonEvents: function () {
+	commonEvents() {
 		return {
 			// Food IDs (confirmed different per game)
 			smallFood: 31,
@@ -970,7 +992,9 @@ MATTIE.static.registerGameModule({
 	// ─── Multiplayer ──────────────────────────────────────────────────────────
 	multiplayer: {
 		// Ghost actor source: miner on map 185, event 20, troop 174 index 7
-		ghost: { mapId: 185, eventId: 20, troopId: 174, troopIndex: 7 },
+		ghost: {
+			mapId: 185, eventId: 20, troopId: 174, troopIndex: 7,
+		},
 
 		// PvP: actor ID → troop ID mapping for battle conversion
 		pvpActorTroopMap: {
@@ -1016,7 +1040,7 @@ MATTIE.static.registerGameModule({
 
 	// ─── Hooks ────────────────────────────────────────────────────────────────
 	hooks: {
-		onStaticUpdate: function () {
+		onStaticUpdate() {
 			// Version confirmation dialog
 			if (!MATTIE.DataManager.global.get('correctVersion')) {
 				if (confirm('The mod loader thinks you are running fear and hunger 1.'

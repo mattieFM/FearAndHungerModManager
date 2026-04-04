@@ -75,7 +75,7 @@ Game_Character.prototype.getValidMove = function (moveRoute) {
 					const currentElement = list[k];
 					const historicalElement = last20Steps[index];
 
-					if (currentElement.code != historicalElement) {
+					if (currentElement.code != historicalElement.code) {
 						misses++;
 						if (misses >= tolerance) {
 							shouldContinue = false;
@@ -108,6 +108,11 @@ MATTIE.multiplayer.moveStraight = Game_CharacterBase.prototype.moveStraight;
 Game_Event.prototype.moveStraight = function (d, callAnyways = false) {
 	// console.log(`moved with${d}`);
 	if (!MATTIE.multiplayer.inBattle) {
+		// If multiplayer isn't connected yet, allow normal movement
+		if (!MATTIE.multiplayer.hasController()) {
+			MATTIE.multiplayer.moveStraight.call(this, d);
+			return;
+		}
 		if (MATTIE.multiplayer.isEnemyHost || callAnyways || this._moveRouteForcing) MATTIE.multiplayer.moveStraight.call(this, d);
 		if (MATTIE.multiplayer.isEnemyHost && !callAnyways && !this._moveRouteForcing) { // dont send if move route forcing
 			if (MATTIE.multiplayer.devTools.enemyMoveLogger) {
@@ -144,6 +149,38 @@ Game_CharacterBase.prototype.isNearTheScreen = function () {
 	var dis = Math.abs(this.deltaXFrom(nearestPlayer.x));
 	dis += Math.abs(this.deltaYFrom(nearestPlayer.y));
 	return dis < 10;
+};
+
+// Enemy host pause detection: when the enemy host opens a menu or leaves Scene_Map,
+// relinquish authority so the other player can take over enemy movement.
+MATTIE.multiplayer._enemyHostWasActive = true;
+MATTIE.multiplayer._sceneMapUpdateOriginal = Scene_Map.prototype.update;
+Scene_Map.prototype.update = function () {
+	MATTIE.multiplayer._sceneMapUpdateOriginal.call(this);
+	if (!MATTIE.multiplayer.isActive) return;
+
+	const isSceneActive = this.isActive();
+
+	// Detect transition: was active -> now inactive (menu opened)
+	if (MATTIE.multiplayer._enemyHostWasActive && !isSceneActive) {
+		if (MATTIE.multiplayer.isEnemyHost) {
+			MATTIE.multiplayer.isEnemyHost = false;
+			try {
+				MATTIE.multiplayer.getCurrentNetController().emitEnemyHostPause(true);
+			} catch (e) { console.error('[EnemyHost] Error emitting pause:', e); }
+			if (MATTIE.multiplayer.devTools.enemyHostLogger) console.log('[EnemyHost] Paused - relinquished authority');
+		}
+	}
+	// Detect transition: was inactive -> now active (menu closed)
+	if (!MATTIE.multiplayer._enemyHostWasActive && isSceneActive) {
+		try {
+			MATTIE.multiplayer.getCurrentNetController().emitEnemyHostPause(false);
+		} catch (e) { console.error('[EnemyHost] Error emitting unpause:', e); }
+		MATTIE.multiplayer.setEnemyHost(); // re-evaluate to potentially reclaim
+		if (MATTIE.multiplayer.devTools.enemyHostLogger) console.log(`[EnemyHost] Resumed - isHost=${MATTIE.multiplayer.isEnemyHost}`);
+	}
+
+	MATTIE.multiplayer._enemyHostWasActive = isSceneActive;
 };
 
 // MATTIE.RPG.processMoveCommand = Game_Character.prototype.processMoveCommand;

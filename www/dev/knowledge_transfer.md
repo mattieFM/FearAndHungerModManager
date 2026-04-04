@@ -2,7 +2,7 @@
 
 **Target Audience:** Autonomous coding agent (Claude Code) executing a decoupling refactor  
 **Objective:** Decouple generic RPG Maker MV mod-loading and multiplayer engine logic from Fear & Hunger 1 & 2 game-specific logic  
-**Repository:** `mattieFM/FearAndHungerModManager` (v1.1.7)  
+**Repository:** `mattieFM/FearAndHungerModManager` (v1.2.3)  
 **Date Generated:** 2026-03-31
 
 ---

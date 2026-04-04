@@ -24,6 +24,35 @@ MATTIE.multiplayer.config.maxPacketsPerSecond = 50;
  * */
 MATTIE.multiplayer.config.scaling = MATTIE.multiplayer.config.scaling || {};
 
+/** Config keys that affect gameplay and MUST be synced from host to clients */
+MATTIE.multiplayer.config.GAMEPLAY_KEYS = [
+	'enemyBattleIndexScaler', 'shouldScaleHealingWhispers', 'healingWhispersScaler',
+	'partyActionsTargetAll', 'resurrectionHasCost', 'resurrectionNeedsNecromancy',
+	'resurrectionActorCost', 'actorCost', 'resurrectionItemCost',
+	'resurrectionItemId', 'resurrectionItemAmount', 'scaleHp',
+	'hpScaler', 'hpPlayerDivisor', 'bodyBlocking', 'canInteract',
+];
+
+/** Snapshot all gameplay config values (host calls this) */
+MATTIE.multiplayer.config.getGameplaySnapshot = function () {
+	var snapshot = {};
+	MATTIE.multiplayer.config.GAMEPLAY_KEYS.forEach((key) => {
+		snapshot[key] = MATTIE.configGet(key);
+	});
+	return snapshot;
+};
+
+/** Apply a gameplay config snapshot received from host (writes to in-memory cache only, not disk) */
+MATTIE.multiplayer.config.applyGameplaySnapshot = function (snapshot) {
+	if (!snapshot || typeof snapshot !== 'object') return;
+	MATTIE.multiplayer.config.GAMEPLAY_KEYS.forEach((key) => {
+		if (snapshot[key] !== undefined) {
+			MATTIE.DataManager.global.data[key] = snapshot[key];
+		}
+	});
+	console.log('[Config] Applied host gameplay config:', Object.keys(snapshot).length, 'keys');
+};
+
 //---------------------------------------------------------
 // Enemy Scaling
 //---------------------------------------------------------
@@ -256,12 +285,10 @@ MATTIE.multiplayer.config.scaling.resurrectionCost = () => {
 /**
  * @description the function to scale hp
  * @returns {number} the scaler for the enemies' hp
- * !!DANGER!! only edit this if you know what you are doing
  */
-MATTIE.multiplayer.config.scaling.hpScaling = (forceLocal = false) => {
-	// If we are a client and have received a strict scaling factor from the Host, use it ALWAYS.
-	// unless forceLocal is true (used for calculating the "Before" state during transitions)
-	if (!forceLocal && !MATTIE.multiplayer.isHost && MATTIE.multiplayer.hostScalingFactor) {
+MATTIE.multiplayer.config.scaling.hpScaling = () => {
+	// Clients use the host-authoritative factor when available
+	if (!MATTIE.multiplayer.isHost && MATTIE.multiplayer.hostScalingFactor) {
 		return MATTIE.multiplayer.hostScalingFactor;
 	}
 
@@ -331,16 +358,10 @@ var _Game_Enemy_param = Game_Enemy.prototype.param;
 Game_Enemy.prototype.param = function (paramId) {
 	let val = _Game_Enemy_param.call(this, paramId);
 	if (paramId === 0) {
-		// max HP
-		// Use cached scaling factor if available (Stable), otherwise dynamic (Volatile)
 		const scaler = (this._scalingFactor !== undefined) ? this._scalingFactor : MATTIE.multiplayer.config.scaling.hpScaling();
 
-		// Initialize _scalingFactor if undefined (first call)
 		if (this._scalingFactor === undefined) {
 			this._scalingFactor = scaler;
-			if (MATTIE.multiplayer.devTools.battleLogger && MATTIE.multiplayer.hostScalingFactor) {
-				console.log(`[Scaling] Enemy ${this.index()} initialized with factor: ${scaler}`);
-			}
 		}
 
 		val *= scaler;
@@ -370,29 +391,7 @@ MATTIE.multiplayer.config.scaling.applyTroopScaling = function (updateAction) {
 
 	enemies.forEach((e, idx) => {
 		if (e.isEnemy() && e._scalingFactor === undefined) {
-			// If undefined, we assume it was using the Local Calculation logic
-			// But if we are a client connecting to a host, our Local Logic (1.0) is the "Old" state.
-			// If hpScaling() returns 2.0 (because we set hostScalingFactor), we should lock to 1.0 (local).
-			// BUT only if we believe we were truly local.
-
-			let assumedFactor = currentGlobalFactor;
-			if (!MATTIE.multiplayer.isHost && MATTIE.multiplayer.hostScalingFactor) {
-				// We are client, and we have a host factor.
-				// Did we just get it? Inspect `forceLocal`.
-				const localCalc = MATTIE.multiplayer.config.scaling.hpScaling(!MATTIE.getCurrentNetController().isHost);
-				if (localCalc !== currentGlobalFactor) {
-					assumedFactor = localCalc;
-					if (MATTIE.multiplayer.devTools.battleLogger) {
-						console.log(`[Scaling] Enemy ${idx} uninitialized. Assuming transition from Local (${localCalc}) -> Host (${currentGlobalFactor})`);
-					}
-				}
-			}
-
-			if (typeof assumedFactor !== 'number' || !isFinite(assumedFactor) || assumedFactor <= 0) {
-				assumedFactor = currentGlobalFactor;
-			}
-
-			e._scalingFactor = assumedFactor;
+			e._scalingFactor = currentGlobalFactor;
 		}
 	});
 
@@ -467,45 +466,6 @@ MATTIE.multiplayer.config.scaling.applyTroopScaling = function (updateAction) {
 		}
 	});
 };
-
-/**
- * @description edit the dataEnemies obj of a set enemy to have its scaled amount of health as determined by scaling and config above
- * @param {*} enemyId the id of the data enemy
- */
-function updateHpOfEnemy(enemyId) {
-	if (!$dataEnemies[enemyId].scaled) {
-		$dataEnemies[enemyId].params[0] *= MATTIE.multiplayer.config.scaling.hpScaling();
-		// // console.log(`#${enemyId} mhp:${$dataEnemies[enemyId].params[0]}`);
-		$dataEnemies[enemyId].scaled = true;
-	}
-}
-
-/**
- * @description adjust the hp of every enemy within memory
- * !!DANGER!! don't edit this unless you know what your doing.
- */
-
-// setTimeout(() => {
-// 	$dataEnemies.forEach((enemy) => {
-// 		if (enemy) {
-// 			updateHpOfEnemy(enemy.id);
-// 		}
-// 	});
-// }, 5000);
-// deprecated runtime solution.
-// // MATTIE_RPG.Game_Enemy_Setup = Game_Enemy.prototype.setup;
-// // Game_Enemy.prototype.setup = function (enemyId, x, y) {
-// // 	updateHpOfEnemy(enemyId);
-// // 	MATTIE_RPG.Game_Enemy_Setup.call(this, enemyId, x, y);
-// // };
-// // /** @description the default transform cmd */
-// // MATTIE_RPG.Game_Enemy_TRANSFORM = Game_Enemy.prototype.transform;
-// // /** @description extend the transform method to do the same as above */
-// // Game_Enemy.prototype.transform = function (enemyId) {
-// // 	updateHpOfEnemy(enemyId);
-// // 	// // console.log(`#${enemyId} mhp:${$dataEnemies[enemyId].params[0]}`);
-// // 	MATTIE_RPG.Game_Enemy_TRANSFORM.call(this, enemyId);
-// // };1
 
 //---------------------------------------------------------
 // Client Side Configs

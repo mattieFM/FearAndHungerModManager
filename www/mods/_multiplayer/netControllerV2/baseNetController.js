@@ -74,20 +74,19 @@ class BaseNetController extends EventEmitter {
 		/** @type {Object.<string, number[]>} */
 		this.pendingMoveTimeouts = {};
 
-		// Reliability: Deduplication Cache
-		/** @type {Map<string, number>} uid -> timestamp */
-		this._receivedUids = new Map();
-		// Prune unseen IDs every 60s
-		setInterval(() => {
-			const now = Date.now();
-			for (const [uid, time] of this._receivedUids) {
-				if (now - time > 60000) this._receivedUids.delete(uid);
-			}
-		}, 60000);
+		// Reliability: Deduplication Cache — fixed-size ring buffer
+		// Evicts oldest entries when full instead of time-based pruning
+		/** @type {Set<string>} */
+		this._receivedUids = new Set();
+		/** @type {string[]} insertion-order tracking for FIFO eviction */
+		this._receivedUidsOrder = [];
+		this._receivedUidsMax = 2000;
 
 		// Sequence tracking for movements (handling jitter/out-of-order)
 		this._lastMoveSeq = {};
 		this._moveSeqCounter = 0;
+		// Deterministic UID counter for critical packet deduplication
+		this._uidCounter = 0;
 	}
 
 	/**
@@ -174,6 +173,14 @@ class BaseNetController extends EventEmitter {
 		MATTIE.multiplayer.isClient = false;
 		MATTIE.multiplayer.isHost = false;
 		MATTIE.multiplayer.isActive = false;
+		// Clean up movement-related state for disconnected players
+		if (this.pendingMoveTimeouts) {
+			Object.values(this.pendingMoveTimeouts).forEach((timeouts) => {
+				if (Array.isArray(timeouts)) timeouts.forEach((t) => clearTimeout(t));
+			});
+		}
+		this.pendingMoveTimeouts = {};
+		this._lastMoveSeq = {};
 	}
 
 	setIsHost() {
@@ -229,7 +236,7 @@ class BaseNetController extends EventEmitter {
 			if (SceneManager._scene.isActive() && MATTIE.multiplayer.varSyncer.syncedOnce) { obj.priority = 1; }
 		}
 		if (data.event) {
-			if (SceneManager._scene.isActive() && MATTIE.multiplayer.varSyncer.syncedOnce) { obj.priority = 1; }
+			obj.priority = 10;
 		}
 		if (data.battleStart) {
 			obj.priority = 1;
@@ -297,32 +304,35 @@ class BaseNetController extends EventEmitter {
 		if (data.saveEventLocationEvent) {
 			obj.priority = 1008;
 		}
+		if (data.enemyHostPause) {
+			obj.priority = 1010;
+		}
 		obj.excludedIds = excludedIds;
+
+		// MOVEMENT: Sequencing — assign BEFORE cloning so retransmits carry the same seq
+		if (obj.move) {
+			obj.move.seq = ++this._moveSeqCounter;
+		}
 
 		// RELIABILITY: Redundancy for Critical Packets
 		// We simulate reliability by sending critical events multiple times.
 		// The receiver effectively de-dupes them via 'uid'.
 		if (this._isCriticalPacket(obj)) {
-			// Assign Unique ID if not present
-			if (!obj.uid) obj.uid = Math.random().toString(36).substr(2, 9);
+			// Assign Unique ID if not present — deterministic counter avoids collision
+			if (!obj.uid) obj.uid = `${this.peerId}-${++this._uidCounter}`;
 
-			// Send clones with delay
-			// We clone to ensure the queue doesn't get messed up by reference modification
-			// separate delays ensure we bridge gaps in packet loss
-			setTimeout(() => this.sendOrQueue({ ...obj }, excludedIds), 150);
-			setTimeout(() => this.sendOrQueue({ ...obj }, excludedIds), 300);
-			setTimeout(() => this.sendOrQueue({ ...obj }, excludedIds), 600);
-			setTimeout(() => this.sendOrQueue({ ...obj }, excludedIds), 1200);
+			// Deep-clone a frozen snapshot so retransmits are immune to later mutation
+			const frozen = JSON.parse(JSON.stringify(obj));
+
+			// Send clones with staggered delays to bridge packet loss gaps
+			setTimeout(() => this.sendOrQueue({ ...frozen }), 150);
+			setTimeout(() => this.sendOrQueue({ ...frozen }), 300);
+			setTimeout(() => this.sendOrQueue({ ...frozen }), 600);
+			setTimeout(() => this.sendOrQueue({ ...frozen }), 1200);
 			// Verify extreme loss conditions
 			if (MATTIE.multiplayer.simulation && MATTIE.multiplayer.simulation.packetLoss > 0.2) {
-				setTimeout(() => this.sendOrQueue({ ...obj }, excludedIds), 600);
+				setTimeout(() => this.sendOrQueue({ ...frozen }), 600);
 			}
-		}
-
-		// MOVEMENT: Sequencing
-		// Add sequence number to moves to handle out-of-order packets (Jitter)
-		if (obj.move) {
-			obj.move.seq = ++this._moveSeqCounter;
 		}
 
 		if (obj.priority > 1 || MATTIE.multiplayer.netQueue.values.length < 100) this.sendOrQueue(obj, excludedIds);
@@ -431,13 +441,16 @@ class BaseNetController extends EventEmitter {
 	_processData(data, conn) {
 		// console.log(data);
 
-		// RELIABILITY: Deduplication
+		// RELIABILITY: Deduplication (ring-buffer Set)
 		if (data.uid) {
 			if (this._receivedUids.has(data.uid)) {
-				// console.log(`[Net] Discarding duplicate packet ${data.uid}`);
 				return;
 			}
-			this._receivedUids.set(data.uid, Date.now());
+			this._receivedUids.add(data.uid);
+			this._receivedUidsOrder.push(data.uid);
+			while (this._receivedUidsOrder.length > this._receivedUidsMax) {
+				this._receivedUids.delete(this._receivedUidsOrder.shift());
+			}
 		}
 
 		data = this.preprocessData(data, conn);
@@ -474,10 +487,19 @@ class BaseNetController extends EventEmitter {
 			if (SceneManager._scene.isActive() && MATTIE.multiplayer.varSyncer.syncedOnce) { this.onCmdEventData(data.cmd, data.id); }
 		}
 		if (data.event) {
-			if (SceneManager._scene.isActive() && MATTIE.multiplayer.varSyncer.syncedOnce) { this.onEventMoveEventData(data.event); }
+			if (MATTIE.multiplayer.varSyncer.syncedOnce) { this.onEventMoveEventData(data.event); }
+		}
+		if (data.enemyHostPause) {
+			this.onEnemyHostPauseData(data.enemyHostPause, id);
 		}
 		if (data.battleStart) {
 			this.onBattleStartData(data.battleStart, id);
+		}
+		if (data.configSync && !MATTIE.multiplayer.isHost) {
+			// Apply host-authoritative gameplay config
+			if (MATTIE.multiplayer.config.applyGameplaySnapshot) {
+				MATTIE.multiplayer.config.applyGameplaySnapshot(data.configSync);
+			}
 		}
 		if (data.scalingCorrection) {
 			// Host Authority: Correcting our scaling factor mid-flight
@@ -508,6 +530,9 @@ class BaseNetController extends EventEmitter {
 		}
 		if (data.ready) {
 			this.onReadyData(data.ready, id);
+		}
+		if (data.exTurnNotify) {
+			this.onExTurnNotify(data.exTurnNotify, id);
 		}
 		if (data.enemyActions) {
 			this.onEnemyActionsData(data.enemyActions, id);
@@ -574,11 +599,13 @@ class BaseNetController extends EventEmitter {
 	 * @param {Array} enemyActions array of pre-calculated enemy actions with targets and results
 	 */
 	emitEnemyActions(enemyActions) {
-		if (!this.isHost) return; // Only host should emit enemy actions
+		if (!MATTIE.multiplayer.isHost) return; // Only host should emit enemy actions
 
 		const obj = {};
 		obj.enemyActions = enemyActions;
-		console.log('[HostAI] Broadcasting enemy actions:', enemyActions);
+		if (MATTIE.multiplayer.devTools.battleLogger) {
+			console.log('[HostAI] Broadcasting enemy actions:', enemyActions);
+		}
 		this.sendViaMainRoute(obj);
 	}
 
@@ -588,7 +615,9 @@ class BaseNetController extends EventEmitter {
 	 * @param {string} id sender id (should be host)
 	 */
 	onEnemyActionsData(enemyActions, id) {
-		console.log('[HostAI] Received enemy actions:', enemyActions);
+		if (MATTIE.multiplayer.devTools.battleLogger) {
+			console.log('[HostAI] Received enemy actions:', enemyActions);
+		}
 
 		if (!enemyActions || !Array.isArray(enemyActions)) {
 			console.error('[HostAI] Invalid enemy actions data');
@@ -599,6 +628,46 @@ class BaseNetController extends EventEmitter {
 		enemyActions.forEach((actionData) => {
 			this.processHostEnemyAction(actionData, id);
 		});
+	}
+
+	/**
+	 * @description process a single host-authoritative enemy action on the client
+	 * @param {Object} actionData the action data from host containing skillId, targetIndex, subjectEnemyIndex, targetResults, _indexedTargetResults
+	 * @param {string} hostId the peer id of the host that sent this action
+	 */
+	processHostEnemyAction(actionData, hostId) {
+		if (!actionData || typeof actionData.subjectEnemyIndex !== 'number') {
+			console.error('[HostAI] Invalid action data - missing subjectEnemyIndex');
+			return;
+		}
+
+		const enemy = $gameTroop.members()[actionData.subjectEnemyIndex];
+		if (!enemy) {
+			console.error(`[HostAI] Enemy not found at index ${actionData.subjectEnemyIndex}`);
+			return;
+		}
+
+		const action = new Game_Action(enemy);
+		if (actionData.skillId) {
+			action.setSkill(actionData.skillId);
+		}
+		if (typeof actionData.targetIndex === 'number') {
+			action._targetIndex = actionData.targetIndex;
+		}
+
+		// Attach host's precomputed RNG results
+		if (actionData.targetResults) {
+			action.loadRng(actionData.targetResults, hostId);
+		}
+		if (actionData._indexedTargetResults) {
+			action.loadIndexedResults(actionData._indexedTargetResults);
+		}
+
+		action._netSubjectPeerId = hostId;
+		action._netTarget = hostId;
+		action._subjectEnemyIndex = actionData.subjectEnemyIndex;
+
+		this.processNormalEnemyAction(enemy, action, false, hostId);
 	}
 
 	//-----------------------------------------------------
@@ -619,7 +688,8 @@ class BaseNetController extends EventEmitter {
 		obj.turnEnd.enemyMhps = enemyMhps; // Added MHP sync
 		obj.turnEnd.enemyStates = enemyStates;
 		obj.turnEnd.actorData = actorData;
-		console.log(obj);
+		obj.turnEnd.isHost = MATTIE.multiplayer.isHost; // Host-authority tag
+		if (MATTIE.multiplayer.devTools.battleLogger) console.log('[TurnEnd] Emitting:', obj);
 		this.emit('turnend');
 		this.sendViaMainRoute(obj);
 	}
@@ -634,8 +704,9 @@ class BaseNetController extends EventEmitter {
 			const actorDataArr = data.actorData;
 			const actorHealthArr = actorDataArr.map((data) => data.hp);
 			const enemyStatesArr = data.enemyStates;
+			const isHostData = !!data.isHost; // Host-authority flag
 			if (actorDataArr) { this.syncActorData(actorDataArr, id); }
-			if (enemyHealthArr) { this.syncEnemyHealths(enemyHealthArr, enemyStatesArr, data.enemyMhps); }
+			if (enemyHealthArr) { this.syncEnemyHealths(enemyHealthArr, enemyStatesArr, data.enemyMhps, isHostData); }
 			if (enemyStatesArr) { this.syncEnemyStates(enemyStatesArr); }
 			setTimeout(() => {
 				BattleManager.doneSyncing(); // done syncing
@@ -749,10 +820,10 @@ class BaseNetController extends EventEmitter {
 		});
 	}
 
-	syncEnemyHealths(enemyHealthArr, enemyStatesArr, remoteMaxHpArr) { // Added remoteMaxHpArr
+	syncEnemyHealths(enemyHealthArr, enemyStatesArr, remoteMaxHpArr, isHostData = false) { // Added remoteMaxHpArr, isHostData
 		// Log inbound health array for debugging scaling/sync issues
 		if (MATTIE.multiplayer.devTools.battleLogger) {
-			console.log('[NetSync] Received Enemy Healths:', JSON.stringify(enemyHealthArr), 'States:', JSON.stringify(enemyStatesArr));
+			console.log(`[NetSync] Received Enemy Healths (host=${isHostData}):`, JSON.stringify(enemyHealthArr), 'States:', JSON.stringify(enemyStatesArr));
 		}
 
 		// Match enemies by their index and enemyId to prevent wrong targets from being synced
@@ -783,13 +854,18 @@ class BaseNetController extends EventEmitter {
 				// If we blindly take 1500, we halve our HP for no reason.
 				let adjustedRemoteHp = remoteHp;
 
-				if (remoteMaxHp && remoteMaxHp !== orgMhp && remoteMaxHp > 0) {
+				if (remoteMaxHp && remoteMaxHp !== orgMhp && remoteMaxHp > 0 && orgMhp > 0) {
 					// Calculate Remote Health Percentage and convert to our scale
-					const remotePercent = remoteHp / remoteMaxHp;
-					adjustedRemoteHp = Math.floor(orgMhp * remotePercent);
+					// Clamp percent to [0, 1] to prevent rounding errors from exceeding max
+					const remotePercent = Math.max(0, Math.min(1, remoteHp / remoteMaxHp));
+					adjustedRemoteHp = Math.round(orgMhp * remotePercent);
 
 					if (MATTIE.multiplayer.devTools.battleLogger) {
-						console.log(`[NetSync] MHP Mismatch detected for Enemy ${remoteData.index}. LocalMHP: ${orgMhp}, RemoteMHP: ${remoteMaxHp}. Adjusting RemoteHP ${remoteHp} -> ${adjustedRemoteHp}`);
+						console.log(
+							`[NetSync] MHP Mismatch detected for Enemy ${remoteData.index}. `
+							+ `LocalMHP: ${orgMhp}, RemoteMHP: ${remoteMaxHp}. `
+							+ `Adjusting RemoteHP ${remoteHp} -> ${adjustedRemoteHp}`,
+						);
 					}
 				}
 
@@ -822,21 +898,37 @@ class BaseNetController extends EventEmitter {
 				}
 
 				// HP SYNC LOGIC
-				// Logic: Generally trust the lowest HP (Lag compensation - damage happened recently).
+				// Host-Authoritative: If data is from the host, accept directly (host is ground truth).
+				// Client-to-Client: Use conservative Math.min heuristic.
 				// EXCEPTION: If Local HP is EXACTLY Local Base Max (Unscaled) and Remote is Scaled High,
 				// we assume Local is "Fresh/Uninitialized Scale" and allow Healing up to Remote.
 
-				let limitHp = Math.min(orgHp, adjustedRemoteHp);
+				let limitHp;
 
-				// Detect Unscaled Initialization Trap
-				// If local enemy never had scaling applied (factor 1.0 or undefined)
-				// and remote is sending scaled values, accept the remote value
-				if (orgHp < adjustedRemoteHp) {
-					if (!enemy._scalingFactor || enemy._scalingFactor === 1.0) {
-						if (MATTIE.multiplayer.devTools.battleLogger) {
-							console.log(`[NetSync] Detected Unscaled Local HP (${orgHp}, factor: ${enemy._scalingFactor}). Allowing sync UP to ${adjustedRemoteHp}`);
+				if (isHostData) {
+					// Host is the single source of truth — accept directly
+					limitHp = adjustedRemoteHp;
+					if (MATTIE.multiplayer.devTools.battleLogger && limitHp !== orgHp) {
+						console.log(`[NetSync] Host-authoritative HP for Enemy ${remoteData.index}: ${orgHp} -> ${limitHp}`);
+					}
+				} else {
+					// Client-to-client: trust the lowest HP (lag compensation)
+					limitHp = Math.min(orgHp, adjustedRemoteHp);
+
+					// Detect Unscaled Initialization Trap
+					// If local enemy never had scaling applied (factor 1.0 or undefined)
+					// and remote is sending scaled values, accept the remote value
+					if (orgHp < adjustedRemoteHp) {
+						if (!enemy._scalingFactor || enemy._scalingFactor === 1.0) {
+							if (MATTIE.multiplayer.devTools.battleLogger) {
+								console.log(
+									`[NetSync] Detected Unscaled Local HP (${orgHp}, `
+									+ `factor: ${enemy._scalingFactor}). `
+									+ `Allowing sync UP to ${adjustedRemoteHp}`,
+								);
+							}
+							limitHp = adjustedRemoteHp;
 						}
-						limitHp = adjustedRemoteHp;
 					}
 				}
 
@@ -891,6 +983,32 @@ class BaseNetController extends EventEmitter {
 	}
 
 	/**
+	 * @description handles an early extra turn notification from a peer.
+	 * Fires when a remote player's setupExTurn() detects an extra turn,
+	 * BEFORE the remote player has entered input or sent a ready packet.
+	 * @param {Object} notifyObj the notification payload
+	 * @param {string} senderId the peer that has the extra turn
+	 */
+	onExTurnNotify(notifyObj, senderId) {
+		// Check if any LOCAL player actor has an extra turn.
+		// Cannot use Galv.EXTURN.active because it may be true when only
+		// enemies qualified locally (different AGI threshold per client).
+		var localActorHasExTurn = $gameParty.battleMembers().some((m) => m._exTurn);
+		if (notifyObj.active && !localActorHasExTurn) {
+			MATTIE.multiplayer.combatEmitter.netExTurnPending = true;
+			if (BattleManager._phase === 'input') {
+				// Close command windows so isAnyInputWindowActive() unblocks
+				// the battle update loop and changeInputWindow can proceed.
+				var scene = SceneManager._scene;
+				if (scene && scene.endCommandSelection) {
+					scene.endCommandSelection();
+				}
+				BattleManager.ready();
+			}
+		}
+	}
+
+	/**
      * @description handles logic for readying and unreadying in combat.
      * @param {*} readyObj the net obj for the ready event
      * @param {*} senderId the sender's id
@@ -906,6 +1024,18 @@ class BaseNetController extends EventEmitter {
 			}
 		}
 		$gameTroop.setReadyIfExists(id, val, isExtraTurn); // set the player as unready in combat arr <- this one is actually used
+
+		// Early extra turn detection: if a remote player readied with an extra turn
+		// and the local player does NOT have one, immediately block input and auto-ready
+		var localActorHasExTurn = $gameParty.battleMembers().some((m) => m._exTurn);
+		if (isExtraTurn && val && !localActorHasExTurn && BattleManager._phase === 'input') {
+			MATTIE.multiplayer.combatEmitter.netExTurnPending = true;
+			var scene = SceneManager._scene;
+			if (scene && scene.endCommandSelection) {
+				scene.endCommandSelection();
+			}
+			BattleManager.ready();
+		}
 
 		if ($gameTroop.getIdsInCombatWithExSelf().includes(id)) { // only setup net actions if we are in combat with that troop
 			if (readyObj.actions) {
@@ -981,12 +1111,13 @@ class BaseNetController extends EventEmitter {
 							}
 						}
 						if (shouldAddAction) {
-							console.log(action);
+							if (MATTIE.multiplayer.devTools.battleLogger) console.log('[NetReady] action', action);
 							if (actor == null) {
 								if (action._subjectActorId <= 0) {
 									// is enemy action
-									console.log($gameTroop.members()[action._subjectEnemyIndex]);
-									console.log($gameTroop.members()[action._subjectEnemyIndex]);
+									if (MATTIE.multiplayer.devTools.battleLogger) {
+										console.log('[NetReady] enemy subject', $gameTroop.members()[action._subjectEnemyIndex]);
+									}
 
 									this.processNormalEnemyAction($gameTroop.members()[action._subjectEnemyIndex], action, isExtraTurn, senderId);
 								} else {
@@ -1014,6 +1145,12 @@ class BaseNetController extends EventEmitter {
 	processNormalAction(actor, action, isExtraTurn, senderId) {
 		if (!this.netPlayers[senderId]) {
 			console.error(`[NetAction] Cannot process action - sender ${senderId} not found`);
+			return;
+		}
+
+		// Guard: reject non-extra-turn actions while an extra turn is executing
+		if (MATTIE.multiplayer.combatEmitter.netExTurn && !isExtraTurn) {
+			console.warn(`[NetAction] Rejected non-extra-turn action from ${senderId} during active extra turn`);
 			return;
 		}
 
@@ -1380,6 +1517,8 @@ class BaseNetController extends EventEmitter {
      */
 	onTransferData(transData, id) {
 		this.transferNetPlayer(transData, id);
+		// Re-evaluate enemy host when any player changes maps
+		MATTIE.multiplayer.updateEnemyHost();
 	}
 
 	/**
@@ -1391,13 +1530,16 @@ class BaseNetController extends EventEmitter {
 		const map = transData.map;
 		this.netPlayers[id].setMap(map);
 
-		// if not on the map try again later
+		// if not on the map try again later (with bounded retries to prevent timer leak)
 		if (!(SceneManager._scene instanceof Scene_Map)) {
-			// console.log('waiting to transfer');
-			setTimeout(() => {
-				// console.log('transfering');
-				this.transferNetPlayer(transData, id, shouldSync);
-			}, 1000);
+			if (!transData._sceneRetryCount) transData._sceneRetryCount = 0;
+			if (transData._sceneRetryCount++ < 10) {
+				setTimeout(() => {
+					this.transferNetPlayer(transData, id, shouldSync);
+				}, 1000);
+			} else {
+				console.warn(`[Net] Gave up waiting for Scene_Map to transfer ${id} after 10 retries`);
+			}
 			return;
 		}
 
@@ -1668,50 +1810,24 @@ class BaseNetController extends EventEmitter {
 			if (!$dataTroops[troopId]) return;
 			const troopName = $dataTroops[troopId].name;
 
-			// Update active battle if matches
-			if (MATTIE.multiplayer.inBattle && $gameTroop) {
-				// Check by ID or Name
-				if ($gameTroop._troopId === troopId || $gameTroop.troop().name === troopName) {
-					if (typeof $gameTroop.addIdToCombatArr === 'function') {
-						$gameTroop.addIdToCombatArr(id);
-						if (MATTIE.multiplayer.devTools.battleLogger) console.info(`[Net] Added ${id} to active Game_Troop combatants`);
-					}
-				}
+			// Single authoritative add to $gameTroop when it matches
+			const troopMatches = $gameTroop && (
+				$gameTroop._troopId == troopId
+				|| $gameTroop.name == troopName
+				|| (MATTIE.multiplayer.inBattle && $gameTroop.troop().name === troopName)
+			);
+			if (troopMatches && typeof $gameTroop.addIdToCombatArr === 'function') {
+				$gameTroop.addIdToCombatArr(id);
+				if (MATTIE.multiplayer.devTools.battleLogger) console.info(`[Net] Added ${id} to active Game_Troop combatants`);
 			}
 
+			// Track in all matching $dataTroops entries by name
 			$dataTroops.forEach((element) => {
-				if (element) {
-					if (element.name === troopName) {
-						if (element._combatants) {
-							element._combatants[id] = {};
-							element._combatants[id].bool = 0;
-							element._combatants[id].isExtraTurn = 0;
-						} else {
-							element._combatants = {};
-							element._combatants[id] = {};
-							element._combatants[id].bool = 0;
-							element._combatants[id].isExtraTurn = 0;
-						}
-					}
+				if (element && element.name === troopName) {
+					if (!element._combatants) element._combatants = {};
+					element._combatants[id] = { bool: 0, isExtraTurn: 0 };
 				}
 			});
-
-			if ($gameTroop.name == troopName) {
-				$gameTroop.addIdToCombatArr(id);
-			}
-
-			if ($gameTroop._troopId == troopId) {
-				$gameTroop.addIdToCombatArr(id);
-			} else if ($dataTroops[troopId]._combatants) {
-				$dataTroops[troopId]._combatants[id] = {};
-				$dataTroops[troopId]._combatants[id].bool = 0;
-				$dataTroops[troopId]._combatants[id].isExtraTurn = 0;
-			} else {
-				$dataTroops[troopId]._combatants = {};
-				$dataTroops[troopId]._combatants[id] = {};
-				$dataTroops[troopId]._combatants[id].bool = 0;
-				$dataTroops[troopId]._combatants[id].isExtraTurn = 0;
-			}
 		};
 
 		if (MATTIE.multiplayer.config.scaling && MATTIE.multiplayer.config.scaling.applyTroopScaling) {
@@ -1948,6 +2064,28 @@ class BaseNetController extends EventEmitter {
 
 	//-----------------------------------------------------
 	// Control Switch Event
+	//-----------------------------------------------------
+
+	//-----------------------------------------------------
+	// Enemy Host Pause
+	//-----------------------------------------------------
+
+	emitEnemyHostPause(paused) {
+		const obj = {};
+		obj.enemyHostPause = { paused, map: $gameMap.mapId() };
+		this.sendViaMainRoute(obj);
+	}
+
+	onEnemyHostPauseData(data, id) {
+		if (this.netPlayers[id]) {
+			this.netPlayers[id]._enemyHostPaused = data.paused;
+			if (MATTIE.multiplayer.devTools.enemyHostLogger) console.log(`[EnemyHost] Peer ${id} paused=${data.paused} on map ${data.map}`);
+			MATTIE.multiplayer.updateEnemyHost();
+		}
+	}
+
+	//-----------------------------------------------------
+	// Control Switch Event (continued)
 	//-----------------------------------------------------
 
 	/** @emits ctrlSwitch */

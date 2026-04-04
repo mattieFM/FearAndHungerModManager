@@ -118,7 +118,7 @@ MATTIE.multiplayer.NetActors.prototype.dataActor = function (baseActorId) {
 	for (let index = 0; index < this._data.length; index++) {
 		const element = this._data[index];
 		if (element.dataActorId == baseActorId) {
-			actor = element.gameActor;
+			const actor = element.gameActor;
 			return actor;
 		}
 	}
@@ -129,7 +129,7 @@ MATTIE.multiplayer.NetActors.prototype.netActor = function (id) {
 	for (let index = 0; index < this._data.length; index++) {
 		const element = this._data[index];
 		if (element.dataActorId == id) {
-			actor = element;
+			const actor = element;
 			return actor;
 		}
 	}
