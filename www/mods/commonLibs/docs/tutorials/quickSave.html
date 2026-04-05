@@ -1,0 +1,61 @@
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<body style="font-size: larger;">
+
+<h1>Quick Save</h1>
+<p>
+    The Quick Save mod binds keyboard shortcuts to <strong>instantly save</strong> or <strong>instantly load</strong>
+    your game without opening any menus. It is designed for fast iteration during development, speedrunning,
+    and moments when you want a safety net without interrupting the flow of play.
+</p>
+
+<hr>
+<h1 style="color: #c75050;">Default Hotkeys</h1>
+
+<table border="1" cellpadding="8" cellspacing="0" style="border-collapse: collapse; width: 100%; max-width: 600px;">
+    <thead style="background-color: #333; color: #fff;">
+        <tr><th>Key</th><th>Action</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><strong>+</strong> (numpad plus or keyboard plus)</td><td>Quick Save to slot 9998</td></tr>
+        <tr><td><strong>-</strong> (numpad minus or keyboard minus)</td><td>Quick Load from slot 9998</td></tr>
+        <tr><td><strong>I</strong></td><td>Alternative Save shortcut (same slot)</td></tr>
+        <tr><td><strong>U</strong></td><td>Alternative Load shortcut (same slot)</td></tr>
+    </tbody>
+</table>
+
+<hr>
+<h1 style="color: #c75050;">Save Slot Details</h1>
+
+<p>
+    The Quick Save mod stores its saves in <strong>slot 9998</strong> (<code>file9998.rpgsave</code>). This is a reserved
+    slot separate from all your regular saves.
+</p>
+
+<ul>
+    <li>Slot 9998 does <em>not</em> appear in the regular save or load menu.</li>
+    <li>Quick saving overwrites the previous quick save without any confirmation prompt.</li>
+    <li>Quick loading also happens immediately with no confirmation &mdash; any unsaved progress since the last quick save is lost.</li>
+</ul>
+
+<p style="color: #c75050;">
+    <strong>Warning:</strong> Slot 9998 is also shared with the <a href="betterSaves.html">Better Saves</a>
+    Suspended Run feature. Do not use Quick Save while a suspended run is active if you want to keep the suspension.
+</p>
+
+<hr>
+<h1 style="color: #c75050;">Interaction with Other Mods</h1>
+
+<h2>Auto-Backup</h2>
+<p>
+    Quick Save does <em>not</em> trigger the Battle Auto-Backup system. Auto-backups are solely created at the start
+    and end of battles via <code>BattleManager</code> hooks, regardless of how you save.
+</p>
+
+<h2>Multiplayer</h2>
+<p>
+    Quick Save is intended for single-player use. In multiplayer, the host's save state is what matters.
+    Using Quick Save on a client machine will save the client's local copy, which may be out of sync with the host.
+    Load from the multiplayer menu or the host's save file for reliable multiplayer recovery.
+</p>
+
+</body>

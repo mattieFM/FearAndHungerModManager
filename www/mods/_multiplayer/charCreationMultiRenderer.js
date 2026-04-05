@@ -44,6 +44,7 @@ MATTIE.multiplayer.charCreationRenderer.renderNetPlayerPortraitsOnScreen = funct
 
 				// eslint-disable-next-line no-loop-func
 				const portraitMap = MATTIE.multiplayer.charCreationRenderer.getPortraitMap();
+				// eslint-disable-next-line no-loop-func
 				ids.forEach((id) => {
 					if (portraitMap[id]) {
 						const xVal = 250 + ((x * 100) * (i % 2 == 0 ? 1 : -1));

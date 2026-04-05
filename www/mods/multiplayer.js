@@ -140,7 +140,9 @@ MATTIE.multiplayer.setEnemyHost = function () {
 	// Deterministic election: lowest peerId among active players on this map wins
 	peersOnMap.sort();
 	MATTIE.multiplayer.isEnemyHost = (peersOnMap[0] === selfId);
-	if (MATTIE.multiplayer.devTools.enemyHostLogger) console.log(`[EnemyHost] setEnemyHost: map=${currentMap}, peers=${JSON.stringify(peersOnMap)}, isHost=${MATTIE.multiplayer.isEnemyHost}`);
+	if (MATTIE.multiplayer.devTools.enemyHostLogger) {
+		console.log(`[EnemyHost] setEnemyHost: map=${currentMap}, peers=${JSON.stringify(peersOnMap)}, isHost=${MATTIE.multiplayer.isEnemyHost}`);
+	}
 };
 
 MATTIE.multiplayer.updateEnemyHost = function () {

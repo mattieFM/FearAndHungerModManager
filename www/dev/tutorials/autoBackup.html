@@ -1,0 +1,140 @@
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<body style="font-size: larger;">
+
+<h1>Battle Auto-Backup System</h1>
+<p>
+    The Battle Auto-Backup system automatically creates save file snapshots <strong>before and after every enemy encounter</strong>.
+    These snapshots are stored separately from your normal save files so they are never overwritten by regular saving.
+    If something goes wrong &mdash; a crash, a desync, a missed event, or a run-ending mistake &mdash; you can restore
+    any of the last 50 combat checkpoints directly from the multiplayer menu.
+</p>
+
+<hr>
+<h1 style="color: #c75050;">How It Works</h1>
+
+<h2>What Gets Saved and When</h2>
+<p>
+    Two snapshots are created for every battle:
+</p>
+<ul>
+    <li><strong>Before Enemy &mdash;</strong> Created the moment a battle begins, before any combat actions happen.
+        This is the safest restore point if the battle went badly.</li>
+    <li><strong>After Enemy &mdash;</strong> Created immediately after the battle ends (victory, escape, or defeat).
+        Use this to restore the rewards and progression you earned.</li>
+</ul>
+<p>
+    Backup filenames include a timestamp and the enemy group name so they are easy to identify:
+</p>
+<code>20260404_153022_045 - before enemy - Crow Mauler.rpgsave</code>
+<br>
+<code>20260404_153045_210 - after enemy - Crow Mauler.rpgsave</code>
+
+<h2>Where Are the Backups Stored?</h2>
+<p>
+    Backups are saved inside your game folder at:
+</p>
+<code>save/autobackups/file{N}/</code>
+<p>
+    Where <code>{N}</code> is the number of the save slot that was active when the battle happened.
+    For example, if you are playing on Save Slot 1, all backups go to <code>save/autobackups/file1/</code>.
+</p>
+<p>
+    <strong>Backups are completely separate from your normal save files.</strong> They are never overwritten by regular
+    in-game saving, quick saving, or auto-syncing. Your normal save in <code>save/file1.rpgsave</code> is not touched.
+</p>
+
+<h2>The 50-Backup Limit</h2>
+<p>
+    Each save slot keeps a rolling window of the <strong>50 most recent snapshots</strong> (across both "before" and "after" entries).
+    When a new backup would exceed 50, the oldest file is deleted automatically. This means you always have at minimum
+    25 full before/after pairs available.
+</p>
+
+<hr>
+<h1 style="color: #c75050;">How to Recover a Backup</h1>
+
+<h2>Finding the Recovery Menu</h2>
+<ol>
+    <li>From the game's <strong>main menu</strong>, click <strong>Multiplayer</strong>.</li>
+    <li>In the multiplayer home screen, you will see a button labelled <strong>"Recover Auto Backup"</strong>.</li>
+    <li>Click it to open the recovery scene.</li>
+</ol>
+
+<h2>The Recovery Scene</h2>
+<p>
+    The recovery scene has three panels:
+</p>
+<ul>
+    <li><strong>Left panel (Save Slot List)</strong> &mdash; Lists every save slot that has backup files. Select the slot you want to recover.</li>
+    <li><strong>Right panel (Backup File List)</strong> &mdash; After selecting a slot, shows all available backup snapshots for that slot, newest first. Each entry shows the date/time, whether it is "before enemy" or "after enemy", and the enemy group name.</li>
+    <li><strong>Confirm dialog</strong> &mdash; After selecting a backup, a confirmation box appears. Choose <strong>"Restore this backup"</strong> to proceed, or <strong>"Cancel"</strong> to go back.</li>
+</ul>
+
+<h2>After Restoring</h2>
+<p>
+    Restoring a backup <strong>overwrites</strong> your current <code>file{N}.rpgsave</code> with the selected snapshot.
+    The recovery scene will confirm success in green, or show an error in red if something went wrong.
+</p>
+<p>
+    <strong style="color: #c75050;">Important:</strong> After restoring, return to the main menu and use <strong>Load Game</strong>
+    to actually load the restored save. Restoring only writes the file &mdash; it does not automatically load it into the game.
+</p>
+
+<hr>
+<h1 style="color: #c75050;">Tips &amp; Best Practices</h1>
+
+<h2>Which Backup to Choose?</h2>
+<table border="1" cellpadding="8" cellspacing="0" style="border-collapse: collapse; width: 100%; max-width: 700px;">
+    <thead style="background-color: #333; color: #fff;">
+        <tr>
+            <th>Situation</th>
+            <th>Which Backup to Restore</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Game crashed during a battle</td>
+            <td><strong>before enemy</strong> (most recent one)</td>
+        </tr>
+        <tr>
+            <td>Desync happened mid-fight in multiplayer</td>
+            <td><strong>before enemy</strong> for the desynced battle</td>
+        </tr>
+        <tr>
+            <td>You won a battle but then something broke</td>
+            <td><strong>after enemy</strong> for the battle you won</td>
+        </tr>
+        <tr>
+            <td>Player died and wants to retry</td>
+            <td><strong>before enemy</strong> for the fatal battle</td>
+        </tr>
+        <tr>
+            <td>Wrong item was used and the battle ended</td>
+            <td><strong>before enemy</strong> for that battle</td>
+        </tr>
+    </tbody>
+</table>
+
+<h2>Backups and Multiplayer Saves</h2>
+<p>
+    Backups are created using the <strong>host's active save slot</strong>. In multiplayer, the host's save slot is
+    what determines which backup folder is used. Clients do not independently generate backups.
+    When the host restores a backup, they should then load the game normally so the restored state syncs to all clients
+    when a new session is started.
+</p>
+
+<h2>Manual Backup Access</h2>
+<p>
+    Because backups are plain <code>.rpgsave</code> files in <code>save/autobackups/</code>, you can also manage them
+    manually in Windows Explorer. You can copy them to a safe location before restoring, keep particular snapshots
+    permanently by moving them out of the folder, or inspect them with RPG Maker MV save editors.
+</p>
+
+<h2>Known Limitations</h2>
+<ul>
+    <li>Backups only exist if a save slot was active (loaded or saved) before the battle. If you start a New Game and immediately fight without ever saving, there is no save slot ID yet and no backup will be created.</li>
+    <li>The backup uses the game state at the exact moment the battle starts/ends. Any changes made between the backup and the next normal save are not included in the backup.</li>
+    <li>The system is fault-tolerant: if a backup fails to write (e.g. disk full), the failure is logged to the console but the game continues normally.</li>
+</ul>
+
+</body>

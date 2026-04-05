@@ -77,6 +77,12 @@ MATTIE.scenes.multiplayer.main.prototype.createCommandWindow = function () {
 		MATTIE.menus.multiplayer.openJoin();
 	}));
 
+	this._commandWindow.setHandler('MATTIE_recoverBackup', (() => {
+		this._inputWin.close();
+		this.updateName();
+		SceneManager.push(MATTIE.scenes.RecoverAutoBackup);
+	}));
+
 	this._commandWindow.setHandler(MATTIE.CmdManager.return, (() => {
 		this._inputWin.close();
 		this.updateName();
@@ -112,9 +118,15 @@ MATTIE.windows.multiplayer.Main = function () {
 MATTIE.windows.multiplayer.Main.prototype = Object.create(Window_TitleCommand.prototype);
 MATTIE.windows.multiplayer.Main.prototype.constructor = MATTIE.windows.multiplayer.Main;
 
+MATTIE.windows.multiplayer.Main.prototype.updatePlacement = function () {
+	this.x = (Graphics.boxWidth - this.width) / 2;
+	this.y = Graphics.boxHeight - this.height - 16;
+};
+
 MATTIE.windows.multiplayer.Main.prototype.makeCommandList = function () {
 	this.addCommand(MATTIE.TextManager.host, MATTIE.CmdManager.host);
 	this.addCommand(MATTIE.TextManager.join, MATTIE.CmdManager.join);
+	this.addCommand('Recover Auto Backup', 'MATTIE_recoverBackup');
 	this.addCommand(MATTIE.TextManager.return, MATTIE.CmdManager.return);
 };
 

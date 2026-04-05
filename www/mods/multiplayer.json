@@ -45,6 +45,8 @@
         "_multiplayer/netControllerV2/battle/pvpController",
         "_multiplayer/gameOverScene",
         "_multiplayer/saveEmitter",
+        "_multiplayer/autoBackup",
+        "_multiplayer/autoBackupRecovery",
         "_multiplayer/spectateScene",
         "_multiplayer/netControllerV2/models/netActors",
         "_multiplayer/startGameMenu",

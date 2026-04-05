@@ -13,5 +13,32 @@
     },
     "markdownTutorial": {
         "title": "Markdown tutorial"
+    },
+    "autoBackup": {
+        "title": "Auto-Backup & Recovery"
+    },
+    "multiplayer": {
+        "title": "Multiplayer Mod Guide"
+    },
+    "modsOverview": {
+        "title": "All Mods Overview"
+    },
+    "betterSaves": {
+        "title": "Better Saves"
+    },
+    "quickSave": {
+        "title": "Quick Save"
+    },
+    "randomiser": {
+        "title": "Randomiser"
+    },
+    "difficulty": {
+        "title": "Difficulty Mods"
+    },
+    "bossRush": {
+        "title": "Boss Rush"
+    },
+    "devTools": {
+        "title": "Dev Tools"
     }
 }

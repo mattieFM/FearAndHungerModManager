@@ -1,0 +1,65 @@
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<body style="font-size: larger;">
+
+<h1>Better Saves</h1>
+<p>
+    The Better Saves mod overhauls Fear &amp; Hunger's default save system. It removes the tight vanilla save slot cap,
+    adds a <strong>Suspended Run</strong> (Save and Quit) feature, and improves the save/load UI so managing long
+    or multiple playthroughs is much more comfortable.
+</p>
+
+<hr>
+<h1 style="color: #c75050;">Expanded Save Slots</h1>
+
+<p>
+    Vanilla Fear &amp; Hunger limits the number of save slots you can have. Better Saves raises this cap significantly,
+    defaulting to <strong>99 save slots</strong>. The limit is configurable in the mod settings.
+</p>
+<p>
+    All extra slots behave identically to the vanilla save slots &mdash; they appear in the save/load menu and are
+    stored as standard <code>.rpgsave</code> files in the <code>save/</code> folder.
+</p>
+
+<hr>
+<h1 style="color: #c75050;">Suspended Run (Save and Quit)</h1>
+
+<h2>What Is It?</h2>
+<p>
+    The Suspended Run feature lets you save your game to a special <strong>suspend slot</strong> and quit immediately,
+    without filling one of your regular save slots. When you come back, you can continue from the exact moment you
+    suspended &mdash; including your position on the map, all inventory, and all game state.
+</p>
+<p>
+    This is useful for sessions where you need to stop playing mid-dungeon without losing progress,
+    or when you want a clean "I can always pick this back up" save without committing it to a numbered slot.
+</p>
+
+<h2>How to Use It</h2>
+<ol>
+    <li>Open the in-game menu.</li>
+    <li>You will see a <strong>"Save and Quit"</strong> (or <strong>"Suspend Run"</strong>) option.</li>
+    <li>Select it. The game saves to the suspend slot and returns you to the title screen.</li>
+    <li>The next time you launch, a <strong>"Continue Suspended Run"</strong> button appears on the main menu if a suspended save exists.</li>
+    <li>Click it to resume exactly where you left off.</li>
+</ol>
+
+<h2>Notes</h2>
+<ul>
+    <li>Only one suspended run exists at a time. Starting a new suspension overwrites the previous one.</li>
+    <li>The suspend slot is stored as save slot <strong>9998</strong> internally (<code>file9998.rpgsave</code>). It does not appear in the regular save/load list.</li>
+    <li>The "Continue Suspended Run" button only appears on the main menu when a suspended save file actually exists.</li>
+</ul>
+
+<hr>
+<h1 style="color: #c75050;">Compatibility</h1>
+<p>
+    Better Saves is compatible with the Multiplayer mod. However, in multiplayer sessions only the <strong>host's</strong>
+    save file is the canonical game state. Clients should not rely on their own save files as the source of truth
+    during a multiplayer run.
+</p>
+<p>
+    Better Saves is also compatible with the <a href="autoBackup.html">Battle Auto-Backup</a> system &mdash; battle
+    snapshots are created for all active save slots regardless of which Better Saves features you use.
+</p>
+
+</body>
