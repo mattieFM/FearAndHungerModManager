@@ -59,6 +59,7 @@ MATTIE.scenes.modLoader.prototype.create = function () {
 	MATTIE.scenes.base.prototype.create.call(this);
 	console.log('modloader create');
 	this.addModsListWindow();
+	this.addSaveProtectionPopupIfNeeded();
 };
 
 /**
@@ -67,6 +68,70 @@ MATTIE.scenes.modLoader.prototype.create = function () {
 MATTIE.scenes.modLoader.prototype.addModsListWindow = function () {
 	this._modListWin = new MATTIE.windows.ModListWin(0, 0);
 	this.addChild(this._modListWin);
+};
+
+MATTIE.modLoader.saveProtectionPopupSeenKey = 'saveProtectionPopupSeen';
+MATTIE.modLoader.saveProtectionPopupNeverShowKey = 'saveProtectionPopupNeverShow';
+
+MATTIE.modLoader.shouldShowSaveProtectionPopup = function () {
+	const hasSeenPopup = !!MATTIE.DataManager.global.get(MATTIE.modLoader.saveProtectionPopupSeenKey);
+	const neverShowPopup = !!MATTIE.DataManager.global.get(MATTIE.modLoader.saveProtectionPopupNeverShowKey);
+	return !hasSeenPopup && !neverShowPopup;
+};
+
+MATTIE.modLoader.markSaveProtectionPopupSeen = function (neverShowAgain = false) {
+	MATTIE.DataManager.global.set(MATTIE.modLoader.saveProtectionPopupSeenKey, true);
+	if (neverShowAgain) MATTIE.DataManager.global.set(MATTIE.modLoader.saveProtectionPopupNeverShowKey, true);
+};
+
+MATTIE.scenes.modLoader.prototype.addSaveProtectionPopupIfNeeded = function () {
+	if (!MATTIE.modLoader.shouldShowSaveProtectionPopup()) return;
+
+	const infoText = [
+		'Save protection keeps dangerous-mod runs on separate saves from vanilla/save-compatible runs.',
+		'Use Force Vanilla Saves or Force Modded Saves below if you want to override that split.',
+	];
+
+	this._modListWin.deactivate();
+	this._saveProtectionInfoWin = new MATTIE.windows.TextDisplay(0, 0, 900, 110, infoText);
+	this._saveProtectionInfoWin.updatePlacement(0, -40);
+	this.addChild(this._saveProtectionInfoWin);
+
+	this._saveProtectionBtns = new MATTIE.windows.HorizontalBtns(
+		this._saveProtectionInfoWin.y + this._saveProtectionInfoWin.height + 6,
+		{
+			Close: 'close',
+			'Never Show Again': 'neverShowAgain',
+		},
+		2,
+	);
+
+	this._saveProtectionBtns.setHandler('close', this.closeSaveProtectionPopup.bind(this, false));
+	this._saveProtectionBtns.setHandler('neverShowAgain', this.closeSaveProtectionPopup.bind(this, true));
+	this._saveProtectionBtns.setHandler('cancel', this.closeSaveProtectionPopup.bind(this, false));
+	this.addChild(this._saveProtectionBtns);
+	this._saveProtectionBtns.activate();
+	this._saveProtectionBtns.select(0);
+};
+
+MATTIE.scenes.modLoader.prototype.closeSaveProtectionPopup = function (neverShowAgain) {
+	MATTIE.modLoader.markSaveProtectionPopupSeen(neverShowAgain);
+
+	if (this._saveProtectionBtns) {
+		this._saveProtectionBtns.close();
+		this.removeChild(this._saveProtectionBtns);
+		this._saveProtectionBtns = null;
+	}
+
+	if (this._saveProtectionInfoWin) {
+		this._saveProtectionInfoWin.close();
+		this.removeChild(this._saveProtectionInfoWin);
+		this._saveProtectionInfoWin = null;
+	}
+
+	if (this._modListWin) {
+		this._modListWin.activate();
+	}
 };
 
 //-----------------------------------

@@ -1,5 +1,5 @@
 {
-  "name": "83",
+  "name": "2",
   "main": "www/index.html",
   "js-flags": "--expose-gc",
   "node-remote": true,

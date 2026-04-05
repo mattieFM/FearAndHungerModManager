@@ -38,6 +38,7 @@ function mulberry32(seed) {
 		a |= 0;
 		a = (a + 0x6D2B79F5) | 0;
 		var t = Math.imul(a ^ (a >>> 15), 1 | a);
+		// eslint-disable-next-line operator-assignment
 		t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
 		return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
 	};
@@ -771,7 +772,8 @@ Game_Action.prototype.makeDamageValue = function (target, critical) {
 		if (MATTIE.multiplayer.devTools.battleLogger) {
 			const targetName = target && target.name ? target.name() : 'unknown';
 			const skillId = this._item ? this._item._itemId : '?';
-			console.warn(`[NetRNG] DESYNC: No preloaded result for net action (peer=${netPeerId}, skill=${skillId}, target=${targetName}). Falling back to local calculation.`);
+			console.warn(`[NetRNG] DESYNC: No preloaded result for net action (peer=${netPeerId},
+				 skill=${skillId}, target=${targetName}). Falling back to local calculation.`);
 		}
 	}
 	return MATTIE.multiplayer.Game_ActionmakeDamageValue.call(this, target, critical);

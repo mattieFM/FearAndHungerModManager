@@ -233,6 +233,22 @@ MATTIE.menus.mainMenu.addBtnToMainMenu(
 	MATTIE.menus.toDecryptMenu.bind(this),
 );
 
+MATTIE.menus.mainMenu.addBtnToMainMenu(
+	'Help',
+	'Help',
+	function() {
+		var helpWindow = window.open('./mods/commonLibs/docs/tutorial-FAQ.html', '_blank');
+		if (helpWindow) helpWindow.focus();
+		this._commandWindow.activate();
+		var poll = setInterval(function() {
+			if (!helpWindow || helpWindow.closed) {
+				clearInterval(poll);
+				window.focus();
+			}
+		}, 500);
+	},
+);
+
 // --ENGINE OVERRIDES--
 
 // MATTIE_RPG.Game_Map_Setup = Game_Map.prototype.setup;

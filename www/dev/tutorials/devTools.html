@@ -1,0 +1,99 @@
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<body style="font-size: larger;">
+
+<h1>Dev Tools</h1>
+<p>
+    The Dev Tools mod provides an in-game debug and cheat panel for developers and power users. It is
+    designed for mod development, testing, and troubleshooting &mdash; not for a vanilla gameplay experience.
+    Keep this mod disabled if you want an unmodified playthrough.
+</p>
+
+<hr>
+<h1 style="color: #c75050;">Opening the Dev Menu</h1>
+
+<p>
+    Press <strong>P</strong> at any time during gameplay to open the Dev Tools panel. Press <strong>P</strong> again
+    or press <strong>Escape</strong> / <strong>X</strong> to close it.
+</p>
+<p>
+    The panel can be opened on the map, during events, and in most scenes. It is intentionally disabled
+    in certain scenes to avoid breaking them.
+</p>
+
+<hr>
+<h1 style="color: #c75050;">Panel Sections</h1>
+
+<h2>Cheats</h2>
+<ul>
+    <li><strong>godmode</strong> &mdash; infintie damage and health</li>
+
+</ul>
+
+
+<h2>Teleportation</h2>
+<p>
+    Enter a Map ID and optional X/Y coordinates to teleport the player instantly. Useful for jumping to a
+    specific map to test an event without walking through the dungeon. Map IDs match RPG Maker MV's
+    internal map numbering (visible in the editor or via the debug console).
+</p>
+
+<h2>Variable Viewer</h2>
+<p>
+    Browse and edit <code>$gameVariables</code> and <code>$gameSwitches</code> values in real time. Useful for
+    diagnosing event logic bugs or manually setting a state to continue past a broken trigger.
+</p>
+
+<hr>
+<h1 style="color: #c75050;">FPS &amp; Network Metrics Overlay</h1>
+
+<p>
+    A separate companion mod (<code>devFPSMetrics.js</code>) provides an always-on HUD overlay in the top-left
+    corner of the screen showing:
+</p>
+<ul>
+    <li>Current FPS and game tick rate</li>
+    <li>Network packets sent/received per second (multiplayer only)</li>
+    <li>Approximate ping to the session host (multiplayer only)</li>
+    <li>Current enemy HP totals during combat (multiplayer only, for observing sync accuracy)</li>
+</ul>
+
+<p>
+    The overlay auto-hides when multiplayer is not active. To enable it, ensure
+    <code>devFPSMetrics.js</code> is loaded in the mod list (it is loaded by default in dev builds).
+</p>
+
+<hr>
+<h1 style="color: #c75050;">Dev Flag: MATTIE.isDev</h1>
+
+<p>
+    Many conditional code paths in the mod system check <code>MATTIE.isDev</code>. When this flag is
+    <code>true</code>, extra logging and debug helpers are enabled across the entire mod suite.
+</p>
+<p>
+    You can toggle it at runtime by opening the browser console (<strong>F12</strong>) and typing:
+</p>
+<pre style="background-color: #1a1a1a; color: #ddd; padding: 10px; border-radius: 4px;">MATTIE.isDev = true;</pre>
+<p>
+    Or set it at the start of any mod file to have it always active in your dev environment.
+</p>
+
+<hr>
+<h1 style="color: #c75050;">Battle Logger</h1>
+
+<p>
+    To enable detailed combat sync logging in the browser console:
+</p>
+<pre style="background-color: #1a1a1a; color: #ddd; padding: 10px; border-radius: 4px;">MATTIE.multiplayer.devTools.battleLogger = true;</pre>
+<p>
+    This prints every enemy HP sync packet, targeting decision, and battle phase transition to the console.
+    Useful for diagnosing combat desyncs in multiplayer.
+</p>
+
+<hr>
+<h1 style="color: #c75050;">Safety Warning</h1>
+<p style="color: #c75050;">
+    The Dev Tools mod intentionally bypasses game balance and progression. Cheats used during a real playthrough
+    will affect your save file permanently. Use a separate save slot when testing.
+</p>
+
+</body>
