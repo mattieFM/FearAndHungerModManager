@@ -4,7 +4,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Source: commonLibs/_common/menus/windows.js | 97</title>
+    <title>Source: commonLibs/_common/menus/windows.js | 2</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -32,7 +32,7 @@
         
     </div>
     <div class="title">
-        <h1><a href="index.html" class="link">97</a></h1>
+        <h1><a href="index.html" class="link">2</a></h1>
         
             <span class="version">v1.2.4</span>
         
@@ -924,7 +924,8 @@ MATTIE.windows.Window_Tooltip.prototype.showIfMouseIsNear = function (x, y) {
 	}
 };
 /**
- * @override to draw our icon on refresh
+ * Draw our icon on refresh.
+ * @override
  */
 MATTIE.windows.Window_Tooltip.prototype.refresh = function () {
 	this.contents.clear();
@@ -933,7 +934,8 @@ MATTIE.windows.Window_Tooltip.prototype.refresh = function () {
 };
 
 /**
- * @override to show when the mouse is near
+ * Show tooltip when the mouse is near.
+ * @override
  */
 MATTIE.windows.Window_Tooltip.prototype.update = function () {
 	Window_Base.prototype.update.call(this);

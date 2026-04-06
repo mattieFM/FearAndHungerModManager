@@ -236,11 +236,11 @@ MATTIE.menus.mainMenu.addBtnToMainMenu(
 MATTIE.menus.mainMenu.addBtnToMainMenu(
 	'Help',
 	'Help',
-	function() {
+	function () {
 		var helpWindow = window.open('./mods/commonLibs/docs/tutorial-FAQ.html', '_blank');
 		if (helpWindow) helpWindow.focus();
 		this._commandWindow.activate();
-		var poll = setInterval(function() {
+		var poll = setInterval(() => {
 			if (!helpWindow || helpWindow.closed) {
 				clearInterval(poll);
 				window.focus();
