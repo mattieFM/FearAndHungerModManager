@@ -1,0 +1,142 @@
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<body style="font-size: larger;">
+
+<h1>Multiplayer Mod</h1>
+<p>
+    The Fear &amp; Hunger Multiplayer Mod transforms the solo horror RPG into a cooperative (or competitive) experience
+    for 2 or more players over the internet or a local network. One player acts as the <strong>Host</strong> and all
+    others connect as <strong>Clients</strong>. The host's game is the authoritative game state; the mod synchronises
+    enemies, inventory, events, saves, and player positions in real time.
+</p>
+<p>
+    For connection troubleshooting, firewall setup, and networking details see the <a href="FAQ.html">FAQ / Common Issues</a> page.
+</p>
+
+<hr>
+<h1 style="color: #c75050;">Quick Start</h1>
+
+<h2>Hosting a Game</h2>
+<ol>
+    <li>From the main title screen, click <strong>Multiplayer</strong>.</li>
+    <li>Type your username in the field at the top.</li>
+    <li>Click <strong>Host A Game</strong>.</li>
+    <li>Configure your lobby settings (player count, TCP toggle, difficulty options) and click <strong>Start Hosting</strong>.</li>
+    <li>Your <strong>Connection Code</strong> will appear. Click <strong>Copy Code</strong> and share it with your friends via Discord, chat, etc.</li>
+    <li>Wait for players to appear in the lobby list, then click <strong>Start Game</strong>.</li>
+    <li>Choose <strong>New Game</strong> or <strong>Load Game</strong> to begin.</li>
+</ol>
+
+<h2>Joining a Game</h2>
+<ol>
+    <li>From the main title screen, click <strong>Multiplayer</strong>.</li>
+    <li>Type your username.</li>
+    <li>Click <strong>Join A Game</strong>.</li>
+    <li>Paste the Connection Code into the <strong>Connection Key</strong> field (not the username field) and press <strong>Enter</strong>.</li>
+    <li>Wait to be connected. Once in the lobby, wait for the host to click Start Game.</li>
+</ol>
+
+<hr>
+<h1 style="color: #c75050;">Features</h1>
+
+<h2>Real-Time Enemy Synchronisation</h2>
+<p>
+    All enemies in an encounter are synchronised across all players. HP values, status effects, death state, and targeting
+    are kept in sync so every player sees the same battle. The host is authoritative &mdash; the host's game calculates
+    enemy decisions and broadcasts the results.
+</p>
+
+<h2>Difficulty Scaling</h2>
+<p>
+    Enemy HP is automatically scaled based on how many players are in the session. With two players enemies are tougher
+    than solo, with four they are tougher still. The scaling is configurable (see <a href="difficulty.html">Difficulty Modes</a>).
+    Healing Whispers and other balance factors are scaled proportionally as well.
+</p>
+
+<h2>Shared World &amp; Events</h2>
+<p>
+    Map events, NPC movements, game variables, and switches are synchronised so all players see the same world state.
+    Items dropped on the map appear for all players. Events triggered by one player update for all players.
+</p>
+
+<h2>Inventory &amp; Equipment Sync</h2>
+<p>
+    When a player picks up an item, equips or unequips gear, or loses an item, the change is broadcast to all clients
+    so the shared party inventory stays consistent.
+</p>
+
+<h2>Spectate Mode</h2>
+<p>
+    When a player dies, instead of seeing a Game Over screen they enter <strong>Spectate Mode</strong>. As a ghost,
+    they can watch the remaining players continue the run. If all players die the game over sequence plays normally.
+</p>
+
+<h2>Save Synchronisation</h2>
+<p>
+    When the host saves the game, a save event is emitted to all clients so they know the game state has been committed.
+    Only the host's save file is the canonical game state.
+</p>
+
+<h2>Battle Auto-Backup</h2>
+<p>
+    The mod automatically creates save snapshots before and after every battle. These can be recovered from the
+    multiplayer menu if a crash or desync occurs. See the <a href="autoBackup.html">Battle Auto-Backup</a> page for full details.
+</p>
+
+<h2>Reconnection</h2>
+<p>
+    If a client disconnects mid-session, they can attempt to reconnect using the Join menu with the same connection code.
+    The host can also configure whether mid-game joins are allowed.
+</p>
+
+<hr>
+<h1 style="color: #c75050;">Host Menu Reference</h1>
+
+<table border="1" cellpadding="8" cellspacing="0" style="border-collapse: collapse; width: 100%; max-width: 800px;">
+    <thead style="background-color: #333; color: #fff;">
+        <tr>
+            <th>Button / Option</th>
+            <th>What It Does</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr><td><strong>Copy Code</strong></td><td>Copies the connection code to your clipboard to share with friends.</td></tr>
+        <tr><td><strong>TCP: ON / OFF</strong></td><td>Toggles between PeerJS (WebRTC) and TCP Direct Connect. Use TCP if PeerJS fails. TCP exposes your IP address.</td></tr>
+        <tr><td><strong>Start Game</strong></td><td>Starts the game session once all players are in the lobby.</td></tr>
+        <tr><td><strong>ForceStart</strong></td><td>Starts the game even if not all expected players have connected.</td></tr>
+    </tbody>
+</table>
+
+<hr>
+<h1 style="color: #c75050;">Configuration</h1>
+
+<p>
+    The multiplayer mod reads configuration values that the host sets and distributes to all clients when a session starts.
+    Gameplay-critical settings (like difficulty multipliers) are locked on the host and cannot be changed by clients,
+    ensuring a consistent experience.
+</p>
+
+<h2>Key Config Options</h2>
+<table border="1" cellpadding="8" cellspacing="0" style="border-collapse: collapse; width: 100%; max-width: 800px;">
+    <thead style="background-color: #333; color: #fff;">
+        <tr>
+            <th>Option</th>
+            <th>Default</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr><td><code>syncSaves</code></td><td>true</td><td>Whether save events are broadcast to clients.</td></tr>
+        <tr><td><code>sharedAffinity</code></td><td>false</td><td>Whether affinity/relationship values are shared across all players.</td></tr>
+    </tbody>
+</table>
+
+<hr>
+<h1 style="color: #c75050;">Known Limitations</h1>
+<ul>
+    <li>The host's computer handles all game logic. Clients with much slower PCs will not cause lag for the host, but the host's performance affects all players.</li>
+    <li>Mods that add new enemies, events, or mechanics that are not in all players' games may cause desyncs. All players must use the same mod configuration.</li>
+    <li>Map-level scripting using RPG Maker events can sometimes execute out of order if triggered by multiple clients simultaneously. This is a known limitation of the event sync system.</li>
+    <li>PvP (player-vs-player) combat is experimental/not finished at all. See the <a href="FAQ.html">FAQ</a> if you run into issues.</li>
+</ul>
+
+</body>

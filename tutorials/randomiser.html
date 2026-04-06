@@ -1,0 +1,74 @@
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<body style="font-size: larger;">
+
+<h1>Randomiser Mod</h1>
+<p>
+    The Randomiser turns Fear &amp; Hunger into a chaotic rogue-like experience. It shuffles enemy troops, items,
+    weapons, armors, and optionally the dungeon maps themselves, creating a different run each time you play.
+    A seed system lets you share or replay specific randomisations.
+</p>
+
+<hr>
+<h1 style="color: #c75050;">What Gets Randomised</h1>
+
+<table border="1" cellpadding="8" cellspacing="0" style="border-collapse: collapse; width: 100%; max-width: 800px;">
+    <thead style="background-color: #333; color: #fff;">
+        <tr><th>Category</th><th>What Changes</th></tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>Troops / Encounters</strong></td>
+            <td>Random encounters are pulled from a shuffled pool of all defined troops. You may encounter bosses where you would normally find basic enemies, and vice versa.</td>
+        </tr>
+        <tr>
+            <td><strong>Items</strong></td>
+            <td>Item identities are shuffled. A "Torch" in the world might give you a sword. Pick up everything &mdash; you never know what it is until you check.</td>
+        </tr>
+        <tr>
+            <td><strong>Weapons &amp; Armors</strong></td>
+            <td>Equipment loot tables are reshuffled independently of general items.</td>
+        </tr>
+        <tr>
+            <td><strong>Maps (optional)</strong></td>
+            <td>When the Dungeon Knight map generation is enabled, procedural maps replace all dungeon floors. Each floor is a 50×50 grid of rooms, corridors, and encounters.</td>
+        </tr>
+    </tbody>
+</table>
+
+<hr>
+<h1 style="color: #c75050;">Seeds</h1>
+
+<p>
+    Every randomised run is driven by a numeric <strong>seed</strong>. The same seed always produces the same
+    shuffled run on the same version of the mod.
+</p>
+
+<h2>How Seeds Work</h2>
+<ul>
+    <li>If you start a randomised run without specifying a seed, a random seed is generated and stored with the game.</li>
+    <li>The seed is saved in save files, so loading a save will always continue the same randomised run.</li>
+    <li>To share a seed with a friend, find it in the randomiser menu or the dev tools overlay, then tell them the number.</li>
+</ul>
+
+<h2>Sharing Seeds</h2>
+<p>
+    Share a seed in a place like Discord to let friends or streamers replicate your exact experience. Both players
+    must use the same mod version for the seed to produce identical results.
+</p>
+
+<hr>
+
+
+<hr>
+<h1 style="color: #c75050;">Using with Multiplayer</h1>
+
+<p>
+    The Randomiser is fully compatible with the Multiplayer mod. The seed is distributed to all clients by the host
+    at session start, so all players experience the same randomisation.
+</p>
+<p>
+    If a client joins mid-run with a different seed state than the host, there may be desyncs. It is best to start
+    the randomised run from a fresh New Game in multiplayer.
+</p>
+
+</body>
