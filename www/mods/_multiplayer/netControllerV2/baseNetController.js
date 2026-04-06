@@ -78,7 +78,10 @@ class BaseNetController extends EventEmitter {
 		// Evicts oldest entries when full instead of time-based pruning
 		/** @type {Set<string>} */
 		this._receivedUids = new Set();
-		/** @type {string[]} insertion-order tracking for FIFO eviction */
+		/**
+		 * insertion-order tracking for FIFO eviction
+		 * @type {string[]}
+		 */
 		this._receivedUidsOrder = [];
 		this._receivedUidsMax = 2000;
 

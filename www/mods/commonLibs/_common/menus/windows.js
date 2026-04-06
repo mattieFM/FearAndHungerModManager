@@ -859,7 +859,8 @@ MATTIE.windows.Window_Tooltip.prototype.showIfMouseIsNear = function (x, y) {
 	}
 };
 /**
- * @override to draw our icon on refresh
+ * Draw our icon on refresh.
+ * @override
  */
 MATTIE.windows.Window_Tooltip.prototype.refresh = function () {
 	this.contents.clear();
@@ -868,7 +869,8 @@ MATTIE.windows.Window_Tooltip.prototype.refresh = function () {
 };
 
 /**
- * @override to show when the mouse is near
+ * Show tooltip when the mouse is near.
+ * @override
  */
 MATTIE.windows.Window_Tooltip.prototype.update = function () {
 	Window_Base.prototype.update.call(this);

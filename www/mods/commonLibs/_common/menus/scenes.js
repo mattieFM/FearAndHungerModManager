@@ -31,7 +31,8 @@ MATTIE.scenes.base.prototype.create = function () {
 };
 
 /**
- * @override the create background function to have the modmanager background logo
+ * Override create background to show the mod manager logo.
+ * @override
  */
 MATTIE.scenes.base.prototype.createBackground = function () {
 	this._backSprite2 = new Sprite(ImageManager.loadBitmap('mods/commonLibs/_common/images/', 'FearAndHungerModMan', 0, true, true));
@@ -53,7 +54,8 @@ MATTIE.scenes.modLoader.prototype = Object.create(MATTIE.scenes.base.prototype);
 MATTIE.scenes.modLoader.prototype.constructor = MATTIE.scenes.modLoader;
 
 /**
- * @override we add the mods list window here.
+ * Add the mods list window here.
+ * @override
  */
 MATTIE.scenes.modLoader.prototype.create = function () {
 	MATTIE.scenes.base.prototype.create.call(this);
@@ -149,7 +151,8 @@ MATTIE.scenes.decrypter.prototype = Object.create(MATTIE.scenes.base.prototype);
 MATTIE.scenes.decrypter.prototype.constructor = MATTIE.scenes.decrypter;
 
 /**
- * @override we add the mods list window here.
+ * Add the decrypter scene windows.
+ * @override
  */
 MATTIE.scenes.decrypter.prototype.create = function () {
 	MATTIE.scenes.base.prototype.create.call(this);

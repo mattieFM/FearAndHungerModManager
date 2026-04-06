@@ -6,7 +6,7 @@
  */
 class PriorityQueue {
 	constructor() {
-		/** @type {{ node: *, priority: number }[]} */
+		/** @type {Array.<{node: *, priority: number}>} */
 		this._heap = [];
 	}
 
