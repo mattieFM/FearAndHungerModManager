@@ -382,6 +382,7 @@ class ModManagerInstaller(QMainWindow):
         steam_paths = [
             Path.home() / ".steam" / "steam",
             Path.home() / ".local" / "share" / "Steam",
+            Path.home() / ".local" / "share" / "steam",
         ]
         
         possible_libraries = []
@@ -403,7 +404,7 @@ class ModManagerInstaller(QMainWindow):
         if self.game_version == "fh1":
             target_folders = ["Fear & Hunger", "FearAndHunger"]
         else:
-            target_folders = ["Fear & Hunger 2 Termina", "FearAndHunger2Termina", "Fear & Hunger 2"]
+            target_folders = ["Fear & Hunger 2 Termina", "FearAndHunger2Termina", "Fear & Hunger 2", "fh2"]
         
         found = False
         for lib in possible_libraries:
@@ -417,6 +418,24 @@ class ModManagerInstaller(QMainWindow):
                     break
             if found:
                 break
+        
+        if not found:
+            flatpak_path = Path.home() / ".local" / "share" / "flatpak" / "data" / "com.valvesoftware.Steam" / "folders"
+            if flatpak_path.exists():
+                for fl in flatpak_path.glob("*"):
+                    if fl.is_dir():
+                        common = fl / "steamapps" / "common"
+                        if common.exists():
+                            for folder in target_folders:
+                                game_dir = common / folder
+                                if game_dir.exists():
+                                    self.path_edit.setText(str(game_dir))
+                                    self.game_path = str(game_dir)
+                                    self.status_label.setText(f"Found (Flatpak): {folder}")
+                                    found = True
+                                    break
+                            if found:
+                                break
         
         if not found:
             self.status_label.setText("Game not found. Please select manually.")
