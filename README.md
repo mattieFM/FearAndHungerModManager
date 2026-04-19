@@ -56,7 +56,40 @@ Most mods will work for both F&H1 and F&H2. But if they are not working properly
    ![image](https://github.com/mattieFM/FearAndHungerModManager/assets/66142165/0afa2d96-8f7f-451c-a972-b6f520cbc214)
 
 
-# development info  
+# Linux Installer
+
+If you're on Linux, you can use the Qt-based GUI installer instead of the Windows executable.
+
+## Requirements
+
+- Python 3.8+
+- PyQt6 (or PyQt5 as fallback)
+
+```bash
+pip install PyQt6
+```
+
+## Installation
+
+1. Download the release archive or clone this repository
+2. Run the installer:
+   ```bash
+   chmod +x install.sh
+   ./install.sh
+   ```
+3. Select your game version (Fear & Hunger 1 or 2)
+4. Browse to your game directory (auto-detection will attempt to find it)
+5. Select which mods to install using the checkboxes
+6. Click "INSTALL MODS"
+
+The installer will copy the mod files to your game's `www/mods` folder.
+
+## Uninstall
+
+Simply delete the `www/mods` folder and restore your original `index.html` from a backup.
+
+
+# development info
 
 Mods consist of 2 files, a .js file and a .json file, the .json file contains information about the mod, think of it as a config file of sorts. It must contain the following values  
 {  
