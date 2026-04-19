@@ -38,11 +38,12 @@ class FearHungerPalette:
     BG_BLACK = "#0a0a0a"
     BG_DARK = "#1a1a1a"
     BG_MEDIUM = "#2a2a2a"
-    FG_WHITE = "#f0f0f0"
-    FG_GRAY = "#888888"
-    FG_DIM = "#444444"
+    FG_WHITE = "#e0e0e0"
+    FG_GRAY = "#aaaaaa"
+    FG_DIM = "#666666"
     ACCENT_BLOOD = "#8b0000"
-    ACCENT_RED = "#aa0000"
+    ACCENT_RED = "#cc2222"
+    ACCENT_GREEN = "#00dd44"
     BORDER = "#333333"
     SELECTED = "#3a3a3a"
 
@@ -67,21 +68,21 @@ class FearHungerStyle:
 
 
 class RetroFont:
-    """RPG Maker style pixelated fonts"""
-    
+    """Nerd/gamer style mono fonts with retro aesthetic"""
+
     @staticmethod
     def header(size=18):
-        font = QFont("Courier New", size, QFont.Weight.Bold)
+        font = QFont("JetBrains Mono", size, QFont.Weight.Bold)
         return font
-    
+
     @staticmethod
     def body(size=11):
-        font = QFont("Courier New", size)
+        font = QFont("JetBrains Mono", size)
         return font
-    
+
     @staticmethod
     def button(size=12):
-        font = QFont("Courier New", size, QFont.Weight.Bold)
+        font = QFont("JetBrains Mono", size, QFont.Weight.Bold)
         return font
 
 
@@ -138,8 +139,8 @@ class ModManagerInstaller(QMainWindow):
         subtitle.setStyleSheet(f"color: {FearHungerPalette.FG_GRAY};")
         subtitle.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(subtitle)
-        
-       sep = QFrame()
+
+        sep = QFrame()
         sep.setStyleSheet(f"background-color: {FearHungerPalette.BORDER}; min-height: 2; max-height: 2;")
         layout.addWidget(sep)
         
@@ -286,9 +287,49 @@ class ModManagerInstaller(QMainWindow):
                 background-color: {FearHungerPalette.BG_DARK};
             }}
         """)
-        
+
         layout = QVBoxLayout(group)
-        
+
+        btn_layout = QHBoxLayout()
+        btn_layout.setSpacing(10)
+
+        enable_all_btn = QPushButton("[ ENABLE ALL ]")
+        enable_all_btn.setFont(RetroFont.button(11))
+        enable_all_btn.setStyleSheet(f"""
+            QPushButton {{
+                color: {FearHungerPalette.ACCENT_GREEN};
+                background-color: {FearHungerPalette.BG_MEDIUM};
+                border: 1px solid {FearHungerPalette.ACCENT_GREEN};
+                padding: 6px 12px;
+            }}
+            QPushButton:hover {{
+                background-color: {FearHungerPalette.ACCENT_GREEN};
+                color: {FearHungerPalette.BG_BLACK};
+            }}
+        """)
+        enable_all_btn.clicked.connect(lambda: self.select_all_mods(True))
+        btn_layout.addWidget(enable_all_btn)
+
+        disable_all_btn = QPushButton("[ DISABLE ALL ]")
+        disable_all_btn.setFont(RetroFont.button(11))
+        disable_all_btn.setStyleSheet(f"""
+            QPushButton {{
+                color: {FearHungerPalette.FG_GRAY};
+                background-color: {FearHungerPalette.BG_MEDIUM};
+                border: 1px solid {FearHungerPalette.FG_GRAY};
+                padding: 6px 12px;
+            }}
+            QPushButton:hover {{
+                background-color: {FearHungerPalette.FG_GRAY};
+                color: {FearHungerPalette.BG_BLACK};
+            }}
+        """)
+        disable_all_btn.clicked.connect(lambda: self.select_all_mods(False))
+        btn_layout.addWidget(disable_all_btn)
+
+        btn_layout.addStretch()
+        layout.addLayout(btn_layout)
+
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setStyleSheet(f"""
@@ -326,7 +367,7 @@ class ModManagerInstaller(QMainWindow):
         frame.setStyleSheet(f"background-color: {FearHungerPalette.BG_BLACK};")
         layout = QVBoxLayout(frame)
         layout.setContentsMargins(0, 10, 0, 0)
-        
+
         sep = QFrame()
         sep.setStyleSheet(f"background-color: {FearHungerPalette.BORDER}; min-height: 2; max-height: 2;")
         layout.addWidget(sep)
@@ -440,7 +481,7 @@ class ModManagerInstaller(QMainWindow):
         if not found:
             self.status_label.setText("Game not found. Please select manually.")
     
-    def load_mods):
+    def load_mods(self):
         while self.mod_layout.count():
             item = self.mod_layout.takeAt(0)
             if item.widget():
@@ -468,16 +509,21 @@ class ModManagerInstaller(QMainWindow):
             checkbox.setStyleSheet(f"""
                 QCheckBox {{
                     color: {FearHungerPalette.FG_WHITE};
-                    padding: 5px;
+                    padding: 8px 5px;
+                    background-color: transparent;
                 }}
                 QCheckBox::indicator {{
-                    width: 16px;
-                    height: 16px;
-                    border: 1px solid {FearHungerPalette.BORDER};
+                    width: 18px;
+                    height: 18px;
+                    border: 2px solid {FearHungerPalette.FG_GRAY};
+                    background-color: {FearHungerPalette.BG_MEDIUM};
                 }}
                 QCheckBox::indicator:checked {{
-                    background-color: {FearHungerPalette.ACCENT_RED};
-                    border: 1px solid {FearHungerPalette.ACCENT_BLOOD};
+                    background-color: {FearHungerPalette.ACCENT_GREEN};
+                    border: 2px solid {FearHungerPalette.ACCENT_GREEN};
+                }}
+                QCheckBox::indicator:checked:hover {{
+                    background-color: #00ff55;
                 }}
                 QCheckBox:hover {{
                     background-color: {FearHungerPalette.SELECTED};
@@ -486,7 +532,12 @@ class ModManagerInstaller(QMainWindow):
             checkbox.setChecked(True)
             self.mod_layout.addWidget(checkbox)
             self.selected_mods[mod_name] = checkbox
-    
+
+    def select_all_mods(self, checked: bool):
+        for checkbox in self.selected_mods.values():
+            checkbox.setChecked(checked)
+        self.status_label.setText(f"{'All enabled' if checked else 'All disabled'}")
+
     def install(self):
         dest_path = Path(self.path_edit.text())
         if not dest_path.exists():
