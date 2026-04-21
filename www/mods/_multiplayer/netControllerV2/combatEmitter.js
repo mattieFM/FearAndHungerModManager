@@ -869,6 +869,11 @@ BattleManager.startBattle = function () {
 	MATTIE.multiplayer.combatEmitter.netExTurnPending = false;
 	MATTIE.multiplayer.ready = false;
 	MATTIE.multiplayer.waitingOnAllies = false;
+	// Defensive: clear any stale Galv extra-turn flag left over from a prior
+	// fight (e.g. a net extra turn whose cleanup was interrupted). If it
+	// remains true into the next fight, the 'input' branch will spuriously
+	// set netExTurnPending and deadlock both clients.
+	if (typeof Galv !== 'undefined' && Galv.EXTURN) Galv.EXTURN.active = false;
 	MATTIE.multiplayer.battlemanageronStart.call(this);
 	this._netActors = [];
 	BattleManager._deterministicSeedCounter = 0;
@@ -1135,6 +1140,22 @@ BattleManager.update = function () {
 				// Clear stale isExtraTurn flags so they don't persist into
 				// the next normal turn and falsely trigger netExTurnPending.
 				$gameTroop.clearExTurnFlags();
+				// Reset Galv's global extra-turn flag and any local actor
+				// _exTurn flags. We bypass updateTurnEnd() below (intentionally,
+				// to skip state ticks/regen/turn-count), but updateTurnEnd is
+				// also what normally calls setExTurn(false) and clears actor
+				// _exTurn flags via Galv. Without this reset, Galv.EXTURN.active
+				// stays true (forced true at the 'ready' branch above for the
+				// remote-extra-turn receiver, and never cleared on the
+				// originator either), which makes the next normal turn's
+				// 'input' branch wrongly set netExTurnPending=true and
+				// deadlocks both clients in the 'ready' phase waiting for
+				// allExTurnReady() (which can never become true once the
+				// isExtraTurn flags have been cleared above).
+				if (typeof BattleManager.setExTurn === 'function') BattleManager.setExTurn(false);
+				if ($gameParty && typeof $gameParty.battleMembers === 'function') {
+					$gameParty.battleMembers().forEach((m) => { if (m) m._exTurn = false; });
+				}
 				// Extra turn resolved. Mirror Galv's local extra-turn endTurn:
 				// skip state ticks, regen, turn count increment (those only
 				// happen on a real full turn). Unready everyone so the
