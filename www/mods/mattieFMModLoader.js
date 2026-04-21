@@ -1428,11 +1428,53 @@ MATTIE_ModManager.setupConfig = function () {
 	this._iframe = document.createElement('iframe');
 	this.updateConfigDisplay();
 	window.addEventListener('message', (event) => {
-		console.log(event);
-		if (event.data.code === 'config') {
-			console.log('config change');
-			eval(`${event.data.name} = ${event.data.val}`);
+		// SECURITY: only accept config messages from our own config iframe.
+		// Without this gate, ANY page that ever ends up loaded in a child
+		// frame (or any same-process script) could drive the assignment
+		// below and clobber arbitrary globals.
+		if (!event || !event.data || event.data.code !== 'config') return;
+		if (!MATTIE_ModManager._iframe || event.source !== MATTIE_ModManager._iframe.contentWindow) {
+			console.warn('config message rejected: untrusted source');
+			return;
 		}
+
+		const name = event.data.name;
+		const val = event.data.val;
+
+		// Validate the target is a dot-separated JS identifier path.
+		// Rejects anything that could break out of an assignment (whitespace,
+		// brackets, operators, semicolons, parens, etc.) and anything that
+		// could pollute Object.prototype.
+		if (typeof name !== 'string'
+			|| !/^[A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*)*$/.test(name)) {
+			console.warn('config message rejected: invalid name', name);
+			return;
+		}
+		const FORBIDDEN = ['__proto__', 'prototype', 'constructor'];
+		const parts = name.split('.');
+		if (parts.some((p) => FORBIDDEN.indexOf(p) !== -1)) {
+			console.warn('config message rejected: forbidden segment', name);
+			return;
+		}
+
+		// Walk to the parent of the leaf without ever creating new objects.
+		const leaf = parts.pop();
+		let target = window;
+		for (let i = 0; i < parts.length; i++) {
+			if (target == null || typeof target !== 'object') return;
+			target = target[parts[i]];
+		}
+		if (target == null || (typeof target !== 'object' && typeof target !== 'function')) return;
+
+		// Only assign primitive values. Reject objects/functions to keep this
+		// channel from being abused to inject callable payloads.
+		const t = typeof val;
+		if (t !== 'string' && t !== 'number' && t !== 'boolean' && val !== null) {
+			console.warn('config message rejected: non-primitive val for', name);
+			return;
+		}
+
+		target[leaf] = val;
 	});
 
 	this._configDisplay.appendChild(this._iframe);
