@@ -4,7 +4,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Source: _multiplayer/netControllerV2/combatEmitter.js | 2</title>
+    <title>Source: _multiplayer/netControllerV2/combatEmitter.js | 8</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -32,7 +32,7 @@
         
     </div>
     <div class="title">
-        <h1><a href="index.html" class="link">2</a></h1>
+        <h1><a href="index.html" class="link">8</a></h1>
         
             <span class="version">v1.2.4</span>
         
@@ -934,6 +934,11 @@ BattleManager.startBattle = function () {
 	MATTIE.multiplayer.combatEmitter.netExTurnPending = false;
 	MATTIE.multiplayer.ready = false;
 	MATTIE.multiplayer.waitingOnAllies = false;
+	// Defensive: clear any stale Galv extra-turn flag left over from a prior
+	// fight (e.g. a net extra turn whose cleanup was interrupted). If it
+	// remains true into the next fight, the 'input' branch will spuriously
+	// set netExTurnPending and deadlock both clients.
+	if (typeof Galv !== 'undefined' &amp;&amp; Galv.EXTURN) Galv.EXTURN.active = false;
 	MATTIE.multiplayer.battlemanageronStart.call(this);
 	this._netActors = [];
 	BattleManager._deterministicSeedCounter = 0;
@@ -1200,6 +1205,22 @@ BattleManager.update = function () {
 				// Clear stale isExtraTurn flags so they don't persist into
 				// the next normal turn and falsely trigger netExTurnPending.
 				$gameTroop.clearExTurnFlags();
+				// Reset Galv's global extra-turn flag and any local actor
+				// _exTurn flags. We bypass updateTurnEnd() below (intentionally,
+				// to skip state ticks/regen/turn-count), but updateTurnEnd is
+				// also what normally calls setExTurn(false) and clears actor
+				// _exTurn flags via Galv. Without this reset, Galv.EXTURN.active
+				// stays true (forced true at the 'ready' branch above for the
+				// remote-extra-turn receiver, and never cleared on the
+				// originator either), which makes the next normal turn's
+				// 'input' branch wrongly set netExTurnPending=true and
+				// deadlocks both clients in the 'ready' phase waiting for
+				// allExTurnReady() (which can never become true once the
+				// isExtraTurn flags have been cleared above).
+				if (typeof BattleManager.setExTurn === 'function') BattleManager.setExTurn(false);
+				if ($gameParty &amp;&amp; typeof $gameParty.battleMembers === 'function') {
+					$gameParty.battleMembers().forEach((m) => { if (m) m._exTurn = false; });
+				}
 				// Extra turn resolved. Mirror Galv's local extra-turn endTurn:
 				// skip state ticks, regen, turn count increment (those only
 				// happen on a real full turn). Unready everyone so the
