@@ -1,8 +1,7 @@
 {
-  "name": "2",
+  "name": "8",
   "main": "www/index.html",
   "js-flags": "--expose-gc",
-  "node-remote": true,
   "window": {
     "title": "",
     "toolbar": false,
