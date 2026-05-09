@@ -239,10 +239,10 @@ class BaseNetController extends EventEmitter {
 			if (SceneManager._scene.isActive() && MATTIE.multiplayer.varSyncer.syncedOnce) { obj.priority = 1; }
 		}
 		if (data.event) {
-			obj.priority = 10;
+			obj.priority = 0;
 		}
 		if (data.battleStart) {
-			obj.priority = 1;
+			obj.priority = 50;
 		}
 		if (data.battleSyncReq) {
 			obj.priority = 50;
@@ -251,7 +251,7 @@ class BaseNetController extends EventEmitter {
 			obj.priority = 50;
 		}
 		if (data.battleEnd) {
-			obj.priority = 1;
+			obj.priority = 50;
 		}
 		if (data.ready) {
 			obj.priority = 100;
@@ -329,16 +329,16 @@ class BaseNetController extends EventEmitter {
 
 			// Send clones with staggered delays to bridge packet loss gaps
 			setTimeout(() => this.sendOrQueue({ ...frozen }), 150);
-			setTimeout(() => this.sendOrQueue({ ...frozen }), 300);
-			setTimeout(() => this.sendOrQueue({ ...frozen }), 600);
-			setTimeout(() => this.sendOrQueue({ ...frozen }), 1200);
+			setTimeout(() => this.sendOrQueue({ ...frozen }), 500);
+			// setTimeout(() => this.sendOrQueue({ ...frozen }), 600);
+			// setTimeout(() => this.sendOrQueue({ ...frozen }), 1200);
 			// Verify extreme loss conditions
 			if (MATTIE.multiplayer.simulation && MATTIE.multiplayer.simulation.packetLoss > 0.2) {
 				setTimeout(() => this.sendOrQueue({ ...frozen }), 600);
 			}
 		}
 
-		if (obj.priority > 1 || MATTIE.multiplayer.netQueue.values.length < 100) this.sendOrQueue(obj, excludedIds);
+		this.sendOrQueue(obj, excludedIds);
 	}
 
 	/**
